@@ -33,4 +33,7 @@ endforeach()
 list(REMOVE_DUPLICATES RECURSIVE_INCLUDE_DIRS)
 include_directories(${RECURSIVE_INCLUDE_DIRS})
 
+# C++11
+set( CMAKE_CXX_STANDARD 11 )
+
 target_link_libraries( ${PROJECT_NAME}  ${MPI_GCC_LIBRARIES} )

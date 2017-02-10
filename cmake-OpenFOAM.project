@@ -175,6 +175,7 @@
   </Settings>
   <VirtualDirectory Name="src">
     <File Name="main.cpp"/>
+    <File Name="OpenFOAM/algorithms/dynamicIndexedOctree/dynamicIndexedOctree.C"/>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">
     <File Name="CMakeLists.txt"/>
