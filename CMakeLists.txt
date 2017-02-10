@@ -19,6 +19,9 @@ find_package( MPI REQUIRED )
 message( "${MPI_INCLUDE_PATH}")
 include_directories( ${MPI_INCLUDE_PATH} )
 
+# Dependancies
+find_package( FLEX ZLIB REQUIRED )
+
 FILE(GLOB_RECURSE SOURCES "*.cpp" "*.c" "*.C")
 FILE(GLOB_RECURSE HEADERS "*.H")
 
