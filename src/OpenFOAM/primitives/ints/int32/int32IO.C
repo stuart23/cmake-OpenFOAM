@@ -104,7 +104,7 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const int32_t i)
 }
 
 
-#if WM_ARCH_OPTION == 32
+#if ARCH_OPTION == 32
 Foam::Istream& Foam::operator>>(Istream& is, long& i)
 {
     return operator>>(is, reinterpret_cast<int32_t&>(i));

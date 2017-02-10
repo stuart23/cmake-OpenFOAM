@@ -28,10 +28,10 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#if WM_LABEL_SIZE == 32
+#if LABEL_SIZE == 32
 const char* const Foam::pTraits<int64_t>::typeName = "int64";
 const char* const Foam::pTraits<int32_t>::typeName = "label";
-#elif WM_LABEL_SIZE == 64
+#elif LABEL_SIZE == 64
 const char* const Foam::pTraits<int64_t>::typeName = "label";
 const char* const Foam::pTraits<int32_t>::typeName = "int32";
 #endif
