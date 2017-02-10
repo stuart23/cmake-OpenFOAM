@@ -4,23 +4,25 @@ cmake_minimum_required(VERSION 3.0)
 set( PROJECT_NAME "cmake-OpenFOAM" VERSION 3.0 )
 project( ${PROJECT_NAME} )
 
-# Default Installation Path
-set( CMAKE_INSTALL_PREFIX 
-    "/usr/local/${PROJECT_NAME}-${PROJECT_VERSION}" 
-    CACHE PATH "Installation location"
-)
-message( "Installing to ${CMAKE_INSTALL_PREFIX}")
-
 # Determine Number of processors
 include( ProcessorCount )
-ProcessorCount( WM_NCOMPPROCS )
-message ( "Compiling for " ${WM_NCOMPPROCS} " processor(s)" )
+ProcessorCount( NUMBER_PROCESSORS_TEMP )
+set( NUMBER_PROCESSORS ${NUMBER_PROCESSORS_TEMP} CACHE STRING 
+    "Number of processors to compile for")
 
 # Single or double precision
-option( WM_PRECISION_OPTION "Set Calculation Precision. SP for single precision or DP for double precision" "DP" )
+set( WM_PRECISION_OPTION "DP" CACHE STRING 
+    "Set Calculation Precision. SP for single precision or DP for double precision" )
+
+# Auto-fill MPI settings
+find_package( MPI REQUIRED )
+message( "${MPI_INCLUDE_PATH}")
+include_directories( ${MPI_INCLUDE_PATH} )
 
 ## Use all the *.cpp files we found under this folder for the project
-FILE(GLOB SRCS "*.cpp" "*.c")
-
+FILE(GLOB_RECURSE SRCS "*.cpp" "*.c" "*.C")
+message( "${SRCS}")
 ## Define the executable
-add_executable(${PROJECT_NAME} ${SRCS})
+add_executable( ${PROJECT_NAME} ${SRCS} )
+
+target_link_libraries( ${PROJECT_NAME}  ${MPI_GCC_LIBRARIES} )
