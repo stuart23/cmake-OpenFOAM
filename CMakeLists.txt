@@ -19,10 +19,18 @@ find_package( MPI REQUIRED )
 message( "${MPI_INCLUDE_PATH}")
 include_directories( ${MPI_INCLUDE_PATH} )
 
-## Use all the *.cpp files we found under this folder for the project
-FILE(GLOB_RECURSE SRCS "*.cpp" "*.c" "*.C")
-message( "${SRCS}")
+FILE(GLOB_RECURSE SOURCES "*.cpp" "*.c" "*.C")
+FILE(GLOB_RECURSE HEADERS "*.H")
+
 ## Define the executable
-add_executable( ${PROJECT_NAME} ${SRCS} )
+add_executable( ${PROJECT_NAME} ${SOURCES} )
+
+set (RECURSIVE_INCLUDE_DIRS "")
+foreach (_headerFile ${HEADERS})
+    get_filename_component(_dir ${_headerFile} PATH)
+    list (APPEND RECURSIVE_INCLUDE_DIRS ${_dir})
+endforeach()
+list(REMOVE_DUPLICATES RECURSIVE_INCLUDE_DIRS)
+include_directories(${RECURSIVE_INCLUDE_DIRS})
 
 target_link_libraries( ${PROJECT_NAME}  ${MPI_GCC_LIBRARIES} )
