@@ -1,5 +1,12 @@
-FILE(GLOB_RECURSE SOURCES "*.cpp" "*.c" "*.C")
 FILE(GLOB_RECURSE HEADERS "*.H")
+
+set( SOURCES
+global/global.Cver
+# global/constants/constants.C in global.Cver
+# global/constants/dimensionedConstants.C in global.Cver
+global/argList/argList.C
+global/clock/clock.C
+)
 
 ## Define the executable
 add_executable( OpenFOAM ${SOURCES} )
