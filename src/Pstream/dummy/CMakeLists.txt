@@ -4,8 +4,11 @@ set( SOURCES
   UOPwrite.C
 )
 
-## Define the executable
-add_library( Pstream SHARED ${SOURCES} )
+## Define the output
+add_library( Pstream_dummy SHARED ${SOURCES} )
+set_target_properties( Pstream_dummy PROPERTIES 
+  OUTPUT_NAME Pstream 
+)
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX ) 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/include )
