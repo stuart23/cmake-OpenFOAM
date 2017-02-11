@@ -26,7 +26,7 @@ Typedef
 
 Description
     Single floating point number identical to float or double depending on
-    whether SINGLE_PRECISION or DOUBLE_PRECISION is defined.
+    whether OF_SINGLE_PRECISION or OF_DOUBLE_PRECISION is defined.
 
 SourceFiles
     scalar.C
@@ -41,7 +41,7 @@ SourceFiles
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#if defined(SINGLE_PRECISION)
+#if defined(OF_SINGLE_PRECISION)
 
 // Define scalar as a float
 
@@ -60,7 +60,7 @@ namespace Foam
     scalar readScalar(Istream& is);
 }
 
-#elif defined(DOUBLE_PRECISION)
+#elif defined(OF_DOUBLE_PRECISION)
 
 // Define scalar as a double
 
