@@ -34,6 +34,13 @@ include_directories( ${MPI_INCLUDE_PATH} )
 find_package( FLEX REQUIRED )
 find_package( ZLIB REQUIRED )
 
+find_package( Inotify )
+option( INOTIFY_ENABLED "Use iNotify Package" ${INOTIFY_FOUND} )
+if( INOTIFY_ENABLED ) 
+  add_definitions( -DFOAM_USE_INOTIFY )
+endif()
+set( INOTIFY_INCLUDE_DIR ${INOTIFY_INCLUDE_DIR} ) 
+
 # C++11
 set( CMAKE_CXX_STANDARD 11 )
 
