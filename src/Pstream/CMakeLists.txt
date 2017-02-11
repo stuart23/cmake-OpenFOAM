@@ -1,1 +1,3 @@
-add_subdirectory( OpenFOAM )
+add_subdirectory( dummy )
+add_subdirectory( mpi )
+
