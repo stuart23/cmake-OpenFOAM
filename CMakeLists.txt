@@ -13,9 +13,9 @@ set( NUMBER_PROCESSORS ${NUMBER_PROCESSORS_TEMP} CACHE STRING
 # Single or double precision
 option( DOUBLE_PRECISION  "Double Precision Calculations" ON )
 if( DOUBLE_PRECISION )
-  add_definitions( -DDOUBLE_PRECISION )
+	add_definitions( -DOF_DOUBLE_PRECISION )
 else()
-  add_definitions( -DSINGLE_PRECISION )
+	add_definitions( -DOF_SINGLE_PRECISION )
 endif()
 
 set( LABEL_SIZE 64 )
