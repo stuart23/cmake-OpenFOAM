@@ -197,8 +197,207 @@ set( SOURCES
 # dimensionedTypes/dimensionedSphericalTensor/dimensionedSphericalTensor.C
 # dimensionedTypes/dimensionedSymmTensor/dimensionedSymmTensor.C
 # dimensionedTypes/dimensionedTensor/dimensionedTensor.C
+# 
+# matrices/solution/solution.C
+# 
+# db/Time/instant/instant.C
+# 
+# matrices/scalarMatrices/scalarMatrices.C
+# matrices/scalarMatrices/SVD/SVD.C
+# 
+# matrices/LUscalarMatrix/LUscalarMatrix.C
+# matrices/LUscalarMatrix/procLduMatrix.C
+# matrices/LUscalarMatrix/procLduInterface.C
+# 
+# matrices/lduMatrix/lduMatrix/lduMatrix.C
+# matrices/lduMatrix/lduMatrix/lduMatrixOperations.C
+# matrices/lduMatrix/lduMatrix/lduMatrixATmul.C
+# matrices/lduMatrix/lduMatrix/lduMatrixUpdateMatrixInterfaces.C
+# matrices/lduMatrix/lduMatrix/lduMatrixSolver.C
+# matrices/lduMatrix/lduMatrix/lduMatrixSmoother.C
+# matrices/lduMatrix/lduMatrix/lduMatrixPreconditioner.C
+# 
+# matrices/lduMatrix/solvers/diagonalSolver/diagonalSolver.C
+# matrices/lduMatrix/solvers/smoothSolver/smoothSolver.C
+# matrices/lduMatrix/solvers/PCG/PCG.C
+# matrices/lduMatrix/solvers/PBiCG/PBiCG.C
+# matrices/lduMatrix/solvers/ICCG/ICCG.C
+# matrices/lduMatrix/solvers/BICCG/BICCG.C
+# 
+# matrices/lduMatrix/smoothers/GaussSeidel/GaussSeidelSmoother.C
+# matrices/lduMatrix/smoothers/symGaussSeidel/symGaussSeidelSmoother.C
+# matrices/lduMatrix/smoothers/nonBlockingGaussSeidel/nonBlockingGaussSeidelSmoother.C
+# matrices/lduMatrix/smoothers/DIC/DICSmoother.C
+# matrices/lduMatrix/smoothers/FDIC/FDICSmoother.C
+# matrices/lduMatrix/smoothers/DICGaussSeidel/DICGaussSeidelSmoother.C
+# matrices/lduMatrix/smoothers/DILU/DILUSmoother.C
+# matrices/lduMatrix/smoothers/DILUGaussSeidel/DILUGaussSeidelSmoother.C
+# 
+# matrices/lduMatrix/preconditioners/noPreconditioner/noPreconditioner.C
+# matrices/lduMatrix/preconditioners/diagonalPreconditioner/diagonalPreconditioner.C
+# matrices/lduMatrix/preconditioners/DICPreconditioner/DICPreconditioner.C
+# matrices/lduMatrix/preconditioners/FDICPreconditioner/FDICPreconditioner.C
+# matrices/lduMatrix/preconditioners/DILUPreconditioner/DILUPreconditioner.C
+# matrices/lduMatrix/preconditioners/GAMGPreconditioner/GAMGPreconditioner.C
+# 
+# matrices/lduMatrix/lduAddressing/lduAddressing.C
+# matrices/lduMatrix/lduAddressing/lduInterface/lduInterface.C
+# matrices/lduMatrix/lduAddressing/lduInterface/processorLduInterface.C
+# matrices/lduMatrix/lduAddressing/lduInterface/cyclicLduInterface.C
+# 
+# matrices/lduMatrix/lduAddressing/lduInterfaceFields/lduInterfaceField/lduInterfaceField.C
+# matrices/lduMatrix/lduAddressing/lduInterfaceFields/processorLduInterfaceField/processorLduInterfaceField.C
+# matrices/lduMatrix/lduAddressing/lduInterfaceFields/cyclicLduInterfaceField/cyclicLduInterfaceField.C
+# 
+# matrices/lduMatrix/solvers/GAMG/GAMGSolver.C
+# matrices/lduMatrix/solvers/GAMG/GAMGSolverAgglomerateMatrix.C
+# matrices/lduMatrix/solvers/GAMG/GAMGSolverInterpolate.C
+# matrices/lduMatrix/solvers/GAMG/GAMGSolverScale.C
+# matrices/lduMatrix/solvers/GAMG/GAMGSolverSolve.C
+# 
+# matrices/lduMatrix/solvers/GAMG/interfaces/GAMGInterface/GAMGInterface.C
+# matrices/lduMatrix/solvers/GAMG/interfaces/GAMGInterface/GAMGInterfaceNew.C
+# matrices/lduMatrix/solvers/GAMG/interfaces/processorGAMGInterface/processorGAMGInterface.C
+# matrices/lduMatrix/solvers/GAMG/interfaces/processorCyclicGAMGInterface/processorCyclicGAMGInterface.C
+# matrices/lduMatrix/solvers/GAMG/interfaces/cyclicGAMGInterface/cyclicGAMGInterface.C
+# 
+# matrices/lduMatrix/solvers/GAMG/interfaceFields/GAMGInterfaceField/GAMGInterfaceField.C
+# matrices/lduMatrix/solvers/GAMG/interfaceFields/GAMGInterfaceField/GAMGInterfaceFieldNew.C
+# matrices/lduMatrix/solvers/GAMG/interfaceFields/processorGAMGInterfaceField/processorGAMGInterfaceField.C
+# matrices/lduMatrix/solvers/GAMG/interfaceFields/processorCyclicGAMGInterfaceField/processorCyclicGAMGInterfaceField.C
+# matrices/lduMatrix/solvers/GAMG/interfaceFields/cyclicGAMGInterfaceField/cyclicGAMGInterfaceField.C
+# 
+# matrices/lduMatrix/solvers/GAMG/GAMGAgglomerations/GAMGAgglomeration/GAMGAgglomeration.C
+# matrices/lduMatrix/solvers/GAMG/GAMGAgglomerations/GAMGAgglomeration/GAMGAgglomerateLduAddressing.C
+# 
+# matrices/lduMatrix/solvers/GAMG/GAMGAgglomerations/pairGAMGAgglomeration/pairGAMGAgglomeration.C
+# matrices/lduMatrix/solvers/GAMG/GAMGAgglomerations/pairGAMGAgglomeration/pairGAMGAgglomerate.C
+# 
+# matrices/lduMatrix/solvers/GAMG/GAMGAgglomerations/algebraicPairGAMGAgglomeration/algebraicPairGAMGAgglomeration.C
+# matrices/lduMatrix/solvers/GAMG/GAMGAgglomerations/dummyAgglomeration/dummyAgglomeration.C
+# matrices/lduMatrix/solvers/GAMG/GAMGProcAgglomerations/GAMGProcAgglomeration/GAMGProcAgglomeration.C
+# 
+# matrices/lduMatrix/solvers/GAMG/GAMGProcAgglomerations/masterCoarsestGAMGProcAgglomeration/masterCoarsestGAMGProcAgglomeration.C
+# matrices/lduMatrix/solvers/GAMG/GAMGProcAgglomerations/manualGAMGProcAgglomeration/manualGAMGProcAgglomeration.C
+# matrices/lduMatrix/solvers/GAMG/GAMGProcAgglomerations/eagerGAMGProcAgglomeration/eagerGAMGProcAgglomeration.C
+# matrices/lduMatrix/solvers/GAMG/GAMGProcAgglomerations/noneGAMGProcAgglomeration/noneGAMGProcAgglomeration.C
+# matrices/lduMatrix/solvers/GAMG/GAMGProcAgglomerations/procFacesGAMGProcAgglomeration/procFacesGAMGProcAgglomeration.C
+# 
+# meshes/lduMesh/lduMesh.C
+# meshes/lduMesh/lduPrimitiveMesh.C
+# 
+# matrices/LduMatrix/LduMatrix/lduMatrices.C
+# matrices/LduMatrix/LduMatrix/solverPerformance.C
+# matrices/LduMatrix/LduMatrix/LduInterfaceField/LduInterfaceFields.C
+# matrices/LduMatrix/Smoothers/lduSmoothers.C
+# matrices/LduMatrix/Preconditioners/lduPreconditioners.C
+# matrices/LduMatrix/Solvers/lduSolvers.C
+# 
+# meshes/primitiveShapes/line/line.C
+# meshes/primitiveShapes/plane/plane.C
+# meshes/primitiveShapes/triangle/intersection.C
+# meshes/primitiveShapes/objectHit/pointIndexHitIOList.C
+# 
+# meshes/meshShapes/edge/edge.C
+# meshes/meshShapes/edge/edgeIOList.C
+# 
+# meshes/meshShapes/face/face.C
+# meshes/meshShapes/face/faceIntersection.C
+# meshes/meshShapes/face/faceContactSphere.C
+# meshes/meshShapes/face/faceAreaInContact.C
+# meshes/meshShapes/face/faceIOList.C
+# 
+# meshes/meshShapes/cell/cell.C
+# meshes/meshShapes/cell/oppositeCellFace.C
+# meshes/meshShapes/cell/cellIOList.C
+# 
+# meshes/meshShapes/tetCell/tetCell.C
+# 
+# meshes/meshShapes/cellModeller/cellModeller.C
+# 
+# meshes/meshShapes/cellModel/cellModel.C
+# meshes/meshShapes/cellModel/cellModelIO.C
+# 
+# meshes/meshShapes/cellShape/cellShape.C
+# meshes/meshShapes/cellShape/cellShapeEqual.C
+# meshes/meshShapes/cellShape/cellShapeIO.C
+# meshes/meshShapes/cellShape/cellShapeIOList.C
+# 
+# meshes/Identifiers/patch/patchIdentifier.C
+# meshes/Identifiers/patch/coupleGroupIdentifier.C
+# 
+# meshes/MeshObject/meshObject.C
+# 
+# meshes/polyMesh/polyPatches/polyPatch/polyPatch.C
+# meshes/polyMesh/polyPatches/polyPatch/polyPatchNew.C
+# 
+# meshes/polyMesh/polyPatches/basic/coupled/coupledPolyPatch.C
+# meshes/polyMesh/polyPatches/basic/generic/genericPolyPatch.C
+# 
+# meshes/polyMesh/polyPatches/constraint/cyclic/cyclicPolyPatch.C
+# meshes/polyMesh/polyPatches/constraint/cyclicSlip/cyclicSlipPolyPatch.C
+# meshes/polyMesh/polyPatches/constraint/oldCyclic/oldCyclicPolyPatch.C
+# meshes/polyMesh/polyPatches/constraint/empty/emptyPolyPatch.C
+# meshes/polyMesh/polyPatches/constraint/nonuniformTransformCyclic/nonuniformTransformCyclicPolyPatch.C
+# meshes/polyMesh/polyPatches/constraint/processorCyclic/processorCyclicPolyPatch.C
+# meshes/polyMesh/polyPatches/constraint/processor/processorPolyPatch.C
+# meshes/polyMesh/polyPatches/constraint/symmetryPlane/symmetryPlanePolyPatch.C
+# meshes/polyMesh/polyPatches/constraint/symmetry/symmetryPolyPatch.C
+# meshes/polyMesh/polyPatches/constraint/wedge/wedgePolyPatch.C
+# 
+# meshes/polyMesh/polyPatches/derived/wall/wallPolyPatch.C
+# 
+# meshes/polyMesh/polyBoundaryMesh/polyBoundaryMesh.C
+# meshes/polyMesh/polyBoundaryMesh/polyBoundaryMeshEntries.C
+# 
+# meshes/ProcessorTopology/commSchedule.C
+# 
+# meshes/polyMesh/globalMeshData/globalMeshData.C
+# meshes/polyMesh/globalMeshData/globalPoints.C
+# meshes/polyMesh/globalMeshData/globalIndex.C
+# 
+# meshes/polyMesh/syncTools/syncTools.C
+# meshes/polyMesh/polyMeshTetDecomposition/polyMeshTetDecomposition.C
+# meshes/polyMesh/polyMeshTetDecomposition/tetIndices.C
+# 
+# meshes/polyMesh/zones/zone/zone.C
+# 
+# meshes/polyMesh/zones/cellZone/cellZone.C
+# meshes/polyMesh/zones/cellZone/cellZoneNew.C
+# 
+# meshes/polyMesh/zones/faceZone/faceZone.C
+# meshes/polyMesh/zones/faceZone/faceZoneNew.C
+# 
+# meshes/polyMesh/zones/pointZone/pointZone.C
+# meshes/polyMesh/zones/pointZone/pointZoneNew.C
+# 
+# meshes/polyMesh/polyMesh.C
+# meshes/polyMesh/polyMeshFromShapeMesh.C
+# meshes/polyMesh/polyMeshIO.C
+# meshes/polyMesh/polyMeshInitMesh.C
+# meshes/polyMesh/polyMeshClear.C
+# meshes/polyMesh/polyMeshUpdate.C
 
-matrices/solution/solution.C
+meshes/polyMesh/polyMeshCheck/polyMeshCheck.C
+meshes/polyMesh/polyMeshCheck/polyMeshTools.C
+
+meshes/primitiveMesh/primitiveMesh.C
+meshes/primitiveMesh/primitiveMeshCellCells.C
+meshes/primitiveMesh/primitiveMeshCellCentresAndVols.C
+meshes/primitiveMesh/primitiveMeshCellEdges.C
+meshes/primitiveMesh/primitiveMeshCells.C
+meshes/primitiveMesh/primitiveMeshClear.C
+meshes/primitiveMesh/primitiveMeshEdgeCells.C
+meshes/primitiveMesh/primitiveMeshEdgeFaces.C
+meshes/primitiveMesh/primitiveMeshEdges.C
+meshes/primitiveMesh/primitiveMeshFaceCentresAndAreas.C
+meshes/primitiveMesh/primitiveMeshFindCell.C
+meshes/primitiveMesh/primitiveMeshPointCells.C
+meshes/primitiveMesh/primitiveMeshPointFaces.C
+meshes/primitiveMesh/primitiveMeshPointPoints.C
+meshes/primitiveMesh/primitiveMeshCellPoints.C
+meshes/primitiveMesh/primitiveMeshCalcCellShapes.C
+
 
 )
 
@@ -210,11 +409,16 @@ endif()
 add_library( OpenFOAM SHARED ${SOURCES} )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX ) 
+include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo ) 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/signals ) 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime ) 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/include )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/globalIndexAndTransform )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/septernion )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/nil )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/complex )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/random/Random )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/random/cachedRandom )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/lists )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/label )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/uLabel )
@@ -286,16 +490,46 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/memory/Xfer )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/memory/refCount )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/memory/tmp )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/scalarMatrices )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/scalarMatrices/SVD )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/LduMatrix/LduMatrix )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/LduMatrix/Solvers/DiagonalSolver )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/LduMatrix/Solvers/SmoothSolver )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/LduMatrix/Solvers/PCICG )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/LduMatrix/Solvers/PBiCCCG )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/LduMatrix/Solvers/PBiCICG )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/LduMatrix/LduMatrix/LduInterfaceField )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/LduMatrix/Smoothers/GaussSeidel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/LduMatrix/Preconditioners/DiagonalPreconditioner )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/LduMatrix/Preconditioners/DILUPreconditioner )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/LduMatrix/Preconditioners/NoPreconditioner )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/lduMatrix )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/lduAddressing )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/lduAddressing/lduInterface )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/lduAddressing/lduInterfaceFields/lduInterfaceField )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/lduAddressing/lduInterfaceFields/cyclicLduInterfaceField )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/lduAddressing/lduInterfaceFields/processorLduInterfaceField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/lduAddressing/lduSchedule )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/solvers/diagonalSolver )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/solvers/GAMG )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/solvers/GAMG/interfaceFields/processorGAMGInterfaceField )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/solvers/GAMG/interfaceFields/GAMGInterfaceField )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/solvers/GAMG/interfaces/cyclicGAMGInterface )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/solvers/GAMG/interfaces/processorGAMGInterface )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/solvers/GAMG/interfaces/GAMGInterface )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/solvers/GAMG/GAMGAgglomerations/GAMGAgglomeration )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/solvers/GAMG/GAMGAgglomerations/pairGAMGAgglomeration )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/solvers/GAMG/GAMGProcAgglomerations/GAMGProcAgglomeration )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/solvers/PCG )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/solvers/ICCG )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/solvers/BICCG )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/solvers/PBiCG )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/preconditioners/DICPreconditioner )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/preconditioners/FDICPreconditioner )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/preconditioners/DILUPreconditioner )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/smoothers/DIC )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/smoothers/DILU )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/smoothers/GaussSeidel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/LUscalarMatrix )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/Matrix )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/SquareMatrix )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/DiagonalMatrix )
@@ -336,7 +570,10 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjects/CompactIOList
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/regIOobject )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/runTimeSelection/construction )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/runTimeSelection/memberFunctions )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Circulators/ConstCirculator )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Circulators/CirculatorBase )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/List )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/SortableList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/PtrList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/UPtrList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/FixedList )
@@ -368,9 +605,15 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/dimensionedTypes/dimension
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/dimensionedTypes/dimensionedScalar )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/dimensionedTypes/dimensionedSymmTensor )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/dimensionSet )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/pointPatchFields/pointPatchField )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/pointPatchFields/basic/calculated )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/DimensionedFields/DimensionedField )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/DimensionedFields/DimensionedScalarField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/FieldFields/FieldField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/FieldFields/scalarFieldField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/transformList )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/transformField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/diagTensorField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/vectorField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/tensorField )
@@ -380,6 +623,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/Field )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/labelField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/scalarField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/unitConversion )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/argList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/constants )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/constants/mathematical )
@@ -388,31 +632,55 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/debug )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/JobInfo )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/Identifiers/patch )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/bandCompression )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/ProcessorTopology )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/boundBox )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshTools )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/treeBoundBox )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/lduMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/MeshObject )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/GeoMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/pointMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/pointMesh/pointBoundaryMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/pointMesh/pointPatches/pointPatch )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/syncTools )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyMeshTetDecomposition )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/globalMeshData )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/zones/zone )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/zones/faceZone )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/zones/cellZone )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/zones/pointZone )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/zones/ZoneMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/mapPolyMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/mapPolyMesh/mapDistribute )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/mapPolyMesh/objectMap )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyBoundaryMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/polyPatch )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/constraint/empty )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/constraint/wedge )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/constraint/symmetry )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/constraint/cyclic )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/constraint/processor )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/basic/coupled )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveShapes/point )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveShapes/plane )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveShapes/point2D )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveShapes/line )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveShapes/triangle )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveShapes/pyramid )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveShapes/tetrahedron )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveShapes/objectHit )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveMesh/primitiveMeshCheck )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveMesh/primitivePatch )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveMesh/PrimitivePatch )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/edge )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/cell )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/cellShape )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/cellModel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/cellModeller )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/cellMatcher )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/face )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/triFace )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/algorithms/indexedOctree )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/interpolations/interpolationWeights/interpolationWeights )
