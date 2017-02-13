@@ -34,6 +34,7 @@ include_directories( ${MPI_INCLUDE_PATH} )
 find_package( FLEX REQUIRED )
 find_package( ZLIB REQUIRED )
 
+find_package( METIS )
 find_package( Inotify )
 option( INOTIFY_ENABLED "Use iNotify Package" ${INOTIFY_FOUND} )
 if( INOTIFY_ENABLED ) 
@@ -46,7 +47,5 @@ set( CMAKE_CXX_STANDARD 11 )
 
 add_subdirectory( wmake/src )
 add_subdirectory( src )
-
-add_executable( ${PROJECT_NAME} main.cpp )
 
 target_link_libraries( ${PROJECT_NAME}  ${MPI_GCC_LIBRARIES} )
