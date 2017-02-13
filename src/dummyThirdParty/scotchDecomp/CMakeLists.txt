@@ -12,7 +12,7 @@ dummyScotchDecomp.C
 ## Define the output
 add_library( scotchDecomp_dummy SHARED ${SOURCES} )
 set_target_properties( scotchDecomp_dummy PROPERTIES 
-  OUTPUT_NAME ScotchDecomp
+  OUTPUT_NAME scotchDecomp
 )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
