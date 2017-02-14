@@ -8,9 +8,18 @@
 # add_subdirectory( edgeMesh )
 # add_subdirectory( dummyThirdParty )
 # add_subdirectory( finiteVolume )
-add_subdirectory( lagrangian/basic )
-add_subdirectory( lagrangian/distributionModels )
-add_subdirectory( genericPatchFields )
-
-# add_subdirectory( parallel/decompose )
+# add_subdirectory( lagrangian/basic )
+# add_subdirectory( lagrangian/distributionModels )
+# add_subdirectory( genericPatchFields )
+# add_subdirectory( conversion )
+# add_subdirectory( sampling )
+# add_subdirectory( mesh/extrudeModel )
+# add_subdirectory( dynamicMesh )
+# add_subdirectory( dynamicFvMesh )
+# add_subdirectory( topoChangerFvMesh )
+#PROBLEM!
+# add_subdirectory( parallel )
+add_subdirectory( ODE )
+add_subdirectory( randomProcesses )
+add_subdirectory( transportModels )
 
