@@ -23,8 +23,14 @@ endif()
 
 set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wold-style-cast -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -O3 -ftemplate-depth-100" )
 
-set( LABEL_SIZE 64 )
+set( LABEL_SIZE 32 )
 add_definitions( -DLABEL_SIZE=${LABEL_SIZE} )
+
+find_package( SCOTCH )
+set( SCOTCH_VERSION "scotch_6.0.3" )
+set( SCOTCH_ARCH_PATH "$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER$WM_LABEL_OPTION/$SCOTCH_VERSION" )
+
+include_directories( /usr/include )
 
 # Auto-fill MPI settings
 find_package( MPI REQUIRED )
@@ -48,4 +54,3 @@ set( CMAKE_CXX_STANDARD 11 )
 add_subdirectory( wmake/src )
 add_subdirectory( src )
 
-target_link_libraries( ${PROJECT_NAME}  ${MPI_GCC_LIBRARIES} )
