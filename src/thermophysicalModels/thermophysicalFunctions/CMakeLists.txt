@@ -1,0 +1,95 @@
+# May require libs:
+# LIB_LIBS = -lOpenFOAM
+
+
+set( SOURCES
+
+thermophysicalFunction/thermophysicalFunction.C
+NSRDSfunctions/NSRDSfunc0/NSRDSfunc0.C
+NSRDSfunctions/NSRDSfunc1/NSRDSfunc1.C
+NSRDSfunctions/NSRDSfunc2/NSRDSfunc2.C
+NSRDSfunctions/NSRDSfunc3/NSRDSfunc3.C
+NSRDSfunctions/NSRDSfunc4/NSRDSfunc4.C
+NSRDSfunctions/NSRDSfunc5/NSRDSfunc5.C
+NSRDSfunctions/NSRDSfunc6/NSRDSfunc6.C
+NSRDSfunctions/NSRDSfunc7/NSRDSfunc7.C
+NSRDSfunctions/NSRDSfunc14/NSRDSfunc14.C
+APIfunctions/APIdiffCoefFunc/APIdiffCoefFunc.C
+
+)
+
+## Define the output
+add_library( thermophysicalFunctions SHARED ${SOURCES} )
+
+include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashTable )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/accessTypes/ILList )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/accessTypes/LList )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/accessTypes/LPtrList )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/accessTypes/UILList )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/linkTypes/DLListBase )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/linkTypes/SLListBase )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/user )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/BiIndirectList )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/FixedList )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/IndirectList )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/List )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/PtrList )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/UIndirectList )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/UList )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOstreams )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOstreams/IOstreams )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOstreams/Sstreams )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOstreams/StringStreams )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOstreams/Tstreams )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOstreams/token )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/dictionary )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/dictionary/entry )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/dictionary/primitiveEntry )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/error )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/runTimeSelection/construction )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/typeInfo )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/debug )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/memory/Xfer )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/memory/autoPtr )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/memory/refCount )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/memory/tmp )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Scalar )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Scalar/doubleScalar )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Scalar/floatScalar )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Scalar/scalar )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Swap )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/VectorSpace )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/bools/bool )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/chars/char )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/contiguous )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/direction )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/hashes/Hash )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/hashes/Hasher )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/int )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/int32 )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/int64 )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/label )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/uLabel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/uint )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/uint32 )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/uint64 )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/nullObject )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/pTraits )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/fileName )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/keyType )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/lists )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/string )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/word )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/wordRe )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/thermophysicalFunctions/APIfunctions/APIdiffCoefFunc )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/thermophysicalFunctions/NSRDSfunctions/NSRDSfunc0 )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/thermophysicalFunctions/NSRDSfunctions/NSRDSfunc1 )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/thermophysicalFunctions/NSRDSfunctions/NSRDSfunc14 )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/thermophysicalFunctions/NSRDSfunctions/NSRDSfunc2 )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/thermophysicalFunctions/NSRDSfunctions/NSRDSfunc3 )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/thermophysicalFunctions/NSRDSfunctions/NSRDSfunc4 )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/thermophysicalFunctions/NSRDSfunctions/NSRDSfunc5 )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/thermophysicalFunctions/NSRDSfunctions/NSRDSfunc6 )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/thermophysicalFunctions/NSRDSfunctions/NSRDSfunc7 )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/thermophysicalFunctions/thermophysicalFunction )
