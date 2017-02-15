@@ -1,28 +1,51 @@
 #May need to link against:
 #LIB_LIBS = \
-#    -lcompressibleTransportModels \
-#    -lturbulenceModels \
-#    -lincompressibleTurbulenceModels \
-#    -lcompressibleTurbulenceModels \
-#    -lincompressibleTransportModels \
-#    -lfluidThermophysicalModels \
-#    -lspecie \
+#    -lforces \
+#    -lmeshTools \
 #    -lfileFormats \
-#    -lfiniteVolume \
-#    -lmeshTools
+#    -ldynamicMesh
 
 set( SOURCES
 
-forces/forces.C
-forces/forcesFunctionObject.C
+sixDoFRigidBodyMotion/sixDoFRigidBodyMotion.C
+sixDoFRigidBodyMotion/sixDoFRigidBodyMotionIO.C
+sixDoFRigidBodyMotion/sixDoFRigidBodyMotionState.C
+sixDoFRigidBodyMotion/sixDoFRigidBodyMotionStateIO.C
 
-forceCoeffs/forceCoeffs.C
-forceCoeffs/forceCoeffsFunctionObject.C
+sixDoFRigidBodyMotion/restraints/sixDoFRigidBodyMotionRestraint/sixDoFRigidBodyMotionRestraint.C
+sixDoFRigidBodyMotion/restraints/sixDoFRigidBodyMotionRestraint/sixDoFRigidBodyMotionRestraintNew.C
+sixDoFRigidBodyMotion/restraints/linearAxialAngularSpring/linearAxialAngularSpring.C
+sixDoFRigidBodyMotion/restraints/linearSpring/linearSpring.C
+sixDoFRigidBodyMotion/restraints/sphericalAngularSpring/sphericalAngularSpring.C
+sixDoFRigidBodyMotion/restraints/tabulatedAxialAngularSpring/tabulatedAxialAngularSpring.C
+sixDoFRigidBodyMotion/restraints/linearDamper/linearDamper.C
+sixDoFRigidBodyMotion/restraints/sphericalAngularDamper/sphericalAngularDamper.C
+
+sixDoFRigidBodyMotion/constraints/sixDoFRigidBodyMotionConstraint/sixDoFRigidBodyMotionConstraint.C
+sixDoFRigidBodyMotion/constraints/sixDoFRigidBodyMotionConstraint/sixDoFRigidBodyMotionConstraintNew.C
+sixDoFRigidBodyMotion/constraints/axis/sixDoFRigidBodyMotionAxisConstraint.C
+sixDoFRigidBodyMotion/constraints/line/sixDoFRigidBodyMotionLineConstraint.C
+sixDoFRigidBodyMotion/constraints/orientation/sixDoFRigidBodyMotionOrientationConstraint.C
+sixDoFRigidBodyMotion/constraints/plane/sixDoFRigidBodyMotionPlaneConstraint.C
+sixDoFRigidBodyMotion/constraints/point/sixDoFRigidBodyMotionPointConstraint.C
+
+pointPatchFields/derived/sixDoFRigidBodyDisplacement/sixDoFRigidBodyDisplacementPointPatchVectorField.C
+pointPatchFields/derived/uncoupledSixDoFRigidBodyDisplacement/uncoupledSixDoFRigidBodyDisplacementPointPatchVectorField.C
+
+sixDoFRigidBodyMotionSolver/sixDoFRigidBodyMotionSolver.C
+sixDoFRigidBodyMotionSolver/externalPointEdgePoint.C
+sixDoFRigidBodyMotionSolver/pointPatchDist.C
+
+sixDoFSolvers/sixDoFSolver/sixDoFSolver.C
+sixDoFSolvers/sixDoFSolver/newSixDoFSolver.C
+sixDoFSolvers/symplectic/symplectic.C
+sixDoFSolvers/CrankNicolson/CrankNicolson.C
+sixDoFSolvers/Newmark/Newmark.C
 
 )
 
 ## Define the output
-add_library( forces SHARED ${SOURCES} )
+add_library( sixDoFRigidBodyMotion SHARED ${SOURCES} )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
@@ -72,12 +95,9 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/dictionary/entry )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/dictionary/primitiveEntry )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/dynamicLibrary/dlLibraryTable )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/error )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/functionObjects/IOOutputFilter )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/functionObjects/OutputFilterFunctionObject )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/functionObjects/functionObject )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/functionObjects/functionObjectFile )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/functionObjects/functionObjectList )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/functionObjects/outputFilterOutputControl )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/objectRegistry )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/regIOobject )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/runTimeSelection/construction )
@@ -96,7 +116,6 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/DimensionedFields/D
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/DimensionedFields/DimensionedSymmTensorField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/DimensionedFields/DimensionedTensorField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/FieldFields/FieldField )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/FieldFields/oneFieldField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/FieldFields/scalarFieldField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/FieldFields/sphericalTensorFieldField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/FieldFields/symmTensorFieldField )
@@ -105,7 +124,6 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/Field )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/diagTensorField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/labelField )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/oneField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/scalarField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/sphericalTensorField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/symmTensorField )
@@ -118,17 +136,25 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/GeometricFields/Geo
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/GeometricFields/GeometricSphericalTensorField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/GeometricFields/GeometricSymmTensorField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/GeometricFields/GeometricTensorField )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/GeometricFields/geometricOneField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/GeometricFields/pointFields )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/UniformDimensionedFields )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/pointPatchFields/basic/calculated )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/pointPatchFields/basic/fixedValue )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/pointPatchFields/basic/value )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/pointPatchFields/pointPatchField )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/pointPatchFields/pointPatchField/pointConstraint )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/clock )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/constants/mathematical )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/debug )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/unitConversion )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/include )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/interpolations/interpolationTable )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/interpolations/interpolationTable/tableReaders )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/interpolations/interpolationTable/tableReaders/openFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/DiagonalMatrix )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/LduMatrix/LduMatrix )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/LduMatrix/LduMatrix/LduInterfaceField )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/LduMatrix/Solvers/DiagonalSolver )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/Matrix )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/RectangularMatrix )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/SquareMatrix )
@@ -137,7 +163,6 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/lduAddr
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/lduAddressing/lduInterface )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/lduAddressing/lduInterfaceFields/lduInterfaceField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/lduAddressing/lduSchedule )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/lduMatrix/lduMatrix )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/scalarMatrices )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/matrices/solution )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/memory/Xfer )
@@ -146,6 +171,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/memory/refCount )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/memory/tmp )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/GeoMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/Identifiers/patch )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/MeshObject )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/ProcessorTopology )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/bandCompression )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/boundBox )
@@ -156,11 +182,12 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/cellMode
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/cellShape )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/edge )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/face )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/pointMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/pointMesh/pointBoundaryMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/pointMesh/pointPatches/pointPatch )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/globalMeshData )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/mapPolyMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/mapPolyMesh/mapDistribute )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/mapPolyMesh/objectMap )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyBoundaryMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/basic/coupled )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/constraint/cyclic )
@@ -223,7 +250,6 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/uint32 )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/uint64 )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/nil )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/nullObject )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/one )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ops )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/pTraits )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/quaternion )
@@ -236,55 +262,44 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/word )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/wordRe )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/transform )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/triad )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/zero )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/CompressibleTurbulenceModel )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/EddyDiffusivity )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/ThermalDiffusivity )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/turbulentFluidThermoModels )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/incompressible )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/incompressible/IncompressibleTurbulenceModel )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/incompressible/turbulentTransportModels )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/LES/LESModel )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/LES/LESdeltas/LESdelta )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/RAS/RASModel )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/TurbulenceModel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/dynamicMesh/motionSolver/displacement )
+include_directories( ${CMAKE_SOURCE_DIR}/src/dynamicMesh/motionSolver/motionSolver )
 include_directories( ${CMAKE_SOURCE_DIR}/src/fileFormats/coordSet )
 include_directories( ${CMAKE_SOURCE_DIR}/src/fileFormats/sampledSetWriters )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/cfdTools/general/porosityModel/porosityModel )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvPatchFields/basic/calculated )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvPatchFields/basic/coupled )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvPatchFields/basic/zeroGradient )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvPatchFields/fvPatchField )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvsPatchFields/basic/calculated )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvsPatchFields/fvsPatchField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/surfaceFields )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/volFields )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/finiteVolume/fv )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/finiteVolume/fvSchemes )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/finiteVolume/fvSolution )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/finiteVolume/fvc )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/finiteVolume/gradSchemes/gaussGrad )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/finiteVolume/gradSchemes/gradScheme )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMatrices )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMatrices/fvMatrix )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMatrices/fvScalarMatrix )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh/fvBoundaryMesh )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh/fvPatches/basic/coupled )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh/fvPatches/fvPatch )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh/wallDist/nearWallDist )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/interpolation/surfaceInterpolation/schemes/linear )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/interpolation/surfaceInterpolation/surfaceInterpolation )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/interpolation/surfaceInterpolation/surfaceInterpolationScheme )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/surfaceMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/interpolation/volPointInterpolation )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/volMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/algorithms/PointEdgeWave )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/coordinateSystems )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/coordinateSystems/coordinateRotation )
-include_directories( ${CMAKE_SOURCE_DIR}/src/postProcessing/functionObjects/forces/forceCoeffs )
 include_directories( ${CMAKE_SOURCE_DIR}/src/postProcessing/functionObjects/forces/forces )
-include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/basic/basicThermo )
-include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/basic/fluidThermo )
-include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels )
-include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/compressible/compressibleTransportModel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/pointPatchFields/derived/sixDoFRigidBodyDisplacement )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/pointPatchFields/derived/uncoupledSixDoFRigidBodyDisplacement )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFRigidBodyMotion )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFRigidBodyMotion/constraints/axis )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFRigidBodyMotion/constraints/line )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFRigidBodyMotion/constraints/orientation )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFRigidBodyMotion/constraints/plane )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFRigidBodyMotion/constraints/point )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFRigidBodyMotion/constraints/sixDoFRigidBodyMotionConstraint )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFRigidBodyMotion/restraints/linearAxialAngularSpring )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFRigidBodyMotion/restraints/linearDamper )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFRigidBodyMotion/restraints/linearSpring )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFRigidBodyMotion/restraints/sixDoFRigidBodyMotionRestraint )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFRigidBodyMotion/restraints/sphericalAngularDamper )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFRigidBodyMotion/restraints/sphericalAngularSpring )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFRigidBodyMotion/restraints/tabulatedAxialAngularSpring )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFRigidBodyMotionSolver )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFSolvers/CrankNicolson )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFSolvers/Newmark )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFSolvers/sixDoFSolver )
+include_directories( ${CMAKE_SOURCE_DIR}/src/sixDoFRigidBodyMotion/sixDoFSolvers/symplectic )
