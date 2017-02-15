@@ -1,29 +1,50 @@
 #May need to link against:
-#LIB_LIBS = -lmeshTools
+#LIB_LIBS = \
+#    -lmeshTools \
+#    -ldynamicMesh
+
 
 set( SOURCES
 
-extrudeModel/extrudeModel.C
-extrudeModel/extrudeModelNew.C
-linearNormal/linearNormal.C
-planeExtrusion/planeExtrusion.C
-linearDirection/linearDirection.C
-linearRadial/linearRadial.C
-radial/radial.C
-sigmaRadial/sigmaRadial.C
-sector/sector.C
-cyclicSector/cyclicSector.C
-wedge/wedge.C
+curvedEdges/BSpline.C
+curvedEdges/CatmullRomSpline.C
+curvedEdges/polyLine.C
+
+curvedEdges/arcEdge.C
+curvedEdges/curvedEdge.C
+curvedEdges/lineEdge.C
+curvedEdges/polyLineEdge.C
+curvedEdges/lineDivide.C
+curvedEdges/BSplineEdge.C
+curvedEdges/splineEdge.C
+
+gradingDescriptor/gradingDescriptor.C
+gradingDescriptor/gradingDescriptors.C
+
+blockDescriptor/blockDescriptor.C
+blockDescriptor/blockDescriptorEdges.C
+
+block/block.C
+block/blockCreate.C
+
+blockMesh/blockMesh.C
+blockMesh/blockMeshCreate.C
+blockMesh/blockMeshTopology.C
+blockMesh/blockMeshCheck.C
+blockMesh/blockMeshMerge.C
+blockMesh/blockMeshMergeFast.C
 
 )
 
 ## Define the output
-add_library( extrudeModel SHARED ${SOURCES} )
+add_library( blockMesh SHARED ${SOURCES} )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/signals )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashSet )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashTable )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/Map )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/accessTypes/ILList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/accessTypes/LList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/accessTypes/LPtrList )
@@ -36,12 +57,18 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/DynamicLi
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/FixedList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/IndirectList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/List )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/ListListOps )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/ListOps )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/PackedList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/PtrList )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/SubList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/UIndirectList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/UList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/NamedEnum )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobject )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjects/CompactIOList )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjects/IOField )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjects/IOList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjects/IOdictionary )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOstreams )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOstreams/IOstreams )
@@ -66,8 +93,15 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/typeInfo )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/dimensionSet )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/dimensionedTypes/dimensionedScalar )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/dimensionedTypes/dimensionedType )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/Field )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/diagTensorField )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/labelField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/scalarField )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/sphericalTensorField )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/symmTensorField )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/tensorField )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/Fields/vectorField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/clock )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/constants/mathematical )
@@ -84,13 +118,50 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/memory/Xfer )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/memory/autoPtr )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/memory/refCount )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/memory/tmp )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/Identifiers/patch )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/bandCompression )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/boundBox )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/cell )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/cellModel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/cellModeller )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/cellShape )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/edge )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/face )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyBoundaryMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/basic/coupled )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/constraint/cyclic )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/constraint/empty )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/polyPatch )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/zones/ZoneMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/zones/cellZone )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/zones/faceZone )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/zones/pointZone )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/zones/zone )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/preservePatchTypes )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveMesh/PrimitivePatch )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveMesh/primitivePatch )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveShapes/line )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveShapes/objectHit )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveShapes/point )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveShapes/point2D )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/primitiveShapes/triangle )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/DiagTensor )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/DiagTensor/diagTensor )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Pair )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Scalar )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Scalar/doubleScalar )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Scalar/floatScalar )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Scalar/lists )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Scalar/scalar )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/SphericalTensor )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/SphericalTensor/sphericalTensor )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Swap )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/SymmTensor )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/SymmTensor/symmTensor )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Tensor )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Tensor/tensor )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Vector )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Vector/vector )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Vector2D )
@@ -98,10 +169,10 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Vector2D/vector
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/VectorSpace )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/bools/Switch )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/bools/bool )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/bools/lists )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/chars/char )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/contiguous )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/direction )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/functions/DataEntry/DataEntry )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/hashes/Hash )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/hashes/Hasher )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/hashes/SHA1 )
@@ -114,6 +185,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/uLabel )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/uint )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/uint32 )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ints/uint64 )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/nil )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/nullObject )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/ops )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/pTraits )
@@ -123,13 +195,11 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/lists )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/string )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/word )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/wordRe )
-include_directories( ${CMAKE_SOURCE_DIR}/src/mesh/extrudeModel/cyclicSector )
-include_directories( ${CMAKE_SOURCE_DIR}/src/mesh/extrudeModel/extrudeModel )
-include_directories( ${CMAKE_SOURCE_DIR}/src/mesh/extrudeModel/linearDirection )
-include_directories( ${CMAKE_SOURCE_DIR}/src/mesh/extrudeModel/linearNormal )
-include_directories( ${CMAKE_SOURCE_DIR}/src/mesh/extrudeModel/linearRadial )
-include_directories( ${CMAKE_SOURCE_DIR}/src/mesh/extrudeModel/planeExtrusion )
-include_directories( ${CMAKE_SOURCE_DIR}/src/mesh/extrudeModel/radial )
-include_directories( ${CMAKE_SOURCE_DIR}/src/mesh/extrudeModel/sector )
-include_directories( ${CMAKE_SOURCE_DIR}/src/mesh/extrudeModel/sigmaRadial )
-include_directories( ${CMAKE_SOURCE_DIR}/src/mesh/extrudeModel/wedge )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/triad )
+include_directories( ${CMAKE_SOURCE_DIR}/src/mesh/blockMesh/block )
+include_directories( ${CMAKE_SOURCE_DIR}/src/mesh/blockMesh/blockDescriptor )
+include_directories( ${CMAKE_SOURCE_DIR}/src/mesh/blockMesh/blockMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/mesh/blockMesh/curvedEdges )
+include_directories( ${CMAKE_SOURCE_DIR}/src/mesh/blockMesh/gradingDescriptor )
+include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/coordinateSystems )
+include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/coordinateSystems/coordinateRotation )
