@@ -405,4 +405,5 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/postProcessing/functionObjects/util
 include_directories( ${CMAKE_SOURCE_DIR}/src/postProcessing/functionObjects/utilities/yPlus )
 include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/basic/basicThermo )
 include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/basic/fluidThermo )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/compressible/compressibleTransportModel )
