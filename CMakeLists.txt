@@ -21,7 +21,7 @@ if( NO_REPOSITORY )
   add_definitions( -DNoRepository )
 endif()
 
-set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wold-style-cast -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -O3 -ftemplate-depth-100" )
+set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wold-style-cast -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -O3 -ftemplate-depth-100 -DOMPI_SKIP_MPICXX" )
 
 set( LABEL_SIZE 32 )
 add_definitions( -DLABEL_SIZE=${LABEL_SIZE} )
@@ -39,6 +39,7 @@ include_directories( ${MPI_INCLUDE_PATH} )
 # Dependancies
 find_package( FLEX REQUIRED )
 find_package( ZLIB REQUIRED )
+find_package( Boost REQUIRED )
 
 find_package( METIS )
 find_package( Inotify )
