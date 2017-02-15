@@ -1,0 +1,6 @@
+add_subdirectory( regionModel )
+add_subdirectory( pyrolysisModels )
+add_subdirectory( surfaceFilmModels )
+add_subdirectory( surfaceFilmModels/derivedFvPatchFields/wallFunctions )
+add_subdirectory( thermalBaffleModels )
+add_subdirectory( regionCoupling )
