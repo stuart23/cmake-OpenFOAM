@@ -1,3 +1,10 @@
+#May need to link against:
+#LIB_LIBS = \
+#    -lfiniteVolume \
+#    -lmeshTools
+
+set( SOURCES
+
 partialWrite/partialWrite.C
 partialWrite/partialWriteFunctionObject.C
 
@@ -10,4 +17,8 @@ writeDictionary/writeDictionaryFunctionObject.C
 writeRegisteredObject/writeRegisteredObject.C
 writeRegisteredObject/writeRegisteredObjectFunctionObject.C
 
-LIB = $(FOAM_LIBBIN)/libIOFunctionObjects
+)
+
+## Define the output
+add_library( IOFunctionObjects SHARED ${SOURCES} )
+
