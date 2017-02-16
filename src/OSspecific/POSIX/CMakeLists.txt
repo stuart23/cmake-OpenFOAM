@@ -19,6 +19,8 @@ set( SOURCES
 ## Define the output
 add_library( OSspecific STATIC ${SOURCES} )
 
+include_directories( ${Inotify_INCLUDE_DIRS} )
+
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/clockTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
