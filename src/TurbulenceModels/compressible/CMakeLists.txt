@@ -1,34 +1,45 @@
 #May require linking against:
 # LIB_LIBS = \
-#     -lincompressibleTransportModels \
-#     -lturbulenceModels \
-#     -lfiniteVolume \
-#     -lmeshTools
+#    -lcompressibleTransportModels \
+#    -lfluidThermophysicalModels \
+#    -lsolidThermo \
+#    -lsolidSpecie \
+#    -lturbulenceModels \
+#    -lspecie \
+#    -lfiniteVolume \
+#    -lmeshTools
 
 set( SOURCES
 
-incompressibleTurbulenceModel.C
+compressibleTurbulenceModel.C
+turbulentFluidThermoModels/turbulentFluidThermoModels.C
 
-turbulentTransportModels/turbulentTransportModels.C
-turbulentTransportModels/RAS/qZeta/qZeta.C
-turbulentTransportModels/RAS/kkLOmega/kkLOmega.C
-turbulentTransportModels/RAS/LamBremhorstKE/LamBremhorstKE.C
-turbulentTransportModels/RAS/LienLeschziner/LienLeschziner.C
-turbulentTransportModels/RAS/ShihQuadraticKE/ShihQuadraticKE.C
-turbulentTransportModels/RAS/LienCubicKE/LienCubicKE.C
+turbulentFluidThermoModels/derivedFvPatchFields/turbulentHeatFluxTemperature/turbulentHeatFluxTemperatureFvPatchScalarField.C
+turbulentFluidThermoModels/derivedFvPatchFields/temperatureCoupledBase/temperatureCoupledBase.C
+turbulentFluidThermoModels/derivedFvPatchFields/turbulentTemperatureCoupledBaffleMixed/turbulentTemperatureCoupledBaffleMixedFvPatchScalarField.C
+turbulentFluidThermoModels/derivedFvPatchFields/thermalBaffle1D/thermalBaffle1DFvPatchScalarFields.C
+turbulentFluidThermoModels/derivedFvPatchFields/totalFlowRateAdvectiveDiffusive/totalFlowRateAdvectiveDiffusiveFvPatchScalarField.C
+turbulentFluidThermoModels/derivedFvPatchFields/turbulentTemperatureRadCoupledMixed/turbulentTemperatureRadCoupledMixedFvPatchScalarField.C
+turbulentFluidThermoModels/derivedFvPatchFields/externalWallHeatFluxTemperature/externalWallHeatFluxTemperatureFvPatchScalarField.C
+turbulentFluidThermoModels/derivedFvPatchFields/wallHeatTransfer/wallHeatTransferFvPatchScalarField.C
+turbulentFluidThermoModels/derivedFvPatchFields/externalCoupledTemperatureMixed/externalCoupledTemperatureMixedFvPatchScalarField.C
+turbulentFluidThermoModels/derivedFvPatchFields/convectiveHeatTransfer/convectiveHeatTransferFvPatchScalarField.C
 
-turbulentTransportModels/derivedFvPatchFields/wallFunctions/alphatWallFunctions/alphatJayatillekeWallFunction/alphatJayatillekeWallFunctionFvPatchScalarField.C
+turbulentFluidThermoModels/derivedFvPatchFields/wallFunctions/alphatWallFunctions/alphatWallFunction/alphatWallFunctionFvPatchScalarField.C
+turbulentFluidThermoModels/derivedFvPatchFields/wallFunctions/alphatWallFunctions/alphatJayatillekeWallFunction/alphatJayatillekeWallFunctionFvPatchScalarField.C
+turbulentFluidThermoModels/derivedFvPatchFields/wallFunctions/alphatWallFunctions/alphatPhaseChangeWallFunction/alphatPhaseChangeWallFunctionFvPatchScalarField.C
 
 )
 
 ## Define the output
-add_library( incompressibleTurbulenceModels SHARED ${SOURCES} )
+add_library( compressibleTurbulenceModels SHARED ${SOURCES} )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/signals )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/algorithms/indexedOctree )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashPtrTable )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashSet )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashTable )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/Map )
@@ -54,6 +65,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/UList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/UPtrList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/NamedEnum )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobject )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjectList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjects/CompactIOList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjects/IOField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjects/IOList )
@@ -120,9 +132,11 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/GeometricFields/Geo
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/GeometricFields/geometricOneField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/GeometricFields/geometricZeroField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/GeometricFields/pointFields )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/UniformDimensionedFields )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/clock )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/constants/mathematical )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/constants/thermodynamic )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/debug )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/unitConversion )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/include )
@@ -214,6 +228,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/bools/lists )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/chars/char )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/contiguous )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/direction )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/functions/Polynomial )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/globalIndexAndTransform )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/globalIndexAndTransform/vectorTensorTransform )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/hashes/Hash )
@@ -246,17 +261,25 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/wordRe 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/transform )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/triad )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/zero )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/CompressibleTurbulenceModel )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/EddyDiffusivity )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/RAS/buoyantKEpsilon )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/ThermalDiffusivity )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/turbulentFluidThermoModels )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/turbulentFluidThermoModels/derivedFvPatchFields/convectiveHeatTransfer )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/turbulentFluidThermoModels/derivedFvPatchFields/externalCoupledTemperatureMixed )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/turbulentFluidThermoModels/derivedFvPatchFields/externalWallHeatFluxTemperature )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/turbulentFluidThermoModels/derivedFvPatchFields/temperatureCoupledBase )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/turbulentFluidThermoModels/derivedFvPatchFields/thermalBaffle1D )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/turbulentFluidThermoModels/derivedFvPatchFields/totalFlowRateAdvectiveDiffusive )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/turbulentFluidThermoModels/derivedFvPatchFields/turbulentHeatFluxTemperature )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/turbulentFluidThermoModels/derivedFvPatchFields/turbulentTemperatureCoupledBaffleMixed )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/turbulentFluidThermoModels/derivedFvPatchFields/turbulentTemperatureRadCoupledMixed )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/turbulentFluidThermoModels/derivedFvPatchFields/wallFunctions/alphatWallFunctions/alphatJayatillekeWallFunction )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/incompressible )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/incompressible/IncompressibleTurbulenceModel )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/incompressible/turbulentTransportModels )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/incompressible/turbulentTransportModels/RAS/LamBremhorstKE )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/incompressible/turbulentTransportModels/RAS/LienCubicKE )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/incompressible/turbulentTransportModels/RAS/LienLeschziner )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/incompressible/turbulentTransportModels/RAS/ShihQuadraticKE )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/incompressible/turbulentTransportModels/RAS/kkLOmega )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/incompressible/turbulentTransportModels/RAS/qZeta )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/turbulentFluidThermoModels/derivedFvPatchFields/wallFunctions/alphatWallFunctions/alphatPhaseChangeWallFunction )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/turbulentFluidThermoModels/derivedFvPatchFields/wallFunctions/alphatWallFunctions/alphatWallFunction )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/compressible/turbulentFluidThermoModels/derivedFvPatchFields/wallHeatTransfer )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/laminar )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/LES/DeardorffDiffStress )
@@ -289,17 +312,16 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/R
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/RAS/v2f )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/ReynoldsStress )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/TurbulenceModel )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/derivedFvPatchFields/wallFunctions/nutWallFunctions/nutWallFunction )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/derivedFvPatchFields/wallFunctions/nutWallFunctions/nutkWallFunction )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/eddyViscosity )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/linearViscousStress )
-include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/nonlinearEddyViscosity )
-include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/cfdTools/general/bound )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvPatchFields/basic/calculated )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvPatchFields/basic/coupled )
+include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvPatchFields/basic/fixedGradient )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvPatchFields/basic/fixedValue )
+include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvPatchFields/basic/mixed )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvPatchFields/basic/zeroGradient )
+include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvPatchFields/derived/externalCoupledMixed )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvPatchFields/fvPatchField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvsPatchFields/basic/calculated )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvsPatchFields/fvsPatchField )
@@ -344,8 +366,24 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/AMIInterpolation/faceArea
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/AMIInterpolation/patches/cyclicAMI/cyclicAMILduInterfaceField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/AMIInterpolation/patches/cyclicAMI/cyclicAMIPolyPatch )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/indexedOctree )
+include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/mappedPatches/mappedPolyPatch )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/meshTools )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/searchableSurface )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/surfaceLocation )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triSurfaceTools )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triangleFuncs )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/basic/basicThermo )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/basic/fluidThermo )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/solidSpecie/include )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/solidSpecie/transport/const )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/solidSpecie/transport/exponential )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/solidSpecie/transport/polynomial )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/solidThermo/solidThermo )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/specie/equationOfState/rhoConst )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/specie/specie )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/specie/thermo/hConst )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/specie/thermo/hPolynomial )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/specie/thermo/hPower )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/specie/thermo/sensibleEnthalpy )
+include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/specie/thermo/thermo )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/compressible/compressibleTransportModel )
