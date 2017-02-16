@@ -62,6 +62,5 @@ set( INOTIFY_INCLUDE_DIR ${INOTIFY_INCLUDE_DIR} )
 # C++11
 set( CMAKE_CXX_STANDARD 11 )
 
-add_subdirectory( wmake/src )
 add_subdirectory( src )
 

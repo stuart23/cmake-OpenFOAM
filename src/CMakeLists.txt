@@ -17,26 +17,25 @@
 # add_subdirectory( dynamicMesh )
 # add_subdirectory( dynamicFvMesh )
 # add_subdirectory( topoChangerFvMesh )
-add_subdirectory( parallel )
+# add_subdirectory( parallel )
 # add_subdirectory( ODE )
 # add_subdirectory( randomProcesses )
 # add_subdirectory( transportModels )
 # add_subdirectory( thermophysicalModels )
-#PROBLEM!
 # add_subdirectory( TurbulenceModels )
 # add_subdirectory( combustionModels )
 # add_subdirectory( regionModels )
 #PROBLEM!
 # add_subdirectory( lagrangian )
-# add_subdirectory( mesh )
-# add_subdirectory( renumber )
-# add_subdirectory( fvAgglomerationMethods )
+add_subdirectory( mesh )
+add_subdirectory( renumber )
+add_subdirectory( fvAgglomerationMethods )
+
+add_subdirectory( fvMotionSolver )
+add_subdirectory( engine )
+add_subdirectory( fvOptions )
+add_subdirectory( regionCoupled )
+
+add_subdirectory( postProcessing )
  
-# add_subdirectory( fvMotionSolver )
-# add_subdirectory( engine )
-# add_subdirectory( fvOptions )
-# add_subdirectory( regionCoupled )
-# 
-# add_subdirectory( postProcessing )
-#  
-# add_subdirectory( sixDoFRigidBodyMotion )
+add_subdirectory( sixDoFRigidBodyMotion )

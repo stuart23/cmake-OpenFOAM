@@ -1,3 +1,0 @@
-SUFFIXES += .l
-
-ltoo = flex -o $(@D)/$(<F).c $< ; $(cc) $(cFLAGS) -c  $(@D)/$(<F).c -o $@
