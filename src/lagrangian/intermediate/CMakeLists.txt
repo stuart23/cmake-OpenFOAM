@@ -98,7 +98,6 @@ submodels/MPPIC/AveragingMethods/makeAveragingMethods.C
 ## Define the output
 add_library( lagrangianIntermediate SHARED ${SOURCES} )
 
-include_directories( ${CMAKE_SOURCE_DIR}/src/ODE/ODESolvers/Euler )
 include_directories( ${CMAKE_SOURCE_DIR}/src/ODE/ODESolvers/ODESolver )
 include_directories( ${CMAKE_SOURCE_DIR}/src/ODE/ODESolvers/adaptiveSolver )
 include_directories( ${CMAKE_SOURCE_DIR}/src/ODE/ODESystem )
@@ -406,6 +405,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/lagrangian/basic/InteractionLists/r
 include_directories( ${CMAKE_SOURCE_DIR}/src/lagrangian/basic/particle )
 include_directories( ${CMAKE_SOURCE_DIR}/src/lagrangian/distributionModels/distributionModel )
 include_directories( ${CMAKE_SOURCE_DIR}/src/lagrangian/intermediate/IntegrationScheme/Analytical )
+include_directories( ${CMAKE_SOURCE_DIR}/src/lagrangian/intermediate/IntegrationScheme/Euler )
 include_directories( ${CMAKE_SOURCE_DIR}/src/lagrangian/intermediate/IntegrationScheme/IntegrationScheme )
 include_directories( ${CMAKE_SOURCE_DIR}/src/lagrangian/intermediate/clouds/Templates/CollidingCloud )
 include_directories( ${CMAKE_SOURCE_DIR}/src/lagrangian/intermediate/clouds/Templates/KinematicCloud )
