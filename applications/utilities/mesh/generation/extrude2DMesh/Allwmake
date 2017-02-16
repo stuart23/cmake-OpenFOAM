@@ -1,0 +1,8 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+set -x
+
+wmake libso extrude2DMesh
+wmake
+
+# ----------------------------------------------------------------- end-of-file
