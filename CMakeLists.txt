@@ -26,12 +26,12 @@ set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wold-style-cast -Wnon-virtual-dtor -Wno-unu
 set( LABEL_SIZE 32 )
 add_definitions( -DLABEL_SIZE=${LABEL_SIZE} )
 
-find_package( SCOTCH PTSCOTCH )
-
+# GET RID OF ONCE CMAKE FILES WRITTEN FOR DEPENDANCIES
 include_directories( /usr/include )
 
 # Dependancies
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+find_package( SCOTCH )
 find_package( MPI REQUIRED )
 find_package( FLEX REQUIRED )
 find_package( ZLIB REQUIRED )
