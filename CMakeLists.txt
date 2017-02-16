@@ -26,25 +26,31 @@ set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wold-style-cast -Wnon-virtual-dtor -Wno-unu
 set( LABEL_SIZE 32 )
 add_definitions( -DLABEL_SIZE=${LABEL_SIZE} )
 
-find_package( SCOTCH )
-set( SCOTCH_VERSION "scotch_6.0.3" )
-set( SCOTCH_ARCH_PATH "$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER$WM_LABEL_OPTION/$SCOTCH_VERSION" )
+find_package( SCOTCH PTSCOTCH )
 
 include_directories( /usr/include )
 
-# Auto-fill MPI settings
-find_package( MPI REQUIRED )
-include_directories( ${MPI_INCLUDE_PATH} )
-
 # Dependancies
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+find_package( MPI REQUIRED )
 find_package( FLEX REQUIRED )
 find_package( ZLIB REQUIRED )
 find_package( Boost REQUIRED )
 find_package( METIS REQUIRED )
 
-message ( "${METIS_INCLUDE_DIRS}" )
-message ( "${METIS_LIBRARIES}" )
+# Find if the metis header is specifying the same width reals (precision) as OpenFOAM settings
+# Length of real is specified in the metis.h header under the REALTYPEWIDTH macro
+file( STRINGS ${METIS_INCLUDE_DIR}/metis.h METIS_REALTYPEWIDTH REGEX "#define REALTYPEWIDTH" )
+string( FIND ${METIS_REALTYPEWIDTH} "32" METIS_REALTYPE32 ) 
+string( FIND ${METIS_REALTYPEWIDTH} "64" METIS_REALTYPE64 ) 
+if( (METIS_REALTYPE64 EQUAL -1) AND DOUBLE_PRECISION )
+	message( FATAL_ERROR "OpenFOAM is set to build in double precision but METIS is setup for single precision mode. Change REALTYPEWIDTH to 64 in ${METIS_INCLUDE_DIR}/metis.h" )
+elseif( (METIS_REALTYPE32 EQUAL -1) AND (NOT DOUBLE_PRECISION) )
+	message( FATAL_ERROR "OpenFOAM is set to build in single precision but METIS is setup for double precision mode. Change REALTYPEWIDTH to 32 in ${METIS_INCLUDE_DIR}/metis.h" )
+endif()
+
+# Auto-fill MPI settings
+include_directories( ${MPI_INCLUDE_PATH} )
 
 find_package( Inotify )
 option( INOTIFY_ENABLED "Use iNotify Package" ${INOTIFY_FOUND} )
