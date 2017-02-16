@@ -37,11 +37,15 @@ find_package( MPI REQUIRED )
 include_directories( ${MPI_INCLUDE_PATH} )
 
 # Dependancies
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 find_package( FLEX REQUIRED )
 find_package( ZLIB REQUIRED )
 find_package( Boost REQUIRED )
+find_package( METIS REQUIRED )
 
-find_package( METIS )
+message ( "${METIS_INCLUDE_DIRS}" )
+message ( "${METIS_LIBRARIES}" )
+
 find_package( Inotify )
 option( INOTIFY_ENABLED "Use iNotify Package" ${INOTIFY_FOUND} )
 if( INOTIFY_ENABLED ) 
