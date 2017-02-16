@@ -61,7 +61,7 @@ regionSizeDistribution/regionSizeDistributionFunctionObject.C
 )
 
 ## Define the output
-add_library( regionCoupled SHARED ${SOURCES} )
+add_library( fieldFunctionObjects SHARED ${SOURCES} )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
