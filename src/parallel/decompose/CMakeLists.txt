@@ -1,3 +1,4 @@
+add_subdirectory( decompose )
 add_subdirectory( metisDecomp )
 add_subdirectory( ptscotchDecomp )
 add_subdirectory( decompositionMethods )
