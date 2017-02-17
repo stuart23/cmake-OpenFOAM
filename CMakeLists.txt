@@ -4,6 +4,13 @@ cmake_minimum_required(VERSION 3.0)
 set( PROJECT_NAME "cmake-OpenFOAM" VERSION 3.0 )
 project( ${PROJECT_NAME} )
 
+# Disallow in-source build
+if ("${CMAKE_SOURCE_DIR}"  STREQUAL "${CMAKE_BINARY_DIR}")
+  message(FATAL_ERROR
+    "OpenFOAM requires an out of source Build. "
+    "Please create a separate binary directory and run CMake there.")
+endif()
+
 include( ProcessorCount )
 ProcessorCount( NUMBER_PROCESSORS_TEMP )
 set( NUMBER_PROCESSORS ${NUMBER_PROCESSORS_TEMP} CACHE STRING 
