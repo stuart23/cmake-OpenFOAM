@@ -31,7 +31,7 @@ include_directories( /usr/include )
 
 # Dependancies
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-find_package( SCOTCH )
+# find_package( SCOTCH )
 find_package( MPI REQUIRED )
 find_package( FLEX REQUIRED )
 find_package( ZLIB REQUIRED )
@@ -53,14 +53,17 @@ endif()
 include_directories( ${MPI_INCLUDE_PATH} )
 
 find_package( Inotify )
-option( INOTIFY_ENABLED "Use iNotify Package" ${INOTIFY_FOUND} )
-if( INOTIFY_ENABLED ) 
+option( Inotify_ENABLED "Use iNotify Package" ${INOTIFY_FOUND} )
+if( Inotify_ENABLED ) 
   add_definitions( -DFOAM_USE_INOTIFY )
 endif()
-set( INOTIFY_INCLUDE_DIR ${INOTIFY_INCLUDE_DIR} ) 
 
 # C++11
 set( CMAKE_CXX_STANDARD 11 )
 
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
+
 add_subdirectory( src )
+# add_subdirectory( applications )
 
