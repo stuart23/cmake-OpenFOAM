@@ -8,6 +8,7 @@ dummyMGridGen.C
 add_library( MGridGen_dummy SHARED ${SOURCES} )
 set_target_properties( MGridGen_dummy PROPERTIES 
   OUTPUT_NAME MGridGen
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/dummy 
 )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOstreams/IOstreams )

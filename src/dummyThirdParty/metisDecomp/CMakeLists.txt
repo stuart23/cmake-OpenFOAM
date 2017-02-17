@@ -8,6 +8,7 @@ dummyMetisDecomp.C
 add_library( metisDecomp_dummy SHARED ${SOURCES} )
 set_target_properties( metisDecomp_dummy PROPERTIES 
   OUTPUT_NAME metisDecomp
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/dummy 
 )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )

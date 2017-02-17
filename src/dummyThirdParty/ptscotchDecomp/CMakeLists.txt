@@ -8,6 +8,7 @@ dummyPtscotchDecomp.C
 add_library( ptscotchDecomp_dummy SHARED ${SOURCES} )
 set_target_properties( ptscotchDecomp_dummy PROPERTIES 
   OUTPUT_NAME ptscotchDecomp
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/dummy 
 )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
