@@ -13,15 +13,14 @@ find_path(Inotify_INCLUDE_DIR sys/inotify.h
 	  PATH_SUFFIXES inotify
           )
 
-find_library(Inotify_LIBRARY inotify
-             PATH_SUFFIXES lib/inotify
-	     )
+  # find_library(Inotify_LIBRARY inotify
+  #              PATH_SUFFIXES lib/inotify
+  # 	     )
 
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set Inotify_FOUND to TRUE
 # if all listed variables are TRUE
-find_package_handle_standard_args(Inotify  DEFAULT_MSG
-                                  Inotify_LIBRARY Inotify_INCLUDE_DIR)
+find_package_handle_standard_args(Inotify  DEFAULT_MSG Inotify_INCLUDE_DIR)
 
 mark_as_advanced(Inotify_INCLUDE_DIR Inotify_LIBRARY )
 
