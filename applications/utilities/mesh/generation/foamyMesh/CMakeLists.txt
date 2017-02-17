@@ -1,0 +1,7 @@
+add_subdirectory( foamyHexMesh )
+add_subdirectory( foamyHexMeshSurfaceSimplify )
+add_subdirectory( conformalVoronoiMesh )
+add_subdirectory( foamyHexMeshBackgroundMesh )
+add_subdirectory( foamyQuadMesh )
+add_subdirectory( cellSizeAndAlignmentGrid )
+add_subdirectory( conformalVoronoi2DMesh )

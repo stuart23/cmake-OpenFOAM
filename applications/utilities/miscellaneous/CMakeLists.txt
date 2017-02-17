@@ -1,0 +1,6 @@
+add_subdirectory( foamFormatConvert )
+add_subdirectory( foamDebugSwitches )
+add_subdirectory( expandDictionary )
+add_subdirectory( foamInfoExec )
+add_subdirectory( patchSummary )
+add_subdirectory( foamHelp )

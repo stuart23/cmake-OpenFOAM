@@ -1,0 +1,8 @@
+add_subdirectory( foamToTecplot360 )
+add_subdirectory( foamToEnsightParts )
+add_subdirectory( foamToGMV )
+add_subdirectory( foamToTetDualMesh )
+add_subdirectory( foamToEnsight )
+add_subdirectory( foamDataToFluent )
+add_subdirectory( smapToFoam )
+add_subdirectory( foamToVTK )
