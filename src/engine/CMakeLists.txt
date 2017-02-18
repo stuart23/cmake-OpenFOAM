@@ -1,10 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lfiniteVolume \
-#    -lmeshTools \
-#    -ldynamicMesh \
-#    -lfvMotionSolvers
-
 set( SOURCES
 
 engineTime/engineTime.C
@@ -26,6 +19,8 @@ engineMesh/fvMotionSolverEngineMesh/fvMotionSolverEngineMesh.C
 
 ## Define the output
 add_library( engine SHARED ${SOURCES} )
+
+target_link_libraries( engine finiteVolume meshTools dynamicMesh fvMotionSolvers )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

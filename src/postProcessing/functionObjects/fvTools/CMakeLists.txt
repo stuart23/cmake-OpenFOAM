@@ -1,7 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lfiniteVolume
-
 set( SOURCES
 
 calcFvcDiv/calcFvcDiv.C
@@ -17,6 +13,8 @@ calcMag/calcMagFunctionObject.C
 
 ## Define the output
 add_library( FVFunctionObjects SHARED ${SOURCES} )
+
+target_link_libraries( FVFunctionObjects finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

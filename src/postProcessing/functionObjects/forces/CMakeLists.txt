@@ -1,16 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lcompressibleTransportModels \
-#    -lturbulenceModels \
-#    -lincompressibleTurbulenceModels \
-#    -lcompressibleTurbulenceModels \
-#    -lincompressibleTransportModels \
-#    -lfluidThermophysicalModels \
-#    -lspecie \
-#    -lfileFormats \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 forces/forces.C
@@ -23,6 +10,8 @@ forceCoeffs/forceCoeffsFunctionObject.C
 
 ## Define the output
 add_library( forces SHARED ${SOURCES} )
+
+target_link_libraries( forces compressibleTransportModels turbulenceModels incompressibleTurbulenceModels compressibleTurbulenceModels incompressibleTransportModels fluidThermophysicalModels specie fileFormats finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

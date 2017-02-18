@@ -1,25 +1,3 @@
-#May require linking against:
-#LIB_LIBS = \
-#    -llagrangian \
-#    -ldistributionModels \
-#    -lspecie \
-#    -lcompressibleTransportModels \
-#    -lfluidThermophysicalModels \
-#    -lliquidProperties \
-#    -lliquidMixtureProperties \
-#    -lsolidProperties \
-#    -lsolidMixtureProperties \
-#    -lreactionThermophysicalModels \
-#    -lSLGThermo \
-#    -lradiationModels \
-#    -lincompressibleTransportModels \
-#    -lregionModels \
-#    -lsurfaceFilmModels \
-#    -ldynamicFvMesh \
-#    -lsampling \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 clouds/baseClasses/kinematicCloud/kinematicCloud.C
@@ -97,6 +75,8 @@ submodels/MPPIC/AveragingMethods/makeAveragingMethods.C
 
 ## Define the output
 add_library( lagrangianIntermediate SHARED ${SOURCES} )
+
+target_link_libraries( lagrangianIntermediate lagrangian distributionModels specie compressibleTransportModels fluidThermophysicalModels liquidProperties liquidMixtureProperties solidProperties solidMixtureProperties reactionThermophysicalModels SLGThermo radiationModels incompressibleTransportModels regionModels surfaceFilmModels dynamicFvMesh sampling finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/ODE/ODESolvers/ODESolver )
 include_directories( ${CMAKE_SOURCE_DIR}/src/ODE/ODESolvers/adaptiveSolver )

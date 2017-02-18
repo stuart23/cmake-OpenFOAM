@@ -1,11 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lfiniteVolume \
-#    -lsampling \
-#    -lmeshTools \
-#    -lturbulenceModels \
-#    -lcompressibleTurbulenceModels
-
 set( SOURCES
 
 fvOption/fvOption.C
@@ -61,6 +53,8 @@ corrections/limitTemperature/limitTemperature.C
 
 ## Define the output
 add_library( fvOptions SHARED ${SOURCES} )
+
+target_link_libraries( fvOptions finiteVolume sampling meshTools turbulenceModels compressibleTurbulenceModels )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

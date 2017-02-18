@@ -1,8 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 calcType/calcType.C
@@ -22,6 +17,8 @@ basic/addSubtract/addSubtract.C
 
 ## Define the output
 add_library( foamCalcFunctions SHARED ${SOURCES} )
+
+target_link_libraries( foamCalcFunctions finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

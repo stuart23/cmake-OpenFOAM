@@ -1,7 +1,3 @@
-#May require linking against:
-#LIB_LIBS = \
-#    -lfiniteVolume
-
 set( SOURCES
 
 potential/potential.C
@@ -44,6 +40,8 @@ electrostaticPotential/electrostaticPotential.C
 
 ## Define the output
 add_library( potential SHARED ${SOURCES} )
+
+target_link_libraries( potential finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

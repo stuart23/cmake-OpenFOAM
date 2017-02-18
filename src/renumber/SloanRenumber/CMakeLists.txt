@@ -1,11 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -L$(BOOST_ARCH_PATH)/lib -lboost_thread \
-#    -ldecompositionMethods \
-#    -lfiniteVolume \
-#    -lmeshTools
-
-
 set( SOURCES
 
 SloanRenumber.C
@@ -14,6 +6,8 @@ SloanRenumber.C
 
 ## Define the output
 add_library( SloanRenumber SHARED ${SOURCES} )
+
+target_link_libraries( SloanRenumber ${Boost_LIBRARIES} decompositionMethods finiteVolume meshTools )
 
 include_directories( ${Boost_INCLUDE_DIR} )
 

@@ -1,9 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lfiniteVolume \
-#    -lOpenFOAM \
-#    -lmeshTools
-
 set( SOURCES
 
 pairPatchAgglomeration.C
@@ -12,6 +6,8 @@ pairPatchAgglomeration.C
 
 ## Define the output
 add_library( pairPatchAgglomeration SHARED ${SOURCES} )
+
+target_link_libraries( pairPatchAgglomeration finiteVolume OpenFOAM meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashSet )

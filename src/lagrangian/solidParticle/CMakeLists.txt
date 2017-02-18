@@ -1,9 +1,3 @@
-#May require linking against:
-#LIB_LIBS = \
-#    -llagrangian \
-#    -lmeshTools \
-#    -lfiniteVolume
-
 set( SOURCES
 
 solidParticle.C
@@ -14,6 +8,8 @@ solidParticleCloud.C
 
 ## Define the output
 add_library( solidParticle SHARED ${SOURCES} )
+
+target_link_libraries( solidParticle lagrangian meshTools finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

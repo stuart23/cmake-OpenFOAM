@@ -1,16 +1,3 @@
-# May need to link against these libs:
-#LIB_LIBS = \
-#    -lregionModels \
-#    -lpyrolysisModels \
-#    -lsurfaceFilmModels \
-#    -lsolidChemistryModel \
-#    -lreactionThermophysicalModels \
-#    -lSLGThermo \
-#    -lturbulenceModels \
-#    -lcompressibleTurbulenceModels \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 derivedFvPatchFields/filmPyrolysisVelocityCoupled/filmPyrolysisVelocityCoupledFvPatchVectorField.C
@@ -21,6 +8,9 @@ derivedFvPatchFields/filmPyrolysisRadiativeCoupledMixed/filmPyrolysisRadiativeCo
 
 ## Define the output
 add_library( regionCoupling SHARED ${SOURCES} )
+
+target_link_libraries( regionCoupling regionModels pyrolysisModels surfaceFilmModels solidChemistryModel 
+	reactionThermophysicalModels SLGThermo turbulenceModels compressibleTurbulenceModels finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

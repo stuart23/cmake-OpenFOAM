@@ -1,29 +1,3 @@
-#May require linking against:
-#LIB_LIBS = \
-#    -llagrangian \
-#    -llagrangianIntermediate \
-#    -llagrangianTurbulence \
-#    -ldistributionModels \
-#    -lspecie \
-#    -lcompressibleTransportModels \
-#    -lfluidThermophysicalModels \
-#    -lliquidProperties \
-#    -lliquidMixtureProperties \
-#    -lsolidProperties \
-#    -lsolidMixtureProperties \
-#    -lreactionThermophysicalModels \
-#    -lSLGThermo \
-#    -lradiationModels \
-#    -lturbulenceModels \
-#    -lincompressibleTurbulenceModels \
-#    -lcompressibleTurbulenceModels \
-#    -lincompressibleTransportModels \
-#    -lregionModels \
-#    -lsurfaceFilmModels \
-#    -ldynamicFvMesh \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 coalParcel/makeCoalParcelSubmodels.C
@@ -33,6 +7,8 @@ coalCloudList/coalCloudList.C
 
 ## Define the output
 add_library( coalCombustion SHARED ${SOURCES} )
+
+target_link_libraries( coalCombustion lagrangian lagrangianIntermediate lagrangianTurbulence distributionModels specie compressibleTransportModels fluidThermophysicalModels liquidProperties liquidMixtureProperties solidProperties solidMixtureProperties reactionThermophysicalModels SLGThermo radiationModels turbulenceModels incompressibleTurbulenceModels compressibleTurbulenceModels incompressibleTransportModels regionModels surfaceFilmModels dynamicFvMesh finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

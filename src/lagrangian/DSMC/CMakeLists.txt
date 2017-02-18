@@ -1,9 +1,3 @@
-#May require linking against:
-#LIB_LIBS = \
-#    -llagrangian \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 parcels/derived/dsmcParcel/dsmcParcel.C
@@ -19,6 +13,8 @@ parcels/derived/dsmcParcel/makeDSMCParcelInflowBoundaryModels.C
 
 ## Define the output
 add_library( DSMC SHARED ${SOURCES} )
+
+target_link_libraries( DSMC lagrangian finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

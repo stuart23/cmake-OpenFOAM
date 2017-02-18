@@ -1,10 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lforces \
-#    -lmeshTools \
-#    -lfileFormats \
-#    -ldynamicMesh
-
 set( SOURCES
 
 sixDoFRigidBodyMotion/sixDoFRigidBodyMotion.C
@@ -46,6 +39,8 @@ sixDoFSolvers/Newmark/Newmark.C
 
 ## Define the output
 add_library( sixDoFRigidBodyMotion SHARED ${SOURCES} )
+
+target_link_libraries( sixDoFRigidBodyMotion forces meshTools fileFormats dynamicMesh )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

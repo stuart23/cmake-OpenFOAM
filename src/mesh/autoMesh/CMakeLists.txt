@@ -1,16 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -ldynamicMesh \
-#    -lfiniteVolume \
-#    -llagrangian \
-#    -lmeshTools \
-#    -lfileFormats \
-#    -ledgeMesh \
-#    -lsurfMesh \
-#    -ltriSurface \
-#    -ldistributed
-
-
 set( SOURCES
 
 autoHexMesh/autoHexMeshDriver/autoLayerDriver.C
@@ -46,6 +33,8 @@ autoHexMesh/externalDisplacementMeshMover/zeroFixedValue/zeroFixedValuePointPatc
 
 ## Define the output
 add_library( autoMesh SHARED ${SOURCES} )
+
+target_link_libraries( autoMesh dynamicMesh finiteVolume lagrangian meshTools fileFormats edgeMesh surfMesh triSurface distributed )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

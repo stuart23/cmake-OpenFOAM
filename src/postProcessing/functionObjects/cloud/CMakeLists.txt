@@ -1,9 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lfiniteVolume \
-#    -llagrangian \
-#    -llagrangianIntermediate
-
 set( SOURCES
 
 cloudInfo/cloudInfo.C
@@ -13,6 +7,8 @@ cloudInfo/cloudInfoFunctionObject.C
 
 ## Define the output
 add_library( cloudFunctionObjects SHARED ${SOURCES} )
+
+target_link_libraries( cloudFunctionObjects finiteVolume lagrangian lagrangianIntermediate )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

@@ -1,29 +1,3 @@
-#May require linking against:
-#LIB_LIBS = \
-#    -llagrangian \
-#    -llagrangianIntermediate \
-#    -ldistributionModels \
-#    -lspecie \
-#    -lcompressibleTransportModels \
-#    -lfluidThermophysicalModels \
-#    -lliquidProperties \
-#    -lliquidMixtureProperties \
-#    -lsolidProperties \
-#    -lsolidMixtureProperties \
-#    -lreactionThermophysicalModels \
-#    -lSLGThermo \
-#    -lradiationModels \
-#    -lturbulenceModels \
-#    -lincompressibleTurbulenceModels \
-#    -lcompressibleTurbulenceModels \
-#    -lincompressibleTransportModels \
-#    -lregionModels \
-#    -lsurfaceFilmModels \
-#    -ldynamicFvMesh \
-#    -lsampling \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 parcels/derived/basicKinematicParcel/makeBasicKinematicParcelSubmodels.C
@@ -37,6 +11,8 @@ parcels/derived/basicKinematicMPPICParcel/makeBasicKinematicMPPICParcelSubmodels
 
 ## Define the output
 add_library( lagrangianTurbulence SHARED ${SOURCES} )
+
+target_link_libraries( lagrangianTurbulence lagrangian lagrangianIntermediate distributionModels specie compressibleTransportModels fluidThermophysicalModels liquidProperties liquidMixtureProperties solidProperties solidMixtureProperties reactionThermophysicalModels SLGThermo radiationModels turbulenceModels incompressibleTurbulenceModels compressibleTurbulenceModels incompressibleTransportModels regionModels surfaceFilmModels dynamicFvMesh sampling finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

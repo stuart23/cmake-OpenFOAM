@@ -1,9 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-# -L$(ZOLTAN_ARCH_PATH)/lib -lzoltan */ \
-# -lmeshTools
-
-
 set( SOURCES
 
 zoltanRenumber.C
@@ -13,6 +7,9 @@ zoltanRenumber.C
 ## Define the output
 add_library( zoltanRenumber SHARED ${SOURCES} )
 
+target_link_libraries( zoltanRenumber ${ZOLTAN_LIBRARIES} meshTools )
+
+include_directories( ${ZOLTAN_INCLUDE_DIR} )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashSet )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashTable )

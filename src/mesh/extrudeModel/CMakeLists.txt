@@ -1,6 +1,3 @@
-#May need to link against:
-#LIB_LIBS = -lmeshTools
-
 set( SOURCES
 
 extrudeModel/extrudeModel.C
@@ -19,6 +16,8 @@ wedge/wedge.C
 
 ## Define the output
 add_library( extrudeModel SHARED ${SOURCES} )
+
+target_link_libraries( extrudeModel meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

@@ -1,7 +1,3 @@
-#May require linking against:
-#LIB_LIBS = \
-#    -lmeshTools
-
 set( SOURCES
 
 particle/particle.C
@@ -15,6 +11,8 @@ InteractionLists/referredWallFace/referredWallFace.C
 
 ## Define the output
 add_library( lagrangian SHARED ${SOURCES} )
+
+target_link_libraries( lagrangian meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

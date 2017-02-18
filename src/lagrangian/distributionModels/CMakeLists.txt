@@ -1,7 +1,3 @@
-#May require linking against:
-#LIB_LIBS = \
-#    -lmeshTools
-
 set( SOURCES
 
 distributionModel/distributionModel.C

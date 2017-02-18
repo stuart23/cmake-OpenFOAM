@@ -1,19 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lfvOptions \
-#    -lturbulenceModels \
-#    -lincompressibleTurbulenceModels \
-#    -lcompressibleTurbulenceModels \
-#    -lincompressibleTransportModels \
-#    -lcompressibleTransportModels \
-#    -lfluidThermophysicalModels \
-#    -lspecie \
-#    -llagrangian \
-#    -lDSMC \
-#    -lfiniteVolume \
-#    -lmeshTools \
-#    -lsampling
-
 set( SOURCES
 
 codedFunctionObject/codedFunctionObject.C
@@ -66,6 +50,8 @@ setTimeStep/setTimeStepFunctionObject.C
 
 ## Define the output
 add_library( utilityFunctionObjects SHARED ${SOURCES} )
+
+target_link_libraries( utilityFunctionObjects fvOptions turbulenceModels incompressibleTurbulenceModels compressibleTurbulenceModels incompressibleTransportModels compressibleTransportModels fluidThermophysicalModels specie lagrangian DSMC finiteVolume meshTools sampling )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

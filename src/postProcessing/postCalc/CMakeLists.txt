@@ -1,7 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lfiniteVolume
-
 set( SOURCES
 
 postCalc.C
@@ -10,6 +6,8 @@ postCalc.C
 
 ## Define the output
 add_library( postCalc SHARED ${SOURCES} )
+
+target_link_libraries( postCalc finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

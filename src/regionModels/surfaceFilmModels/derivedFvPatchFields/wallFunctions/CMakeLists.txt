@@ -1,21 +1,3 @@
-# May need to link against these libs:
-#LIB_LIBS = \
-#    -lcompressibleTransportModels \
-#    -lfluidThermophysicalModels \
-#    -lspecie \
-#    -lliquidProperties \
-#    -lliquidMixtureProperties \
-#    -lsolidProperties \
-#    -lsolidMixtureProperties \
-#    -lreactionThermophysicalModels \
-#    -lSLGThermo \
-#    -lturbulenceModels \
-#    -lcompressibleTurbulenceModels \
-#    -lregionModels \
-#    -lsurfaceFilmModels \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 alphatFilmWallFunction/alphatFilmWallFunctionFvPatchScalarField.C
@@ -25,6 +7,10 @@ nutkFilmWallFunction/nutkFilmWallFunctionFvPatchScalarField.C
 
 ## Define the output
 add_library( surfaceFilmDerivedFvPatchFields SHARED ${SOURCES} )
+
+target_link_libraries( surfaceFilmDerivedFvPatchFields compressibleTransportModels fluidThermophysicalModels specie 
+	liquidProperties liquidMixtureProperties solidProperties solidMixtureProperties reactionThermophysicalModels 
+	SLGThermo turbulenceModels compressibleTurbulenceModels regionModels surfaceFilmModels finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

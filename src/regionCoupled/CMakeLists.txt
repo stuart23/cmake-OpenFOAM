@@ -1,12 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lcompressibleTransportModels \
-#    -lfluidThermophysicalModels \
-#    -lturbulenceModels \
-#    -lcompressibleTurbulenceModels \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 derivedFvPatchFields/energyRegionCoupled/energyRegionCoupledFvPatchScalarField.C
@@ -15,6 +6,8 @@ derivedFvPatchFields/energyRegionCoupled/energyRegionCoupledFvPatchScalarField.C
 
 ## Define the output
 add_library( regionCoupled SHARED ${SOURCES} )
+
+target_link_libraries( regionCoupled compressibleTransportModels fluidThermophysicalModels turbulenceModels compressibleTurbulenceModels finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

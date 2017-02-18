@@ -1,13 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lfiniteVolume \
-#    -lmeshTools \
-#    -lsurfMesh \
-#    -llagrangian \
-#    -lfileFormats \
-#    -lsampling \
-#    -lsurfMesh
-
 set( SOURCES
 
 fieldAverage/fieldAverage/fieldAverage.C
@@ -62,6 +52,8 @@ regionSizeDistribution/regionSizeDistributionFunctionObject.C
 
 ## Define the output
 add_library( fieldFunctionObjects SHARED ${SOURCES} )
+
+target_link_libraries( fieldFunctionObjects finiteVolume meshTools surfMesh lagrangian fileFormats sampling surfMesh )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

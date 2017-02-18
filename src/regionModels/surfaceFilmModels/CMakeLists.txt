@@ -1,19 +1,3 @@
-# May need to link against these libs:
-#LIB_LIBS = \
-#    -lcompressibleTransportModels \
-#    -lfluidThermophysicalModels \
-#    -lspecie \
-#    -lliquidProperties \
-#    -lliquidMixtureProperties \
-#    -lsolidProperties \
-#    -lsolidMixtureProperties \
-#    -lreactionThermophysicalModels \
-#    -lSLGThermo \
-#    -ldistributionModels \
-#    -lregionModels \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 surfaceFilmModel/surfaceFilmModel.C
@@ -79,6 +63,10 @@ derivedFvPatchFields/inclinedFilmNusseltInletVelocity/inclinedFilmNusseltInletVe
 
 ## Define the output
 add_library( surfaceFilmModels SHARED ${SOURCES} )
+
+target_link_libraries( surfaceFilmModels compressibleTransportModels fluidThermophysicalModels specie liquidProperties 
+	liquidMixtureProperties solidProperties solidMixtureProperties reactionThermophysicalModels SLGThermo 
+	distributionModels regionModels finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

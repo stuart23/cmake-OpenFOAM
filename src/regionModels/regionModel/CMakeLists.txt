@@ -1,8 +1,3 @@
-# May need to link against these libs:
-#LIB_LIBS = \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 regionModel/regionModel.C
@@ -21,6 +16,8 @@ regionModelFunctionObject/regionModelFunctionObject/regionModelFunctionObjectLis
 
 ## Define the output
 add_library( regionModels SHARED ${SOURCES} )
+
+target_link_libraries( regionModels finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

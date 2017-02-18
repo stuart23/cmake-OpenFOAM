@@ -1,12 +1,3 @@
-#May require linking against:
-#LIB_LIBS = \
-#    -lfiniteVolume \
-#    -lmeshTools \
-#    -llagrangian \
-#    -lpotential \
-#    -lmolecularMeasurements
-
-
 set( SOURCES
 
 reducedUnits/reducedUnits.C
@@ -21,6 +12,8 @@ moleculeCloud/moleculeCloud.C
 
 ## Define the output
 add_library( molecule SHARED ${SOURCES} )
+
+target_link_libraries( molecule finiteVolume meshTools lagrangian potential molecularMeasurements )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

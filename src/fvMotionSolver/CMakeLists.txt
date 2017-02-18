@@ -1,12 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -ltriSurface \
-#    -lmeshTools \
-#    -ldynamicMesh \
-#    -lfiniteVolume \
-#    -lfileFormats
-#    /*-lforces include in controlDict if needed */
-
 set( SOURCES
 
 fvMotionSolvers/fvMotionSolverCore/fvMotionSolverCore.C
@@ -52,6 +43,8 @@ pointPatchFields/derived/uniformInterpolatedDisplacement/uniformInterpolatedDisp
 
 ## Define the output
 add_library( fvMotionSolvers SHARED ${SOURCES} )
+
+target_link_libraries( fvMotionSolvers triSurface meshTools dynamicMesh finiteVolume fileFormats )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

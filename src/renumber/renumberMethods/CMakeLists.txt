@@ -1,10 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -ldecompositionMethods \
-#    -lfiniteVolume \
-#    -lmeshTools
-
-
 set( SOURCES
 
 renumberMethod/renumberMethod.C
@@ -18,6 +11,8 @@ structuredRenumber/structuredRenumber.C
 
 ## Define the output
 add_library( renumberMethods SHARED ${SOURCES} )
+
+target_link_libraries( renumberMethods decompositionMethods finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

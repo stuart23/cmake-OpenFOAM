@@ -1,8 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 partialWrite/partialWrite.C
@@ -21,6 +16,8 @@ writeRegisteredObject/writeRegisteredObjectFunctionObject.C
 
 ## Define the output
 add_library( IOFunctionObjects SHARED ${SOURCES} )
+
+target_link_libraries( IOFunctionObjects finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

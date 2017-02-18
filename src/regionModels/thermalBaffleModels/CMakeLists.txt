@@ -1,15 +1,3 @@
-# May need to link against these libs:
-#LIB_LIBS = \
-#    -lcompressibleTransportModels \
-#    -lregionModels \
-#    -lsolidThermo \
-#    -lturbulenceModels \
-#    -lcompressibleTurbulenceModels \
-#    -lradiationModels \
-#    -ldynamicMesh \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 thermalBaffleModel/thermalBaffleModel.C
@@ -23,6 +11,9 @@ derivedFvPatchFields/thermalBaffle/thermalBaffleFvPatchScalarField.C
 
 ## Define the output
 add_library( thermalBaffleModels SHARED ${SOURCES} )
+
+target_link_libraries( thermalBaffleModels compressibleTransportModels regionModels solidThermo turbulenceModels 
+	compressibleTurbulenceModels radiationModels dynamicMesh finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

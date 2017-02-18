@@ -1,18 +1,3 @@
-# May need to link against these libs:
-#LIB_LIBS = \
-#    -lfiniteVolume \
-#    -lmeshTools \
-#    -lchemistryModel \
-#    -lspecie \
-#    -lfluidThermophysicalModels \
-#    -lsolidChemistryModel \
-#    -lsolidThermo \
-#    -lturbulenceModels \
-#    -lcompressibleTurbulenceModels \
-#    -lregionModels \
-#    -lradiationModels \
-#    -lreactionThermophysicalModels
-
 set( SOURCES
 
 pyrolysisModel/pyrolysisModel.C
@@ -25,6 +10,9 @@ pyrolysisModel/pyrolysisModelCollection.C
 
 ## Define the output
 add_library( pyrolysisModels SHARED ${SOURCES} )
+
+target_link_libraries( pyrolysisModels finiteVolume meshTools chemistryModel specie fluidThermophysicalModels solidChemistryModel 
+	solidThermo turbulenceModels compressibleTurbulenceModels regionModels radiationModels reactionThermophysicalModels )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

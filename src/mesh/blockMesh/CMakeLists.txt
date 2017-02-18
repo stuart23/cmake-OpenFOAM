@@ -1,9 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lmeshTools \
-#    -ldynamicMesh
-
-
 set( SOURCES
 
 curvedEdges/BSpline.C
@@ -38,6 +32,8 @@ blockMesh/blockMeshMergeFast.C
 
 ## Define the output
 add_library( blockMesh SHARED ${SOURCES} )
+
+target_link_libraries( blockMesh meshTools dynamicMesh )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
