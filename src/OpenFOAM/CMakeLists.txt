@@ -1,10 +1,3 @@
-
-# MAY NEED TO LINK AGAINST THESE LIBS:
-#    $(FOAM_LIBBIN)/libOSspecific.o \
-#    -L$(FOAM_LIBBIN)/dummy -lPstream \
-#    -lz
-
-
 set( SOURCES
 global/global.Cver
 global/argList/argList.C
@@ -562,6 +555,8 @@ endif()
 
 ## Define the output
 add_library( OpenFOAM SHARED ${SOURCES} )
+
+target_link_libraries( OpenFOAM OSspecific Pstream ${ZLIB_LIBRARIES} )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
