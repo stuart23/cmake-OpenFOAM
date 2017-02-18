@@ -28,7 +28,7 @@ if( NO_REPOSITORY )
   add_definitions( -DNoRepository )
 endif()
 
-set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wold-style-cast -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -O3 -ftemplate-depth-100 -DOMPI_SKIP_MPICXX" )
+set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wold-style-cast -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -O3 -ftemplate-depth-100 -DOMPI_SKIP_MPICXX -fPIC" )
 
 set( LABEL_SIZE 32 )
 add_definitions( -DLABEL_SIZE=${LABEL_SIZE} )
@@ -44,6 +44,7 @@ find_package( FLEX REQUIRED )
 find_package( ZLIB REQUIRED )
 find_package( Boost REQUIRED )
 find_package( METIS REQUIRED )
+find_package( Threads REQUIRED )
 
 # Find if the metis header is specifying the same width reals (precision) as OpenFOAM settings
 # Length of real is specified in the metis.h header under the REALTYPEWIDTH macro
@@ -68,7 +69,10 @@ endif()
 # C++11
 set( CMAKE_CXX_STANDARD 11 )
 
+link_directories( ${CMAKE_BINARY_DIR}/lib )
+
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
 
 add_subdirectory( src )
