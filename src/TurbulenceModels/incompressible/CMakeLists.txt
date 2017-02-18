@@ -1,10 +1,3 @@
-#May require linking against:
-# LIB_LIBS = \
-#     -lincompressibleTransportModels \
-#     -lturbulenceModels \
-#     -lfiniteVolume \
-#     -lmeshTools
-
 set( SOURCES
 
 incompressibleTurbulenceModel.C
@@ -23,6 +16,8 @@ turbulentTransportModels/derivedFvPatchFields/wallFunctions/alphatWallFunctions/
 
 ## Define the output
 add_library( incompressibleTurbulenceModels SHARED ${SOURCES} )
+
+target_link_libraries( incompressibleTurbulenceModels incompressibleTransportModels turbulenceModels finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

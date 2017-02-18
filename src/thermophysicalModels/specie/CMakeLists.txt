@@ -1,7 +1,3 @@
-# May require libs:
-# LIB_LIBS = -lOpenFOAM
-
-
 set( SOURCES
 
 atomicWeights/atomicWeights.C
@@ -13,6 +9,8 @@ reaction/reactions/makeLangmuirHinshelwoodReactions.C
 
 ## Define the output
 add_library( specie SHARED ${SOURCES} )
+
+target_link_libraries( specie OpenFOAM )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashPtrTable )

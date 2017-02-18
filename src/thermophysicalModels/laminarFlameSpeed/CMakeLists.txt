@@ -1,8 +1,3 @@
-# May require libs:
-# LIB_LIBS = 
-#    -lcompressibleTransportModels \
-#    -lfiniteVolume
-
 set( SOURCES
 
 laminarFlameSpeed/laminarFlameSpeed.C
@@ -16,6 +11,8 @@ RaviPetersen/RaviPetersen.C
 
 ## Define the output
 add_library( laminarFlameSpeedModels SHARED ${SOURCES} )
+
+target_link_libraries( laminarFlameSpeedModels compressibleTransportModels finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

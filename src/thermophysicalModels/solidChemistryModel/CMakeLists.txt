@@ -1,10 +1,3 @@
-# May require libs:
-# LIB_LIBS = 
-#    -lchemistryModel \
-#    -lfiniteVolume \
-#    -lODE\
-#    -lreactionThermophysicalModels
-
 set( SOURCES
 
 basicSolidChemistryModel/basicSolidChemistryModel.C
@@ -17,6 +10,8 @@ solidChemistrySolver/makeSolidChemistrySolvers.C
 
 ## Define the output
 add_library( solidChemistryModel SHARED ${SOURCES} )
+
+target_link_libraries( solidChemistryModel chemistryModel finiteVolume ODE reactionThermophysicalModels )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/ODE/ODESolvers/ODESolver )
 include_directories( ${CMAKE_SOURCE_DIR}/src/ODE/ODESystem )

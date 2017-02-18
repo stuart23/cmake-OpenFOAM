@@ -1,9 +1,3 @@
-# May require libs:
-# LIB_LIBS = -lOpenFOAM
-#    -lcompressibleTransportModels \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 basicThermo/basicThermo.C
@@ -26,6 +20,8 @@ derivedFvPatchFields/energyJump/energyJumpAMI/energyJumpAMIFvPatchScalarField.C
 
 ## Define the output
 add_library( fluidThermophysicalModels SHARED ${SOURCES} )
+
+target_link_libraries( fluidThermophysicalModels compressibleTransportModels finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

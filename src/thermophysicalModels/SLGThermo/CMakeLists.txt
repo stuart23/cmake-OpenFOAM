@@ -1,8 +1,3 @@
-# May require libs:
-# LIB_LIBS = -lOpenFOAM
-#    -lcompressibleTransportModels \
-#    -lfiniteVolume \
-
 set( SOURCES
 
 SLGThermo/SLGThermo.C
@@ -11,6 +6,8 @@ SLGThermo/SLGThermo.C
 
 ## Define the output
 add_library( SLGThermo SHARED ${SOURCES} )
+
+target_link_libraries( SLGThermo compressibleTransportModels finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

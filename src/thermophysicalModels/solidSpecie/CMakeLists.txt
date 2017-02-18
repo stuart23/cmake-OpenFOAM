@@ -10,6 +10,8 @@ reaction/reactions/makeSolidReactions.C
 ## Define the output
 add_library( solidSpecie SHARED ${SOURCES} )
 
+target_link_libraries( solidSpecie specie )
+
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashPtrTable )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashTable )

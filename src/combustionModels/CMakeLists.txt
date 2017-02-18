@@ -1,12 +1,3 @@
-#May require linking against:
-# LIB_LIBS = \
-#    -lcompressibleTransportModels \
-#    -lturbulenceModels \
-#    -lcompressibleTurbulenceModels \
-#    -lchemistryModel \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 combustionModel/combustionModel.C
@@ -41,6 +32,8 @@ noCombustion/noCombustions.C
 
 ## Define the output
 add_library( combustionModels SHARED ${SOURCES} )
+
+target_link_libraries( combustionModels compressibleTransportModels turbulenceModels compressibleTurbulenceModels chemistryModel finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

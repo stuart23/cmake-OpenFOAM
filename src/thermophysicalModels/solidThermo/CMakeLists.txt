@@ -1,12 +1,3 @@
-# May require libs:
-# LIB_LIBS = 
-#    -lmeshTools \
-#    -lfiniteVolume \
-#    -lspecie \
-#    -lsolidSpecie \
-#    -lfluidThermophysicalModels \
-#    -lreactionThermophysicalModels
-
 set( SOURCES
 
 solidThermo/solidThermo.C
@@ -19,6 +10,8 @@ solidReactionThermo/solidReactionThermos.C
 
 ## Define the output
 add_library( solidThermo SHARED ${SOURCES} )
+
+target_link_libraries( solidThermo meshTools finiteVolume specie solidSpecie fluidThermophysicalModels reactionThermophysicalModels )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

@@ -1,11 +1,3 @@
-# May require libs:
-# LIB_LIBS = 
-#    -lcompressibleTransportModels \
-#    -lfluidThermophysicalModels \
-#    -lspecie \
-#    -lsolidSpecie \
-#    -lfiniteVolume
-
 set( SOURCES
 
 chemistryReaders/chemkinReader/chemkinReader.C
@@ -33,6 +25,8 @@ derivedFvPatchFields/mixedUnburntEnthalpy/mixedUnburntEnthalpyFvPatchScalarField
 
 ## Define the output
 add_library( reactionThermophysicalModels SHARED ${SOURCES} )
+
+target_link_libraries( reactionThermophysicalModels compressibleTransportModels fluidThermophysicalModels specie solidSpecie finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

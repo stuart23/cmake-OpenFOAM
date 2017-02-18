@@ -1,17 +1,3 @@
-# May require libs:
-# LIB_LIBS =
-#    -lcompressibleTransportModels \
-#    -lfluidThermophysicalModels \
-#    -lspecie \
-#    -lsolidThermo \
-#    -lSLGThermo \
-#    -lsolidMixtureProperties \
-#    -lliquidMixtureProperties \
-#    -lsolidProperties \
-#    -lliquidProperties \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 radiationModels/radiationModel/radiationModel.C
@@ -55,6 +41,9 @@ derivedFvPatchFields/greyDiffusiveViewFactor/greyDiffusiveViewFactorFixedValueFv
 
 ## Define the output
 add_library( radiationModels SHARED ${SOURCES} )
+
+target_link_libraries( radiationModels compressibleTransportModels fluidThermophysicalModels specie solidThermo 
+SLGThermo solidMixtureProperties liquidMixtureProperties solidProperties liquidProperties finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

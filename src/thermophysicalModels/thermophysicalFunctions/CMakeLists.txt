@@ -1,7 +1,3 @@
-# May require libs:
-# LIB_LIBS = -lOpenFOAM
-
-
 set( SOURCES
 
 thermophysicalFunction/thermophysicalFunction.C

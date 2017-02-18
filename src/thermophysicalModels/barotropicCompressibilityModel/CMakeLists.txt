@@ -1,7 +1,3 @@
-# May require libs:
-# LIB_LIBS = 
-#    -lfiniteVolume
-
 set( SOURCES
 
 barotropicCompressibilityModel/barotropicCompressibilityModel.C
@@ -14,6 +10,8 @@ Chung/Chung.C
 
 ## Define the output
 add_library( barotropicCompressibilityModel SHARED ${SOURCES} )
+
+target_link_libraries( barotropicCompressibilityModel finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

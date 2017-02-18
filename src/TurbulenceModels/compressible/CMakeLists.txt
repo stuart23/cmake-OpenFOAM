@@ -1,14 +1,3 @@
-#May require linking against:
-# LIB_LIBS = \
-#    -lcompressibleTransportModels \
-#    -lfluidThermophysicalModels \
-#    -lsolidThermo \
-#    -lsolidSpecie \
-#    -lturbulenceModels \
-#    -lspecie \
-#    -lfiniteVolume \
-#    -lmeshTools
-
 set( SOURCES
 
 compressibleTurbulenceModel.C
@@ -34,6 +23,8 @@ turbulentFluidThermoModels/derivedFvPatchFields/wallFunctions/alphatWallFunction
 ## Define the output
 add_library( compressibleTurbulenceModels SHARED ${SOURCES} )
 
+target_link_libraries( compressibleTurbulenceModels compressibleTransportModels fluidThermophysicalModels solidThermo solidSpecie turbulenceModels specie finiteVolume meshTools )
+
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )
@@ -46,8 +37,6 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/Map 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/accessTypes/ILList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/accessTypes/LList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/accessTypes/LPtrList )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/accessTypes/UILList )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/linkTypes/DLListBase )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/linkTypes/SLListBase )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/user )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/BiIndirectList )

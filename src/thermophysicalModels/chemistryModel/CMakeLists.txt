@@ -1,14 +1,3 @@
-# May require libs:
-# LIB_LIBS = 
-#    -lcompressibleTransportModels \
-#    -lfluidThermophysicalModels \
-#    -lreactionThermophysicalModels \
-#    -lspecie \
-#    -lthermophysicalFunctions \
-#    -lODE \
-#    -lfiniteVolume
-
-
 set( SOURCES
 
 chemistryModel/basicChemistryModel/basicChemistryModel.C
@@ -25,6 +14,8 @@ chemistrySolver/chemistrySolver/makeChemistrySolvers.C
 
 ## Define the output
 add_library( chemistryModel SHARED ${SOURCES} )
+
+target_link_libraries( chemistryModel compressibleTransportModels fluidThermophysicalModels reactionThermophysicalModels specie thermophysicalFunctions ODE finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/ODE/ODESolvers/ODESolver )
 include_directories( ${CMAKE_SOURCE_DIR}/src/ODE/ODESystem )

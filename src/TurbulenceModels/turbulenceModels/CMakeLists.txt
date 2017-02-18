@@ -1,8 +1,3 @@
-#May require linking against:
-# LIB_LIBS = \
-#     -lfiniteVolume \
-#     -lmeshTools
-
 set( SOURCES
 
 turbulenceModel.C
@@ -60,6 +55,8 @@ RAS/derivedFvPatchFields/atmBoundaryLayerInletEpsilon/atmBoundaryLayerInletEpsil
 
 ## Define the output
 add_library( turbulenceModels SHARED ${SOURCES} )
+
+target_link_libraries( turbulenceModels finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
