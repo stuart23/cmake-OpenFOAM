@@ -1,8 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -L$(FOAM_EXT_LIBBIN) -lMGridGen
-
-
 set( SOURCES
 
 MGridGenGAMGAgglomeration.C
@@ -12,6 +7,8 @@ MGridGenGAMGAgglomerate.C
 
 ## Define the output
 add_library( MGridGenGAMGAgglomeration SHARED ${SOURCES} )
+
+target_link_libraries( MGridGenGAMGAgglomeration ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dummy/libMGridGen.so )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashSet )
