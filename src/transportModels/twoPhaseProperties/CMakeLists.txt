@@ -1,9 +1,3 @@
-# May require libs:
-# LIB_LIBS = \
-#     -ltwoPhaseMixture \
-#     -linterfaceProperties \
-#     -lfiniteVolume
-
 set( SOURCES
 
 alphaContactAngle/alphaContactAngle/alphaContactAngleFvPatchScalarField.C
@@ -17,6 +11,8 @@ alphaFixedPressure/alphaFixedPressureFvPatchScalarField.C
 
 ## Define the output
 add_library( twoPhaseProperties SHARED ${SOURCES} )
+
+target_link_libraries( twoPhaseProperties twoPhaseMixture interfaceProperties finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

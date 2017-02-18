@@ -1,8 +1,3 @@
-# May require libs:
-# LIB_LIBS = \
-#     -ltwoPhaseMixture \
-#     -lfiniteVolume
-
 set( SOURCES
 
 interfaceProperties.C
@@ -12,6 +7,8 @@ interfaceCompression/interfaceCompression.C
 
 ## Define the output
 add_library( interfaceProperties SHARED ${SOURCES} )
+
+target_link_libraries( interfaceProperties twoPhaseMixture finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

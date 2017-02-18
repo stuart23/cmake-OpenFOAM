@@ -1,9 +1,3 @@
-# May have to link against these:
-# LIB_LIBS = \
-#     -lfileFormats \
-#     -lsurfMesh
-
-
 set( SOURCES
 
 faceTriangulation/faceTriangulation.C
@@ -45,6 +39,8 @@ triSurfaceFields/triSurfaceFields.C
 
 ## Define the output
 add_library( triSurface SHARED ${SOURCES} )
+
+target_link_libraries( triSurface fileFormats surfMesh )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

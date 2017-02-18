@@ -1,10 +1,3 @@
-#May require linking against:
-# LIB_LIBS = \
-#    -lfiniteVolume \
-#    -ldynamicFvMesh \
-#    -ldynamicMesh \
-#    -lmeshTools
-
 set( SOURCES
 
 topoChangerFvMesh/topoChangerFvMesh.C
@@ -16,6 +9,8 @@ movingConeTopoFvMesh/movingConeTopoFvMesh.C
 
 ## Define the output
 add_library( topoChangerFvMesh SHARED ${SOURCES} )
+
+target_link_libraries( topoChangerFvMesh finiteVolume dynamicFvMesh dynamicMesh meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

@@ -1,9 +1,3 @@
-# May need to link against these libs:
-#LIB_LIBS = \
-#    -ltriSurface \
-#    -ldecompositionMethods \
-#    -lmeshTools
-
 set( SOURCES
 
 distributedTriSurfaceMesh/distributedTriSurfaceMesh.C
@@ -12,6 +6,8 @@ distributedTriSurfaceMesh/distributedTriSurfaceMesh.C
 
 ## Define the output
 add_library( distributed SHARED ${SOURCES} )
+
+target_link_libraries( distributed triSurface decompositionMethods meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

@@ -1,10 +1,3 @@
-#May require linking against:
-#LIB_LIBS = \
-#    -lfileFormats \
-#    -lfiniteVolume \
-#    -lmeshTools
-
-
 set( SOURCES
 
 ensight/file/ensightFile.C
@@ -34,6 +27,8 @@ polyDualMesh/polyDualMesh.C
 
 ## Define the output
 add_library( conversion SHARED ${SOURCES} )
+
+target_link_libraries( conversion fileFormats finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

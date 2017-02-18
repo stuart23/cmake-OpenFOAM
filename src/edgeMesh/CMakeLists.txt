@@ -1,10 +1,3 @@
-# May need to link against these libs:
-#LIB_LIBS = \
-#    -ltriSurface \
-#    -lsurfMesh \
-#    -lmeshTools
-#    -lfileFormats
-
 set( SOURCES
 
 edgeMesh.C
@@ -47,6 +40,8 @@ extendedEdgeMesh/extendedFeatureEdgeMesh/extendedFeatureEdgeMesh.C
 
 ## Define the output
 add_library( edgeMesh SHARED ${SOURCES} )
+
+target_link_libraries( edgeMesh triSurface meshTools fileFormats surfMesh )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

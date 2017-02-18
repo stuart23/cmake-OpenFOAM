@@ -1,9 +1,3 @@
-# May need to link against these libs:
-#LIB_LIBS = \
-#    -lfiniteVolume \
-#    -lmeshTools \
-#    -llagrangian
-
 set( SOURCES
 
 fvFieldDecomposer.C
@@ -12,6 +6,8 @@ fvFieldDecomposer.C
 
 ## Define the output
 add_library( decompose SHARED ${SOURCES} )
+
+target_link_libraries( decompose finiteVolume meshTools lagrangian )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

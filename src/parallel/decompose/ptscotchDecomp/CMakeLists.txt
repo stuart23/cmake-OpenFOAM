@@ -1,6 +1,3 @@
-# May need to link against these libs:
-#LIB_LIBS = \
-#        -L$(SCOTCH_ROOT)/lib -L$(FOAM_EXT_LIBBIN)/$(FOAM_MPI) -lptscotch -lptscotcherrexit -lscotch ${LINK_FLAGS} -lrt
 
 set( SOURCES
 
@@ -10,6 +7,8 @@ set( SOURCES
 
 ## Define the output
 add_library( ptscotchDecomp SHARED ${SOURCES} )
+
+target_link_libraries( ptscotchDecomp ptscotch ptscotcherrexit scotch rt )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

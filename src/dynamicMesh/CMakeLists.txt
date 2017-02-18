@@ -1,8 +1,3 @@
-#May require linking against:
-#    -lfiniteVolume \
-#    -ltriSurface \
-#    -lextrudeModel
-
 set( SOURCES
 
 attachDetach/attachDetach.C
@@ -111,6 +106,8 @@ polyMeshFilter/polyMeshFilter.C
 
 ## Define the output
 add_library( dynamicMesh SHARED ${SOURCES} )
+
+target_link_libraries( dynamicMesh finiteVolume triSurface extrudeModel )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

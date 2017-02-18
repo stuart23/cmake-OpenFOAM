@@ -1,8 +1,3 @@
-# May need to link against these libs:
-#LIB_LIBS = \
-#    -lmeshTools \
-#    -lfiniteVolume
-
 set( SOURCES
 
 dummyScotchDecomp.C

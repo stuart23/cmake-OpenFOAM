@@ -1,7 +1,3 @@
-# May need to link against these libs:
-#LIB_LIBS = \
-#    -L$(METIS_ARCH_PATH)/lib -lmetis
-
 set( SOURCES
 
 metisDecomp.C

@@ -1,7 +1,3 @@
-#May require linking against:
-#LIB_LIBS = \
-#    -lfiniteVolume
-
 set( SOURCES
 
 genericFvPatchField/genericFvPatchFields.C
@@ -11,6 +7,8 @@ genericPointPatchField/genericPointPatchFields.C
 
 ## Define the output
 add_library( genericPatchFields SHARED ${SOURCES} )
+
+target_link_libraries( genericPatchFields finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

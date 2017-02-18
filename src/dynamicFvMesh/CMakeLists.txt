@@ -1,10 +1,3 @@
-#May require linking against:
-# LIB_LIBS = \
-#     -ltriSurface \
-#     -lmeshTools \
-#     -ldynamicMesh \
-#     -lfiniteVolume
-
 set( SOURCES
 
 dynamicFvMesh/dynamicFvMesh.C
@@ -32,6 +25,8 @@ solidBodyMotionFvMesh/pointPatchFields/derived/solidBodyMotionDisplacement/solid
 
 ## Define the output
 add_library( dynamicFvMesh SHARED ${SOURCES} )
+
+target_link_libraries( dynamicFvMesh triSurface meshTools dynamicMesh finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

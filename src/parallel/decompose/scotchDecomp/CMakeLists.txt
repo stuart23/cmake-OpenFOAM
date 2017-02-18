@@ -1,5 +1,3 @@
-# May need to link against these libs:
-
 set( SOURCES
 
 scotchDecomp.C
@@ -8,6 +6,8 @@ scotchDecomp.C
 
 ## Define the output
 add_library( scotchDecomp SHARED ${SOURCES} )
+
+target_link_libraries( scotchDecomp scotch scotcherrexit rt )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

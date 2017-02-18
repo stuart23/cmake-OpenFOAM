@@ -1,9 +1,3 @@
-# May need to link against these libs:
-#LIB_LIBS = \
-#    -ltriSurface \
-#    -lsurfMesh \
-#    -lfileFormats
-
 set( SOURCES
 
 cellClassification/cellClassification.C
@@ -211,6 +205,8 @@ tetOverlapVolume/tetOverlapVolume.C
 
 ## Define the output
 add_library( meshTools SHARED ${SOURCES} )
+
+target_link_libraries( meshTools triSurface surfMesh fileFormats )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

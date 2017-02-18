@@ -1,6 +1,3 @@
-# May require linking against
-#    -lfiniteVolume
-
 set( SOURCES
 
 Kmesh/Kmesh.C
@@ -20,6 +17,8 @@ noise/noiseFFT.C
 
 ## Define the output
 add_library( randomProcesses SHARED ${SOURCES} )
+
+target_link_libraries( randomProcesses finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

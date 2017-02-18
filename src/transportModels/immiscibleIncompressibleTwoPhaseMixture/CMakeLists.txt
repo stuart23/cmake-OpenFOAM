@@ -1,11 +1,3 @@
-# May require libs:
-# LIB_LIBS = \
-#    -ltwoPhaseMixture \
-#    -lincompressibleTransportModels \
-#    -linterfaceProperties \
-#    -ltwoPhaseProperties \
-#    -lfiniteVolume
-
 set( SOURCES
 
 immiscibleIncompressibleTwoPhaseMixture.C
@@ -14,6 +6,8 @@ immiscibleIncompressibleTwoPhaseMixture.C
 
 ## Define the output
 add_library( immiscibleIncompressibleTwoPhaseMixture SHARED ${SOURCES} )
+
+target_link_libraries( immiscibleIncompressibleTwoPhaseMixture twoPhaseMixture incompressibleTransportModels interfaceProperties twoPhaseProperties finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

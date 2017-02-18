@@ -1,7 +1,3 @@
-# May require libs:
-# LIB_LIBS = \
-#     -lfiniteVolume
-
 set( SOURCES
 
 compressibleTransportModel/compressibleTransportModel.C
@@ -10,6 +6,8 @@ compressibleTransportModel/compressibleTransportModel.C
 
 ## Define the output
 add_library( compressibleTransportModels SHARED ${SOURCES} )
+
+target_link_libraries( compressibleTransportModels finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashTable )

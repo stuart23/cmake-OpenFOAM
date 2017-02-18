@@ -1,9 +1,3 @@
-# May require libs:
-# LIB_LIBS = \
-#     -lfiniteVolume
-#    -ltwoPhaseMixture \
-
-
 set( SOURCES
 
 viscosityModels/viscosityModel/viscosityModel.C
@@ -23,6 +17,8 @@ incompressibleTwoPhaseMixture/incompressibleTwoPhaseMixture.C
 
 ## Define the output
 add_library( incompressibleTransportModels SHARED ${SOURCES} )
+
+target_link_libraries( incompressibleTransportModels twoPhaseMixture finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

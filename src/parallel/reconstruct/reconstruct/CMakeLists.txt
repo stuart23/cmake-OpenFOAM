@@ -1,9 +1,3 @@
-# May need to link against these libs:
-#LIB_LIBS = \
-#    -lfiniteVolume \
-#    -lmeshTools \
-#    -llagrangian
-
 set( SOURCES
 
 processorMeshes.C
@@ -15,6 +9,8 @@ reconstructLagrangianPositions.C
 
 ## Define the output
 add_library( reconstruct SHARED ${SOURCES} )
+
+target_link_libraries( reconstruct finiteVolume meshTools lagrangian )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

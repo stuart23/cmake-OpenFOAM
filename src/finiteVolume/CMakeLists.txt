@@ -1,10 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lOpenFOAM \
-#    -ltriSurface \
-#    -lmeshTools
-
-
 set( SOURCES
 
 fvMesh/fvMeshGeometry.C
@@ -393,6 +386,8 @@ cfdTools/general/SRF/derivedFvPatchFields/SRFFreestreamVelocityFvPatchVectorFiel
 
 ## Define the output
 add_library( finiteVolume SHARED ${SOURCES} )
+
+target_link_libraries( finiteVolume OpenFOAM triSurface meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

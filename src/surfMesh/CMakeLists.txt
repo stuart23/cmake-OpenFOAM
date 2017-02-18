@@ -51,6 +51,8 @@ surfaceFormats/x3d/X3DsurfaceFormatRunTime.C
 ## Define the output
 add_library( surfMesh SHARED ${SOURCES} )
 
+target_link_libraries( surfMesh fileFormats )
+
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/signals )

@@ -1,13 +1,3 @@
-#May require linking against:
-#LIB_LIBS = \
-#    -lfiniteVolume \
-#    -lmeshTools \
-#    -lsurfMesh \
-#    -lfileFormats \
-#    -ltriSurface \
-#    -llagrangian \
-#    -lconversion
-
 set( SOURCES
 
 probes/probes.C
@@ -82,6 +72,8 @@ meshToMesh0/calculateMeshToMesh0Weights.C
 
 ## Define the output
 add_library( sampling SHARED ${SOURCES} )
+
+target_link_libraries( sampling finiteVolume meshTools surfMesh fileFormats triSurface lagrangian conversion )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

@@ -1,6 +1,3 @@
-# May require libs:
-# -lfiniteVolume
-
 set( SOURCES
 
 twoPhaseMixture/twoPhaseMixture.C
@@ -9,6 +6,8 @@ twoPhaseMixture/twoPhaseMixture.C
 
 ## Define the output
 add_library( twoPhaseMixture SHARED ${SOURCES} )
+
+target_link_libraries( twoPhaseMixture finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
