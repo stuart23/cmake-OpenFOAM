@@ -42,8 +42,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 find_package( MPI REQUIRED )
 find_package( FLEX REQUIRED )
 find_package( ZLIB REQUIRED )
-find_package( Boost REQUIRED )
+find_package( Boost COMPONENTS thread REQUIRED )
 find_package( METIS REQUIRED )
+find_package( Zoltan REQUIRED )
 find_package( Threads REQUIRED )
 
 # Find if the metis header is specifying the same width reals (precision) as OpenFOAM settings
