@@ -1,7 +1,7 @@
 add_subdirectory( specie )
 add_subdirectory( solidSpecie )
 add_subdirectory( thermophysicalFunctions )
-  
+add_subdirectory( properties )
 add_subdirectory( basic )
 add_subdirectory( reactionThermo )
 add_subdirectory( laminarFlameSpeed )
