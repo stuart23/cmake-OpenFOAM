@@ -29,6 +29,8 @@ if( NO_REPOSITORY )
 endif()
 
 set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wold-style-cast -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -O3 -ftemplate-depth-100 -DOMPI_SKIP_MPICXX -fPIC" )
+set( CMAKE_SHARED_LINKER_FLAGS "-Xlinker --copy-dt-needed-entries -Xlinker --no-as-needed" )
+set( CMAKE_EXE_LINKER_FLAGS "-Xlinker --copy-dt-needed-entries -Xlinker --no-as-needed" )
 
 set( LABEL_SIZE 32 )
 add_definitions( -DLABEL_SIZE=${LABEL_SIZE} )
@@ -70,7 +72,12 @@ endif()
 # C++11
 set( CMAKE_CXX_STANDARD 11 )
 
+# Relink to installed libs on install
+set( CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib" )
+set( CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE )
+
 link_directories( ${CMAKE_BINARY_DIR}/lib )
+# link_directories( "/home/stuart/OpenFOAM-3.0.x_test/OpenFOAM-3.0.x/platforms/linux64GccDPInt32Opt/lib" )
 
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
