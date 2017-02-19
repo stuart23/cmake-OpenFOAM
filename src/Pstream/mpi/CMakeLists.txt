@@ -8,6 +8,8 @@ set( SOURCES
 ## Define the output
 add_library( Pstream SHARED ${SOURCES} )
 
+target_link_libraries( Pstream ${MPI_CXX_LIBRARIES} )
+
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashTable )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/accessTypes/LList )
