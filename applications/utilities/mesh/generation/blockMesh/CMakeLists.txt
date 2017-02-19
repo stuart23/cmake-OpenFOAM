@@ -1,4 +1,4 @@
-set( EXE_NAME blockMesh )
+set( EXE_NAME blockMesh_exe )
 
 set( SOURCES
 
@@ -8,6 +8,9 @@ blockMeshApp.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+set_target_properties( ${EXE_NAME} PROPERTIES
+	OUTPUT_NAME blockMesh
+)	
 
 target_link_libraries( ${EXE_NAME} blockMesh meshTools dynamicMesh )
 
