@@ -1,6 +1,3 @@
-# May require libs:
-# LIB_LIBS = -lspecie
-
 set( SOURCES
 
 reaction/reactions/makeSolidReactions.C

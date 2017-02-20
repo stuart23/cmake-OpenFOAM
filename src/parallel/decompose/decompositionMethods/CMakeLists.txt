@@ -1,8 +1,3 @@
-# May need to link against these libs:
-#LIB_LIBS = \
-#    -lmeshTools \
-#    -lfiniteVolume
-
 set( SOURCES
 
 decompositionMethod/decompositionMethod.C
@@ -18,6 +13,8 @@ noDecomp/noDecomp.C
 
 ## Define the output
 add_library( decompositionMethods SHARED ${SOURCES} )
+
+target_link_libraries( decompositionMethods meshTools finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
