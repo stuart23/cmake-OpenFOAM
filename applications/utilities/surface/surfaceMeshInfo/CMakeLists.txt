@@ -9,7 +9,7 @@ surfaceMeshInfo.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} OpenFOAM dl m )
+target_link_libraries( ${EXE_NAME} meshTools surfMesh OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

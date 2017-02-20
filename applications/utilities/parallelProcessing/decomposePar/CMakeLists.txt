@@ -25,7 +25,7 @@ lagrangianFieldDecomposer.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} finiteVolume decompose genericPatchFields decompositionMethods lagrangian meshTools regionModels ${CMAKE_THREAD_LIBS_INIT} )
+target_link_libraries( ${EXE_NAME} finiteVolume decompose genericPatchFields decompositionMethods lagrangian meshTools regionModels ${CMAKE_THREAD_LIBS_INIT} OpenFOAM dl m )
 # target_link_libraries( ${EXE_NAME} finiteVolume decompose genericPatchFields decompositionMethods lagrangian meshTools regionModels metisDecomp scotchDecomp )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/parallelProcessing/decomposePar )
