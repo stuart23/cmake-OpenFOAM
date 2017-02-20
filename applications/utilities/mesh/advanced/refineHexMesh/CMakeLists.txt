@@ -9,7 +9,7 @@ refineHexMesh.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} dynamicMesh meshTools finiteVolume genereicPatchFields )
+target_link_libraries( ${EXE_NAME} dynamicMesh meshTools finiteVolume genericPatchFields )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
