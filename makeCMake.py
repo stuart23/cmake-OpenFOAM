@@ -20,6 +20,8 @@ for line in make_options:
     if line.strip().startswith('-l'):
         libs.append(line.replace('\\', '').strip().replace('-l',''))
 
+libs += ['OpenFOAM', 'dl', 'm']
+
 with open('CMakeLists.txt', 'w') as cmake:
     cmake.write('set( EXE_NAME %s )\n' % target_name)
     cmake.write('\n')
@@ -33,7 +35,6 @@ with open('CMakeLists.txt', 'w') as cmake:
     cmake.write('## Define the output\n')
     cmake.write('add_executable( ${EXE_NAME} ${SOURCES} )\n')
     cmake.write('\n')
-    if len(libs) > 0:
-        cmake.write('target_link_libraries( ${EXE_NAME} %s )\n' % ' '.join(libs))
-        cmake.write('\n')
+    cmake.write('target_link_libraries( ${EXE_NAME} %s )\n' % ' '.join(libs))
+    cmake.write('\n')
 
