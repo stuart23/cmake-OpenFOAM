@@ -1,5 +1,6 @@
 set( SOURCES
 
+liquidProperties/liquidProperties.C
 H2O/H2O.C
 C7H16/C7H16.C
 C12H26/C12H26.C

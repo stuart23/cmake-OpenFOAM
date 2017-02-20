@@ -1,5 +1,8 @@
 set( SOURCES
 
+solidProperties/solidProperties.C
+solidProperties/solidPropertiesNew.C
+
 ash/ash.C
 C/C.C
 CaCO3/CaCO3.C
