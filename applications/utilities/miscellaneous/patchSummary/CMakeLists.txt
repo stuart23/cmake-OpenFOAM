@@ -9,7 +9,7 @@ patchSummary.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} genericPatchFields finiteVolume meshTools )
+target_link_libraries( ${EXE_NAME} genericPatchFields finiteVolume meshTools OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/miscellaneous/patchSummary )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )

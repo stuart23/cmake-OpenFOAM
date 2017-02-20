@@ -9,7 +9,7 @@ mdInitialise.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} meshTools dynamicMesh finiteVolume lagrangian molecule potential molecularMeasurements )
+target_link_libraries( ${EXE_NAME} meshTools dynamicMesh finiteVolume lagrangian molecule potential molecularMeasurements OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

@@ -13,7 +13,7 @@ checkMesh.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} meshTools dynamicMesh )
+target_link_libraries( ${EXE_NAME} meshTools dynamicMesh OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/manipulation/checkMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )

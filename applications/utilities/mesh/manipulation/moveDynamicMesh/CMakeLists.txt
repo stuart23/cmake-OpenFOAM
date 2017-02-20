@@ -9,7 +9,7 @@ moveDynamicMesh.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} dynamicFvMesh meshTools sampling dynamicMesh )
+target_link_libraries( ${EXE_NAME} dynamicFvMesh meshTools sampling dynamicMesh OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

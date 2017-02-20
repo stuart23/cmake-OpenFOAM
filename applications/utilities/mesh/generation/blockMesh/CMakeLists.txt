@@ -12,7 +12,7 @@ set_target_properties( ${EXE_NAME} PROPERTIES
 	OUTPUT_NAME blockMesh
 )	
 
-target_link_libraries( ${EXE_NAME} blockMesh meshTools dynamicMesh )
+target_link_libraries( ${EXE_NAME} blockMesh meshTools dynamicMesh OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/generation/blockMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )

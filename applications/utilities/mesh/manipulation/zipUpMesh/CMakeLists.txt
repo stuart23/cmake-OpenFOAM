@@ -9,7 +9,7 @@ zipUpMesh.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} meshTools )
+target_link_libraries( ${EXE_NAME} meshTools OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

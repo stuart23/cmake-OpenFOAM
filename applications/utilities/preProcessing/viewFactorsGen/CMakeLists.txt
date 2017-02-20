@@ -9,7 +9,7 @@ viewFactorsGen.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} meshTools finiteVolume meshTools triSurface distributed radiationModels )
+target_link_libraries( ${EXE_NAME} meshTools finiteVolume meshTools triSurface distributed radiationModels OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/preProcessing/viewFactorsGen )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )

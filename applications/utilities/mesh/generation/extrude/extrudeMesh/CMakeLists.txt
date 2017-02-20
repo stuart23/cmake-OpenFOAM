@@ -10,7 +10,7 @@ extrudeMesh.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} finiteVolume surfMesh meshTools dynamicMesh extrudeModel )
+target_link_libraries( ${EXE_NAME} finiteVolume surfMesh meshTools dynamicMesh extrudeModel OpenFOAM dl m )
 #target_link_libraries( ${EXE_NAME} finiteVolume surfMesh meshTools dynamicMesh extrudeModel ${CMAKE_THREAD_LIBS_INIT} )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/generation/extrude/extrudeMesh )

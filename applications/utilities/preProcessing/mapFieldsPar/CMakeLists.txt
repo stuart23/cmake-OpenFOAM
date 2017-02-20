@@ -10,7 +10,7 @@ mapFieldsPar.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} sampling meshTools lagrangian finiteVolume genericPatchFields )
+target_link_libraries( ${EXE_NAME} sampling meshTools lagrangian finiteVolume genericPatchFields OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/preProcessing/mapFieldsPar )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )

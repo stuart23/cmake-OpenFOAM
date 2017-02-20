@@ -9,7 +9,7 @@ renumberMesh.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} meshTools dynamicMesh finiteVolume genericPatchFields renumberMethods decompositionMethods metisDecomp scotchDecomp )
+target_link_libraries( ${EXE_NAME} meshTools dynamicMesh finiteVolume genericPatchFields renumberMethods decompositionMethods metisDecomp scotchDecomp OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

@@ -10,7 +10,7 @@ foamMeshToFluent.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} finiteVolume )
+target_link_libraries( ${EXE_NAME} finiteVolume OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/conversion/foamMeshToFluent )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )

@@ -9,7 +9,7 @@ PDRMesh.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} turbulenceModels compressibleTurbulenceModels compressibleTransportModels fluidThermophysicalModels meshTools dynamicMesh finiteVolume )
+target_link_libraries( ${EXE_NAME} turbulenceModels compressibleTurbulenceModels compressibleTransportModels fluidThermophysicalModels meshTools dynamicMesh finiteVolume OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

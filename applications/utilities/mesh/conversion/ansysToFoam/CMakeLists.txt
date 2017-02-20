@@ -11,6 +11,8 @@ ${CMAKE_CURRENT_BINARY_DIR}/ansysToFoam.L.cpp
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
+target_link_libraries( OpenFOAM dl m )
+
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/signals )

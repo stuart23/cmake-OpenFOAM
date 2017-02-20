@@ -11,7 +11,7 @@ general/general.C
 ## Define the output
 add_library( tabulatedWallFunctions SHARED ${SOURCES} )
 
-target_link_libraries( tabulatedWallFunctions finiteVolume )
+target_link_libraries( tabulatedWallFunctions finiteVolume OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/preProcessing/wallFunctionTable/tabulatedWallFunction/SpaldingsLaw )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/preProcessing/wallFunctionTable/tabulatedWallFunction/tabulatedWallFunction )

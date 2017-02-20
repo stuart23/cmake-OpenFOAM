@@ -9,7 +9,7 @@ foamHelp.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} helpTypes turbulenceModels incompressibleTurbulenceModels compressibleTurbulenceModels radiationModels fluidThermophysicalModels finiteVolume meshTools )
+target_link_libraries( ${EXE_NAME} helpTypes turbulenceModels incompressibleTurbulenceModels compressibleTurbulenceModels radiationModels fluidThermophysicalModels finiteVolume meshTools OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/miscellaneous/foamHelp/helpTypes/helpType )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )

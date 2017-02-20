@@ -12,7 +12,7 @@ set_target_properties( ${EXE_NAME} PROPERTIES
 	OUTPUT_NAME extrude2DMesh
 )	
 
-target_link_libraries( ${EXE_NAME} surfMesh dynamicMesh extrude2DMesh extrudeModel )
+target_link_libraries( ${EXE_NAME} surfMesh dynamicMesh extrude2DMesh extrudeModel OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/generation/extrude2DMesh/extrude2DMesh/extrude2DMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/generation/extrude2DMesh/extrude2DMesh/patchToPoly2DMesh )

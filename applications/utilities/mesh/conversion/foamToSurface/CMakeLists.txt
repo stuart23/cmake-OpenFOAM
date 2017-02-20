@@ -9,7 +9,7 @@ foamToSurface.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} surfMesh )
+target_link_libraries( ${EXE_NAME} surfMesh OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/conversion/foamToStarMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )

@@ -8,7 +8,7 @@ patchToPoly2DMesh/patchToPoly2DMesh.C
 ## Define the output
 add_library( extrude2DMesh SHARED ${SOURCES} )
 
-target_link_libraries( extrude2DMesh meshTools dynamicMesh surfMesh finiteVolume ) 
+target_link_libraries( extrude2DMesh meshTools dynamicMesh surfMesh finiteVolume OpenFOAM dl m ) 
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

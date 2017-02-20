@@ -9,7 +9,7 @@ dsmcInitialise.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} meshTools finiteVolume lagrangian DSMC )
+target_link_libraries( ${EXE_NAME} meshTools finiteVolume lagrangian DSMC OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

@@ -11,7 +11,7 @@ ${CMAKE_CURRENT_BINARY_DIR}/fluent3DMeshToFoam.L.cpp
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} meshTools dynamicMesh )
+target_link_libraries( ${EXE_NAME} meshTools dynamicMesh OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

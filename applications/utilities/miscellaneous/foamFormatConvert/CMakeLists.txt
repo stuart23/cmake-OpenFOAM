@@ -9,7 +9,7 @@ foamFormatConvert.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} meshTools finiteVolume genericPatchFields lagrangian )
+target_link_libraries( ${EXE_NAME} meshTools finiteVolume genericPatchFields lagrangian OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/miscellaneous/foamFormatConvert )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )

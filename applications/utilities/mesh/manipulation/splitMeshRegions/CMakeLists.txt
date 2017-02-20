@@ -9,7 +9,7 @@ splitMeshRegions.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} finiteVolume genericPatchFields dynamicMesh meshTools )
+target_link_libraries( ${EXE_NAME} finiteVolume genericPatchFields dynamicMesh meshTools OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

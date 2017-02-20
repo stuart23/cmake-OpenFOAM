@@ -9,7 +9,7 @@ boxTurb.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} randomProcesses finiteVolume meshTools )
+target_link_libraries( ${EXE_NAME} randomProcesses finiteVolume meshTools OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/test/cyclic )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/preProcessing/boxTurb )
