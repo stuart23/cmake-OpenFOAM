@@ -1,3 +1,5 @@
+FLEX_TARGET(readSTLASCII triSurface/interfaces/STL/readSTLASCII.L ${CMAKE_CURRENT_BINARY_DIR}/readSTLASCII.L.cpp COMPILE_FLAGS ${FLEX_FLAGS})
+
 set( SOURCES
 
 faceTriangulation/faceTriangulation.C
@@ -9,7 +11,7 @@ triSurface/stitchTriangles.C
 
 triSurface/interfaces/STL/writeSTL.C
 triSurface/interfaces/STL/readSTL.C
-triSurface/interfaces/STL/readSTLASCII.L
+${CMAKE_CURRENT_BINARY_DIR}/readSTLASCII.L.cpp
 triSurface/interfaces/STL/readSTLBINARY.C
 triSurface/interfaces/GTS/writeGTS.C
 triSurface/interfaces/GTS/readGTS.C

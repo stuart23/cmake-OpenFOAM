@@ -1,4 +1,4 @@
-FLEX_TARGET(STLsurfaceFormatASCII surfaceFormats/stl/STLsurfaceFormatASCII.L surfaceFormats/stl/STLsurfaceFormatASCII.L.cpp)
+FLEX_TARGET(STLsurfaceFormatASCII surfaceFormats/stl/STLsurfaceFormatASCII.L ${CMAKE_CURRENT_BINARY_DIR}/STLsurfaceFormatASCII.L.cpp COMPILE_FLAGS ${FLEX_FLAGS})
 
 set( SOURCES
 
@@ -38,7 +38,7 @@ surfaceFormats/starcd/STARCDsurfaceFormatCore.C
 surfaceFormats/starcd/STARCDsurfaceFormatRunTime.C
 surfaceFormats/stl/STLsurfaceFormatCore.C
 surfaceFormats/stl/STLsurfaceFormatRunTime.C
-surfaceFormats/stl/STLsurfaceFormatASCII.L.cpp
+${CMAKE_CURRENT_BINARY_DIR}/STLsurfaceFormatASCII.L.cpp
 surfaceFormats/tri/TRIsurfaceFormatCore.C
 surfaceFormats/tri/TRIsurfaceFormatRunTime.C
 surfaceFormats/vtk/VTKsurfaceFormatCore.C

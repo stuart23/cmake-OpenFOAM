@@ -1,7 +1,9 @@
+FLEX_TARGET(chemkinLexer chemistryReaders/chemkinReader/chemkinLexer.L ${CMAKE_CURRENT_BINARY_DIR}/chemkinLexer.L.cpp COMPILE_FLAGS ${FLEX_FLAGS})
+
 set( SOURCES
 
 chemistryReaders/chemkinReader/chemkinReader.C
-chemistryReaders/chemkinReader/chemkinLexer.L
+chemistryReaders/chemkinReader/chemkinLexer.L.cpp
 chemistryReaders/chemistryReader/makeChemistryReaders.C
 
 mixtures/basicMultiComponentMixture/basicMultiComponentMixture.C
