@@ -1,5 +1,5 @@
 set( SOURCES
-global/global.Cver
+global/global.C
 global/argList/argList.C
 global/clock/clock.C
 
@@ -547,6 +547,7 @@ graph/writers/jplotGraph/jplotGraph.C
 
 meshes/data/data.C
 
+
 )
 
 if( DOUBLE_PRECISION )
@@ -554,9 +555,9 @@ if( DOUBLE_PRECISION )
 endif()
 
 ## Define the output
-add_library( OpenFOAM SHARED ${SOURCES} )
+add_library( OpenFOAM SHARED ${SOURCES} $<TARGET_OBJECTS:OSspecific> )
 
-target_link_libraries( OpenFOAM OSspecific Pstream ${ZLIB_LIBRARIES} )
+target_link_libraries( OpenFOAM Pstream ${ZLIB_LIBRARIES} )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
@@ -1025,4 +1026,3 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/searchableSurface )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/surfaceLocation )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triSurfaceTools )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triangleFuncs )
-
