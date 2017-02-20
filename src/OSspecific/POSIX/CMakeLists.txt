@@ -17,7 +17,7 @@ set( SOURCES
 )
 
 ## Define the output
-add_library( OSspecific STATIC ${SOURCES} )
+add_library( OSspecific OBJECT ${SOURCES} )
 
 include_directories( ${Inotify_INCLUDE_DIRS} )
 
