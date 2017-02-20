@@ -4,4 +4,4 @@
 # add_subdirectory( thermophysical )
 add_subdirectory( mesh )
 # add_subdirectory( postProcessing )
-# add_subdirectory( miscellaneous )
+add_subdirectory( miscellaneous )
