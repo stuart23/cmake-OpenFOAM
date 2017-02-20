@@ -28,7 +28,8 @@ if( NO_REPOSITORY )
   add_definitions( -DNoRepository )
 endif()
 
-set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wold-style-cast -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -O3 -ftemplate-depth-100 -DOMPI_SKIP_MPICXX -fPIC" )
+set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wold-style-cast -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -ftemplate-depth-100 -DOMPI_SKIP_MPICXX -fPIC" )
+set( CMAKE_MODULE_LINKER_FLAGS "-Xlinker --copy-dt-needed-entries -Xlinker --no-as-needed" )
 set( CMAKE_SHARED_LINKER_FLAGS "-Xlinker --copy-dt-needed-entries -Xlinker --no-as-needed" )
 set( CMAKE_EXE_LINKER_FLAGS "-Xlinker --copy-dt-needed-entries -Xlinker --no-as-needed" )
 
@@ -48,6 +49,9 @@ find_package( Boost COMPONENTS thread REQUIRED )
 find_package( METIS REQUIRED )
 find_package( Zoltan REQUIRED )
 find_package( Threads REQUIRED )
+
+# Flag for running Flex. Currently just specifying C++ as language
+set( FLEX_FLAGS "--c++" )
 
 # Find if the metis header is specifying the same width reals (precision) as OpenFOAM settings
 # Length of real is specified in the metis.h header under the REALTYPEWIDTH macro
