@@ -1,3 +1,5 @@
+FLEX_TARGET(fluentMeshToFoam fluentMeshToFoam.L ${CMAKE_CURRENT_BINARY_DIR}/fluentMeshToFoam.L.cpp COMPILE_FLAGS ${FLEX_FLAGS})
+
 set( EXE_NAME fluentMeshToFoam )
 
 set( SOURCES
@@ -5,7 +7,7 @@ set( SOURCES
 extrudedTriangleCellShape.C
 extrudedQuadCellShape.C
 create3DCellShape.C
-fluentMeshToFoam.L
+${CMAKE_CURRENT_BINARY_DIR}/fluentMeshToFoam.L.cpp
 
 )
 

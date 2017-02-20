@@ -1,8 +1,10 @@
+FLEX_TARGET(fluent3DMeshToFoam fluent3DMeshToFoam.L ${CMAKE_CURRENT_BINARY_DIR}/fluent3DMeshToFoam.L.cpp COMPILE_FLAGS ${FLEX_FLAGS})
+
 set( EXE_NAME fluent3DMeshToFoam )
 
 set( SOURCES
 
-fluent3DMeshToFoam.L
+${CMAKE_CURRENT_BINARY_DIR}/fluent3DMeshToFoam.L.cpp
 
 )
 

@@ -1,8 +1,10 @@
+FLEX_TARGET(ansysToFoam ansysToFoam.L ${CMAKE_CURRENT_BINARY_DIR}/ansysToFoam.L.cpp COMPILE_FLAGS ${FLEX_FLAGS})
+
 set( EXE_NAME ansysToFoam )
 
 set( SOURCES
 
-ansysToFoam.L
+${CMAKE_CURRENT_BINARY_DIR}/ansysToFoam.L.cpp
 
 )
 

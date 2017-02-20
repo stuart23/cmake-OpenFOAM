@@ -1,8 +1,10 @@
+FLEX_TARGET(gambitToFoam gambitToFoam.L ${CMAKE_CURRENT_BINARY_DIR}/gambitToFoam.L.cpp COMPILE_FLAGS ${FLEX_FLAGS})
+
 set( EXE_NAME gambitToFoam )
 
 set( SOURCES
 
-gambitToFoam.L
+${CMAKE_CURRENT_BINARY_DIR}/gambitToFoam.L.cpp
 
 )
 
