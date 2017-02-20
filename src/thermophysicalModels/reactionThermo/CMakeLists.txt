@@ -3,7 +3,7 @@ FLEX_TARGET(chemkinLexer chemistryReaders/chemkinReader/chemkinLexer.L ${CMAKE_C
 set( SOURCES
 
 chemistryReaders/chemkinReader/chemkinReader.C
-chemistryReaders/chemkinReader/chemkinLexer.L.cpp
+${CMAKE_CURRENT_BINARY_DIR}/chemkinLexer.L.cpp
 chemistryReaders/chemistryReader/makeChemistryReaders.C
 
 mixtures/basicMultiComponentMixture/basicMultiComponentMixture.C
