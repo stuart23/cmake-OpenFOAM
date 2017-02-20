@@ -1,5 +1,6 @@
 add_subdirectory( foamToStarMesh )
-add_subdirectory( Optional )
+#### REQUIRES THIRD PARTY PACKAGE
+#add_subdirectory( Optional )
 add_subdirectory( datToFoam )
 add_subdirectory( cfx4ToFoam )
 add_subdirectory( tetgenToFoam )
