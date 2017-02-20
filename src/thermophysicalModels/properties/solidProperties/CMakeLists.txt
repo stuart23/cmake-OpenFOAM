@@ -51,6 +51,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Scalar/floatSca
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Scalar/scalar )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/Swap )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/VectorSpace )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/bools/Switch )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/bools/bool )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/chars/char )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/contiguous )
