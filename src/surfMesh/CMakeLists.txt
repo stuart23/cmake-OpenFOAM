@@ -1,3 +1,5 @@
+FLEX_TARGET(STLsurfaceFormatASCII surfaceFormats/stl/STLsurfaceFormatASCII.L surfaceFormats/stl/STLsurfaceFormatASCII.L.cpp)
+
 set( SOURCES
 
 surfZone/surfZone/surfZone.C
@@ -36,7 +38,7 @@ surfaceFormats/starcd/STARCDsurfaceFormatCore.C
 surfaceFormats/starcd/STARCDsurfaceFormatRunTime.C
 surfaceFormats/stl/STLsurfaceFormatCore.C
 surfaceFormats/stl/STLsurfaceFormatRunTime.C
-surfaceFormats/stl/STLsurfaceFormatASCII.L
+surfaceFormats/stl/STLsurfaceFormatASCII.L.cpp
 surfaceFormats/tri/TRIsurfaceFormatCore.C
 surfaceFormats/tri/TRIsurfaceFormatRunTime.C
 surfaceFormats/vtk/VTKsurfaceFormatCore.C
