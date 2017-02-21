@@ -1,18 +1,17 @@
-set( EXE_NAME redistributePar )
+set( EXE_NAME reconstructPar )
 
 set( SOURCES
 
-loadOrCreateMesh.C
-redistributePar.C
+reconstructPar.C
 
 )
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} finiteVolume genericPatchFields decompositionMethods ptscotchDecomp meshTools dynamicMesh OpenFOAM dl m )
+target_link_libraries( ${EXE_NAME} finiteVolume genericPatchFields lagrangian meshTools reconstruct regionModels OpenFOAM dl m )
 
-include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/parallelProcessing/redistributePar )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/parallelProcessing/reconstructPar )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )
@@ -30,7 +29,6 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/lin
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/linkTypes/SLListBase )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/user )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/BiIndirectList )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/CompactListList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/DynamicList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/FixedList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/IndirectList )
@@ -46,10 +44,10 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/UPtrList 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/NamedEnum )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobject )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjectList )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjects/CompactIOField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjects/CompactIOList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjects/IOField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjects/IOList )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjects/IOPtrList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOobjects/IOdictionary )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOstreams )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/db/IOstreams/Fstreams )
@@ -111,8 +109,8 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/GeometricFields/Geo
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/GeometricFields/geometricZeroField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/GeometricFields/pointFields )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/UniformDimensionedFields )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/cloud )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/pointPatchFields/basic/calculated )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/pointPatchFields/constraint/empty )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/fields/pointPatchFields/pointPatchField )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/global/argList )
@@ -164,8 +162,6 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshShapes/triFace 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/meshTools )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/pointMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/pointMesh/pointBoundaryMesh )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/pointMesh/pointPatches/constraint/empty )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/pointMesh/pointPatches/facePointPatch )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/pointMesh/pointPatches/pointPatch )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/globalMeshData )
@@ -177,7 +173,6 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatche
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/constraint/cyclic )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/constraint/empty )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/constraint/processor )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/constraint/processorCyclic )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/polyPatches/polyPatch )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/zones/ZoneMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/meshes/polyMesh/zones/cellZone )
@@ -255,7 +250,6 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/wordRe 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/transform )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/triad )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/zero )
-include_directories( ${CMAKE_SOURCE_DIR}/src/dynamicMesh/fvMeshDistribute )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/cfdTools/general/MRF )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/cfdTools/general/adjustPhi )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/cfdTools/general/findRefCell )
@@ -290,7 +284,6 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMatrices/fvMatrix )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMatrices/fvScalarMatrix )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh/fvBoundaryMesh )
-include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh/fvMeshSubset )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh/fvPatches/basic/coupled )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh/fvPatches/constraint/cyclicAMI )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh/fvPatches/constraint/empty )
@@ -309,7 +302,9 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/AMIInterpolation/patches/
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/indexedOctree )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/meshTools )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/searchableSurface )
+include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/sets/topoSets )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/surfaceLocation )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triSurfaceTools )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triangleFuncs )
-include_directories( ${CMAKE_SOURCE_DIR}/src/parallel/decompose/decompositionMethods/decompositionMethod )
+include_directories( ${CMAKE_SOURCE_DIR}/src/parallel/reconstruct/reconstruct )
+include_directories( ${CMAKE_SOURCE_DIR}/src/regionModels/regionModel/regionProperties )
