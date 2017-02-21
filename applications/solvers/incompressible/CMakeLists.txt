@@ -1,0 +1,8 @@
+add_subdirectory( boundaryFoam )
+add_subdirectory( nonNewtonianIcoFoam )
+add_subdirectory( shallowWaterFoam )
+add_subdirectory( adjointShapeOptimizationFoam )
+add_subdirectory( simpleFoam )
+add_subdirectory( pimpleFoam )
+add_subdirectory( icoFoam )
+add_subdirectory( pisoFoam )

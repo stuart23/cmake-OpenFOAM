@@ -1,0 +1,5 @@
+add_subdirectory( interfacialModels )
+add_subdirectory( interfacialCompositionModels )
+add_subdirectory( reactingMultiphaseEulerFoam )
+add_subdirectory( reactingTwoPhaseEulerFoam )
+add_subdirectory( phaseSystems )

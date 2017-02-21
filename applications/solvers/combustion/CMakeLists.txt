@@ -1,0 +1,7 @@
+add_subdirectory( coldEngineFoam )
+add_subdirectory( fireFoam )
+add_subdirectory( engineFoam )
+add_subdirectory( XiFoam )
+add_subdirectory( PDRFoam )
+add_subdirectory( reactingFoam )
+add_subdirectory( chemFoam )
