@@ -10,4 +10,5 @@ add_subdirectory( patch )
 add_subdirectory( foamCalc )
 add_subdirectory( sampling )
 add_subdirectory( miscellaneous )
+# LEAVING OUT FOR NOW. NEEDS MORE WORK
 # add_subdirectory( graphics )
