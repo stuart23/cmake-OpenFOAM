@@ -5,9 +5,12 @@ postCalc.C
 )
 
 ## Define the output
-add_library( postCalc SHARED ${SOURCES} )
+add_library( postCalc OBJECT ${SOURCES} )
 
-target_link_libraries( postCalc finiteVolume )
+# NOTE: CMAKE WILL NOT ALLOW AN OBJECT TO BE BUILT WITH LINKS TO ANOTHER LIB. 
+# THEREFORE THIS LIB MUST BE LINKED AGAINST IN ANY TARGET THAT COMPILES WITH THIS OBJECT
+#target_link_libraries( postCalc finiteVolume )
+set_target_properties( postCalc PROPERTIES REQUIRED_LIBS finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
