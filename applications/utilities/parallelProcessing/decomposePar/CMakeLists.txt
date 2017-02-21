@@ -1,13 +1,3 @@
-#May need to link against:
-#LIB_LIBS = \
-#    -lfiniteVolume \
-#    -ldecompose \
-#    -lgenericPatchFields \
-#    -ldecompositionMethods -L$(FOAM_LIBBIN)/dummy -lmetisDecomp -lscotchDecomp \
-#    -llagrangian \
-#    -lmeshTools \
-#    -lregionModels
-
 set( EXE_NAME decomposePar )
 
 set( SOURCES
@@ -25,8 +15,7 @@ lagrangianFieldDecomposer.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} finiteVolume decompose genericPatchFields decompositionMethods lagrangian meshTools regionModels ${CMAKE_THREAD_LIBS_INIT} OpenFOAM dl m )
-# target_link_libraries( ${EXE_NAME} finiteVolume decompose genericPatchFields decompositionMethods lagrangian meshTools regionModels metisDecomp scotchDecomp )
+target_link_libraries( ${EXE_NAME} finiteVolume decompose genericPatchFields decompositionMethods metisDecomp scotchDecomp lagrangian meshTools regionModels OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/parallelProcessing/decomposePar )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
