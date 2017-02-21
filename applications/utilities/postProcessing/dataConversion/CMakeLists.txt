@@ -1,4 +1,5 @@
-add_subdirectory( foamToTecplot360 )
+# Requires third party lib
+# add_subdirectory( foamToTecplot360 )
 add_subdirectory( foamToEnsightParts )
 add_subdirectory( foamToGMV )
 add_subdirectory( foamToTetDualMesh )
