@@ -307,4 +307,5 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/surfaceLocatio
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triSurfaceTools )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triangleFuncs )
 include_directories( ${CMAKE_SOURCE_DIR}/src/sampling/graphField )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/incompressible/singlePhaseTransportModel )
