@@ -5,12 +5,11 @@ set( SOURCES
 streamFunction.C
 
 )
-set( SOURCE_OBJECT postCalc )
 
 ## Define the output
-add_executable( ${EXE_NAME} ${SOURCES} $<TARGET_OBJECTS:${SOURCE_OBJECT}> )
+add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} $<TARGET_PROPERTY:${SOURCE_OBJECT},REQUIRED_LIBS> genericPatchFields finiteVolume meshTools OpenFOAM dl m )
+target_link_libraries( ${EXE_NAME} genericPatchFields finiteVolume meshTools OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
