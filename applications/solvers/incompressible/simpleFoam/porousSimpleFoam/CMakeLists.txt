@@ -12,7 +12,7 @@ add_executable( ${EXE_NAME} ${SOURCES} )
 target_link_libraries( ${EXE_NAME} turbulenceModels incompressibleTurbulenceModels incompressibleTransportModels finiteVolume meshTools fvOptions sampling OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/incompressible/simpleFoam/porousSimpleFoam )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/test/cyclic )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/incompressible/simpleFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )
