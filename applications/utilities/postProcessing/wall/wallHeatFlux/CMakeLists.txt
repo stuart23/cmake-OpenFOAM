@@ -11,7 +11,7 @@ add_executable( ${EXE_NAME} ${SOURCES} )
 
 target_link_libraries( ${EXE_NAME} turbulenceModels compressibleTurbulenceModels reactionThermophysicalModels genericPatchFields specie compressibleTransportModels fluidThermophysicalModels solidThermo finiteVolume meshTools OpenFOAM dl m )
 
-include_directories( ${CMAKE_SOURCE_DIR}/applications/test/cyclic )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/postProcessing/wall/wallHeatFlux )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )
@@ -254,6 +254,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/L
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/LES/LESdeltas/LESdelta )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/RAS/RASModel )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/TurbulenceModel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/cfdTools/compressible )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/cfdTools/general/MRF )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/cfdTools/general/adjustPhi )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/cfdTools/general/findRefCell )
