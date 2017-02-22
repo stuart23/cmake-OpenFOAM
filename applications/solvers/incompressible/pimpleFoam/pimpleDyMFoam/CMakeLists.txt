@@ -11,7 +11,7 @@ add_executable( ${EXE_NAME} ${SOURCES} )
 
 target_link_libraries( ${EXE_NAME} turbulenceModels incompressibleTurbulenceModels incompressibleTransportModels finiteVolume fvOptions sampling dynamicFvMesh topoChangerFvMesh dynamicMesh meshTools OpenFOAM dl m )
 
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/heatTransfer/buoyantPimpleFoam )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/incompressible/pimpleFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/incompressible/pimpleFoam/pimpleDyMFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/test/cyclic )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
