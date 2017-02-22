@@ -1,6 +1,7 @@
 add_subdirectory( thermoFoam )
 add_subdirectory( buoyantPimpleFoam )
 add_subdirectory( chtMultiRegionFoam )
+add_subdirectory( chtMultiRegionFoam/chtMultiRegionSimpleFoam )
 add_subdirectory( buoyantSimpleFoam )
 add_subdirectory( buoyantBoussinesqPimpleFoam )
 add_subdirectory( buoyantBoussinesqSimpleFoam )
