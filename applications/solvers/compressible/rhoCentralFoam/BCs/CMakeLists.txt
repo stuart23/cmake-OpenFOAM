@@ -8,9 +8,12 @@ rho/fixedRhoFvPatchScalarField.C
 )
 
 ## Define the output
-add_library( rhoCentralFoam SHARED ${SOURCES} )
+add_library( rhoCentralFoam_lib SHARED ${SOURCES} )
+set_target_properties( rhoCentralFoam_lib PROPERTIES
+  OUTPUT_NAME rhoCentralFoam
+)
 
-target_link_libraries( rhoCentralFoam finiteVolume compressibleTransportModels fluidThermophysicalModels specie )
+target_link_libraries( rhoCentralFoam_lib finiteVolume compressibleTransportModels fluidThermophysicalModels specie )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/compressible/rhoCentralFoam/BCs/T )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/compressible/rhoCentralFoam/BCs/U )

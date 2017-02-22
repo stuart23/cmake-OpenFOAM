@@ -9,7 +9,7 @@ rhoCentralFoam.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} finiteVolume compressibleTransportModels fluidThermophysicalModels specie rhoCentralFoam turbulenceModels compressibleTurbulenceModels meshTools OpenFOAM dl m )
+target_link_libraries( ${EXE_NAME} finiteVolume compressibleTransportModels fluidThermophysicalModels specie rhoCentralFoam_lib turbulenceModels compressibleTurbulenceModels meshTools OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/compressible/rhoCentralFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/compressible/rhoCentralFoam/BCs/rho )
