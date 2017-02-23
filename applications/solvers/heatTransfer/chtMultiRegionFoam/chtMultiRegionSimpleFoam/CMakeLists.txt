@@ -13,7 +13,6 @@ target_link_libraries( ${EXE_NAME} finiteVolume compressibleTransportModels flui
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/heatTransfer/chtMultiRegionFoam/chtMultiRegionSimpleFoam/fluid )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/heatTransfer/chtMultiRegionFoam/chtMultiRegionSimpleFoam/solid )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/heatTransfer/chtMultiRegionFoam/fluid )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/heatTransfer/chtMultiRegionFoam/solid )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
