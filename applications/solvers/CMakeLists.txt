@@ -1,4 +1,4 @@
-# add_subdirectory( heatTransfer )
+add_subdirectory( heatTransfer )
 # add_subdirectory( multiphase )
 # add_subdirectory( discreteMethods )
 # add_subdirectory( stressAnalysis )
@@ -8,5 +8,5 @@
 add_subdirectory( basic )
 # add_subdirectory( combustion )
 # add_subdirectory( DNS )
-# add_subdirectory( compressible )
+add_subdirectory( compressible )
 add_subdirectory( incompressible )
