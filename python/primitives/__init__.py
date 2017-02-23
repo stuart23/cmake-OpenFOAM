@@ -18,6 +18,9 @@ class Point(object):
         """
         self.coordinates = (x, y, z)
 
+    def __repr__(self):
+        return self.coordinates
+
     @property
     def coordinates(self):
         """
@@ -25,7 +28,7 @@ class Point(object):
 
         :rtype: List
         """
-        return(x, y, z)
+        return(self.x, self.y, self.z)
 
     @coordinates.setter
     def coordinates(self, values):
