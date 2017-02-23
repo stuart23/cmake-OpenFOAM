@@ -253,6 +253,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/L
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/LES/LESdeltas/LESdelta )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/RAS/RASModel )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/TurbulenceModel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/cfdTools )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/cfdTools/compressible )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/cfdTools/general/MRF )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/cfdTools/general/adjustPhi )

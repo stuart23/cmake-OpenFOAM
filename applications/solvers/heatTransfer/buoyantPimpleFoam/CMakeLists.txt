@@ -318,4 +318,5 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/basic/fluidThe
 include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/basic/rhoThermo )
 include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/radiation/include )
 include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/radiation/radiationModels/radiationModel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/compressible/compressibleTransportModel )

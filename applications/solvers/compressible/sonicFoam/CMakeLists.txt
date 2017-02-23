@@ -12,7 +12,6 @@ add_executable( ${EXE_NAME} ${SOURCES} )
 target_link_libraries( ${EXE_NAME} compressibleTransportModels fluidThermophysicalModels specie turbulenceModels compressibleTurbulenceModels meshTools sampling fvOptions finiteVolume OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/compressible/sonicFoam )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/compressible/sonicFoam/sonicLiquidFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )
