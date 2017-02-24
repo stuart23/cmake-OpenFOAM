@@ -11,10 +11,10 @@ add_executable( ${EXE_NAME} ${SOURCES} )
 
 target_link_libraries( ${EXE_NAME} compressibleTransportModels fluidThermophysicalModels specie turbulenceModels compressibleTurbulenceModels finiteVolume meshTools sampling fvOptions dynamicFvMesh topoChangerFvMesh dynamicMesh meshTools OpenFOAM dl m )
 
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/compressible/rhoPimpleFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/compressible/rhoPimpleFoam/rhoPimpleDyMFoam )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/heatTransfer/buoyantPimpleFoam )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/heatTransfer/thermoFoam )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/reactingMultiphaseEulerFoam )
+# include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/heatTransfer/thermoFoam )
+# include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/reactingMultiphaseEulerFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/test/cyclic )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
