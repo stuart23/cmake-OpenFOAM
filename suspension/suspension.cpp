@@ -29,30 +29,22 @@ Wishbone::Wishbone() {
 }
 
 void Wishbone::PublishPickup() {
-    state = multibody_system.realizeTopology();
     std::cout << ib_fore_spherical.getPointOnBody1(state) << "\n\n";
-    state = multibody_system.realizeTopology();
 }
 
 void Wishbone::set_ib_fore_spherical(Vec3 coordinates) {
-    state = multibody_system.realizeTopology();
     ib_fore_spherical.setPointOnBody1(state, coordinates);
     ib_fore_spherical.setPointOnBody2(state, coordinates);
-    state = multibody_system.realizeTopology();
 };
 
 void Wishbone::set_ib_aft_spherical(Vec3 coordinates) {
-    state = multibody_system.realizeTopology();
     ib_aft_spherical.setPointOnBody1(state, coordinates);
     ib_aft_spherical.setPointOnBody2(state, coordinates);
-    state = multibody_system.realizeTopology();
 };
 
 void Wishbone::set_ob_spherical(Vec3 coordinates) {
-    state = multibody_system.realizeTopology();
     ob_spherical.setPointOnBody1(state, coordinates);
     ob_spherical.setPointOnBody2(state, coordinates);
-    state = multibody_system.realizeTopology();
 };
 
 class Suspension{
@@ -93,21 +85,33 @@ int main() {
     suspension.bottom_wishbone.set_ib_aft_spherical(Vec3(0.3, 0.25, 0.2));
     suspension.bottom_wishbone.set_ob_spherical(Vec3(0.0, 0.8, 0.2));
 
+    std::cout << suspension.top_wishbone.ib_fore_spherical.getPointOnBody1(state) << "\n\n";
+
     // Purely for visualisation (optional)
     Visualizer viz(multibody_system);
     viz.setSystemUpDirection(CoordinateAxis::ZCoordinateAxis());
     multibody_system.addEventReporter(new Visualizer::Reporter(viz, 0.01));
 
+
+    std::cout << state.getSystemStage() << "SYS STAGE\n\n";
+    std::cout << multibody_system.getSystemTopologyCacheVersion() << "CACHE VERSION\n\n";
+    // RESULT = 2
+    std::cout << state.getSystemTopologyStageVersion() << "STAGE VERSION\n\n";
+    // RESULT = 1
     // Finalizes the geometry
     multibody_system.realizeTopology();
-  //  multibody_system.realizeModel(state);
-  //  std::cout << suspension.top_wishbone.ib_fore_spherical.getPointOnBody1(state) << "\n\n";
+    std::cout << suspension.top_wishbone.ib_fore_spherical.getPointOnBody1(state) << "\n\n";
+    multibody_system.realize(state);
+    multibody_system.realizeModel(state);
+    multibody_system.realizeTopology();
+    std::cout << suspension.top_wishbone.ib_fore_spherical.getPointOnBody1(state) << "\n\n";
 
-
-  //  RungeKuttaMersonIntegrator integ(multibody_system);
-  //  TimeStepper ts(multibody_system, integ);
-  //  ts.initialize(state);
-  //  ts.stepTo(50.0);
+/*
+    RungeKuttaMersonIntegrator integ(multibody_system);
+    TimeStepper ts(multibody_system, integ);
+    ts.initialize(state);
+    ts.stepTo(50.0);
+    */
 }
 
 
