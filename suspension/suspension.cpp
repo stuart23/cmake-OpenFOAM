@@ -4,14 +4,17 @@ using namespace SimTK;
 Body::Rigid susp_properties(MassProperties(1.0, Vec3(0), Inertia(1)));
 MultibodySystem(multibody_system);
 SimbodyMatterSubsystem matter(multibody_system);
+MobilizedBody::Ground ground(matter.getGround());
 GeneralForceSubsystem forces(multibody_system);
 Force::UniformGravity gravity(forces, matter, Vec3(0, 0, -9.8));
+State state;
 
 class Wishbone{
     public:
         Wishbone();
 
-        MobilizedBody wishbone_body;
+	void PublishPickup();
+	MobilizedBody::Free wishbone_body;
         Constraint::Ball ib_fore_spherical;
         Constraint::Ball ib_aft_spherical;
         Constraint::Ball ob_spherical;
@@ -22,28 +25,34 @@ class Wishbone{
 };
 
 Wishbone::Wishbone() {
-    MobilizedBody::Free wishbone_body(matter.Ground(), Transform(Vec3(0)), susp_properties, Transform(Vec3(0)));
+    wishbone_body = MobilizedBody::Free(ground, Transform(Vec3(0)), susp_properties, Transform(Vec3(0)));
+}
+
+void Wishbone::PublishPickup() {
+    state = multibody_system.realizeTopology();
+    std::cout << ib_fore_spherical.getPointOnBody1(state) << "\n\n";
+    state = multibody_system.realizeTopology();
 }
 
 void Wishbone::set_ib_fore_spherical(Vec3 coordinates) {
-    multibody_system.realizeTopology();
-    State state = multibody_system.getDefaultState();
+    state = multibody_system.realizeTopology();
     ib_fore_spherical.setPointOnBody1(state, coordinates);
     ib_fore_spherical.setPointOnBody2(state, coordinates);
+    state = multibody_system.realizeTopology();
 };
 
 void Wishbone::set_ib_aft_spherical(Vec3 coordinates) {
-    multibody_system.realizeTopology();
-    State state = multibody_system.getDefaultState();
+    state = multibody_system.realizeTopology();
     ib_aft_spherical.setPointOnBody1(state, coordinates);
     ib_aft_spherical.setPointOnBody2(state, coordinates);
+    state = multibody_system.realizeTopology();
 };
 
 void Wishbone::set_ob_spherical(Vec3 coordinates) {
-    multibody_system.realizeTopology();
-    State state = multibody_system.getDefaultState();
+    state = multibody_system.realizeTopology();
     ob_spherical.setPointOnBody1(state, coordinates);
     ob_spherical.setPointOnBody2(state, coordinates);
+    state = multibody_system.realizeTopology();
 };
 
 class Suspension{
@@ -58,22 +67,24 @@ class Suspension{
 Suspension::Suspension()
  : top_wishbone(), bottom_wishbone()
 {
-    upright = MobilizedBody::Free(matter.Ground(), Transform(Vec3(0)), susp_properties, Transform(Vec3(0)));
+    upright = MobilizedBody::Free(ground, Transform(Vec3(0,1,0)), susp_properties, Transform(Vec3(0)));
 
-     top_wishbone.ib_fore_spherical Constraint::Ball (matter.Ground(), Vec3(0), top_wishbone.wishbone_body, Vec3(0))
-     top_wishbone.ib_aft_spherical Constraint::Ball (matter.Ground(), Vec3(0), top_wishbone.wishbone_body, Vec3(0))
-     top_wishbone.ob_spherical Constraint::Ball (upright, Vec3(0), top_wishbone.wishbone_body, Vec3(0))
+    bottom_wishbone.ib_fore_spherical = Constraint::Ball(ground, Vec3(0), bottom_wishbone.wishbone_body, Vec3(0));
+    bottom_wishbone.ib_aft_spherical = Constraint::Ball(ground, Vec3(0), bottom_wishbone.wishbone_body, Vec3(0));
+    bottom_wishbone.ob_spherical = Constraint::Ball(upright, Vec3(0), bottom_wishbone.wishbone_body, Vec3(0));
 
-     bottom_wishbone.ib_fore_spherical Constraint::Ball  (matter.Ground(), Vec3(0), bottom_wishbone.wishbone_body, Vec3(0))
-     bottom_wishbone.ib_aft_spherical Constraint::Ball (matter.Ground(), Vec3(0), bottom_wishbone.wishbone_body, Vec3(0))
-    bottom_wishbone.ob_spherical Constraint::Ball (upright, Vec3(0), bottom_wishbone.wishbone_body, Vec3(0))
+    top_wishbone.ib_fore_spherical = Constraint::Ball(ground, Vec3(0), top_wishbone.wishbone_body, Vec3(0));
+    top_wishbone.ib_aft_spherical = Constraint::Ball(ground, Vec3(0), top_wishbone.wishbone_body, Vec3(0));
+    top_wishbone.ob_spherical = Constraint::Ball(upright, Vec3(0), top_wishbone.wishbone_body, Vec3(0));
 
+    state = multibody_system.realizeTopology();
 };
 
 
 int main() {
     Suspension suspension;
-
+  
+ 
     suspension.top_wishbone.set_ib_fore_spherical(Vec3(-0.3, 0.25, 0.6));
     suspension.top_wishbone.set_ib_aft_spherical(Vec3(0.3, 0.25, 0.6));
     suspension.top_wishbone.set_ob_spherical(Vec3(0.0, 0.8, 0.6));
@@ -82,22 +93,6 @@ int main() {
     suspension.bottom_wishbone.set_ib_aft_spherical(Vec3(0.3, 0.25, 0.2));
     suspension.bottom_wishbone.set_ob_spherical(Vec3(0.0, 0.8, 0.2));
 
-    /*
-    MobilizedBody::Free top_wishbone(matter.Ground(), Transform(Vec3(0)), suspension, Transform(Vec3(0)));
-
-    Constraint::Ball top_fore_spherical(matter.Ground(), Vec3(0.1,0,0.5), top_wishbone, Vec3(0.1,0,0.5));
-    Constraint::Ball top_aft_spherical(matter.Ground(), Vec3(-0.1,0,0.5), top_wishbone, Vec3(-0.1,0,0.5));
-
-    MobilizedBody::Free bottom_wishbone(matter.Ground(), Transform(Vec3(0)), suspension, Transform(Vec3(0)));
-
-    Constraint::Ball bottom_fore_spherical(matter.Ground(), Vec3(0.1,0,0.3), bottom_wishbone, Vec3(0.1,0,0.3));
-    Constraint::Ball bottom_aft_spherical(matter.Ground(), Vec3(-0.1,0,0.3), bottom_wishbone, Vec3(-0.1,0,0.3));
-
-    MobilizedBody::Free upright(matter.Ground(), Transform(Vec3(0)), suspension, Transform(Vec3(0)));
-
-    Constraint::Ball top_ob_spherical(bottom_wishbone, Vec3(0.0,0.5,0.5), upright, Vec3(0.0,0.5,0.5));
-    Constraint::Ball bottom_ob_spherical(top_wishbone, Vec3(-0.0,0.5,0.3), upright, Vec3(-0.0,0.5,0.3));
-*/
     // Purely for visualisation (optional)
     Visualizer viz(multibody_system);
     viz.setSystemUpDirection(CoordinateAxis::ZCoordinateAxis());
@@ -105,13 +100,14 @@ int main() {
 
     // Finalizes the geometry
     multibody_system.realizeTopology();
-    State state = multibody_system.getDefaultState();
+  //  multibody_system.realizeModel(state);
+  //  std::cout << suspension.top_wishbone.ib_fore_spherical.getPointOnBody1(state) << "\n\n";
 
 
-    RungeKuttaMersonIntegrator integ(multibody_system);
-    TimeStepper ts(multibody_system, integ);
-    ts.initialize(state);
-    ts.stepTo(50.0);
+  //  RungeKuttaMersonIntegrator integ(multibody_system);
+  //  TimeStepper ts(multibody_system, integ);
+  //  ts.initialize(state);
+  //  ts.stepTo(50.0);
 }
 
 
