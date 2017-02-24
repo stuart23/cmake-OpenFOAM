@@ -69,7 +69,9 @@ Suspension::Suspension()
     top_wishbone.ib_aft_spherical = Constraint::Ball(ground, Vec3(0), top_wishbone.wishbone_body, Vec3(0));
     top_wishbone.ob_spherical = Constraint::Ball(upright, Vec3(0), top_wishbone.wishbone_body, Vec3(0));
 
+    std::cout << multibody_system.getSystemTopologyCacheVersion() << "CACHE VERSION A\n\n";
     state = multibody_system.realizeTopology();
+    std::cout << multibody_system.getSystemTopologyCacheVersion() << "CACHE VERSION B\n\n";
 };
 
 
