@@ -1,4 +1,4 @@
-add_executable( suspension suspension.cpp )
+add_executable( suspension suspension.cpp resolveSuspension.cpp )
 
 set( CMAKE_CXX_FLAGS "-g" )
 
