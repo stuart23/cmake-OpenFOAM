@@ -1,7 +1,7 @@
-add_executable( suspension suspension.cpp resolveSuspension.cpp )
+add_library( suspensionKinematics SHARED suspensionKinematics.cpp )
 
-set( CMAKE_CXX_FLAGS "-g" )
+add_executable( suspension resolveSuspension.cpp )
 
-target_link_libraries( suspension SimTKsimbody SimTKmath SimTKcommon m )
+target_link_libraries( suspension suspensionKinematics SimTKsimbody SimTKmath SimTKcommon m )
 
 include_directories( /usr/local/include/simbody )

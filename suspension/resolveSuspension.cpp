@@ -1,4 +1,4 @@
-#include "suspension.hpp"
+#include "suspensionKinematics.hpp"
 using namespace SimTK;
 
 int main() {

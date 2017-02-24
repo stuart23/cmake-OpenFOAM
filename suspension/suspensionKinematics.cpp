@@ -1,4 +1,4 @@
-#include "suspension.hpp"
+#include "suspensionKinematics.hpp"
 using namespace SimTK;
 
 Body::Rigid susp_properties(MassProperties(1.0, Vec3(0), Inertia(1)));
