@@ -6,7 +6,6 @@ MultibodySystem(multibody_system);
 SimbodyMatterSubsystem matter(multibody_system);
 GeneralForceSubsystem forces(multibody_system);
 Force::UniformGravity gravity(forces, matter, Vec3(0, 0, -9.8));
-State state = multibody_system.getDefaultState();
 
 class Wishbone{
     public:
@@ -27,40 +26,53 @@ Wishbone::Wishbone() {
 }
 
 void Wishbone::set_ib_fore_spherical(Vec3 coordinates) {
+    multibody_system.realizeTopology();
+    State state = multibody_system.getDefaultState();
     ib_fore_spherical.setPointOnBody1(state, coordinates);
     ib_fore_spherical.setPointOnBody2(state, coordinates);
 };
 
 void Wishbone::set_ib_aft_spherical(Vec3 coordinates) {
+    multibody_system.realizeTopology();
+    State state = multibody_system.getDefaultState();
     ib_aft_spherical.setPointOnBody1(state, coordinates);
     ib_aft_spherical.setPointOnBody2(state, coordinates);
 };
 
 void Wishbone::set_ob_spherical(Vec3 coordinates) {
+    multibody_system.realizeTopology();
+    State state = multibody_system.getDefaultState();
     ob_spherical.setPointOnBody1(state, coordinates);
     ob_spherical.setPointOnBody2(state, coordinates);
 };
 
 class Suspension{
-    private:
+    public:
         Wishbone top_wishbone;
         Wishbone bottom_wishbone;
         MobilizedBody::Free upright;
      
-    public:
         Suspension();
 };
 
-Suspension::Suspension(){
-    top_wishbone = Wishbone;   
-    bottom_wishbone = Wishbone;   
-	upright = MobilizedBody::Free(matter.Ground(), Transform(Vec3(0)), susp_properties, Transform(Vec3(0)));
+Suspension::Suspension()
+ : top_wishbone(), bottom_wishbone()
+{
+    upright = MobilizedBody::Free(matter.Ground(), Transform(Vec3(0)), susp_properties, Transform(Vec3(0)));
+
+     top_wishbone.ib_fore_spherical Constraint::Ball (matter.Ground(), Vec3(0), top_wishbone.wishbone_body, Vec3(0))
+     top_wishbone.ib_aft_spherical Constraint::Ball (matter.Ground(), Vec3(0), top_wishbone.wishbone_body, Vec3(0))
+     top_wishbone.ob_spherical Constraint::Ball (upright, Vec3(0), top_wishbone.wishbone_body, Vec3(0))
+
+     bottom_wishbone.ib_fore_spherical Constraint::Ball  (matter.Ground(), Vec3(0), bottom_wishbone.wishbone_body, Vec3(0))
+     bottom_wishbone.ib_aft_spherical Constraint::Ball (matter.Ground(), Vec3(0), bottom_wishbone.wishbone_body, Vec3(0))
+    bottom_wishbone.ob_spherical Constraint::Ball (upright, Vec3(0), bottom_wishbone.wishbone_body, Vec3(0))
 
 };
 
 
 int main() {
-    Suspension suspension();
+    Suspension suspension;
 
     suspension.top_wishbone.set_ib_fore_spherical(Vec3(-0.3, 0.25, 0.6));
     suspension.top_wishbone.set_ib_aft_spherical(Vec3(0.3, 0.25, 0.6));
@@ -93,6 +105,7 @@ int main() {
 
     // Finalizes the geometry
     multibody_system.realizeTopology();
+    State state = multibody_system.getDefaultState();
 
 
     RungeKuttaMersonIntegrator integ(multibody_system);
