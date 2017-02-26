@@ -11,8 +11,6 @@ add_executable( ${EXE_NAME} ${SOURCES} )
 
 target_link_libraries( ${EXE_NAME} twoPhaseMixtureThermo compressibleTransportModels fluidThermophysicalModels specie twoPhaseMixture twoPhaseProperties interfaceProperties turbulenceModels compressibleTurbulenceModels dynamicMesh meshTools dynamicFvMesh finiteVolume OpenFOAM dl m )
 
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/heatTransfer/buoyantBoussinesqPimpleFoam )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/heatTransfer/buoyantPimpleFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/compressibleInterFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/compressibleInterFoam/compressibleInterDyMFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/compressibleInterFoam/twoPhaseMixtureThermo )

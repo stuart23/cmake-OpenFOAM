@@ -1,5 +1,5 @@
 add_subdirectory( heatTransfer )
-# add_subdirectory( multiphase )
+add_subdirectory( multiphase )
 # add_subdirectory( discreteMethods )
 # add_subdirectory( stressAnalysis )
 # add_subdirectory( electromagnetics )

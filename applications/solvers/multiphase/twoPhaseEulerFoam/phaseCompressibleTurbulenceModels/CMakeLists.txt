@@ -42,7 +42,6 @@ kineticTheoryModels/derivedFvPatchFields/JohnsonJacksonParticleSlip/JohnsonJacks
 ## Define the output
 add_library( phaseCompressibleTurbulenceModels SHARED ${SOURCES} )
 
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/compressibleMultiphaseInterFoam/multiphaseMixtureThermo/phaseModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/interfacialModels/dragModels/dragModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/interfacialModels/virtualMassModels/virtualMassModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/phaseCompressibleTurbulenceModels/kineticTheoryModels/conductivityModel/Gidaspow )
@@ -69,6 +68,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhas
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/phaseCompressibleTurbulenceModels/kineticTheoryModels/viscosityModel/viscosityModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/phaseCompressibleTurbulenceModels/phasePressureModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/phaseModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/phasePair/orderedPhasePair )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/phasePair/phasePair )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/phasePair/phasePairKey )
@@ -308,6 +308,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/phaseCompressible/
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/phaseCompressible/RAS/kOmegaSSTSato )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/phaseCompressible/RAS/mixtureKEpsilon )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels )
+include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/laminar )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/LES/LESModel )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/LES/LESdeltas/LESdelta )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/LES/LESeddyViscosity )
@@ -319,7 +320,6 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/R
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/TurbulenceModel )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/eddyViscosity )
 include_directories( ${CMAKE_SOURCE_DIR}/src/TurbulenceModels/turbulenceModels/linearViscousStress )
-include_directories( ${CMAKE_SOURCE_DIR}/src/combustionModels/laminar )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/cfdTools/general/bound )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvPatchFields/basic/calculated )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fields/fvPatchFields/basic/coupled )
@@ -381,3 +381,4 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/basic/basicThe
 include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/basic/fluidThermo )
 include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/basic/rhoThermo )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/compressible/compressibleTransportModel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/incompressible/transportModel )

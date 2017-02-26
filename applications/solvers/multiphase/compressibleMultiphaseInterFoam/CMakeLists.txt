@@ -14,7 +14,7 @@ target_link_libraries( ${EXE_NAME} multiphaseMixtureThermo compressibleTransport
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/compressibleMultiphaseInterFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/compressibleMultiphaseInterFoam/multiphaseMixtureThermo )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/compressibleMultiphaseInterFoam/multiphaseMixtureThermo/phaseModel )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoLiquidMixingFoam )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/interFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )

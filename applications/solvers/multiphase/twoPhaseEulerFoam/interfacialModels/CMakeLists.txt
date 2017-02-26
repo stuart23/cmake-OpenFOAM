@@ -70,7 +70,6 @@ add_library( compressibleEulerianInterfacialModels SHARED ${SOURCES} )
 
 target_link_libraries( compressibleEulerianInterfacialModels compressibleTwoPhaseSystem compressibleTransportModels fluidThermophysicalModels specie )
 
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/compressibleMultiphaseInterFoam/multiphaseMixtureThermo/phaseModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/interfacialModels/aspectRatioModels/TomiyamaAspectRatio )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/interfacialModels/aspectRatioModels/VakhrushevEfremov )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/interfacialModels/aspectRatioModels/Wellek )
@@ -117,8 +116,10 @@ include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhas
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/interfacialModels/wallLubricationModels/TomiyamaWallLubrication )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/interfacialModels/wallLubricationModels/noWallLubrication )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/interfacialModels/wallLubricationModels/wallLubricationModel )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/phaseModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/phasePair/phasePair )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/phasePair/phasePairKey )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/phasePair/phaseModel )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/signals )
@@ -361,3 +362,4 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/basic/basicThe
 include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/basic/fluidThermo )
 include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/basic/rhoThermo )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/compressible/compressibleTransportModel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/incompressible/transportModel )

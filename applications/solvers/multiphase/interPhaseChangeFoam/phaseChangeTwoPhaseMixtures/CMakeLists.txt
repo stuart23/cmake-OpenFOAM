@@ -226,5 +226,6 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh/fvBoundaryMesh 
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh/fvPatches/fvPatch )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/interpolation/surfaceInterpolation/surfaceInterpolation )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/volMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/incompressible/incompressibleTwoPhaseMixture )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/twoPhaseMixture/twoPhaseMixture )
