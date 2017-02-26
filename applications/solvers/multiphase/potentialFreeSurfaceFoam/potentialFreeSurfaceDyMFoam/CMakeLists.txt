@@ -13,6 +13,7 @@ target_link_libraries( ${EXE_NAME} incompressibleTransportModels turbulenceModel
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/potentialFreeSurfaceFoam/potentialFreeSurfaceDyMFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/potentialFreeSurfaceFoam )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/interFoam/interDyMFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/test/cyclic )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
@@ -316,4 +317,5 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/searchableSurface )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/surfaceLocation )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triSurfaceTools )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triangleFuncs )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/incompressible/singlePhaseTransportModel )
