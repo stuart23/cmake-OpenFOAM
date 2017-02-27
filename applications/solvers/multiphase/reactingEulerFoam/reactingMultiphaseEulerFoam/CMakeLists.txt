@@ -13,7 +13,6 @@ target_link_libraries( ${EXE_NAME} reactingPhaseSystem reactingMultiphaseSystem 
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/BlendedInterfacialModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/BlendedInterfacialModel/blendingMethods/blendingMethod )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/BlendedInterfacialModel/blendingMethods/linear )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/phaseModel/MovingPhaseModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/phaseModel/phaseModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/phasePair/orderedPhasePair )
@@ -295,6 +294,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh/fvBoundaryMesh 
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh/fvPatches/basic/coupled )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh/fvPatches/constraint/cyclicAMI )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/fvMesh/fvPatches/fvPatch )
+include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/interpolation/surfaceInterpolation/schemes/linear )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/interpolation/surfaceInterpolation/multivariateSchemes/multivariateSurfaceInterpolationScheme )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/interpolation/surfaceInterpolation/surfaceInterpolation )
 include_directories( ${CMAKE_SOURCE_DIR}/src/finiteVolume/interpolation/surfaceInterpolation/surfaceInterpolationScheme )

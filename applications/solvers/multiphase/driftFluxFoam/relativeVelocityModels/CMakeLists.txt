@@ -15,6 +15,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/driftFl
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/driftFluxFoam/relativeVelocityModels/general )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/driftFluxFoam/relativeVelocityModels/relativeVelocityModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/driftFluxFoam/relativeVelocityModels/simple )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/driftFluxFoam/incompressibleTwoPhaseInteractingMixture )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )
@@ -296,4 +297,5 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/surfaceLocatio
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triSurfaceTools )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triangleFuncs )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/compressible/compressibleTransportModel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/twoPhaseMixture/twoPhaseMixture )
