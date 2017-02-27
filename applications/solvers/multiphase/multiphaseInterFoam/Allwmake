@@ -1,9 +1,0 @@
-#!/bin/sh
-cd ${0%/*} || exit 1    # Run from this directory
-set -x
-
-wmake libso multiphaseMixture
-wmake
-wmake multiphaseInterDyMFoam
-
-# ----------------------------------------------------------------- end-of-file
