@@ -31,6 +31,10 @@ def findFile(filename):
         if filename in files:
             return('include_directories( %s )' % root.replace('/home/stuart/Documents/cmake-OpenFOAM/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
                 os.path.join(root, filename))
+#    for root, directory, files in os.walk(os.path.abspath(os.path.join(os.getcwd(),'..'))):
+#        if filename in files:
+#            return('include_directories( %s )' % root.replace('/home/stuart/Documents/cmake-OpenFOAM/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
+#                os.path.join(root, filename))
     for root, directory, files in os.walk('/home/stuart/Documents/cmake-OpenFOAM/cmake-OpenFOAM/src'):
         if filename in files:
             return('include_directories( %s )' % root.replace('/home/stuart/Documents/cmake-OpenFOAM/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
@@ -42,7 +46,7 @@ def findFile(filename):
 
 def walkFile(filename, scanned_files, depth):
     includes = readIncludes(filename)
-    print('. '*depth + filename + ' CONTAINS ' + ','.join(includes))
+    #print('. '*depth + filename + ' CONTAINS ' + ','.join(includes))
     directories = []
     if len(includes) == 0:
         return ['', scanned_files]
@@ -52,12 +56,12 @@ def walkFile(filename, scanned_files, depth):
                 scanned_files.append(filename)
                 paths = findFile(filename)
                 if paths > 0:
-                    print '. '*depth + 'FOUND %s' % paths[1]
+                    #print '. '*depth + 'FOUND %s' % paths[1]
                     directories.append(paths[0])
                     [ new_directories, scanned_files ] = walkFile(paths[1], scanned_files, depth + 1)
                     directories += new_directories
-            else:
-                print '. '*depth + "%s ALREADY SCANNED %i files" % ( filename, len(scanned_files))
+            #else:
+                #print '. '*depth + "%s ALREADY SCANNED %i files" % ( filename, len(scanned_files))
         return [filter(lambda x: len(x) > 1, directories), scanned_files]
 
 all_includes = []
