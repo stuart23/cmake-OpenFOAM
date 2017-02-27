@@ -1,2 +1,2 @@
-add_subdirectory( dsmc )
+add_subdirectory( dsmc/dsmcFoam )
 add_subdirectory( molecularDynamics )
