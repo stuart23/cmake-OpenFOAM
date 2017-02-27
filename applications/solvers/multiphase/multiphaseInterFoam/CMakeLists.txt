@@ -9,14 +9,13 @@ multiphaseInterFoam.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 
-target_link_libraries( ${EXE_NAME} multiphaseInterFoam interfaceProperties incompressibleTransportModels turbulenceModels incompressibleTurbulenceModels finiteVolume fvOptions meshTools sampling OpenFOAM dl m )
+target_link_libraries( ${EXE_NAME} multiphaseInterFoam_lib interfaceProperties incompressibleTransportModels turbulenceModels incompressibleTurbulenceModels finiteVolume fvOptions meshTools sampling OpenFOAM dl m )
 
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/heatTransfer/buoyantPimpleFoam )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/interPhaseChangeFoam/interPhaseChangeDyMFoam )
+# include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/heatTransfer/buoyantPimpleFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/multiphaseInterFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/multiphaseInterFoam/multiphaseMixture )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/multiphaseInterFoam/multiphaseMixture/phase )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoLiquidMixingFoam )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/interFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )
@@ -321,3 +320,4 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/searchableSurface )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/surfaceLocation )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triSurfaceTools )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triangleFuncs )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels )

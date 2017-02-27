@@ -7,9 +7,12 @@ multiphaseMixture.C
 )
 
 ## Define the output
-add_library( multiphaseInterFoam SHARED ${SOURCES} )
+add_library( multiphaseInterFoam_lib SHARED ${SOURCES} )
+set_target_properties( multiphaseInterFoam_lib PROPERTIES
+  OUTPUT_NAME multiphaseInterFoam
+)
 
-target_link_libraries( multiphaseInterFoam interfaceProperties incompressibleTransportModels finiteVolume meshTools )
+target_link_libraries( multiphaseInterFoam_lib interfaceProperties incompressibleTransportModels finiteVolume meshTools )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/multiphaseInterFoam/multiphaseMixture )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/multiphaseInterFoam/multiphaseMixture/alphaContactAngle )
@@ -287,3 +290,4 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/searchableSurface )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/surfaceLocation )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triSurfaceTools )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triangleFuncs )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels )

@@ -11,9 +11,8 @@ add_executable( ${EXE_NAME} ${SOURCES} )
 
 target_link_libraries( ${EXE_NAME} immiscibleIncompressibleTwoPhaseMixture turbulenceModels incompressibleTurbulenceModels finiteVolume dynamicMesh dynamicFvMesh topoChangerFvMesh meshTools fvOptions sampling OpenFOAM dl m )
 
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/interFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/interFoam/interDyMFoam )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/interFoam/interMixingFoam )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/interFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )
@@ -334,4 +333,5 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triangleFuncs 
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/immiscibleIncompressibleTwoPhaseMixture )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/incompressible/incompressibleTwoPhaseMixture )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/interfaceProperties )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/twoPhaseMixture/twoPhaseMixture )
