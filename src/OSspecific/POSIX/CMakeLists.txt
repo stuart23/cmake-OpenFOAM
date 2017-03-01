@@ -19,8 +19,10 @@ set( SOURCES
 ## Define the output
 add_library( OSspecific OBJECT ${SOURCES} )
 
-include_directories( ${Inotify_INCLUDE_DIRS} )
+configure_file( etcDir.H.in etcDir.H )
+include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
+include_directories( ${Inotify_INCLUDE_DIRS} )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/clockTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

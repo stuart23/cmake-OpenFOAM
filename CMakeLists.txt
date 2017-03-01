@@ -81,11 +81,11 @@ set( CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib" )
 set( CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE )
 
 link_directories( ${CMAKE_BINARY_DIR}/lib )
-# link_directories( "/home/stuart/OpenFOAM-3.0.x_test/OpenFOAM-3.0.x/platforms/linux64GccDPInt32Opt/lib" )
 
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
+set( CONFIG_DIRECTORY ${CMAKE_INSTALL_PREFIX}/etc )
 
 add_subdirectory( src )
 add_subdirectory( applications )

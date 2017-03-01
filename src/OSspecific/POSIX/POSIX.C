@@ -30,6 +30,8 @@ Description
 # define _SYS_VNODE_H
 #endif
 
+#include "etcDir.H"
+
 #include "OSspecific.H"
 #include "POSIX.H"
 #include "foamVersion.H"
@@ -305,81 +307,24 @@ Foam::fileNameList Foam::findEtcFiles
         }
     }
 
-    // Search for group (site) files in
-    // * $WM_PROJECT_SITE/VERSION
-    // * $WM_PROJECT_SITE
-    //
-    searchDir = getEnv("WM_PROJECT_SITE");
-    if (searchDir.size())
+    // Search in config directory.
+    searchDir = CONFIG_DIRECTORY;
+    fileName fullName = searchDir/FOAMversion/name;
+    if (isFile(fullName))
     {
-        if (isDir(searchDir))
+        results.append(fullName);
+        if (findFirst)
         {
-            fileName fullName = searchDir/FOAMversion/name;
-            if (isFile(fullName))
-            {
-                results.append(fullName);
-                if (findFirst)
-                {
-                    return results;
-                }
-            }
-
-            fullName = searchDir/name;
-            if (isFile(fullName))
-            {
-                results.append(fullName);
-                if (findFirst)
-                {
-                    return results;
-                }
-            }
+            return results;
         }
     }
-    else
+    fullName = searchDir/name;
+    if (isFile(fullName))
     {
-        // OR search for group (site) files in
-        // * $WM_PROJECT_INST_DIR/site/VERSION
-        // * $WM_PROJECT_INST_DIR/site
-        //
-        searchDir = getEnv("WM_PROJECT_INST_DIR");
-        if (isDir(searchDir))
+        results.append(fullName);
+        if (findFirst)
         {
-            fileName fullName = searchDir/"site"/FOAMversion/name;
-            if (isFile(fullName))
-            {
-                results.append(fullName);
-                if (findFirst)
-                {
-                    return results;
-                }
-            }
-
-            fullName = searchDir/"site"/name;
-            if (isFile(fullName))
-            {
-                results.append(fullName);
-                if (findFirst)
-                {
-                    return results;
-                }
-            }
-        }
-    }
-
-    // Search for other (shipped) files in
-    // * $WM_PROJECT_DIR/etc
-    //
-    searchDir = getEnv("WM_PROJECT_DIR");
-    if (isDir(searchDir))
-    {
-        fileName fullName = searchDir/"etc"/name;
-        if (isFile(fullName))
-        {
-            results.append(fullName);
-            if (findFirst)
-            {
-                return results;
-            }
+            return results;
         }
     }
 

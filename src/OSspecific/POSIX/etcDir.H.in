@@ -1,0 +1,1 @@
+#cmakedefine CONFIG_DIRECTORY "@CONFIG_DIRECTORY@"
