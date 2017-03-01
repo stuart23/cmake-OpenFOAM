@@ -1,8 +1,0 @@
-#!/bin/sh
-
-cd ${0%/*} || exit 1
-set -x
-
-wmake libso DPMTurbulenceModels
-wmake
-wmake MPPICFoam
