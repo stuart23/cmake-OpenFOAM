@@ -40,6 +40,7 @@ extendedEdgeMesh/extendedFeatureEdgeMesh/extendedFeatureEdgeMesh.C
 
 ## Define the output
 add_library( edgeMesh SHARED ${SOURCES} )
+install( TARGETS edgeMesh DESTINATION lib )
 
 target_link_libraries( edgeMesh triSurface meshTools fileFormats surfMesh )
 

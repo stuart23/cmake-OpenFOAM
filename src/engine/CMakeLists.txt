@@ -19,6 +19,7 @@ engineMesh/fvMotionSolverEngineMesh/fvMotionSolverEngineMesh.C
 
 ## Define the output
 add_library( engine SHARED ${SOURCES} )
+install( TARGETS engine DESTINATION lib )
 
 target_link_libraries( engine finiteVolume meshTools dynamicMesh fvMotionSolvers )
 

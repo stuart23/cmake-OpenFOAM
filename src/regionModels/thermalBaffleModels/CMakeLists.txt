@@ -11,6 +11,7 @@ derivedFvPatchFields/thermalBaffle/thermalBaffleFvPatchScalarField.C
 
 ## Define the output
 add_library( thermalBaffleModels SHARED ${SOURCES} )
+install( TARGETS thermalBaffleModels DESTINATION lib )
 
 target_link_libraries( thermalBaffleModels compressibleTransportModels regionModels solidThermo turbulenceModels 
 	compressibleTurbulenceModels radiationModels dynamicMesh finiteVolume meshTools )

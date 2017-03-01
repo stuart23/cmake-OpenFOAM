@@ -10,6 +10,7 @@ general/general.C
 
 ## Define the output
 add_library( tabulatedWallFunctions SHARED ${SOURCES} )
+install( TARGETS tabulatedWallFunctions DESTINATION lib )
 
 target_link_libraries( tabulatedWallFunctions finiteVolume OpenFOAM dl m )
 

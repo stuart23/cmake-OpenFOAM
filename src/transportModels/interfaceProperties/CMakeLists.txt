@@ -7,6 +7,7 @@ interfaceCompression/interfaceCompression.C
 
 ## Define the output
 add_library( interfaceProperties SHARED ${SOURCES} )
+install( TARGETS interfaceProperties DESTINATION lib )
 
 target_link_libraries( interfaceProperties twoPhaseMixture finiteVolume )
 

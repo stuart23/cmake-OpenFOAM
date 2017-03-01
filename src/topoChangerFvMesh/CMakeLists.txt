@@ -9,6 +9,7 @@ movingConeTopoFvMesh/movingConeTopoFvMesh.C
 
 ## Define the output
 add_library( topoChangerFvMesh SHARED ${SOURCES} )
+install( TARGETS topoChangerFvMesh DESTINATION lib )
 
 target_link_libraries( topoChangerFvMesh finiteVolume dynamicFvMesh dynamicMesh meshTools )
 

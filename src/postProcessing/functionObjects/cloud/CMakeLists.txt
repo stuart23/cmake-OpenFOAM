@@ -7,6 +7,7 @@ cloudInfo/cloudInfoFunctionObject.C
 
 ## Define the output
 add_library( cloudFunctionObjects SHARED ${SOURCES} )
+install( TARGETS cloudFunctionObjects DESTINATION lib )
 
 target_link_libraries( cloudFunctionObjects finiteVolume lagrangian lagrangianIntermediate )
 

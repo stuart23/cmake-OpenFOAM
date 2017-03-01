@@ -6,6 +6,7 @@ SloanRenumber.C
 
 ## Define the output
 add_library( SloanRenumber SHARED ${SOURCES} )
+install( TARGETS SloanRenumber DESTINATION lib )
 
 target_link_libraries( SloanRenumber ${Boost_LIBRARIES} decompositionMethods finiteVolume meshTools )
 

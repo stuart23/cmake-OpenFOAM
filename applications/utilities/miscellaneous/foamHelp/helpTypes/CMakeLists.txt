@@ -11,6 +11,7 @@ doxygenXmlParser/doxygenXmlParser.C
 
 ## Define the output
 add_library( helpTypes SHARED ${SOURCES} )
+install( TARGETS helpTypes DESTINATION lib )
 
 target_link_libraries( helpTypes finiteVolume turbulenceModels incompressibleTurbulenceModels compressibleTurbulenceModels radiationModels fluidThermophysicalModels )
 

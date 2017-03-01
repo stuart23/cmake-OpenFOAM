@@ -7,6 +7,7 @@ patchToPoly2DMesh/patchToPoly2DMesh.C
 
 ## Define the output
 add_library( extrude2DMesh SHARED ${SOURCES} )
+install( TARGETS extrude2DMesh DESTINATION lib )
 
 target_link_libraries( extrude2DMesh meshTools dynamicMesh surfMesh finiteVolume OpenFOAM dl m ) 
 

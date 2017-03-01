@@ -6,6 +6,7 @@ dummyPtscotchDecomp.C
 
 ## Define the output
 add_library( ptscotchDecomp_dummy SHARED ${SOURCES} )
+install( TARGETS ptscotchDecomp_dummy DESTINATION lib/dummy )
 set_target_properties( ptscotchDecomp_dummy PROPERTIES 
   OUTPUT_NAME ptscotchDecomp
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/dummy 

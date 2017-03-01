@@ -6,6 +6,7 @@ fvFieldDecomposer.C
 
 ## Define the output
 add_library( decompose SHARED ${SOURCES} )
+install( TARGETS decompose DESTINATION lib )
 
 target_link_libraries( decompose finiteVolume meshTools lagrangian )
 

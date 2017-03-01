@@ -10,6 +10,7 @@ solidChemistrySolver/makeSolidChemistrySolvers.C
 
 ## Define the output
 add_library( solidChemistryModel SHARED ${SOURCES} )
+install( TARGETS solidChemistryModel DESTINATION lib )
 
 target_link_libraries( solidChemistryModel chemistryModel finiteVolume ODE reactionThermophysicalModels )
 

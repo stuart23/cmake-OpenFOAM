@@ -106,6 +106,7 @@ polyMeshFilter/polyMeshFilter.C
 
 ## Define the output
 add_library( dynamicMesh SHARED ${SOURCES} )
+install( TARGETS dynamicMesh DESTINATION lib )
 
 target_link_libraries( dynamicMesh finiteVolume triSurface extrudeModel )
 

@@ -17,6 +17,7 @@ basic/addSubtract/addSubtract.C
 
 ## Define the output
 add_library( foamCalcFunctions SHARED ${SOURCES} )
+install( TARGETS foamCalcFunctions DESTINATION lib )
 
 target_link_libraries( foamCalcFunctions finiteVolume meshTools )
 

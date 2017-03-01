@@ -7,6 +7,7 @@ genericPointPatchField/genericPointPatchFields.C
 
 ## Define the output
 add_library( genericPatchFields SHARED ${SOURCES} )
+install( TARGETS genericPatchFields DESTINATION lib )
 
 target_link_libraries( genericPatchFields finiteVolume )
 

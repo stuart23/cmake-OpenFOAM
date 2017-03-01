@@ -8,6 +8,7 @@ multiphaseMixture.C
 
 ## Define the output
 add_library( multiphaseInterFoam_lib SHARED ${SOURCES} )
+install( TARGETS multiphaseInterFoam_lib DESTINATION lib )
 set_target_properties( multiphaseInterFoam_lib PROPERTIES
   OUTPUT_NAME multiphaseInterFoam
 )

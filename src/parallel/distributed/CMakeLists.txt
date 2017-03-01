@@ -6,6 +6,7 @@ distributedTriSurfaceMesh/distributedTriSurfaceMesh.C
 
 ## Define the output
 add_library( distributed SHARED ${SOURCES} )
+install( TARGETS distributed DESTINATION lib )
 
 target_link_libraries( distributed triSurface decompositionMethods meshTools )
 

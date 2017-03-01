@@ -10,6 +10,7 @@ Chung/Chung.C
 
 ## Define the output
 add_library( barotropicCompressibilityModel SHARED ${SOURCES} )
+install( TARGETS barotropicCompressibilityModel DESTINATION lib )
 
 target_link_libraries( barotropicCompressibilityModel finiteVolume )
 

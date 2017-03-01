@@ -386,6 +386,7 @@ cfdTools/general/SRF/derivedFvPatchFields/SRFFreestreamVelocityFvPatchVectorFiel
 
 ## Define the output
 add_library( finiteVolume SHARED ${SOURCES} )
+install( TARGETS finiteVolume DESTINATION lib )
 
 target_link_libraries( finiteVolume OpenFOAM triSurface meshTools )
 

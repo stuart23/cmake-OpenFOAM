@@ -41,6 +41,7 @@ triSurfaceFields/triSurfaceFields.C
 
 ## Define the output
 add_library( triSurface SHARED ${SOURCES} )
+install( TARGETS triSurface DESTINATION lib )
 
 target_link_libraries( triSurface fileFormats surfMesh )
 

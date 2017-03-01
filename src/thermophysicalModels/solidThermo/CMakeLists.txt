@@ -10,6 +10,7 @@ solidReactionThermo/solidReactionThermos.C
 
 ## Define the output
 add_library( solidThermo SHARED ${SOURCES} )
+install( TARGETS solidThermo DESTINATION lib )
 
 target_link_libraries( solidThermo meshTools finiteVolume specie solidSpecie fluidThermophysicalModels reactionThermophysicalModels )
 

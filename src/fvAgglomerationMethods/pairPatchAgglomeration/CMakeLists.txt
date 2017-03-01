@@ -6,6 +6,7 @@ pairPatchAgglomeration.C
 
 ## Define the output
 add_library( pairPatchAgglomeration SHARED ${SOURCES} )
+install( TARGETS pairPatchAgglomeration DESTINATION lib )
 
 target_link_libraries( pairPatchAgglomeration finiteVolume OpenFOAM meshTools )
 

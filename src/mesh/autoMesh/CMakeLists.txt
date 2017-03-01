@@ -33,6 +33,7 @@ autoHexMesh/externalDisplacementMeshMover/zeroFixedValue/zeroFixedValuePointPatc
 
 ## Define the output
 add_library( autoMesh SHARED ${SOURCES} )
+install( TARGETS autoMesh DESTINATION lib )
 
 target_link_libraries( autoMesh dynamicMesh finiteVolume lagrangian meshTools fileFormats edgeMesh surfMesh triSurface distributed )
 

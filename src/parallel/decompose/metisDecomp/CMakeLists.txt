@@ -6,6 +6,7 @@ metisDecomp.C
 
 ## Define the output
 add_library( metisDecomp SHARED ${SOURCES} )
+install( TARGETS metisDecomp DESTINATION lib )
 
 target_link_libraries( metisDecomp metis )
 

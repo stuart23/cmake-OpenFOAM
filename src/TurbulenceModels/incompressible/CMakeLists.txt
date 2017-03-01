@@ -16,6 +16,7 @@ turbulentTransportModels/derivedFvPatchFields/wallFunctions/alphatWallFunctions/
 
 ## Define the output
 add_library( incompressibleTurbulenceModels SHARED ${SOURCES} )
+install( TARGETS incompressibleTurbulenceModels DESTINATION lib )
 
 target_link_libraries( incompressibleTurbulenceModels incompressibleTransportModels turbulenceModels finiteVolume meshTools )
 

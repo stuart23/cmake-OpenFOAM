@@ -39,6 +39,7 @@ sixDoFSolvers/Newmark/Newmark.C
 
 ## Define the output
 add_library( sixDoFRigidBodyMotion SHARED ${SOURCES} )
+install( TARGETS sixDoFRigidBodyMotion DESTINATION lib )
 
 target_link_libraries( sixDoFRigidBodyMotion forces meshTools fileFormats dynamicMesh )
 

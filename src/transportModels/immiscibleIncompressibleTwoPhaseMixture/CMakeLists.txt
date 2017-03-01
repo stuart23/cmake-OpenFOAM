@@ -6,6 +6,7 @@ immiscibleIncompressibleTwoPhaseMixture.C
 
 ## Define the output
 add_library( immiscibleIncompressibleTwoPhaseMixture SHARED ${SOURCES} )
+install( TARGETS immiscibleIncompressibleTwoPhaseMixture DESTINATION lib )
 
 target_link_libraries( immiscibleIncompressibleTwoPhaseMixture twoPhaseMixture incompressibleTransportModels interfaceProperties twoPhaseProperties finiteVolume )
 

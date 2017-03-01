@@ -14,6 +14,7 @@ chemistrySolver/chemistrySolver/makeChemistrySolvers.C
 
 ## Define the output
 add_library( chemistryModel SHARED ${SOURCES} )
+install( TARGETS chemistryModel DESTINATION lib )
 
 target_link_libraries( chemistryModel compressibleTransportModels fluidThermophysicalModels reactionThermophysicalModels specie thermophysicalFunctions ODE finiteVolume )
 

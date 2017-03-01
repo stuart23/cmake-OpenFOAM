@@ -9,6 +9,7 @@ parcels/derived/basicSprayParcel/makeBasicSprayParcelSubmodels.C
 
 ## Define the output
 add_library( lagrangianSpray SHARED ${SOURCES} )
+install( TARGETS lagrangianSpray DESTINATION lib )
 
 target_link_libraries( lagrangianSpray lagrangian lagrangianIntermediate lagrangianTurbulence distributionModels specie compressibleTransportModels fluidThermophysicalModels liquidProperties liquidMixtureProperties solidProperties solidMixtureProperties reactionThermophysicalModels SLGThermo radiationModels turbulenceModels incompressibleTurbulenceModels compressibleTurbulenceModels incompressibleTransportModels regionModels surfaceFilmModels dynamicFvMesh sampling finiteVolume meshTools )
 

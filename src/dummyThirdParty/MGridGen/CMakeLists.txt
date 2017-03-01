@@ -6,6 +6,7 @@ dummyMGridGen.C
 
 ## Define the output
 add_library( MGridGen_dummy SHARED ${SOURCES} )
+install( TARGETS MGridGen_dummy DESTINATION lib/dummy )
 set_target_properties( MGridGen_dummy PROPERTIES 
   OUTPUT_NAME MGridGen
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/dummy 

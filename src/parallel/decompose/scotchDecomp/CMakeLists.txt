@@ -6,6 +6,7 @@ scotchDecomp.C
 
 ## Define the output
 add_library( scotchDecomp SHARED ${SOURCES} )
+install( TARGETS scotchDecomp DESTINATION lib )
 
 target_link_libraries( scotchDecomp scotch scotcherrexit rt )
 

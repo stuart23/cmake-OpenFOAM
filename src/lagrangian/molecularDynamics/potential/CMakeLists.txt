@@ -40,6 +40,7 @@ electrostaticPotential/electrostaticPotential.C
 
 ## Define the output
 add_library( potential SHARED ${SOURCES} )
+install( TARGETS potential DESTINATION lib )
 
 target_link_libraries( potential finiteVolume )
 

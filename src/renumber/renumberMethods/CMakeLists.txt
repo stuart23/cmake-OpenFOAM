@@ -11,6 +11,7 @@ structuredRenumber/structuredRenumber.C
 
 ## Define the output
 add_library( renumberMethods SHARED ${SOURCES} )
+install( TARGETS renumberMethods DESTINATION lib )
 
 target_link_libraries( renumberMethods decompositionMethods finiteVolume meshTools )
 

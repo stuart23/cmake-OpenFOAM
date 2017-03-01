@@ -67,6 +67,7 @@ wallDependentModel/wallDependentModel.C
 
 ## Define the output
 add_library( compressibleEulerianInterfacialModels SHARED ${SOURCES} )
+install( TARGETS compressibleEulerianInterfacialModels DESTINATION lib )
 
 target_link_libraries( compressibleEulerianInterfacialModels compressibleTwoPhaseSystem compressibleTransportModels fluidThermophysicalModels specie )
 

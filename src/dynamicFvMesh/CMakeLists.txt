@@ -25,6 +25,7 @@ solidBodyMotionFvMesh/pointPatchFields/derived/solidBodyMotionDisplacement/solid
 
 ## Define the output
 add_library( dynamicFvMesh SHARED ${SOURCES} )
+install( TARGETS dynamicFvMesh DESTINATION lib )
 
 target_link_libraries( dynamicFvMesh triSurface meshTools dynamicMesh finiteVolume )
 

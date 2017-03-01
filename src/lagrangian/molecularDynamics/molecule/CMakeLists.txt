@@ -12,6 +12,7 @@ moleculeCloud/moleculeCloud.C
 
 ## Define the output
 add_library( molecule SHARED ${SOURCES} )
+install( TARGETS molecule DESTINATION lib )
 
 target_link_libraries( molecule finiteVolume meshTools lagrangian potential molecularMeasurements )
 

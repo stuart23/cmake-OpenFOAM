@@ -72,6 +72,7 @@ meshToMesh0/calculateMeshToMesh0Weights.C
 
 ## Define the output
 add_library( sampling SHARED ${SOURCES} )
+install( TARGETS sampling DESTINATION lib )
 
 target_link_libraries( sampling finiteVolume meshTools surfMesh fileFormats triSurface lagrangian conversion )
 

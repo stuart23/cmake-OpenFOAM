@@ -41,6 +41,7 @@ derivedFvPatchFields/greyDiffusiveViewFactor/greyDiffusiveViewFactorFixedValueFv
 
 ## Define the output
 add_library( radiationModels SHARED ${SOURCES} )
+install( TARGETS radiationModels DESTINATION lib )
 
 target_link_libraries( radiationModels compressibleTransportModels fluidThermophysicalModels specie solidThermo 
 SLGThermo solidMixtureProperties liquidMixtureProperties solidProperties liquidProperties finiteVolume meshTools )

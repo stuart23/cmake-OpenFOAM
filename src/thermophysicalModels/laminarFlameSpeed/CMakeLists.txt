@@ -11,6 +11,7 @@ RaviPetersen/RaviPetersen.C
 
 ## Define the output
 add_library( laminarFlameSpeedModels SHARED ${SOURCES} )
+install( TARGETS laminarFlameSpeedModels DESTINATION lib )
 
 target_link_libraries( laminarFlameSpeedModels compressibleTransportModels finiteVolume )
 

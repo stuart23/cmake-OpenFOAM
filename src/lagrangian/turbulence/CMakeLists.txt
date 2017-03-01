@@ -11,6 +11,7 @@ parcels/derived/basicKinematicMPPICParcel/makeBasicKinematicMPPICParcelSubmodels
 
 ## Define the output
 add_library( lagrangianTurbulence SHARED ${SOURCES} )
+install( TARGETS lagrangianTurbulence DESTINATION lib )
 
 target_link_libraries( lagrangianTurbulence lagrangian lagrangianIntermediate distributionModels specie compressibleTransportModels fluidThermophysicalModels liquidProperties liquidMixtureProperties solidProperties solidMixtureProperties reactionThermophysicalModels SLGThermo radiationModels turbulenceModels incompressibleTurbulenceModels compressibleTurbulenceModels incompressibleTransportModels regionModels surfaceFilmModels dynamicFvMesh sampling finiteVolume meshTools )
 

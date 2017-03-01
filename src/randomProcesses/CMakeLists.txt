@@ -17,6 +17,7 @@ noise/noiseFFT.C
 
 ## Define the output
 add_library( randomProcesses SHARED ${SOURCES} )
+install( TARGETS randomProcesses DESTINATION lib )
 
 target_link_libraries( randomProcesses finiteVolume )
 

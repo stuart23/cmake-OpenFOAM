@@ -10,6 +10,7 @@ pyrolysisModel/pyrolysisModelCollection.C
 
 ## Define the output
 add_library( pyrolysisModels SHARED ${SOURCES} )
+install( TARGETS pyrolysisModels DESTINATION lib )
 
 target_link_libraries( pyrolysisModels finiteVolume meshTools chemistryModel specie fluidThermophysicalModels solidChemistryModel 
 	solidThermo turbulenceModels compressibleTurbulenceModels regionModels radiationModels reactionThermophysicalModels )

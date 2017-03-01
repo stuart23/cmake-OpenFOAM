@@ -16,6 +16,7 @@ APIfunctions/APIdiffCoefFunc/APIdiffCoefFunc.C
 
 ## Define the output
 add_library( thermophysicalFunctions SHARED ${SOURCES} )
+install( TARGETS thermophysicalFunctions DESTINATION lib )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashTable )

@@ -7,6 +7,7 @@ nutkFilmWallFunction/nutkFilmWallFunctionFvPatchScalarField.C
 
 ## Define the output
 add_library( surfaceFilmDerivedFvPatchFields SHARED ${SOURCES} )
+install( TARGETS surfaceFilmDerivedFvPatchFields DESTINATION lib )
 
 target_link_libraries( surfaceFilmDerivedFvPatchFields compressibleTransportModels fluidThermophysicalModels specie 
 	liquidProperties liquidMixtureProperties solidProperties solidMixtureProperties reactionThermophysicalModels 

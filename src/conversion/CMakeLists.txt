@@ -27,6 +27,7 @@ polyDualMesh/polyDualMesh.C
 
 ## Define the output
 add_library( conversion SHARED ${SOURCES} )
+install( TARGETS conversion DESTINATION lib )
 
 target_link_libraries( conversion fileFormats finiteVolume meshTools )
 

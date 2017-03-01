@@ -43,6 +43,7 @@ derivedFvPatchFields/alphatFixedDmdtWallBoilingWallFunction/alphatFixedDmdtWallB
 
 ## Define the output
 add_library( twoPhaseReactingTurbulenceModels SHARED ${SOURCES} )
+install( TARGETS twoPhaseReactingTurbulenceModels DESTINATION lib )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialCompositionModels/massTransferModels/massTransferModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialCompositionModels/saturationModels/saturationModel )

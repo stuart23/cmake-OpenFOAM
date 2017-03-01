@@ -6,6 +6,7 @@ dummyMetisDecomp.C
 
 ## Define the output
 add_library( metisDecomp_dummy SHARED ${SOURCES} )
+install( TARGETS metisDecomp_dummy DESTINATION lib/dummy )
 set_target_properties( metisDecomp_dummy PROPERTIES 
   OUTPUT_NAME metisDecomp
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/dummy 

@@ -19,6 +19,7 @@ sampledSetWriters/csv/csvSetWriterRunTime.C
 
 ## Define the output
 add_library( fileFormats SHARED ${SOURCES} )
+install( TARGETS fileFormats DESTINATION lib )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashSet )

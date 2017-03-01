@@ -50,6 +50,7 @@ setTimeStep/setTimeStepFunctionObject.C
 
 ## Define the output
 add_library( utilityFunctionObjects SHARED ${SOURCES} )
+install( TARGETS utilityFunctionObjects DESTINATION lib )
 
 target_link_libraries( utilityFunctionObjects fvOptions turbulenceModels incompressibleTurbulenceModels compressibleTurbulenceModels incompressibleTransportModels compressibleTransportModels fluidThermophysicalModels specie lagrangian DSMC finiteVolume meshTools sampling )
 

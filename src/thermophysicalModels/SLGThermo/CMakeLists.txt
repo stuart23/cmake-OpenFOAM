@@ -6,6 +6,7 @@ SLGThermo/SLGThermo.C
 
 ## Define the output
 add_library( SLGThermo SHARED ${SOURCES} )
+install( TARGETS SLGThermo DESTINATION lib )
 
 target_link_libraries( SLGThermo compressibleTransportModels finiteVolume )
 

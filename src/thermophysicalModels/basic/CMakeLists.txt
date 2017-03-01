@@ -20,6 +20,7 @@ derivedFvPatchFields/energyJump/energyJumpAMI/energyJumpAMIFvPatchScalarField.C
 
 ## Define the output
 add_library( fluidThermophysicalModels SHARED ${SOURCES} )
+install( TARGETS fluidThermophysicalModels DESTINATION lib )
 
 target_link_libraries( fluidThermophysicalModels compressibleTransportModels finiteVolume meshTools )
 

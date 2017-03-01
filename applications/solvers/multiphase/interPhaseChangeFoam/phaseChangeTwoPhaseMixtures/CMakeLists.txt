@@ -10,6 +10,7 @@ SchnerrSauer/SchnerrSauer.C
 
 ## Define the output
 add_library( phaseChangeTwoPhaseMixtures SHARED ${SOURCES} )
+install( TARGETS phaseChangeTwoPhaseMixtures DESTINATION lib )
 
 target_link_libraries( phaseChangeTwoPhaseMixtures twoPhaseMixture twoPhaseProperties incompressibleTransportModels finiteVolume )
 

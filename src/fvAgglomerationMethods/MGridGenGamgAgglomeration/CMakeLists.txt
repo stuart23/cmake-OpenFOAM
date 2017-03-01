@@ -7,6 +7,7 @@ MGridGenGAMGAgglomerate.C
 
 ## Define the output
 add_library( MGridGenGAMGAgglomeration SHARED ${SOURCES} )
+install( TARGETS MGridGenGAMGAgglomeration DESTINATION lib )
 
 target_link_libraries( MGridGenGAMGAgglomeration ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dummy/libMGridGen.so )
 

@@ -13,6 +13,7 @@ noDecomp/noDecomp.C
 
 ## Define the output
 add_library( decompositionMethods SHARED ${SOURCES} )
+install( TARGETS decompositionMethods DESTINATION lib )
 
 target_link_libraries( decompositionMethods meshTools finiteVolume )
 

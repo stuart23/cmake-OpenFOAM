@@ -9,6 +9,7 @@ reaction/reactions/makeLangmuirHinshelwoodReactions.C
 
 ## Define the output
 add_library( specie SHARED ${SOURCES} )
+install( TARGETS specie DESTINATION lib )
 
 target_link_libraries( specie OpenFOAM )
 

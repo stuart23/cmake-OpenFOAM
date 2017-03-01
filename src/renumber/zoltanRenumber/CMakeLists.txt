@@ -6,6 +6,7 @@ zoltanRenumber.C
 
 ## Define the output
 add_library( zoltanRenumber SHARED ${SOURCES} )
+install( TARGETS zoltanRenumber DESTINATION lib )
 
 target_link_libraries( zoltanRenumber ${ZOLTAN_LIBRARIES} meshTools )
 

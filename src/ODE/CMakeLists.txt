@@ -24,6 +24,7 @@ ODESolvers/seulex/seulex.C
 
 ## Define the output
 add_library( ODE SHARED ${SOURCES} )
+install( TARGETS ODE DESTINATION lib )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/ODE/ODESolvers/Euler )
 include_directories( ${CMAKE_SOURCE_DIR}/src/ODE/ODESolvers/EulerSI )

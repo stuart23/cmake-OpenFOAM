@@ -75,6 +75,7 @@ submodels/MPPIC/AveragingMethods/makeAveragingMethods.C
 
 ## Define the output
 add_library( lagrangianIntermediate SHARED ${SOURCES} )
+install( TARGETS lagrangianIntermediate DESTINATION lib )
 
 target_link_libraries( lagrangianIntermediate lagrangian distributionModels specie compressibleTransportModels fluidThermophysicalModels liquidProperties liquidMixtureProperties solidProperties solidMixtureProperties reactionThermophysicalModels SLGThermo radiationModels incompressibleTransportModels regionModels surfaceFilmModels dynamicFvMesh sampling finiteVolume meshTools )
 

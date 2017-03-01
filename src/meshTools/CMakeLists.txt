@@ -205,6 +205,7 @@ tetOverlapVolume/tetOverlapVolume.C
 
 ## Define the output
 add_library( meshTools SHARED ${SOURCES} )
+install( TARGETS meshTools DESTINATION lib )
 
 target_link_libraries( meshTools triSurface surfMesh fileFormats )
 

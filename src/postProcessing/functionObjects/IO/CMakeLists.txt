@@ -16,6 +16,7 @@ writeRegisteredObject/writeRegisteredObjectFunctionObject.C
 
 ## Define the output
 add_library( IOFunctionObjects SHARED ${SOURCES} )
+install( TARGETS IOFunctionObjects DESTINATION lib )
 
 target_link_libraries( IOFunctionObjects finiteVolume meshTools )
 

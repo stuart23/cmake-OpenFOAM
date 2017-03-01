@@ -28,6 +28,7 @@ twoPhaseSystem.C
 
 ## Define the output
 add_library( compressibleTwoPhaseSystem SHARED ${SOURCES} )
+install( TARGETS compressibleTwoPhaseSystem DESTINATION lib )
 
 target_link_libraries( compressibleTwoPhaseSystem incompressibleTransportModels compressibleTransportModels fluidThermophysicalModels specie )
 

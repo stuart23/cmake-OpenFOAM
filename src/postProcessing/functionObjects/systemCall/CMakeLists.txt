@@ -7,6 +7,7 @@ systemCallFunctionObject.C
 
 ## Define the output
 add_library( systemCall SHARED ${SOURCES} )
+install( TARGETS systemCall DESTINATION lib )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

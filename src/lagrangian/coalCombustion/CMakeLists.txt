@@ -7,6 +7,7 @@ coalCloudList/coalCloudList.C
 
 ## Define the output
 add_library( coalCombustion SHARED ${SOURCES} )
+install( TARGETS coalCombustion DESTINATION lib )
 
 target_link_libraries( coalCombustion lagrangian lagrangianIntermediate lagrangianTurbulence distributionModels specie compressibleTransportModels fluidThermophysicalModels liquidProperties liquidMixtureProperties solidProperties solidMixtureProperties reactionThermophysicalModels SLGThermo radiationModels turbulenceModels incompressibleTurbulenceModels compressibleTurbulenceModels incompressibleTransportModels regionModels surfaceFilmModels dynamicFvMesh finiteVolume meshTools )
 

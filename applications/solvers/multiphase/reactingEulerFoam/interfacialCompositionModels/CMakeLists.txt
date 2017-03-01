@@ -24,6 +24,7 @@ saturationModels/constantSaturationConditions/constantSaturationConditions.C
 
 ## Define the output
 add_library( reactingEulerianInterfacialCompositionModels SHARED ${SOURCES} )
+install( TARGETS reactingEulerianInterfacialCompositionModels DESTINATION lib )
 
 target_link_libraries( reactingEulerianInterfacialCompositionModels fluidThermophysicalModels reactionThermophysicalModels specie )
 

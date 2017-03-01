@@ -7,6 +7,7 @@ abortCalculation/abortCalculationFunctionObject.C
 
 ## Define the output
 add_library( jobControl SHARED ${SOURCES} )
+install( TARGETS jobControl DESTINATION lib )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

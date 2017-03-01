@@ -17,6 +17,7 @@ incompressibleTwoPhaseMixture/incompressibleTwoPhaseMixture.C
 
 ## Define the output
 add_library( incompressibleTransportModels SHARED ${SOURCES} )
+install( TARGETS incompressibleTransportModels DESTINATION lib )
 
 target_link_libraries( incompressibleTransportModels twoPhaseMixture finiteVolume )
 

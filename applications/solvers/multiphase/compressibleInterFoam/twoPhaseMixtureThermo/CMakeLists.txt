@@ -6,6 +6,7 @@ twoPhaseMixtureThermo.C
 
 ## Define the output
 add_library( twoPhaseMixtureThermo SHARED ${SOURCES} )
+install( TARGETS twoPhaseMixtureThermo DESTINATION lib )
 
 target_link_libraries( twoPhaseMixtureThermo compressibleTransportModels fluidThermophysicalModels specie twoPhaseMixture finiteVolume )
 

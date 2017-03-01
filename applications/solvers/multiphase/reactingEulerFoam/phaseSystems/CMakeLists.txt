@@ -27,6 +27,7 @@ reactionThermo/hRefConstThermos.C
 
 ## Define the output
 add_library( reactingPhaseSystem SHARED ${SOURCES} )
+install( TARGETS reactingPhaseSystem DESTINATION lib )
 
 target_link_libraries( reactingPhaseSystem combustionModels )
 

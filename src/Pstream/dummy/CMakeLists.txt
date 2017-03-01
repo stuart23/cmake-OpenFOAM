@@ -6,6 +6,7 @@ set( SOURCES
 
 ## Define the output
 add_library( Pstream_dummy SHARED ${SOURCES} )
+install( TARGETS Pstream_dummy DESTINATION lib/dummy )
 set_target_properties( Pstream_dummy PROPERTIES 
   OUTPUT_NAME Pstream 
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/dummy 

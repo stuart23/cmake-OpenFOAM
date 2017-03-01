@@ -22,6 +22,7 @@ turbulentFluidThermoModels/derivedFvPatchFields/wallFunctions/alphatWallFunction
 
 ## Define the output
 add_library( compressibleTurbulenceModels SHARED ${SOURCES} )
+install( TARGETS compressibleTurbulenceModels DESTINATION lib )
 
 target_link_libraries( compressibleTurbulenceModels compressibleTransportModels fluidThermophysicalModels solidThermo solidSpecie turbulenceModels specie finiteVolume meshTools )
 

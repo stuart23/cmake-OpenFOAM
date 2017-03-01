@@ -27,6 +27,7 @@ derivedFvPatchFields/mixedUnburntEnthalpy/mixedUnburntEnthalpyFvPatchScalarField
 
 ## Define the output
 add_library( reactionThermophysicalModels SHARED ${SOURCES} )
+install( TARGETS reactionThermophysicalModels DESTINATION lib )
 
 target_link_libraries( reactionThermophysicalModels compressibleTransportModels fluidThermophysicalModels specie solidSpecie finiteVolume )
 

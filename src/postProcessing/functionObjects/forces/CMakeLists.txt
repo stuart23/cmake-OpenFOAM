@@ -10,6 +10,7 @@ forceCoeffs/forceCoeffsFunctionObject.C
 
 ## Define the output
 add_library( forces SHARED ${SOURCES} )
+install( TARGETS forces DESTINATION lib )
 
 target_link_libraries( forces compressibleTransportModels turbulenceModels incompressibleTurbulenceModels compressibleTurbulenceModels incompressibleTransportModels fluidThermophysicalModels specie fileFormats finiteVolume meshTools )
 

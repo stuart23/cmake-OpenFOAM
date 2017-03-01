@@ -6,6 +6,7 @@ compressibleTransportModel/compressibleTransportModel.C
 
 ## Define the output
 add_library( compressibleTransportModels SHARED ${SOURCES} )
+install( TARGETS compressibleTransportModels DESTINATION lib )
 
 target_link_libraries( compressibleTransportModels finiteVolume )
 

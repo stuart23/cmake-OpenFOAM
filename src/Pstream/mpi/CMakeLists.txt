@@ -7,6 +7,7 @@ set( SOURCES
 
 ## Define the output
 add_library( Pstream SHARED ${SOURCES} )
+install( TARGETS Pstream DESTINATION lib )
 
 target_link_libraries( Pstream ${MPI_CXX_LIBRARIES} )
 

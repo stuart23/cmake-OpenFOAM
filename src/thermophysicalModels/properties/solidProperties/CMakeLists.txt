@@ -11,6 +11,7 @@ CaCO3/CaCO3.C
 
 ## Define the output
 add_library( solidProperties SHARED ${SOURCES} )
+install( TARGETS solidProperties DESTINATION lib )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashTable )

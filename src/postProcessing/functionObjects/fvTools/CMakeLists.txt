@@ -13,6 +13,7 @@ calcMag/calcMagFunctionObject.C
 
 ## Define the output
 add_library( FVFunctionObjects SHARED ${SOURCES} )
+install( TARGETS FVFunctionObjects DESTINATION lib )
 
 target_link_libraries( FVFunctionObjects finiteVolume )
 

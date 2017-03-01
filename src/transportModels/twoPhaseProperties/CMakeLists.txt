@@ -11,6 +11,7 @@ alphaFixedPressure/alphaFixedPressureFvPatchScalarField.C
 
 ## Define the output
 add_library( twoPhaseProperties SHARED ${SOURCES} )
+install( TARGETS twoPhaseProperties DESTINATION lib )
 
 target_link_libraries( twoPhaseProperties twoPhaseMixture interfaceProperties finiteVolume )
 

@@ -32,6 +32,7 @@ blockMesh/blockMeshMergeFast.C
 
 ## Define the output
 add_library( blockMesh SHARED ${SOURCES} )
+install( TARGETS blockMesh DESTINATION lib )
 
 target_link_libraries( blockMesh meshTools dynamicMesh )
 

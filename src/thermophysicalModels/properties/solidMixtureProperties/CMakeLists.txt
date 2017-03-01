@@ -6,6 +6,7 @@ solidMixtureProperties/solidMixtureProperties.C
 
 ## Define the output
 add_library( solidMixtureProperties SHARED ${SOURCES} )
+install( TARGETS solidMixtureProperties DESTINATION lib )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashTable )

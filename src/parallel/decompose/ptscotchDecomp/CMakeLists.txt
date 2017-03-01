@@ -7,6 +7,7 @@ set( SOURCES
 
 ## Define the output
 add_library( ptscotchDecomp SHARED ${SOURCES} )
+install( TARGETS ptscotchDecomp DESTINATION lib )
 
 target_link_libraries( ptscotchDecomp ptscotch ptscotcherrexit scotch rt )
 

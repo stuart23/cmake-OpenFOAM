@@ -9,6 +9,7 @@ reconstructLagrangianPositions.C
 
 ## Define the output
 add_library( reconstruct SHARED ${SOURCES} )
+install( TARGETS reconstruct DESTINATION lib )
 
 target_link_libraries( reconstruct finiteVolume meshTools lagrangian )
 

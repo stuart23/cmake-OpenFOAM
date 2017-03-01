@@ -6,6 +6,7 @@ twoPhaseMixture/twoPhaseMixture.C
 
 ## Define the output
 add_library( twoPhaseMixture SHARED ${SOURCES} )
+install( TARGETS twoPhaseMixture DESTINATION lib )
 
 target_link_libraries( twoPhaseMixture finiteVolume )
 

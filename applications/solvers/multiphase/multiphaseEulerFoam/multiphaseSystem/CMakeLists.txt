@@ -13,6 +13,7 @@ multiphaseSystem.C
 
 ## Define the output
 add_library( multiphaseSystem SHARED ${SOURCES} )
+install( TARGETS multiphaseSystem DESTINATION lib )
 
 target_link_libraries( multiphaseSystem interfaceProperties incompressibleTransportModels finiteVolume meshTools )
 

@@ -11,6 +11,7 @@ InteractionLists/referredWallFace/referredWallFace.C
 
 ## Define the output
 add_library( lagrangian SHARED ${SOURCES} )
+install( TARGETS lagrangian DESTINATION lib )
 
 target_link_libraries( lagrangian meshTools )
 

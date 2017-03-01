@@ -52,6 +52,7 @@ surfaceFormats/x3d/X3DsurfaceFormatRunTime.C
 
 ## Define the output
 add_library( surfMesh SHARED ${SOURCES} )
+install( TARGETS surfMesh DESTINATION lib )
 
 target_link_libraries( surfMesh fileFormats )
 

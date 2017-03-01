@@ -6,6 +6,7 @@ liquidMixtureProperties/liquidMixtureProperties.C
 
 ## Define the output
 add_library( liquidMixtureProperties SHARED ${SOURCES} )
+install( TARGETS liquidMixtureProperties DESTINATION lib )
 
 target_link_libraries( liquidMixtureProperties liquidProperties thermophysicalFunctions )
 

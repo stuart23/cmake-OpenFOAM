@@ -53,6 +53,7 @@ corrections/limitTemperature/limitTemperature.C
 
 ## Define the output
 add_library( fvOptions SHARED ${SOURCES} )
+install( TARGETS fvOptions DESTINATION lib )
 
 target_link_libraries( fvOptions finiteVolume sampling meshTools turbulenceModels compressibleTurbulenceModels )
 

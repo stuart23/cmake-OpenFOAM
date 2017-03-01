@@ -8,6 +8,7 @@ general/general.C
 
 ## Define the output
 add_library( driftFluxRelativeVelocityModels SHARED ${SOURCES} )
+install( TARGETS driftFluxRelativeVelocityModels DESTINATION lib )
 
 target_link_libraries( driftFluxRelativeVelocityModels incompressibleTransportModels finiteVolume meshTools )
 

@@ -16,6 +16,7 @@ regionModelFunctionObject/regionModelFunctionObject/regionModelFunctionObjectLis
 
 ## Define the output
 add_library( regionModels SHARED ${SOURCES} )
+install( TARGETS regionModels DESTINATION lib )
 
 target_link_libraries( regionModels finiteVolume meshTools )
 

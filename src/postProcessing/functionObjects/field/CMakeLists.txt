@@ -52,6 +52,7 @@ regionSizeDistribution/regionSizeDistributionFunctionObject.C
 
 ## Define the output
 add_library( fieldFunctionObjects SHARED ${SOURCES} )
+install( TARGETS fieldFunctionObjects DESTINATION lib )
 
 target_link_libraries( fieldFunctionObjects finiteVolume meshTools surfMesh lagrangian fileFormats sampling surfMesh )
 

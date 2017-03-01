@@ -55,6 +55,7 @@ RAS/derivedFvPatchFields/atmBoundaryLayerInletEpsilon/atmBoundaryLayerInletEpsil
 
 ## Define the output
 add_library( turbulenceModels SHARED ${SOURCES} )
+install( TARGETS turbulenceModels DESTINATION lib )
 
 target_link_libraries( turbulenceModels finiteVolume meshTools )
 

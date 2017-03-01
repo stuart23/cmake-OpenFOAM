@@ -14,6 +14,7 @@ twoPhaseSystems.C
 
 ## Define the output
 add_library( reactingTwoPhaseSystem SHARED ${SOURCES} )
+install( TARGETS reactingTwoPhaseSystem DESTINATION lib )
 
 target_link_libraries( reactingTwoPhaseSystem combustionModels reactingPhaseSystem )
 

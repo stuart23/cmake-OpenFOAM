@@ -41,6 +41,7 @@ kineticTheoryModels/derivedFvPatchFields/JohnsonJacksonParticleSlip/JohnsonJacks
 
 ## Define the output
 add_library( phaseCompressibleTurbulenceModels SHARED ${SOURCES} )
+install( TARGETS phaseCompressibleTurbulenceModels DESTINATION lib )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/interfacialModels/dragModels/dragModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/twoPhaseEulerFoam/interfacialModels/virtualMassModels/virtualMassModel )

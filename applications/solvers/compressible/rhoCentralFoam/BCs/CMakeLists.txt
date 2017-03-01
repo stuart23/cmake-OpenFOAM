@@ -9,6 +9,7 @@ rho/fixedRhoFvPatchScalarField.C
 
 ## Define the output
 add_library( rhoCentralFoam_lib SHARED ${SOURCES} )
+install( TARGETS rhoCentralFoam_lib DESTINATION lib )
 set_target_properties( rhoCentralFoam_lib PROPERTIES
   OUTPUT_NAME rhoCentralFoam
 )

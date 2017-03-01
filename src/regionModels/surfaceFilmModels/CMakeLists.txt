@@ -63,6 +63,7 @@ derivedFvPatchFields/inclinedFilmNusseltInletVelocity/inclinedFilmNusseltInletVe
 
 ## Define the output
 add_library( surfaceFilmModels SHARED ${SOURCES} )
+install( TARGETS surfaceFilmModels DESTINATION lib )
 
 target_link_libraries( surfaceFilmModels compressibleTransportModels fluidThermophysicalModels specie liquidProperties 
 	liquidMixtureProperties solidProperties solidMixtureProperties reactionThermophysicalModels SLGThermo 

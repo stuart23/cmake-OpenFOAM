@@ -32,6 +32,7 @@ noCombustion/noCombustions.C
 
 ## Define the output
 add_library( combustionModels SHARED ${SOURCES} )
+install( TARGETS combustionModels DESTINATION lib )
 
 target_link_libraries( combustionModels compressibleTransportModels turbulenceModels compressibleTurbulenceModels chemistryModel finiteVolume meshTools )
 

@@ -8,6 +8,7 @@ multiphaseMixtureThermo.C
 
 ## Define the output
 add_library( multiphaseMixtureThermo SHARED ${SOURCES} )
+install( TARGETS multiphaseMixtureThermo DESTINATION lib )
 
 target_link_libraries( multiphaseMixtureThermo compressibleTransportModels fluidThermophysicalModels specie finiteVolume meshTools )
 

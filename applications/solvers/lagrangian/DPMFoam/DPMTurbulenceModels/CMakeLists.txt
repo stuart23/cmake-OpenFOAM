@@ -6,6 +6,7 @@ DPMTurbulenceModels.C
 
 ## Define the output
 add_library( DPMTurbulenceModels SHARED ${SOURCES} )
+install( TARGETS DPMTurbulenceModels DESTINATION lib )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

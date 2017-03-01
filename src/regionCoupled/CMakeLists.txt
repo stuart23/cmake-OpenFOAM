@@ -6,6 +6,7 @@ derivedFvPatchFields/energyRegionCoupled/energyRegionCoupledFvPatchScalarField.C
 
 ## Define the output
 add_library( regionCoupled SHARED ${SOURCES} )
+install( TARGETS regionCoupled DESTINATION lib )
 
 target_link_libraries( regionCoupled compressibleTransportModels fluidThermophysicalModels turbulenceModels compressibleTurbulenceModels finiteVolume meshTools )
 

@@ -8,6 +8,7 @@ solidParticleCloud.C
 
 ## Define the output
 add_library( solidParticle SHARED ${SOURCES} )
+install( TARGETS solidParticle DESTINATION lib )
 
 target_link_libraries( solidParticle lagrangian meshTools finiteVolume )
 

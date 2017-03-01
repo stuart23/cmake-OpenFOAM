@@ -6,6 +6,7 @@ multiphaseCompressibleTurbulenceModels.C
 
 ## Define the output
 add_library( multiphaseReactingTurbulenceModels SHARED ${SOURCES} )
+install( TARGETS multiphaseReactingTurbulenceModels DESTINATION lib )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/phaseModel/phaseModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/phaseModel/MovingPhaseModel )

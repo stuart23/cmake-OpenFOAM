@@ -10,6 +10,7 @@ slurry/slurry.C
 
 ## Define the output
 add_library( driftFluxTransportModels SHARED ${SOURCES} )
+install( TARGETS driftFluxTransportModels DESTINATION lib )
 
 target_link_libraries( driftFluxTransportModels twoPhaseMixture incompressibleTransportModels finiteVolume )
 

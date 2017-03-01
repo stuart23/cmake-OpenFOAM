@@ -16,6 +16,7 @@ wedge/wedge.C
 
 ## Define the output
 add_library( extrudeModel SHARED ${SOURCES} )
+install( TARGETS extrudeModel DESTINATION lib )
 
 target_link_libraries( extrudeModel meshTools )
 

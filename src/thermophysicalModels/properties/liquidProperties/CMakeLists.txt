@@ -36,6 +36,7 @@ iC3H8O/iC3H8O.C
 
 ## Define the output
 add_library( liquidProperties SHARED ${SOURCES} )
+install( TARGETS liquidProperties DESTINATION lib )
 
 target_link_libraries( liquidProperties thermophysicalFunctions )
 

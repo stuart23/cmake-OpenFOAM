@@ -13,6 +13,7 @@ parcels/derived/dsmcParcel/makeDSMCParcelInflowBoundaryModels.C
 
 ## Define the output
 add_library( DSMC SHARED ${SOURCES} )
+install( TARGETS DSMC DESTINATION lib )
 
 target_link_libraries( DSMC lagrangian finiteVolume meshTools )
 

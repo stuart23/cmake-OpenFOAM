@@ -43,6 +43,7 @@ pointPatchFields/derived/uniformInterpolatedDisplacement/uniformInterpolatedDisp
 
 ## Define the output
 add_library( fvMotionSolvers SHARED ${SOURCES} )
+install( TARGETS fvMotionSolvers DESTINATION lib )
 
 target_link_libraries( fvMotionSolvers triSurface meshTools dynamicMesh finiteVolume fileFormats )
 

@@ -20,6 +20,7 @@ heatTransferModels/RanzMarshall/RanzMarshall.C
 
 ## Define the output
 add_library( compressibleMultiphaseEulerianInterfacialModels SHARED ${SOURCES} )
+install( TARGETS compressibleMultiphaseEulerianInterfacialModels DESTINATION lib )
 
 target_link_libraries( compressibleMultiphaseEulerianInterfacialModels multiphaseSystem )
 

@@ -6,6 +6,7 @@ reaction/reactions/makeSolidReactions.C
 
 ## Define the output
 add_library( solidSpecie SHARED ${SOURCES} )
+install( TARGETS solidSpecie DESTINATION lib )
 
 target_link_libraries( solidSpecie specie )
 

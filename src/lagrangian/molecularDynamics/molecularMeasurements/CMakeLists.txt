@@ -6,6 +6,7 @@ distribution/distribution.C
 
 ## Define the output
 add_library( molecularMeasurements SHARED ${SOURCES} )
+install( TARGETS molecularMeasurements DESTINATION lib )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/HashTables/HashTable )

@@ -8,6 +8,7 @@ derivedFvPatchFields/filmPyrolysisRadiativeCoupledMixed/filmPyrolysisRadiativeCo
 
 ## Define the output
 add_library( regionCoupling SHARED ${SOURCES} )
+install( TARGETS regionCoupling DESTINATION lib )
 
 target_link_libraries( regionCoupling regionModels pyrolysisModels surfaceFilmModels solidChemistryModel 
 	reactionThermophysicalModels SLGThermo turbulenceModels compressibleTurbulenceModels finiteVolume meshTools )

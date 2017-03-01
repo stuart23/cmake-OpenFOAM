@@ -556,6 +556,7 @@ endif()
 
 ## Define the output
 add_library( OpenFOAM SHARED ${SOURCES} $<TARGET_OBJECTS:OSspecific> )
+install( TARGETS OpenFOAM DESTINATION lib )
 
 target_link_libraries( OpenFOAM Pstream ${ZLIB_LIBRARIES} )
 

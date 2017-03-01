@@ -9,6 +9,7 @@ multiphaseSystems.C
 
 ## Define the output
 add_library( reactingMultiphaseSystem SHARED ${SOURCES} )
+install( TARGETS reactingMultiphaseSystem DESTINATION lib )
 
 target_link_libraries( reactingMultiphaseSystem combustionModels reactingPhaseSystem )
 
