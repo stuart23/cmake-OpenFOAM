@@ -8,6 +8,7 @@ reactingParcelFoam.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} finiteVolume meshTools turbulenceModels compressibleTurbulenceModels lagrangian lagrangianIntermediate lagrangianTurbulence specie compressibleTransportModels fluidThermophysicalModels liquidProperties liquidMixtureProperties solidProperties solidMixtureProperties thermophysicalFunctions reactionThermophysicalModels SLGThermo chemistryModel radiationModels ODE regionModels surfaceFilmModels combustionModels fvOptions sampling OpenFOAM dl m )
 

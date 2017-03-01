@@ -8,6 +8,7 @@ reactingTwoPhaseEulerFoam.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} reactingPhaseSystem reactingTwoPhaseSystem reactingEulerianInterfacialModels reactingEulerianInterfacialCompositionModels twoPhaseReactingTurbulenceModels finiteVolume fvOptions meshTools sampling OpenFOAM dl m )
 

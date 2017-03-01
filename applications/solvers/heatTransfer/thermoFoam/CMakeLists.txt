@@ -8,6 +8,7 @@ thermoFoam.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} finiteVolume sampling meshTools fvOptions compressibleTransportModels fluidThermophysicalModels radiationModels specie turbulenceModels compressibleTurbulenceModels OpenFOAM dl m )
 

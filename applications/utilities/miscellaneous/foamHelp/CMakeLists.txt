@@ -8,6 +8,7 @@ foamHelp.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} helpTypes turbulenceModels incompressibleTurbulenceModels compressibleTurbulenceModels radiationModels fluidThermophysicalModels finiteVolume meshTools OpenFOAM dl m )
 

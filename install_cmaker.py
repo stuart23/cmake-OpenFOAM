@@ -13,7 +13,7 @@ for root, directory, files in os.walk(os.getcwd()):
                 for line in contents:
                     if line.find('add_executable') > -1:
                         fh.write(line)
-                        fh.write('install( TARGETS ${EXE_NAME} DESTINATION lib )\n')
+                        fh.write('install( TARGETS ${EXE_NAME} DESTINATION bin )\n')
                     else:
                         fh.write(line)
 

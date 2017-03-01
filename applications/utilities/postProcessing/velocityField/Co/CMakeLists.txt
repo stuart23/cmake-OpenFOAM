@@ -9,6 +9,7 @@ set( SOURCE_OBJECT postCalc )
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} $<TARGET_OBJECTS:${SOURCE_OBJECT}> )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} $<TARGET_PROPERTY:${SOURCE_OBJECT},REQUIRED_LIBS> genericPatchFields finiteVolume meshTools OpenFOAM dl m )
 

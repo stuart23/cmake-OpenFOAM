@@ -8,6 +8,7 @@ engineCompRatio.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} engine dynamicMesh finiteVolume meshTools OpenFOAM dl m )
 

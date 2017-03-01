@@ -8,6 +8,7 @@ steadyParticleTracks.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} lagrangian meshTools finiteVolume OpenFOAM dl m )
 

@@ -8,6 +8,7 @@ multiphaseInterDyMFoam.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} multiphaseInterFoam interfaceProperties incompressibleTransportModels turbulenceModels incompressibleTurbulenceModels finiteVolume dynamicMesh dynamicFvMesh topoChangerFvMesh fvOptions meshTools sampling OpenFOAM dl m )
 

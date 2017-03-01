@@ -8,6 +8,7 @@ rhoCentralDyMFoam.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} finiteVolume compressibleTransportModels fluidThermophysicalModels specie rhoCentralFoam turbulenceModels compressibleTurbulenceModels dynamicMesh dynamicFvMesh topoChangerFvMesh meshTools OpenFOAM dl m )
 

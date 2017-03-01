@@ -8,6 +8,7 @@ wallHeatFlux.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} turbulenceModels compressibleTurbulenceModels reactionThermophysicalModels genericPatchFields specie compressibleTransportModels fluidThermophysicalModels solidThermo finiteVolume meshTools OpenFOAM dl m )
 

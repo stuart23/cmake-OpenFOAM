@@ -8,6 +8,7 @@ fireFoam.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} finiteVolume fvOptions meshTools sampling turbulenceModels compressibleTurbulenceModels specie compressibleTransportModels fluidThermophysicalModels solidProperties solidMixtureProperties thermophysicalFunctions reactionThermophysicalModels SLGThermo chemistryModel solidChemistryModel combustionModels regionModels radiationModels surfaceFilmModels surfaceFilmDerivedFvPatchFields pyrolysisModels regionCoupling lagrangianIntermediate lagrangianTurbulence ODE OpenFOAM dl m )
 

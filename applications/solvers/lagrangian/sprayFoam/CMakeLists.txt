@@ -8,6 +8,7 @@ sprayFoam.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} turbulenceModels compressibleTurbulenceModels lagrangian lagrangianIntermediate lagrangianTurbulence lagrangianSpray specie compressibleTransportModels fluidThermophysicalModels liquidProperties liquidMixtureProperties solidProperties solidMixtureProperties thermophysicalFunctions reactionThermophysicalModels SLGThermo chemistryModel radiationModels ODE regionModels surfaceFilmModels combustionModels finiteVolume fvOptions meshTools sampling OpenFOAM dl m )
 

@@ -8,6 +8,7 @@ uncoupledKinematicParcelFoam.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} lagrangian lagrangianIntermediate lagrangianTurbulence thermophysicalFunctions compressibleTransportModels fluidThermophysicalModels specie radiationModels turbulenceModels compressibleTurbulenceModels finiteVolume meshTools regionModels surfaceFilmModels OpenFOAM dl m )
 

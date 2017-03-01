@@ -10,6 +10,7 @@ driftFluxFoam.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} driftFluxTransportModels driftFluxRelativeVelocityModels finiteVolume meshTools sampling fvOptions compressibleTransportModels turbulenceModels compressibleTurbulenceModels OpenFOAM dl m )
 

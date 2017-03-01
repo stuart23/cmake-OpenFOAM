@@ -8,6 +8,7 @@ extrude2DMeshApp.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 set_target_properties( ${EXE_NAME} PROPERTIES
 	OUTPUT_NAME extrude2DMesh
 )	

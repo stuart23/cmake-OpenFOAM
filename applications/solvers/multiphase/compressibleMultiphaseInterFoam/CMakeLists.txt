@@ -8,6 +8,7 @@ compressibleMultiphaseInterFoam.C
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
+install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} multiphaseMixtureThermo compressibleTransportModels fluidThermophysicalModels specie interfaceProperties turbulenceModels compressibleTurbulenceModels finiteVolume meshTools OpenFOAM dl m )
 
