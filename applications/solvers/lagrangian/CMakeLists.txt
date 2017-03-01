@@ -4,6 +4,7 @@ add_subdirectory( icoUncoupledKinematicParcelFoam/icoUncoupledKinematicParcelDyM
 add_subdirectory( reactingParcelFoam )
 add_subdirectory( reactingParcelFoam/simpleReactingParcelFoam )
 add_subdirectory( DPMFoam )
+add_subdirectory( DPMFoam/MPPICFoam )
 add_subdirectory( DPMFoam/DPMTurbulenceModels )
 add_subdirectory( sprayFoam/sprayEngineFoam )
 add_subdirectory( sprayFoam/sprayDyMFoam )
