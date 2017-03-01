@@ -7,14 +7,13 @@ for root, directory, files in os.walk(os.getcwd()):
         filename = os.path.join(root, 'CMakeLists.txt')
         with open(filename) as fh:
             contents = fh.readlines()
-        library_lines = filter(lambda x: x.find('add_library') > -1, contents)
+        library_lines = filter(lambda x: x.find('add_executable') > -1, contents)
         if len(library_lines) > 0:
             with open(filename, 'w') as fh:
                 for line in contents:
-                    if line.find('add_library') > -1:
-                        libname = line.split('(')[1].strip().split(' ')[0]
+                    if line.find('add_executable') > -1:
                         fh.write(line)
-                        fh.write('install( TARGETS %s DESTINATION lib )\n' % libname)
+                        fh.write('install( TARGETS ${EXE_NAME} DESTINATION lib )\n')
                     else:
                         fh.write(line)
 
