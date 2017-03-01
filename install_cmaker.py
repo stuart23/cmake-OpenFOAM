@@ -12,6 +12,7 @@ for root, directory, files in os.walk(os.getcwd()):
             with open(filename, 'w') as fh:
                 for line in contents:
                     if line.find('add_library') > -1:
+                        libname = line.split('(')[1].strip().split(' ')[0]
                         fh.write(line)
                         fh.write('install( TARGETS %s DESTINATION lib )' % libname)
                     else:
