@@ -11,11 +11,8 @@ add_executable( ${EXE_NAME} ${SOURCES} )
 
 target_link_libraries( ${EXE_NAME} finiteVolume fvOptions sampling meshTools engine turbulenceModels compressibleTurbulenceModels compressibleTransportModels fluidThermophysicalModels reactionThermophysicalModels specie laminarFlameSpeedModels OpenFOAM dl m )
 
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/combustion/PDRFoam )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/combustion/XiFoam )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/combustion/coldEngineFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/combustion/engineFoam )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/combustion/fireFoam )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/combustion/XiFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )
