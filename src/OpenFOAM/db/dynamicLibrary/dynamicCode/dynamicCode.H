@@ -66,7 +66,7 @@ private:
         fileName codeRoot_;
 
         //- Subdirectory name for loading libraries
-        const fileName libSubDir_;
+        fileName libSubDir_;
 
         //- Name for code
         word codeName_;
