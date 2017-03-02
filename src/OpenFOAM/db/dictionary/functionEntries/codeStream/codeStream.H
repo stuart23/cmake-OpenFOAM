@@ -30,7 +30,7 @@ Description
     - codeStream reads three entries: 'code', 'codeInclude' (optional),
     'codeOptions' (optional)
     and uses those to generate library sources inside \c codeStream/
-    - these get compiled using 'wmake libso'
+    - these get compiled using 'make libso'
     - the resulting library is loaded in executed with as arguments
     \code
         (const dictionary& dict, Ostream& os)

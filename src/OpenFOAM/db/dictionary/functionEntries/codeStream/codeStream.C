@@ -168,13 +168,13 @@ Foam::functionEntries::codeStream::getFunction
                 }
             }
 
-            if (!dynCode.wmakeLibso())
+            if (!dynCode.makeLibso())
             {
                 FatalIOErrorIn
                 (
                     "functionEntries::codeStream::execute(..)",
                     parentDict
-                )   << "Failed wmake " << dynCode.libRelPath() << nl
+                )   << "Failed make " << dynCode.libRelPath() << nl
                     << exit(FatalIOError);
             }
         }
