@@ -33,6 +33,7 @@ License
 #include "labelList.H"
 #include "regIOobject.H"
 #include "dynamicCode.H"
+#include "caseDirs.H"
 
 #include <cctype>
 
@@ -47,6 +48,10 @@ Foam::SLList<Foam::string>    Foam::argList::notes;
 Foam::string::size_type Foam::argList::usageMin = 20;
 Foam::string::size_type Foam::argList::usageMax = 80;
 
+//Foam Case directory globals defined here (and in header caseDirs.H). 
+//May move this definition into a header later
+Foam::string Foam::FOAM_CASE;
+Foam::string Foam::FOAM_CASENAME;
 
 Foam::argList::initValidTables::initValidTables()
 {
@@ -346,13 +351,12 @@ void Foam::argList::getRootCase()
     globalCase_ = casePath.name();
     case_       = globalCase_;
 
-
     // Set the case and case-name as an environment variable
     if (rootPath_.isAbsolute())
     {
         // absolute path - use as-is
-        setEnv("FOAM_CASE", rootPath_/globalCase_, true);
-        setEnv("FOAM_CASENAME", globalCase_, true);
+        FOAM_CASE = rootPath_/globalCase_;
+        FOAM_CASENAME = globalCase_;
     }
     else
     {
@@ -360,8 +364,8 @@ void Foam::argList::getRootCase()
         casePath = cwd()/rootPath_/globalCase_;
         casePath.clean();
 
-        setEnv("FOAM_CASE", casePath, true);
-        setEnv("FOAM_CASENAME", casePath.name(), true);
+        FOAM_CASE = casePath;
+        FOAM_CASENAME = casePath.name();
     }
 }
 
