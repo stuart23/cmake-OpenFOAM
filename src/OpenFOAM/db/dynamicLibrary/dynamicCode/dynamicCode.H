@@ -279,7 +279,7 @@ public:
         bool copyOrCreateFiles(const bool verbose = false) const;
 
         //- Compile a libso
-        bool wmakeLibso() const;
+        bool makeLibso() const;
 
 };
 

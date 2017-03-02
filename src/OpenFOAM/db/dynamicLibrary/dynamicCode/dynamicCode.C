@@ -522,12 +522,12 @@ bool Foam::dynamicCode::copyOrCreateFiles(const bool verbose) const
 }
 
 
-bool Foam::dynamicCode::wmakeLibso() const
+bool Foam::dynamicCode::makeLibso() const
 {
-    const Foam::string wmakeCmd("wmake -s libso " + this->codePath());
-    Info<< "Invoking " << wmakeCmd << endl;
+    const Foam::string makeCmd("wmake -s libso " + this->codePath());
+    Info<< "Invoking " << makeCmd << endl;
 
-    if (Foam::system(wmakeCmd))
+    if (Foam::system(makeCmd))
     {
         return false;
     }
