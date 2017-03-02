@@ -30,6 +30,7 @@ License
 #include "OFstream.H"
 #include "OSspecific.H"
 #include "dictionary.H"
+#include "caseDirs.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -309,12 +310,13 @@ bool Foam::dynamicCode::writeDigest(const std::string& sha1) const
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::dynamicCode::dynamicCode(const word& codeName, const word& codeDirName)
-:
-    codeRoot_(stringOps::expand("$FOAM_CASE")/topDirName),
-    libSubDir_(stringOps::expand("platforms/$WM_OPTIONS/lib")),
-    codeName_(codeName),
-    codeDirName_(codeDirName)
 {
+    codeRoot_ = stringOps::expand(FOAM_CASE)/topDirName;
+    // Removed the building of different libs for different architectures
+    // because this is an outdated idea.
+    libSubDir_ = stringOps::expand("lib");
+    codeName_ = codeName;
+    codeDirName_ = codeDirName;
     if (codeDirName_.empty())
     {
         codeDirName_ = codeName_;
