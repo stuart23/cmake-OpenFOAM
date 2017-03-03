@@ -132,6 +132,9 @@ protected:
         //- Write SHA1 value as C-comment
         bool writeCommentSHA1(Ostream&) const;
 
+        //- Create CMakeLists
+        bool createCMakeLists() const;
+
         //- Copy/create Make/files prior to compilation
         bool createMakeFiles() const;
 

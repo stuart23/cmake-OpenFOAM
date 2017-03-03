@@ -202,13 +202,55 @@ bool Foam::dynamicCode::writeCommentSHA1(Ostream& os) const
 
     if (hasSHA1)
     {
-        os  << "/* dynamicCode:\n * SHA1 = ";
-        os.writeQuoted(filterVars_["SHA1sum"], false) << "\n */\n";
+        os  << "# dynamicCode:\n# SHA1 = ";
+        os.writeQuoted(filterVars_["SHA1sum"], false) << "\n#\n";
     }
 
     return hasSHA1;
 }
 
+
+bool Foam::dynamicCode::createCMakeLists() const
+{
+    // Create Make/files
+    if (compileFiles_.empty())
+    {
+        return false;
+    }
+
+    const fileName cmakeLists(this->codePath()/"CMakeLists.txt");
+
+    OFstream cmakeLists_handle(cmakeLists);
+    if (!cmakeLists_handle.good())
+    {
+        FatalErrorIn
+            (
+                "dynamicCode::createCMakeLists()"
+                " const"
+            )   << "Failed writing " << cmakeLists
+                << exit(FatalError);
+    }
+
+    writeCommentSHA1(cmakeLists_handle);
+
+    //Write source files
+    cmakeLists_handle << "\nadd_library( "
+	    << codeName_.c_str()
+	    << " SHARED ";
+
+    forAll(compileFiles_, fileI)
+    {
+        cmakeLists_handle << compileFiles_[fileI] << " ";
+    }
+	    
+    cmakeLists_handle << ")\n\n";
+    
+    cmakeLists_handle << "target_link_libraries( "
+	    << codeName_.c_str()
+	    << " OpenFOAM )";
+
+    return true;
+}
 
 bool Foam::dynamicCode::createMakeFiles() const
 {
@@ -514,6 +556,7 @@ bool Foam::dynamicCode::copyOrCreateFiles(const bool verbose) const
 
     // Create Make/files + Make/options
     createMakeFiles();
+    createCMakeLists();
     createMakeOptions();
 
     writeDigest(filterVars_["SHA1sum"]);
@@ -524,7 +567,7 @@ bool Foam::dynamicCode::copyOrCreateFiles(const bool verbose) const
 
 bool Foam::dynamicCode::makeLibso() const
 {
-    const Foam::string makeCmd("wmake -s libso " + this->codePath());
+    const Foam::string makeCmd("cmake " + this->codePath() + " && make");
     Info<< "Invoking " << makeCmd << endl;
 
     if (Foam::system(makeCmd))
