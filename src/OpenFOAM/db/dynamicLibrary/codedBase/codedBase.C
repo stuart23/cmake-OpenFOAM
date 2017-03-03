@@ -204,13 +204,13 @@ void Foam::codedBase::createLibrary
             }
         }
 
-        if (!dynCode.wmakeLibso())
+        if (!dynCode.makeLibso())
         {
             FatalIOErrorIn
             (
                 "codedBase::createLibrary(..)",
                 context.dict()
-            )   << "Failed wmake " << dynCode.libRelPath() << nl
+            )   << "Failed make " << dynCode.libRelPath() << nl
                 << exit(FatalIOError);
         }
     }
