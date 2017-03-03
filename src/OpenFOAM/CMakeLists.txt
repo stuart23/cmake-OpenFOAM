@@ -558,9 +558,10 @@ endif()
 add_library( OpenFOAM SHARED ${SOURCES} $<TARGET_OBJECTS:OSspecific> )
 install( TARGETS OpenFOAM DESTINATION lib )
 
-configure_file( db/dynamicLibrary/dynamicCode/includePath.H.in db/dynamicLibrary/dynamicCode/includePath.H )
+configure_file( db/dynamicLibrary/dynamicCode/includePath.H.in includePath.H )
 
 target_link_libraries( OpenFOAM Pstream ${ZLIB_LIBRARIES} )
+include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

@@ -1,0 +1,2 @@
+#cmakedefine INCLUDE_DIRECTORY "@INCLUDE_DIRECTORY@"
+

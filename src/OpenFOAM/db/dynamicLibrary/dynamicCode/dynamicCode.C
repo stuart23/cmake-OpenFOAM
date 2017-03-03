@@ -31,6 +31,7 @@ License
 #include "OSspecific.H"
 #include "dictionary.H"
 #include "caseDirs.H"
+#include "includePath.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -247,7 +248,11 @@ bool Foam::dynamicCode::createCMakeLists() const
     
     cmakeLists_handle << "target_link_libraries( "
 	    << codeName_.c_str()
-	    << " OpenFOAM )";
+	    << " OpenFOAM )\n\n";
+
+    cmakeLists_handle << "include_directory( "
+	    << INCLUDE_DIRECTORY
+	    << " )"; 
 
     return true;
 }
