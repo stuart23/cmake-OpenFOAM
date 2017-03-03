@@ -250,7 +250,7 @@ bool Foam::dynamicCode::createCMakeLists() const
 	    << codeName_.c_str()
 	    << " OpenFOAM )\n\n";
 
-    cmakeLists_handle << "include_directory( "
+    cmakeLists_handle << "include_directories( "
 	    << INCLUDE_DIRECTORY
 	    << " )"; 
 
