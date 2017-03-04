@@ -31,7 +31,7 @@ License
 #include "OSspecific.H"
 #include "dictionary.H"
 #include "caseDirs.H"
-#include "includePath.H"
+#include "installPaths.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -234,6 +234,14 @@ bool Foam::dynamicCode::createCMakeLists() const
 
     writeCommentSHA1(cmakeLists_handle);
 
+    cmakeLists_handle << "include_directories( "
+	    << INCLUDE_DIRECTORY
+	    << " )\n"; 
+
+    cmakeLists_handle << "link_directories( "
+	    << LIBRARY_DIRECTORY
+	    << " )\n\n"; 
+
     //Write source files
     cmakeLists_handle << "\nadd_library( "
 	    << codeName_.c_str()
@@ -259,10 +267,6 @@ bool Foam::dynamicCode::createCMakeLists() const
     #elif defined(OF_DOUBLE_PRECISION)
         cmakeLists_handle << "add_definitions( -DOF_DOUBLE_PRECISION )\n\n";
     #endif
-
-    cmakeLists_handle << "include_directories( "
-	    << INCLUDE_DIRECTORY
-	    << " )\n\n"; 
 
     return true;
 }
