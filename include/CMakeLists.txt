@@ -10,7 +10,9 @@ set( INCLUDE_FILES
 	${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/string/string.H
 	${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/chars/char/char.H
 	${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/hashes/Hasher/Hasher.H
-
+	${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/string/stringI.H
+	${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/keyType/keyTypeI.H
+	${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/LinkedLists/user/IDLList.H
 )
 
 install( FILES ${INCLUDE_FILES}
