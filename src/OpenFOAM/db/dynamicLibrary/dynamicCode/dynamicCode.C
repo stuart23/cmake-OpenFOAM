@@ -250,9 +250,19 @@ bool Foam::dynamicCode::createCMakeLists() const
 	    << codeName_.c_str()
 	    << " OpenFOAM )\n\n";
 
+    cmakeLists_handle << "add_definitions( -DLABEL_SIZE="
+	   << LABEL_SIZE
+	   <<  " )\n";
+
+    #if defined(OF_SINGLE_PRECISION)
+        cmakeLists_handle << "add_definitions( -DOF_SINGLE_PRECISION )\n\n";
+    #elif defined(OF_DOUBLE_PRECISION)
+        cmakeLists_handle << "add_definitions( -DOF_DOUBLE_PRECISION )\n\n";
+    #endif
+
     cmakeLists_handle << "include_directories( "
 	    << INCLUDE_DIRECTORY
-	    << " )"; 
+	    << " )\n\n"; 
 
     return true;
 }
