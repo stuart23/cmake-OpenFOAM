@@ -253,10 +253,10 @@ bool Foam::dynamicCode::createCMakeLists() const
     }
 	    
     cmakeLists_handle << ")\n\n";
+
+    cmakeLists_handle << "set( TARGET " << codeName_.c_str() << " )\n\n";
     
-    cmakeLists_handle << "target_link_libraries( "
-	    << codeName_.c_str()
-	    << " OpenFOAM )\n\n";
+    cmakeLists_handle << "target_link_libraries( ${TARGET} OpenFOAM )\n\n";
 
     cmakeLists_handle << "add_definitions( -DLABEL_SIZE="
 	   << LABEL_SIZE
@@ -268,6 +268,8 @@ bool Foam::dynamicCode::createCMakeLists() const
         cmakeLists_handle << "add_definitions( -DOF_DOUBLE_PRECISION )\n\n";
     #endif
 
+    cmakeLists_handle << "set( CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/.. )\n";
+    cmakeLists_handle << "install( TARGETS ${TARGET} DESTINATION lib )";
     return true;
 }
 
@@ -586,7 +588,7 @@ bool Foam::dynamicCode::copyOrCreateFiles(const bool verbose) const
 
 bool Foam::dynamicCode::makeLibso() const
 {
-    const Foam::string makeCmd("cmake " + this->codePath() + " && make");
+    const Foam::string makeCmd("cd " + this->codePath() + "&& cmake . && make && make install");
     Info<< "Invoking " << makeCmd << endl;
 
     if (Foam::system(makeCmd))
