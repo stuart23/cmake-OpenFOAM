@@ -49,6 +49,7 @@ find_package( Boost COMPONENTS thread REQUIRED )
 find_package( METIS REQUIRED )
 find_package( Zoltan REQUIRED )
 find_package( Threads REQUIRED )
+find_package( CGAL REQUIRED )
 
 # Flag for running Flex. Currently just specifying C++ as language
 set( FLEX_FLAGS "--c++" )
