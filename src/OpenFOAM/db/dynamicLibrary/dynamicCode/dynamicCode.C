@@ -234,6 +234,8 @@ bool Foam::dynamicCode::createCMakeLists() const
 
     writeCommentSHA1(cmakeLists_handle);
 
+    cmakeLists_handle << "set( TARGET " << codeName_.c_str() << " )\n\n";
+    
     cmakeLists_handle << "include_directories( "
 	    << INCLUDE_DIRECTORY
 	    << " )\n"; 
@@ -243,9 +245,7 @@ bool Foam::dynamicCode::createCMakeLists() const
 	    << " )\n\n"; 
 
     //Write source files
-    cmakeLists_handle << "\nadd_library( "
-	    << codeName_.c_str()
-	    << " SHARED ";
+    cmakeLists_handle << "add_library( ${TARGET} SHARED ";
 
     forAll(compileFiles_, fileI)
     {
@@ -254,13 +254,15 @@ bool Foam::dynamicCode::createCMakeLists() const
 	    
     cmakeLists_handle << ")\n\n";
 
-    cmakeLists_handle << "set( TARGET " << codeName_.c_str() << " )\n\n";
-    
     cmakeLists_handle << "target_link_libraries( ${TARGET} OpenFOAM )\n\n";
 
     cmakeLists_handle << "add_definitions( -DLABEL_SIZE="
 	   << LABEL_SIZE
 	   <<  " )\n";
+
+    #if defined(NoRepository)
+        cmakeLists_handle << "add_definitions( -DNoRepository )\n";
+    #endif
 
     #if defined(OF_SINGLE_PRECISION)
         cmakeLists_handle << "add_definitions( -DOF_SINGLE_PRECISION )\n\n";
