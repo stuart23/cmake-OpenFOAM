@@ -5,6 +5,7 @@ set( CONFIG_FILES
 
 set( CONFIG_DIRECTORIES
 	codeTemplates
+	caseDicts
 )
 
 install( FILES ${CONFIG_FILES}
