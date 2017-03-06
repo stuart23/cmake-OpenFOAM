@@ -77,11 +77,16 @@ searchableSurfaceFeatures/triSurfaceMeshFeatures.C
 )
 
 ## Define the output
-add_executable( ${EXE_NAME} ${SOURCES} )
+add_library( ${EXE_NAME} SHARED ${SOURCES} )
 install( TARGETS ${EXE_NAME} DESTINATION bin )
 
-target_link_libraries( ${EXE_NAME} meshTools edgeMesh fileFormats triSurface dynamicMesh surfMesh sampling autoMesh OpenFOAM dl m )
+add_definitions( -frounding-math )
+add_definitions( -DCGAL_INEXACT )
+add_definitions( -DNDEBUG )
 
+target_link_libraries( ${EXE_NAME} ${CGAL_LIBRARIES} meshTools edgeMesh fileFormats triSurface dynamicMesh surfMesh sampling autoMesh OpenFOAM dl m )
+
+include_directories( ${CGAL_INCLUDE_DIR} )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/generation/foamyMesh/conformalVoronoiMesh/DelaunayMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/generation/foamyMesh/conformalVoronoiMesh/DelaunayMeshTools )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/generation/foamyMesh/conformalVoronoiMesh/PrintTable )
