@@ -78,7 +78,7 @@ searchableSurfaceFeatures/triSurfaceMeshFeatures.C
 
 ## Define the output
 add_library( ${LIB_NAME} SHARED ${SOURCES} )
-install( TARGETS ${LIB_NAME} DESTINATION bin )
+install( TARGETS ${LIB_NAME} DESTINATION lib )
 
 add_definitions( -frounding-math )
 add_definitions( -DCGAL_INEXACT )
