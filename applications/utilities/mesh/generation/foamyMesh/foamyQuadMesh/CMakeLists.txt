@@ -20,6 +20,8 @@ install( TARGETS ${LIB_NAME} DESTINATION bin )
 target_link_libraries( ${EXE_NAME} extrude2DMesh extrudeModel cv2DMesh conformalVoronoiMesh meshTools surfMesh edgeMesh triSurface dynamicMesh decompositionMethods sampling fileFormats OpenFOAM dl m )
 
 include_directories( ${CGAL_INCLUDE_DIR} )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/generation/extrude2DMesh/extrude2DMesh/extrude2DMesh )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/generation/extrude2DMesh/extrude2DMesh/patchToPoly2DMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/generation/foamyMesh/conformalVoronoi2DMesh/cv2DControls )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/generation/foamyMesh/conformalVoronoiMesh/cellShapeControl/cellSizeAndAlignmentControl )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/generation/foamyMesh/conformalVoronoiMesh/cellShapeControl/cellSizeAndAlignmentControl/cellSizeAndAlignmentControl )
