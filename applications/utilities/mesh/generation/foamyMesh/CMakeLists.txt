@@ -1,5 +1,5 @@
 add_subdirectory( conformalVoronoiMesh )
-# add_subdirectory( conformalVoronoi2DMesh )
+add_subdirectory( conformalVoronoi2DMesh )
 # add_subdirectory( foamyHexMesh )
 # # add_subdirectory( foamyHexMeshSurfaceSimplify )
 # # add_subdirectory( foamyHexMeshBackgroundMesh )
