@@ -8,11 +8,7 @@ cv2DControls/cv2DControls.C
 
 ## Define the output
 add_library( ${LIB_NAME} SHARED ${SOURCES} )
-install( TARGETS ${LIB_NAME} DESTINATION bin )
-
-add_definitions( -frounding-math )
-add_definitions( -DCGAL_INEXACT )
-add_definitions( -DNDEBUG )
+install( TARGETS ${LIB_NAME} DESTINATION lib )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/generation/foamyMesh/conformalVoronoi2DMesh/cv2DControls )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
