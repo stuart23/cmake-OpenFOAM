@@ -2,7 +2,7 @@
 
 OpenFOAM taken from the OF repo https://github.com/OpenFOAM and adapted to use the CMake build system
 
-This build currently builds with all OF features, and therefore the dependancies are not optional. The dependancies needed (on a machine with dnf) can be resolved with: "sudo dnf install gcc-c++ python3-devel openmpi-devel boost-devel metis-devel CGAL-devel scotch-devel". 
+This build currently builds with all OF features, and therefore the dependancies are not optional. The dependancies needed (on a machine with dnf) can be resolved with: "sudo dnf install gcc-c++ python3-devel openmpi-devel boost-devel metis-devel CGAL-devel scotch-devel ptscotch-openmpi-devel". 
 
 There is also a dependancy on Zoltan, which does not exist in any dnf repos and has to be built from source. Zoltan can be downloaded from: http://www.cs.sandia.gov/Zoltan/Zoltan_download.html  
 
