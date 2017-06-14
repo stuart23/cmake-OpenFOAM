@@ -8,7 +8,7 @@ metisDecomp.C
 add_library( metisDecomp SHARED ${SOURCES} )
 install( TARGETS metisDecomp DESTINATION lib )
 
-target_link_libraries( metisDecomp metis )
+target_link_libraries( metisDecomp ${METIS_LIBRARY} )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
