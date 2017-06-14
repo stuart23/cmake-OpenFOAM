@@ -41,8 +41,9 @@ include_directories( /usr/include )
 
 # Dependancies
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-# find_package( SCOTCH )
 find_package( MPI REQUIRED )
+find_package( SCOTCH REQUIRED )
+find_package( PTSCOTCH REQUIRED )
 find_package( FLEX REQUIRED )
 find_package( ZLIB REQUIRED )
 find_package( Boost COMPONENTS thread REQUIRED )

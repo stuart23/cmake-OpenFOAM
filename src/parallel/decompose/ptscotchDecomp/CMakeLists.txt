@@ -9,7 +9,7 @@ set( SOURCES
 add_library( ptscotchDecomp SHARED ${SOURCES} )
 install( TARGETS ptscotchDecomp DESTINATION lib )
 
-target_link_libraries( ptscotchDecomp ptscotch ptscotcherrexit scotch rt )
+target_link_libraries( ptscotchDecomp ${PTSCOTCH_LIBRARY} ${SCOTCH_LIBRARY} rt )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
