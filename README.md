@@ -2,15 +2,15 @@
 
 OpenFOAM taken from the OF repo https://github.com/OpenFOAM and adapted to use the CMake build system
 
-##Dependancies
+## Dependancies
 This build currently builds with all OF features, and therefore the dependancies are not optional. The dependancies needed (on a machine with dnf) can be resolved with: "sudo dnf install cmake gcc-c++ python3-devel openmpi-devel boost-devel metis-devel CGAL-devel scotch-devel ptscotch-openmpi-devel". 
 
-###Zoltan
+### Zoltan
 There is also a dependancy on Zoltan, which does not exist in any dnf repos and has to be built from source. Zoltan can be downloaded from: http://www.cs.sandia.gov/Zoltan/Zoltan_download.html  
 
 When installing Zoltan, dnf currently installs Open-MPI into a non-system path, and therefore cmake is unable to find it. So that cmake can find it, add the Open-MPI directory to the path (provided /usr/lib64/openmpi/bin is the installed location of Open-MPI): "export PATH=$PATH:/usr/lib64/openmpi/bin". Also, Zoltan MUST be compiled position independent, so configure MUST be compiled with the following options: ../configure CCFLAGS="-fPIC" CXXFLAGS="-fPIC" CFLAGS="-fPIC" 
 
-##Building
+## Building
 Building OpenFOAM using this build environment is much simpler than the official build. The steps are as follows:
 
 1. Clone this repository.
