@@ -14,7 +14,7 @@ find_path(SCOTCH_INCLUDE_DIR scotch.h
           )
 
 find_library(SCOTCH_LIBRARY 
-             NAMES scotch
+             NAMES scotch scotcherrexit
 	     HINTS ${SCOTCH_LIBDIR} ${SCOTCH_LIB_DIR} 
 	     )
 

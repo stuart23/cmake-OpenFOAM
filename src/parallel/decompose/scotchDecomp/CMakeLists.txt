@@ -8,7 +8,7 @@ scotchDecomp.C
 add_library( scotchDecomp SHARED ${SOURCES} )
 install( TARGETS scotchDecomp DESTINATION lib )
 
-target_link_libraries( scotchDecomp scotch scotcherrexit rt )
+target_link_libraries( scotchDecomp ${SCOTCH_LIBRARY} rt )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
