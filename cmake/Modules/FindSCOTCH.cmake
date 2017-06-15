@@ -14,18 +14,24 @@ find_path(SCOTCH_INCLUDE_DIR scotch.h
           )
 
 find_library(SCOTCH_LIBRARY 
-             NAMES scotch scotcherrexit
-	     HINTS ${SCOTCH_LIBDIR} ${SCOTCH_LIB_DIR} 
+             NAMES scotch
+	     PATHS ${SCOTCH_LIBDIR} ${SCOTCH_LIB_DIR} 
+	     )
+
+find_library(SCOTCHERREXIT_LIBRARY 
+             NAMES scotcherrexit
+	     PATHS ${SCOTCH_LIBDIR} ${SCOTCH_LIB_DIR} 
 	     )
 
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set SCOTCH_FOUND to TRUE
 # if all listed variables are TRUE
 find_package_handle_standard_args(SCOTCH  DEFAULT_MSG
-                                  SCOTCH_LIBRARY SCOTCH_INCLUDE_DIR)
+                                  SCOTCH_LIBRARY SCOTCHERREXIT_LIBRARY SCOTCH_INCLUDE_DIR)
 
-mark_as_advanced(SCOTCH_INCLUDE_DIR SCOTCH_LIBRARY )
+mark_as_advanced(SCOTCH_INCLUDE_DIR SCOTCH_LIBRARY SCOTCHERREXIT_LIBRARY )
 
 set(SCOTCH_LIBRARIES ${SCOTCH_LIBRARY} )
+set(SCOTCHERREXIT_LIBRARIES ${SCOTCHERREXIT_LIBRARY} )
 set(SCOTCH_INCLUDE_DIRS ${SCOTCH_INCLUDE_DIR} )
 
