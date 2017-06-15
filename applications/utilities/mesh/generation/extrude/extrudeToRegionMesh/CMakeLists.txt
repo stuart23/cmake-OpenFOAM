@@ -11,7 +11,6 @@ add_executable( ${EXE_NAME} ${SOURCES} )
 install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} surfMesh finiteVolume meshTools dynamicMesh extrudeModel OpenFOAM dl m )
-#target_link_libraries( ${EXE_NAME} surfMesh finiteVolume meshTools dynamicMesh extrudeModel ${CMAKE_THREAD_LIBS_INIT} )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
