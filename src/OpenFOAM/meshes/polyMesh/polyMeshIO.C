@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,8 +33,7 @@ void Foam::polyMesh::setInstance(const fileName& inst)
 {
     if (debug)
     {
-        Info<< "void polyMesh::setInstance(const fileName& inst) : "
-            << "Resetting file instance to " << inst << endl;
+        InfoInFunction << "Resetting file instance to " << inst << endl;
     }
 
     points_.writeOpt() = IOobject::AUTO_WRITE;
@@ -67,8 +66,7 @@ Foam::polyMesh::readUpdateState Foam::polyMesh::readUpdate()
 {
     if (debug)
     {
-        Info<< "polyMesh::readUpdateState polyMesh::readUpdate() : "
-            << "Updating mesh based on saved data." << endl;
+        InfoInFunction << "Updating mesh based on saved data." << endl;
     }
 
     // Find the point and cell instance
@@ -80,8 +78,6 @@ Foam::polyMesh::readUpdateState Foam::polyMesh::readUpdate()
     {
         Info<< "Faces instance: old = " << facesInstance()
             << " new = " << facesInst << nl
-            //<< "Boundary instance: old = " << boundary_.instance()
-            //<< " new = " << boundaryInst << nl
             << "Points instance: old = " << pointsInstance()
             << " new = " << pointsInst << endl;
     }
@@ -188,12 +184,12 @@ Foam::polyMesh::readUpdateState Foam::polyMesh::readUpdate()
             wordList oldTypes = boundary_.types();
             wordList oldNames = boundary_.names();
 
-            forAll(oldTypes, patchI)
+            forAll(oldTypes, patchi)
             {
                 if
                 (
-                    oldTypes[patchI] != newTypes[patchI]
-                 || oldNames[patchI] != newNames[patchI]
+                    oldTypes[patchi] != newTypes[patchi]
+                 || oldNames[patchi] != newNames[patchi]
                 )
                 {
                     boundaryChanged = true;
@@ -204,30 +200,29 @@ Foam::polyMesh::readUpdateState Foam::polyMesh::readUpdate()
 
         if (boundaryChanged)
         {
-            WarningIn("polyMesh::readUpdateState polyMesh::readUpdate()")
-                << "Number of patches has changed.  This may have "
+            WarningInFunction
                 << "unexpected consequences.  Proceed with care." << endl;
 
             boundary_.clear();
             boundary_.setSize(newBoundary.size());
 
-            forAll(newBoundary, patchI)
+            forAll(newBoundary, patchi)
             {
-                boundary_.set(patchI, newBoundary[patchI].clone(boundary_));
+                boundary_.set(patchi, newBoundary[patchi].clone(boundary_));
             }
         }
         else
         {
-            forAll(boundary_, patchI)
+            forAll(boundary_, patchi)
             {
-                boundary_[patchI] = polyPatch
+                boundary_[patchi] = polyPatch
                 (
-                    newBoundary[patchI].name(),
-                    newBoundary[patchI].size(),
-                    newBoundary[patchI].start(),
-                    patchI,
+                    newBoundary[patchi].name(),
+                    newBoundary[patchi].size(),
+                    newBoundary[patchi].start(),
+                    patchi,
                     boundary_,
-                    newBoundary[patchI].type()
+                    newBoundary[patchi].type()
                 );
             }
         }
@@ -273,8 +268,8 @@ Foam::polyMesh::readUpdateState Foam::polyMesh::readUpdate()
 
         // Derived info
         bounds_ = boundBox(points_);
-        geometricD_ = Vector<label>::zero;
-        solutionD_ = Vector<label>::zero;
+        geometricD_ = Zero;
+        solutionD_ = Zero;
 
         // Zones
         pointZoneMesh newPointZones
@@ -432,7 +427,7 @@ Foam::polyMesh::readUpdateState Foam::polyMesh::readUpdate()
 
         if (nOldPoints != 0 && nOldPoints != newPoints.size())
         {
-            FatalErrorIn("polyMesh::readUpdate()")
+            FatalErrorInFunction
                 << "Point motion detected but number of points "
                 << newPoints.size() << " in "
                 << newPoints.objectPath() << " does not correspond to "
@@ -443,56 +438,15 @@ Foam::polyMesh::readUpdateState Foam::polyMesh::readUpdate()
         points_.transfer(newPoints);
         points_.instance() = pointsInst;
 
+        // Calculate the geometry for the patches (transformation tensors etc.)
+        boundary_.calcGeometry();
+
         // Derived info
         bounds_ = boundBox(points_);
 
         // Rotation can cause direction vector to change
-        geometricD_ = Vector<label>::zero;
-        solutionD_ = Vector<label>::zero;
-
-
-        //if (boundaryInst != boundary_.instance())
-        //{
-        //    // Boundary file but no topology change
-        //    if (debug)
-        //    {
-        //        Info<< "Boundary state change" << endl;
-        //    }
-        //
-        //    // Reset the boundary patches
-        //    polyBoundaryMesh newBoundary
-        //    (
-        //        IOobject
-        //        (
-        //            "boundary",
-        //            facesInst,
-        //            meshSubDir,
-        //            *this,
-        //            IOobject::MUST_READ,
-        //            IOobject::NO_WRITE,
-        //            false
-        //        ),
-        //        *this
-        //    );
-        //
-        //
-        //
-        //
-        //    boundary_.clear();
-        //    boundary_.setSize(newBoundary.size());
-        //
-        //    forAll(newBoundary, patchI)
-        //    {
-        //        boundary_.set(patchI, newBoundary[patchI].clone(boundary_));
-        //    }
-        //    // Calculate topology for the patches (processor-processor comms
-        //    // etc.)
-        //    boundary_.updateMesh();
-        //
-        //    // Calculate the geometry for the patches (transformation tensors
-        //    // etc.)
-        //    boundary_.calcGeometry();
-        //}
+        geometricD_ = Zero;
+        solutionD_ = Zero;
 
         return polyMesh::POINTS_MOVED;
     }

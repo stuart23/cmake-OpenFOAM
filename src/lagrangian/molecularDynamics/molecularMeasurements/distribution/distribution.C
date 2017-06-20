@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -38,7 +38,7 @@ namespace Foam
 void Foam::distribution::write
 (
     const fileName& file,
-    const List<Pair<scalar> >& pairs
+    const List<Pair<scalar>>& pairs
 )
 {
     OFstream os(file);
@@ -68,7 +68,7 @@ Foam::distribution::distribution(const scalar binWidth)
 
 Foam::distribution::distribution(const distribution& d)
 :
-    Map<label>(static_cast< Map<label> >(d)),
+    Map<label>(static_cast<Map<label>>(d)),
     binWidth_(d.binWidth())
 {}
 
@@ -91,7 +91,7 @@ Foam::label Foam::distribution::totalEntries() const
 
         if (sumOfEntries < 0)
         {
-            WarningIn("label distribution::totalEntries()")
+            WarningInFunction
                 << "Accumulated distribution values total has become negative: "
                 << "sumOfEntries = " << sumOfEntries
                 << ". This is most likely to be because too many samples "
@@ -147,7 +147,7 @@ Foam::scalar Foam::distribution::mean() const
 
 Foam::scalar Foam::distribution::median()
 {
-    // From:
+    // Reference:
     // http://mathworld.wolfram.com/StatisticalMedian.html
     // The statistical median is the value of the distribution variable
     // where the cumulative distribution = 0.5.
@@ -156,7 +156,7 @@ Foam::scalar Foam::distribution::median()
 
     scalar runningSum = 0.0;
 
-    List<Pair<scalar> > normDist(normalised());
+    List<Pair<scalar>> normDist(normalised());
 
     if (normDist.size())
     {
@@ -228,7 +228,7 @@ void Foam::distribution::add(const scalar valueToAdd)
 
     if ((*this)[n] < 0)
     {
-        FatalErrorIn("distribution::add(const scalar valueToAdd)")
+        FatalErrorInFunction
             << "Accumulated distribution value has become negative: "
             << "bin = " << (0.5 + scalar(n)) * binWidth_
             << ", value = " << (*this)[n]
@@ -268,7 +268,7 @@ void Foam::distribution::insertMissingKeys()
 }
 
 
-Foam::List<Foam::Pair<Foam::scalar> > Foam::distribution::normalised()
+Foam::List<Foam::Pair<Foam::scalar>> Foam::distribution::normalised()
 {
     scalar totEnt = approxTotalEntries();
 
@@ -278,7 +278,7 @@ Foam::List<Foam::Pair<Foam::scalar> > Foam::distribution::normalised()
 
     sort(keys);
 
-    List<Pair<scalar> > normDist(size());
+    List<Pair<scalar>> normDist(size());
 
     forAll(keys,k)
     {
@@ -298,20 +298,20 @@ Foam::List<Foam::Pair<Foam::scalar> > Foam::distribution::normalised()
 }
 
 
-Foam::List<Foam::Pair<Foam::scalar> > Foam::distribution::normalisedMinusMean()
+Foam::List<Foam::Pair<Foam::scalar>> Foam::distribution::normalisedMinusMean()
 {
     return normalisedShifted(mean());
 }
 
 
-Foam::List<Foam::Pair<Foam::scalar> > Foam::distribution::normalisedShifted
+Foam::List<Foam::Pair<Foam::scalar>> Foam::distribution::normalisedShifted
 (
     scalar shiftValue
 )
 {
-    List<Pair<scalar> > oldDist(normalised());
+    List<Pair<scalar>> oldDist(normalised());
 
-    List<Pair<scalar> > newDist(oldDist.size());
+    List<Pair<scalar>> newDist(oldDist.size());
 
     forAll(oldDist,u)
     {
@@ -416,7 +416,7 @@ Foam::List<Foam::Pair<Foam::scalar> > Foam::distribution::normalisedShifted
 }
 
 
-Foam::List<Foam::Pair<Foam::scalar> > Foam::distribution::raw()
+Foam::List<Foam::Pair<Foam::scalar>> Foam::distribution::raw()
 {
     insertMissingKeys();
 
@@ -424,7 +424,7 @@ Foam::List<Foam::Pair<Foam::scalar> > Foam::distribution::raw()
 
     sort(keys);
 
-    List<Pair<scalar> > rawDist(size());
+    List<Pair<scalar>> rawDist(size());
 
     forAll(keys,k)
     {
@@ -446,7 +446,7 @@ void Foam::distribution::operator=(const distribution& rhs)
     // Check for assignment to self
     if (this == &rhs)
     {
-        FatalErrorIn("distribution::operator=(const distribution&)")
+        FatalErrorInFunction
             << "Attempted assignment to self"
             << abort(FatalError);
     }

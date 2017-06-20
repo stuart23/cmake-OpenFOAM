@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -94,11 +94,8 @@ Foam::radiation::wideBandAbsorptionEmission::wideBandAbsorptionEmission
             {
                 if (!speciesNames_.found(key))
                 {
-                    FatalErrorIn
-                    (
-                        "Foam::radiation::wideBandAbsorptionEmission(const"
-                        "dictionary& dict, const fvMesh& mesh)"
-                    )   << "specie: " << key << "is not in all the bands"
+                    FatalErrorInFunction
+                        << "specie: " << key << "is not in all the bands"
                         << nl << exit(FatalError);
                 }
             }
@@ -135,11 +132,8 @@ Foam::radiation::wideBandAbsorptionEmission::wideBandAbsorptionEmission
         }
         else
         {
-            FatalErrorIn
-            (
-                "radiation::wideBandAbsorptionEmission(const"
-                "dictionary& dict, const fvMesh& mesh)"
-            )   << "specie: " << iter.key()
+            FatalErrorInFunction
+                << "specie: " << iter.key()
                 << " is neither in look-up table : "
                 << lookUpTable_.tableName() << " nor is being solved"
                 << exit(FatalError);
@@ -183,7 +177,7 @@ Foam::radiation::wideBandAbsorptionEmission::aCont(const label bandI) const
         )
     );
 
-    scalarField& a = ta().internalField();
+    scalarField& a = ta.ref().primitiveFieldRef();
 
     forAll(a, i)
     {
@@ -261,31 +255,24 @@ Foam::radiation::wideBandAbsorptionEmission::ECont(const label bandI) const
 
         if (dQ.dimensions() == dimEnergy/dimTime)
         {
-            E().internalField() =
+            E.ref().primitiveFieldRef() =
                 iEhrrCoeffs_[bandI]
-               *dQ.internalField()
+               *dQ.primitiveField()
                *(iBands_[bandI][1] - iBands_[bandI][0])
                /totalWaveLength_
                /mesh_.V();
         }
         else if (dQ.dimensions() == dimEnergy/dimTime/dimVolume)
         {
-            E().internalField() =
+            E.ref().primitiveFieldRef() =
                 iEhrrCoeffs_[bandI]
-               *dQ.internalField()
+               *dQ.primitiveField()
                *(iBands_[bandI][1] - iBands_[bandI][0])
                /totalWaveLength_;
         }
         else
         {
-            WarningIn
-            (
-                "tmp<volScalarField>"
-                "radiation::wideBandAbsorptionEmission::ECont"
-                "("
-                    "const label"
-                ") const"
-            )
+            WarningInFunction
                 << "Incompatible dimensions for dQ field" << endl;
         }
     }
@@ -304,10 +291,10 @@ void Foam::radiation::wideBandAbsorptionEmission::correct
 
     for (label j=0; j<nBands_; j++)
     {
-        aLambda[j].internalField() = this->a(j);
+        aLambda[j].primitiveFieldRef() = this->a(j);
 
-        a.internalField() +=
-            aLambda[j].internalField()
+        a.primitiveFieldRef() +=
+            aLambda[j].primitiveField()
            *(iBands_[j][1] - iBands_[j][0])
            /totalWaveLength_;
     }

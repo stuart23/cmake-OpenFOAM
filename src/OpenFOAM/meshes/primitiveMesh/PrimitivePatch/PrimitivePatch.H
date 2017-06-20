@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -224,9 +224,9 @@ private:
         //  Used to determine if surface multiply connected through point.
         void visitPointRegion
         (
-            const label pointI,
+            const label pointi,
             const labelList& pFaces,
-            const label startFaceI,
+            const label startFacei,
             const label startEdgeI,
             boolList& pFacesHad
         ) const;
@@ -246,8 +246,8 @@ public:
         //- Construct from components
         PrimitivePatch
         (
-            const Xfer<FaceList<Face> >& faces,
-            const Xfer<List<PointType> >& points
+            const Xfer<FaceList<Face>>& faces,
+            const Xfer<List<PointType>>& points
         );
 
         //- Construct from components, reuse storage
@@ -255,7 +255,7 @@ public:
         (
             FaceList<Face>& faces,
             Field<PointType>& points,
-            const bool reUse
+            const bool reuse
         );
 
         //- Construct as copy
@@ -473,7 +473,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "PrimitivePatch.C"
+    #include "PrimitivePatch.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

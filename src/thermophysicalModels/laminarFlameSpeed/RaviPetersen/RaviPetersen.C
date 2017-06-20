@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -85,13 +85,8 @@ void Foam::laminarFlameSpeedModels::RaviPetersen::checkPointsMonotonicity
     {
         if (x[i] <= x[i-1])
         {
-            FatalIOErrorIn
+            FatalIOErrorInFunction
             (
-                "laminarFlameSpeedModels::RaviPetersen::checkPointsMonotonicity"
-                "("
-                    "const word&, "
-                    "const List<scalar>&"
-                ") const",
                 coeffsDict_
             )   << "Data points for the " << name
                 << " do not increase monotonically" << endl
@@ -104,7 +99,7 @@ void Foam::laminarFlameSpeedModels::RaviPetersen::checkPointsMonotonicity
 void Foam::laminarFlameSpeedModels::RaviPetersen::checkCoefficientArrayShape
 (
     const word& name,
-    const List<List<List<scalar> > >& x
+    const List<List<List<scalar>>>& x
 ) const
 {
     bool ok = true;
@@ -123,13 +118,8 @@ void Foam::laminarFlameSpeedModels::RaviPetersen::checkCoefficientArrayShape
 
     if (!ok)
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "laminarFlameSpeedModels::RaviPetersen::checkCoefficientArrayShape"
-            "("
-                "const word&, "
-                "const List<List<List<scalar> > >&"
-            ") const",
             coeffsDict_
         )   << "Inconsistent size of " << name << " coefficients array" << endl
             << exit(FatalIOError);
@@ -353,11 +343,11 @@ Foam::laminarFlameSpeedModels::RaviPetersen::operator()() const
         )
     );
 
-    volScalarField& Su0 = tSu0();
+    volScalarField& Su0 = tSu0.ref();
 
-    forAll(Su0, cellI)
+    forAll(Su0, celli)
     {
-        Su0[cellI] = speed(EqR[cellI], p[cellI], Tu[cellI]);
+        Su0[celli] = speed(EqR[celli], p[celli], Tu[celli]);
     }
 
     return tSu0;

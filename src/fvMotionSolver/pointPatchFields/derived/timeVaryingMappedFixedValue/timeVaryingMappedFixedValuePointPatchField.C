@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -46,10 +46,10 @@ timeVaryingMappedFixedValuePointPatchField
     sampleTimes_(0),
     startSampleTime_(-1),
     startSampledValues_(0),
-    startAverage_(pTraits<Type>::zero),
+    startAverage_(Zero),
     endSampleTime_(-1),
     endSampledValues_(0),
-    endAverage_(pTraits<Type>::zero),
+    endAverage_(Zero),
     offset_()
 {}
 
@@ -74,10 +74,10 @@ timeVaryingMappedFixedValuePointPatchField
     sampleTimes_(0),
     startSampleTime_(-1),
     startSampledValues_(0),
-    startAverage_(pTraits<Type>::zero),
+    startAverage_(Zero),
     endSampleTime_(-1),
     endSampledValues_(0),
-    endAverage_(pTraits<Type>::zero),
+    endAverage_(Zero),
     offset_
     (
         ptf.offset_.valid()
@@ -113,15 +113,15 @@ timeVaryingMappedFixedValuePointPatchField
     sampleTimes_(0),
     startSampleTime_(-1),
     startSampledValues_(0),
-    startAverage_(pTraits<Type>::zero),
+    startAverage_(Zero),
     endSampleTime_(-1),
     endSampledValues_(0),
-    endAverage_(pTraits<Type>::zero),
+    endAverage_(Zero),
     offset_()
 {
     if (dict.found("offset"))
     {
-        offset_ = DataEntry<Type>::New("offset", dict);
+        offset_ = Function1<Type>::New("offset", dict);
     }
 
     dict.readIfPresent("fieldTableName", fieldTableName_);
@@ -236,7 +236,7 @@ void Foam::timeVaryingMappedFixedValuePointPatchField<Type>::rmap
     fixedValuePointPatchField<Type>::rmap(ptf, addr);
 
     const timeVaryingMappedFixedValuePointPatchField<Type>& tiptf =
-        refCast<const timeVaryingMappedFixedValuePointPatchField<Type> >(ptf);
+        refCast<const timeVaryingMappedFixedValuePointPatchField<Type>>(ptf);
 
     startSampledValues_.rmap(tiptf.startSampledValues_, addr);
     endSampledValues_.rmap(tiptf.endSampledValues_, addr);
@@ -351,10 +351,8 @@ void Foam::timeVaryingMappedFixedValuePointPatchField<Type>::checkTable()
 
     if (!foundTime)
     {
-        FatalErrorIn
-        (
-            "timeVaryingMappedFixedValuePointPatchField<Type>::checkTable"
-        )   << "Cannot find starting sampling values for current time "
+        FatalErrorInFunction
+            << "Cannot find starting sampling values for current time "
             << this->db().time().value() << nl
             << "Have sampling values for times "
             << pointToPointPlanarInterpolation::timeNames(sampleTimes_) << nl
@@ -416,11 +414,8 @@ void Foam::timeVaryingMappedFixedValuePointPatchField<Type>::checkTable()
 
             if (vals.size() != mapperPtr_().sourceSize())
             {
-                FatalErrorIn
-                (
-                    "timeVaryingMappedFixedValuePointPatchField<Type>::"
-                    "checkTable()"
-                )   << "Number of values (" << vals.size()
+                FatalErrorInFunction
+                    << "Number of values (" << vals.size()
                     << ") differs from the number of points ("
                     <<  mapperPtr_().sourceSize()
                     << ") in file " << vals.objectPath() << exit(FatalError);
@@ -473,11 +468,8 @@ void Foam::timeVaryingMappedFixedValuePointPatchField<Type>::checkTable()
 
             if (vals.size() != mapperPtr_().sourceSize())
             {
-                FatalErrorIn
-                (
-                    "timeVaryingMappedFixedValuePointPatchField<Type>::"
-                    "checkTable()"
-                )   << "Number of values (" << vals.size()
+                FatalErrorInFunction
+                    << "Number of values (" << vals.size()
                     << ") differs from the number of points ("
                     <<  mapperPtr_().sourceSize()
                     << ") in file " << vals.objectPath() << exit(FatalError);
@@ -608,7 +600,7 @@ void Foam::timeVaryingMappedFixedValuePointPatchField<Type>::write
         os.writeKeyword("perturb") << perturb_ << token::END_STATEMENT << nl;
     }
 
-    if (fieldTableName_ != this->dimensionedInternalField().name())
+    if (fieldTableName_ != this->internalField().name())
     {
         os.writeKeyword("fieldTableName") << fieldTableName_
             << token::END_STATEMENT << nl;

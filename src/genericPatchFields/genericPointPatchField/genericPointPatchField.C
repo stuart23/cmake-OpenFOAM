@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,15 +26,10 @@ License
 #include "genericPointPatchField.H"
 #include "pointPatchFieldMapper.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-genericPointPatchField<Type>::genericPointPatchField
+Foam::genericPointPatchField<Type>::genericPointPatchField
 (
     const pointPatch& p,
     const DimensionedField<Type, pointMesh>& iF
@@ -42,16 +37,12 @@ genericPointPatchField<Type>::genericPointPatchField
 :
     calculatedPointPatchField<Type>(p, iF)
 {
-    notImplemented
-    (
-        "genericPointPatchField<Type>::genericPointPatchField"
-        "(const pointPatch& p, const DimensionedField<Type, volMesh>& iF)"
-    );
+    NotImplemented;
 }
 
 
 template<class Type>
-genericPointPatchField<Type>::genericPointPatchField
+Foam::genericPointPatchField<Type>::genericPointPatchField
 (
     const pointPatch& p,
     const DimensionedField<Type, pointMesh>& iF,
@@ -101,33 +92,29 @@ genericPointPatchField<Type>::genericPointPatchField
                         }
                         else
                         {
-                            FatalIOErrorIn
+                            FatalIOErrorInFunction
                             (
-                                "genericPointPatchField<Type>::"
-                                "genericPointPatchField"
-                                "(const pointPatch&, const Field<Type>&, "
-                                "const dictionary&)",
                                 dict
                             )   << "\n    token following 'nonuniform' "
                                   "is not a compound"
                                 << "\n    on patch " << this->patch().name()
                                 << " of field "
-                                << this->dimensionedInternalField().name()
+                                << this->internalField().name()
                                 << " in file "
-                                << this->dimensionedInternalField().objectPath()
+                                << this->internalField().objectPath()
                             << exit(FatalIOError);
                         }
                     }
                     else if
                     (
                         fieldToken.compoundToken().type()
-                     == token::Compound<List<scalar> >::typeName
+                     == token::Compound<List<scalar>>::typeName
                     )
                     {
                         scalarField* fPtr = new scalarField;
                         fPtr->transfer
                         (
-                            dynamicCast<token::Compound<List<scalar> > >
+                            dynamicCast<token::Compound<List<scalar>>>
                             (
                                 fieldToken.transferCompoundToken(is)
                             )
@@ -135,12 +122,8 @@ genericPointPatchField<Type>::genericPointPatchField
 
                         if (fPtr->size() != this->size())
                         {
-                            FatalIOErrorIn
+                            FatalIOErrorInFunction
                             (
-                                "genericPointPatchField<Type>::"
-                                "genericPointPatchField"
-                                "(const pointPatch&, const Field<Type>&, "
-                                "const dictionary&)",
                                 dict
                             )   << "\n    size of field " << iter().keyword()
                                 << " (" << fPtr->size() << ')'
@@ -148,9 +131,9 @@ genericPointPatchField<Type>::genericPointPatchField
                                 << this->size() << ')'
                                 << "\n    on patch " << this->patch().name()
                                 << " of field "
-                                << this->dimensionedInternalField().name()
+                                << this->internalField().name()
                                 << " in file "
-                                << this->dimensionedInternalField().objectPath()
+                                << this->internalField().objectPath()
                                 << exit(FatalIOError);
                         }
 
@@ -159,13 +142,13 @@ genericPointPatchField<Type>::genericPointPatchField
                     else if
                     (
                         fieldToken.compoundToken().type()
-                     == token::Compound<List<vector> >::typeName
+                     == token::Compound<List<vector>>::typeName
                     )
                     {
                         vectorField* fPtr = new vectorField;
                         fPtr->transfer
                         (
-                            dynamicCast<token::Compound<List<vector> > >
+                            dynamicCast<token::Compound<List<vector>>>
                             (
                                 fieldToken.transferCompoundToken(is)
                             )
@@ -173,12 +156,8 @@ genericPointPatchField<Type>::genericPointPatchField
 
                         if (fPtr->size() != this->size())
                         {
-                            FatalIOErrorIn
+                            FatalIOErrorInFunction
                             (
-                                "genericPointPatchField<Type>::"
-                                "genericPointPatchField"
-                                "(const pointPatch&, const Field<Type>&, "
-                                "const dictionary&)",
                                 dict
                             )   << "\n    size of field " << iter().keyword()
                                 << " (" << fPtr->size() << ')'
@@ -186,9 +165,9 @@ genericPointPatchField<Type>::genericPointPatchField
                                 << this->size() << ')'
                                 << "\n    on patch " << this->patch().name()
                                 << " of field "
-                                << this->dimensionedInternalField().name()
+                                << this->internalField().name()
                                 << " in file "
-                                << this->dimensionedInternalField().objectPath()
+                                << this->internalField().objectPath()
                                 << exit(FatalIOError);
                         }
 
@@ -197,7 +176,7 @@ genericPointPatchField<Type>::genericPointPatchField
                     else if
                     (
                         fieldToken.compoundToken().type()
-                     == token::Compound<List<sphericalTensor> >::typeName
+                     == token::Compound<List<sphericalTensor>>::typeName
                     )
                     {
                         sphericalTensorField* fPtr = new sphericalTensorField;
@@ -205,7 +184,7 @@ genericPointPatchField<Type>::genericPointPatchField
                         (
                             dynamicCast
                             <
-                                token::Compound<List<sphericalTensor> >
+                                token::Compound<List<sphericalTensor>>
                             >
                             (
                                 fieldToken.transferCompoundToken(is)
@@ -214,12 +193,8 @@ genericPointPatchField<Type>::genericPointPatchField
 
                         if (fPtr->size() != this->size())
                         {
-                            FatalIOErrorIn
+                            FatalIOErrorInFunction
                             (
-                                "genericPointPatchField<Type>::"
-                                "genericPointPatchField"
-                                "(const pointPatch&, const Field<Type>&, "
-                                "const dictionary&)",
                                 dict
                             )   << "\n    size of field " << iter().keyword()
                                 << " (" << fPtr->size() << ')'
@@ -227,9 +202,9 @@ genericPointPatchField<Type>::genericPointPatchField
                                 << this->size() << ')'
                                 << "\n    on patch " << this->patch().name()
                                 << " of field "
-                                << this->dimensionedInternalField().name()
+                                << this->internalField().name()
                                 << " in file "
-                                << this->dimensionedInternalField().objectPath()
+                                << this->internalField().objectPath()
                                 << exit(FatalIOError);
                         }
 
@@ -238,7 +213,7 @@ genericPointPatchField<Type>::genericPointPatchField
                     else if
                     (
                         fieldToken.compoundToken().type()
-                     == token::Compound<List<symmTensor> >::typeName
+                     == token::Compound<List<symmTensor>>::typeName
                     )
                     {
                         symmTensorField* fPtr = new symmTensorField;
@@ -246,7 +221,7 @@ genericPointPatchField<Type>::genericPointPatchField
                         (
                             dynamicCast
                             <
-                                token::Compound<List<symmTensor> >
+                                token::Compound<List<symmTensor>>
                             >
                             (
                                 fieldToken.transferCompoundToken(is)
@@ -255,12 +230,8 @@ genericPointPatchField<Type>::genericPointPatchField
 
                         if (fPtr->size() != this->size())
                         {
-                            FatalIOErrorIn
+                            FatalIOErrorInFunction
                             (
-                                "genericPointPatchField<Type>::"
-                                "genericPointPatchField"
-                                "(const pointPatch&, const Field<Type>&, "
-                                "const dictionary&)",
                                 dict
                             )   << "\n    size of field " << iter().keyword()
                                 << " (" << fPtr->size() << ')'
@@ -268,9 +239,9 @@ genericPointPatchField<Type>::genericPointPatchField
                                 << this->size() << ')'
                                 << "\n    on patch " << this->patch().name()
                                 << " of field "
-                                << this->dimensionedInternalField().name()
+                                << this->internalField().name()
                                 << " in file "
-                                << this->dimensionedInternalField().objectPath()
+                                << this->internalField().objectPath()
                                 << exit(FatalIOError);
                         }
 
@@ -279,13 +250,13 @@ genericPointPatchField<Type>::genericPointPatchField
                     else if
                     (
                         fieldToken.compoundToken().type()
-                     == token::Compound<List<tensor> >::typeName
+                     == token::Compound<List<tensor>>::typeName
                     )
                     {
                         tensorField* fPtr = new tensorField;
                         fPtr->transfer
                         (
-                            dynamicCast<token::Compound<List<tensor> > >
+                            dynamicCast<token::Compound<List<tensor>>>
                             (
                                 fieldToken.transferCompoundToken(is)
                             )
@@ -293,12 +264,8 @@ genericPointPatchField<Type>::genericPointPatchField
 
                         if (fPtr->size() != this->size())
                         {
-                            FatalIOErrorIn
+                            FatalIOErrorInFunction
                             (
-                                "genericPointPatchField<Type>::"
-                                "genericPointPatchField"
-                                "(const pointPatch&, const Field<Type>&, "
-                                "const dictionary&)",
                                 dict
                             )   << "\n    size of field " << iter().keyword()
                                 << " (" << fPtr->size() << ')'
@@ -306,9 +273,9 @@ genericPointPatchField<Type>::genericPointPatchField
                                 << this->size() << ')'
                                 << "\n    on patch " << this->patch().name()
                                 << " of field "
-                                << this->dimensionedInternalField().name()
+                                << this->internalField().name()
                                 << " in file "
-                                << this->dimensionedInternalField().objectPath()
+                                << this->internalField().objectPath()
                                 << exit(FatalIOError);
                         }
 
@@ -316,20 +283,16 @@ genericPointPatchField<Type>::genericPointPatchField
                     }
                     else
                     {
-                        FatalIOErrorIn
+                        FatalIOErrorInFunction
                         (
-                            "genericPointPatchField<Type>::"
-                            "genericPointPatchField"
-                            "(const pointPatch&, const Field<Type>&, "
-                            "const dictionary&)",
                             dict
                         )   << "\n    compound " << fieldToken.compoundToken()
                             << " not supported"
                             << "\n    on patch " << this->patch().name()
                             << " of field "
-                            << this->dimensionedInternalField().name()
+                            << this->internalField().name()
                             << " in file "
-                            << this->dimensionedInternalField().objectPath()
+                            << this->internalField().objectPath()
                             << exit(FatalIOError);
                     }
                 }
@@ -340,7 +303,7 @@ genericPointPatchField<Type>::genericPointPatchField
 
 
 template<class Type>
-genericPointPatchField<Type>::genericPointPatchField
+Foam::genericPointPatchField<Type>::genericPointPatchField
 (
     const genericPointPatchField<Type>& ptf,
     const pointPatch& p,
@@ -425,7 +388,7 @@ genericPointPatchField<Type>::genericPointPatchField
 
 
 template<class Type>
-genericPointPatchField<Type>::genericPointPatchField
+Foam::genericPointPatchField<Type>::genericPointPatchField
 (
     const genericPointPatchField<Type>& ptf,
     const DimensionedField<Type, pointMesh>& iF
@@ -445,7 +408,7 @@ genericPointPatchField<Type>::genericPointPatchField
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-void genericPointPatchField<Type>::autoMap
+void Foam::genericPointPatchField<Type>::autoMap
 (
     const pointPatchFieldMapper& m
 )
@@ -503,14 +466,14 @@ void genericPointPatchField<Type>::autoMap
 
 
 template<class Type>
-void genericPointPatchField<Type>::rmap
+void Foam::genericPointPatchField<Type>::rmap
 (
     const pointPatchField<Type>& ptf,
     const labelList& addr
 )
 {
     const genericPointPatchField<Type>& dptf =
-        refCast<const genericPointPatchField<Type> >(ptf);
+        refCast<const genericPointPatchField<Type>>(ptf);
 
     forAllIter
     (
@@ -595,7 +558,7 @@ void genericPointPatchField<Type>::rmap
 
 
 template<class Type>
-void genericPointPatchField<Type>::write(Ostream& os) const
+void Foam::genericPointPatchField<Type>::write(Ostream& os) const
 {
     os.writeKeyword("type") << actualTypeName_ << token::END_STATEMENT << nl;
 
@@ -645,9 +608,5 @@ void genericPointPatchField<Type>::write(Ostream& os) const
     }
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

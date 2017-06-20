@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -66,10 +66,8 @@ Foam::tabulated6DoFAcceleration::acceleration() const
 
     if (t < times_[0])
     {
-        FatalErrorIn
-        (
-            "tabulated6DoFAcceleration::acceleration()"
-        )   << "current time (" << t
+        FatalErrorInFunction
+            << "current time (" << t
             << ") is less than the minimum in the data table ("
             << times_[0] << ')'
             << exit(FatalError);
@@ -77,10 +75,8 @@ Foam::tabulated6DoFAcceleration::acceleration() const
 
     if (t > times_.last())
     {
-        FatalErrorIn
-        (
-            "tabulated6DoFAcceleration::acceleration()"
-        )   << "current time (" << t
+        FatalErrorInFunction
+            << "current time (" << t
             << ") is greater than the maximum in the data table ("
             << times_.last() << ')'
             << exit(FatalError);
@@ -93,7 +89,7 @@ Foam::tabulated6DoFAcceleration::acceleration() const
         values_
     );
 
-    Info<< "tabulated6DoFAcceleration::acceleration(): "
+    InfoInFunction
         << "Time = " << t << " accelerations: " << avs << endl;
 
     return avs;
@@ -122,7 +118,7 @@ bool Foam::tabulated6DoFAcceleration::read
 
         if (dataStream.good())
         {
-            List<Tuple2<scalar, accelerationVectors> > timeValues
+            List<Tuple2<scalar, accelerationVectors>> timeValues
             (
                 dataStream
             );
@@ -138,10 +134,8 @@ bool Foam::tabulated6DoFAcceleration::read
         }
         else
         {
-            FatalErrorIn
-            (
-                "tabulated6DoFAcceleration::read(const dictionary&)"
-            )   << "Cannot open time data file " << timeDataFileName_
+            FatalErrorInFunction
+                << "Cannot open time data file " << timeDataFileName_
                 << exit(FatalError);
         }
     }

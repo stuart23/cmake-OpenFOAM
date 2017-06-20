@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -52,7 +52,7 @@ void Pstream::gather
     const label comm
 )
 {
-    if (UPstream::nProcs(comm) > 1)
+    if (UPstream::parRun() && UPstream::nProcs(comm) > 1)
     {
         // Get my communication order
         const commsStruct& myComm = comms[UPstream::myProcNo(comm)];
@@ -122,7 +122,7 @@ void Pstream::gather
 }
 
 
-template <class T, class BinaryOp>
+template<class T, class BinaryOp>
 void Pstream::gather
 (
     T& Value,
@@ -151,7 +151,7 @@ void Pstream::scatter
     const label comm
 )
 {
-    if (UPstream::nProcs(comm) > 1)
+    if (UPstream::parRun() && UPstream::nProcs(comm) > 1)
     {
         // Get my communication order
         const commsStruct& myComm = comms[UPstream::myProcNo(comm)];
@@ -185,8 +185,10 @@ void Pstream::scatter
             }
         }
 
-        // Send to my downstairs neighbours
-        forAll(myComm.below(), belowI)
+        // Send to my downstairs neighbours. Note reverse order (compared to
+        // receiving). This is to make sure to send to the critical path
+        // (only when using a tree schedule!) first.
+        forAllReverse(myComm.below(), belowI)
         {
             if (contiguous<T>())
             {
@@ -217,7 +219,7 @@ void Pstream::scatter
 }
 
 
-template <class T>
+template<class T>
 void Pstream::scatter(T& Value, const int tag, const label comm)
 {
     if (UPstream::nProcs(comm) < UPstream::nProcsSimpleSum)

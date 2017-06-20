@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -164,7 +164,8 @@ public:
                 const polyMesh&,
                 UList<T>&,
                 const CombineOp& cop,
-                const TransformOp& top
+                const TransformOp& top,
+                const bool parRun = Pstream::parRun()
             );
 
 
@@ -556,7 +557,8 @@ public:
             (
                 const polyMesh& mesh,
                 PackedList<nBits>& faceValues,
-                const CombineOp& cop
+                const CombineOp& cop,
+                const bool parRun = Pstream::parRun()
             );
 
             template<unsigned nBits>
@@ -615,7 +617,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "syncToolsTemplates.C"
+    #include "syncToolsTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

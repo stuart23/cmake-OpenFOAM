@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -44,6 +44,9 @@ namespace Foam
 
 class boundBox;
 template<class T> class tmp;
+
+bool operator==(const boundBox&, const boundBox&);
+bool operator!=(const boundBox&, const boundBox&);
 
 Istream& operator>>(Istream&, boundBox&);
 Ostream& operator<<(Ostream&, const boundBox&);
@@ -256,7 +259,7 @@ inline bool contiguous<boundBox>() {return contiguous<point>();}
 #include "boundBoxI.H"
 
 #ifdef NoRepository
-#   include "boundBoxTemplates.C"
+    #include "boundBoxTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

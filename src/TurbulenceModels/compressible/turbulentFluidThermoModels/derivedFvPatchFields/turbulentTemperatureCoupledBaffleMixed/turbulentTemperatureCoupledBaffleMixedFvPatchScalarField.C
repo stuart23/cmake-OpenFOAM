@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -93,20 +93,11 @@ turbulentTemperatureCoupledBaffleMixedFvPatchScalarField
 {
     if (!isA<mappedPatchBase>(this->patch().patch()))
     {
-        FatalErrorIn
-        (
-            "turbulentTemperatureCoupledBaffleMixedFvPatchScalarField::"
-            "turbulentTemperatureCoupledBaffleMixedFvPatchScalarField\n"
-            "(\n"
-            "    const fvPatch& p,\n"
-            "    const DimensionedField<scalar, volMesh>& iF,\n"
-            "    const dictionary& dict\n"
-            ")\n"
-        )   << "\n    patch type '" << p.type()
+        FatalErrorInFunction
             << "' not type '" << mappedPatchBase::typeName << "'"
             << "\n    for patch " << p.name()
-            << " of field " << dimensionedInternalField().name()
-            << " in file " << dimensionedInternalField().objectPath()
+            << " of field " << internalField().name()
+            << " in file " << internalField().objectPath()
             << exit(FatalError);
     }
 
@@ -118,7 +109,7 @@ turbulentTemperatureCoupledBaffleMixedFvPatchScalarField
         if (thicknessLayers_.size() > 0)
         {
             // Calculate effective thermal resistance by harmonic averaging
-            forAll (thicknessLayers_, iLayer)
+            forAll(thicknessLayers_, iLayer)
             {
                 contactRes_ += thicknessLayers_[iLayer]/kappaLayers_[iLayer];
             }
@@ -179,9 +170,9 @@ void turbulentTemperatureCoupledBaffleMixedFvPatchScalarField::updateCoeffs()
     const mappedPatchBase& mpp =
         refCast<const mappedPatchBase>(patch().patch());
     const polyMesh& nbrMesh = mpp.sampleMesh();
-    const label samplePatchI = mpp.samplePolyPatch().index();
+    const label samplePatchi = mpp.samplePolyPatch().index();
     const fvPatch& nbrPatch =
-        refCast<const fvMesh>(nbrMesh).boundary()[samplePatchI];
+        refCast<const fvMesh>(nbrMesh).boundary()[samplePatchi];
 
     // Calculate the temperature by harmonic averaging
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -204,17 +195,17 @@ void turbulentTemperatureCoupledBaffleMixedFvPatchScalarField::updateCoeffs()
 
     if (contactRes_ == 0.0)
     {
-        nbrIntFld() = nbrField.patchInternalField();
-        nbrKDelta() = nbrField.kappa(nbrField)*nbrPatch.deltaCoeffs();
+        nbrIntFld.ref() = nbrField.patchInternalField();
+        nbrKDelta.ref() = nbrField.kappa(nbrField)*nbrPatch.deltaCoeffs();
     }
     else
     {
-        nbrIntFld() = nbrField;
-        nbrKDelta() = contactRes_;
+        nbrIntFld.ref() = nbrField;
+        nbrKDelta.ref() = contactRes_;
     }
 
-    mpp.distribute(nbrIntFld());
-    mpp.distribute(nbrKDelta());
+    mpp.distribute(nbrIntFld.ref());
+    mpp.distribute(nbrKDelta.ref());
 
     tmp<scalarField> myKDelta = kappa(*this)*patch().deltaCoeffs();
 
@@ -246,10 +237,10 @@ void turbulentTemperatureCoupledBaffleMixedFvPatchScalarField::updateCoeffs()
 
         Info<< patch().boundaryMesh().mesh().name() << ':'
             << patch().name() << ':'
-            << this->dimensionedInternalField().name() << " <- "
+            << this->internalField().name() << " <- "
             << nbrMesh.name() << ':'
             << nbrPatch.name() << ':'
-            << this->dimensionedInternalField().name() << " :"
+            << this->internalField().name() << " :"
             << " heat transfer rate:" << Q
             << " walltemperature "
             << " min:" << gMin(*this)

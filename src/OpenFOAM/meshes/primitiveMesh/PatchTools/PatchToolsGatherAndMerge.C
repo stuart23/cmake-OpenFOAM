@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,11 +24,9 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "PatchTools.H"
-#include "ListListOps.H"
+#include "polyMesh.H"
+#include "globalMeshData.H"
 #include "mergePoints.H"
-#include "face.H"
-#include "triFace.H"
-#include "ListListOps.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -51,7 +49,7 @@ void Foam::PatchTools::gatherAndMerge
     // Collect points from all processors
     labelList pointSizes;
     {
-        List<Field<PointType> > gatheredPoints(Pstream::nProcs());
+        List<Field<PointType>> gatheredPoints(Pstream::nProcs());
         gatheredPoints[Pstream::myProcNo()] = p.points();
 
         Pstream::gatherList(gatheredPoints);
@@ -61,13 +59,13 @@ void Foam::PatchTools::gatherAndMerge
             pointSizes = ListListOps::subSizes
             (
                 gatheredPoints,
-                accessOp<Field<PointType> >()
+                accessOp<Field<PointType>>()
             );
 
-            mergedPoints = ListListOps::combine<Field<PointType> >
+            mergedPoints = ListListOps::combine<Field<PointType>>
             (
                 gatheredPoints,
-                accessOp<Field<PointType> >()
+                accessOp<Field<PointType>>()
             );
         }
     }
@@ -75,7 +73,7 @@ void Foam::PatchTools::gatherAndMerge
     // Collect faces from all processors and renumber using sizes of
     // gathered points
     {
-        List<List<Face> > gatheredFaces(Pstream::nProcs());
+        List<List<Face>> gatheredFaces(Pstream::nProcs());
         gatheredFaces[Pstream::myProcNo()] = p;
         Pstream::gatherList(gatheredFaces);
 
@@ -83,11 +81,11 @@ void Foam::PatchTools::gatherAndMerge
         {
             mergedFaces = static_cast<const List<Face>&>
             (
-                ListListOps::combineOffset<List<Face> >
+                ListListOps::combineOffset<List<Face>>
                 (
                     gatheredFaces,
                     pointSizes,
-                    accessOp<List<Face> >(),
+                    accessOp<List<Face>>(),
                     offsetOp<Face>()
                 )
             );
@@ -119,11 +117,110 @@ void Foam::PatchTools::gatherAndMerge
             // Relabel faces
             List<Face>& faces = mergedFaces;
 
-            forAll(faces, faceI)
+            forAll(faces, facei)
             {
-                inplaceRenumber(pointMergeMap, faces[faceI]);
+                inplaceRenumber(pointMergeMap, faces[facei]);
             }
         }
+    }
+}
+
+
+template<class FaceList>
+void Foam::PatchTools::gatherAndMerge
+(
+    const polyMesh& mesh,
+    const FaceList& localFaces,
+    const labelList& meshPoints,
+    const Map<label>& meshPointMap,
+
+    labelList& pointToGlobal,
+    labelList& uniqueMeshPointLabels,
+    autoPtr<globalIndex>& globalPointsPtr,
+    autoPtr<globalIndex>& globalFacesPtr,
+    List<typename FaceList::value_type>& mergedFaces,
+    pointField& mergedPoints
+)
+{
+    typedef typename FaceList::value_type FaceType;
+
+    if (Pstream::parRun())
+    {
+        // Renumber the setPatch points/faces into unique points
+        globalPointsPtr = mesh.globalData().mergePoints
+        (
+            meshPoints,
+            meshPointMap,
+            pointToGlobal,
+            uniqueMeshPointLabels
+        );
+
+        globalFacesPtr.reset(new globalIndex(localFaces.size()));
+
+        if (Pstream::master())
+        {
+            // Get renumbered local data
+            pointField myPoints(mesh.points(), uniqueMeshPointLabels);
+            List<FaceType> myFaces(localFaces);
+            forAll(myFaces, i)
+            {
+                inplaceRenumber(pointToGlobal, myFaces[i]);
+            }
+
+
+            mergedFaces.setSize(globalFacesPtr().size());
+            mergedPoints.setSize(globalPointsPtr().size());
+
+            // Insert master data first
+            label pOffset = globalPointsPtr().offset(Pstream::masterNo());
+            SubList<point>(mergedPoints, myPoints.size(), pOffset) = myPoints;
+
+            label fOffset = globalFacesPtr().offset(Pstream::masterNo());
+            SubList<FaceType>(mergedFaces, myFaces.size(), fOffset) = myFaces;
+
+
+            // Receive slave ones
+            for (int slave=1; slave<Pstream::nProcs(); slave++)
+            {
+                IPstream fromSlave(Pstream::scheduled, slave);
+
+                pointField slavePoints(fromSlave);
+                List<FaceType> slaveFaces(fromSlave);
+
+                label pOffset = globalPointsPtr().offset(slave);
+                SubList<point>(mergedPoints, slavePoints.size(), pOffset) =
+                    slavePoints;
+
+                label fOffset = globalFacesPtr().offset(slave);
+                SubList<FaceType>(mergedFaces, slaveFaces.size(), fOffset) =
+                    slaveFaces;
+            }
+        }
+        else
+        {
+            // Get renumbered local data
+            pointField myPoints(mesh.points(), uniqueMeshPointLabels);
+            List<FaceType> myFaces(localFaces);
+            forAll(myFaces, i)
+            {
+                inplaceRenumber(pointToGlobal, myFaces[i]);
+            }
+
+            // Construct processor stream with estimate of size. Could
+            // be improved.
+            OPstream toMaster
+            (
+                Pstream::scheduled,
+                Pstream::masterNo(),
+                myPoints.byteSize() + 4*sizeof(label)*myFaces.size()
+            );
+            toMaster << myPoints << myFaces;
+        }
+    }
+    else
+    {
+        mergedFaces = localFaces;
+        mergedPoints = pointField(mesh.points(), meshPoints);
     }
 }
 

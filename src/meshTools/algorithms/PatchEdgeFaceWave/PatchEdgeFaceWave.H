@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -133,7 +133,7 @@ class PatchEdgeFaceWave
         bool updateEdge
         (
             const label edgeI,
-            const label neighbourFaceI,
+            const label neighbourFacei,
             const Type& neighbourInfo,
             Type& edgeInfo
         );
@@ -142,7 +142,7 @@ class PatchEdgeFaceWave
         //  statistics.
         bool updateFace
         (
-            const label faceI,
+            const label facei,
             const label neighbourEdgeI,
             const Type& neighbourInfo,
             Type& faceInfo
@@ -358,7 +358,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "PatchEdgeFaceWave.C"
+    #include "PatchEdgeFaceWave.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

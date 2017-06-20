@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -75,19 +75,7 @@ Foam::CollisionRecordList<PairType, WallType>::CollisionRecordList
      || pairData.size() != nPair
     )
     {
-        FatalErrorIn
-        (
-            "Foam::CollisionRecordList<PairType, WallType>::CollisionRecordList"
-            "("
-                "const labelField& pairAccessed,"
-                "const labelField& pairOrigProcOfOther,"
-                "const labelField& pairOrigIdOfOther,"
-                "const Field<PairType>& pairData,"
-                "const labelField& wallAccessed,"
-                "const vectorField& wallPRel,"
-                "const Field<WallType>& wallData"
-            ")"
-        )
+        FatalErrorInFunction
             << "Pair field size mismatch." << nl
             << pairAccessed << nl
             << pairOrigProcOfOther << nl
@@ -114,19 +102,7 @@ Foam::CollisionRecordList<PairType, WallType>::CollisionRecordList
 
     if (wallPRel.size() != nWall || wallData.size() != nWall)
     {
-        FatalErrorIn
-        (
-            "Foam::CollisionRecordList<PairType, WallType>::CollisionRecordList"
-            "("
-                "const labelField& pairAccessed,"
-                "const labelField& pairOrigProcOfOther,"
-                "const labelField& pairOrigIdOfOther,"
-                "const Field<PairType>& pairData,"
-                "const labelField& wallAccessed,"
-                "const vectorField& wallPRel,"
-                "const Field<WallType>& wallData"
-            ")"
-        )
+        FatalErrorInFunction
             << "Wall field size mismatch." << nl
             << wallAccessed << nl
             << wallPRel << nl
@@ -379,7 +355,7 @@ template<class PairType, class WallType>
 void Foam::CollisionRecordList<PairType, WallType>::update()
 {
     {
-        DynamicList<PairCollisionRecord<PairType> > updatedRecords;
+        DynamicList<PairCollisionRecord<PairType>> updatedRecords;
 
         forAll(pairRecords_, i)
         {
@@ -395,7 +371,7 @@ void Foam::CollisionRecordList<PairType, WallType>::update()
     }
 
     {
-        DynamicList<WallCollisionRecord<WallType> > updatedRecords;
+        DynamicList<WallCollisionRecord<WallType>> updatedRecords;
 
         forAll(wallRecords_, i)
         {
@@ -423,11 +399,7 @@ void Foam::CollisionRecordList<PairType, WallType>::operator=
     // Check for assignment to self
     if (this == &rhs)
     {
-        FatalErrorIn
-        (
-            "Foam::CollisionRecordList<PairType, WallType>::operator="
-            "(const Foam::CollisionRecordList<PairType, WallType>&)"
-        )
+        FatalErrorInFunction
             << "Attempted assignment to self"
             << abort(FatalError);
     }

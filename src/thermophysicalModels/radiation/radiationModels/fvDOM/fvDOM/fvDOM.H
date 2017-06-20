@@ -131,7 +131,7 @@ class fvDOM
         label maxIter_;
 
         //- List of cached fvMatrices for rays
-        List<PtrList<fvScalarMatrix> >fvRayDiv_;
+        List<PtrList<fvScalarMatrix>>fvRayDiv_;
 
         //- Cache convection div matrix
         bool cacheDiv_;
@@ -200,7 +200,7 @@ public:
             virtual tmp<volScalarField> Rp() const;
 
             //- Source term component (constant)
-            virtual tmp<DimensionedField<scalar, volMesh> > Ru() const;
+            virtual tmp<DimensionedField<scalar, volMesh>> Ru() const;
 
 
         // Access

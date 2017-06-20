@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -58,8 +58,8 @@ Foam::fv::tabulatedAccelerationSource::tabulatedAccelerationSource
 :
     option(name, modelType, dict, mesh),
     motion_(coeffs_, mesh.time()),
-    UName_(coeffs_.lookupOrDefault<word>("UName", "U")),
-    g0_("g0", dimAcceleration, vector::zero)
+    UName_(coeffs_.lookupOrDefault<word>("U", "U")),
+    g0_("g0", dimAcceleration, Zero)
 {
     fieldNames_.setSize(1, UName_);
     applied_.setSize(1, false);

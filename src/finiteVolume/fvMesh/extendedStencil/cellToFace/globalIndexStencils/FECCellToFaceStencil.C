@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,7 +30,6 @@ License
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-// Calculates per edge the neighbour data (= edgeCells)
 void Foam::FECCellToFaceStencil::calcEdgeBoundaryData
 (
     const boolList& isValidBFace,
@@ -62,8 +61,6 @@ void Foam::FECCellToFaceStencil::calcEdgeBoundaryData
 }
 
 
-// Calculates per face the edge connected data (= cell or boundary in global
-// numbering).
 void Foam::FECCellToFaceStencil::calcFaceStencil
 (
     labelListList& faceStencil
@@ -80,19 +77,19 @@ void Foam::FECCellToFaceStencil::calcFaceStencil
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     labelList neiGlobalCell(nBnd);
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        const polyPatch& pp = patches[patchI];
+        const polyPatch& pp = patches[patchi];
 
         if (pp.coupled())
         {
-            label faceI = pp.start();
+            label facei = pp.start();
 
             forAll(pp, i)
             {
-                neiGlobalCell[faceI-mesh().nInternalFaces()] =
-                    globalNumbering().toGlobal(own[faceI]);
-                faceI++;
+                neiGlobalCell[facei-mesh().nInternalFaces()] =
+                    globalNumbering().toGlobal(own[facei]);
+                facei++;
             }
         }
     }
@@ -148,10 +145,10 @@ void Foam::FECCellToFaceStencil::calcFaceStencil
 
         forAll(eFaces, j)
         {
-            label faceI = eFaces[j];
+            label facei = eFaces[j];
 
             // Insert eGlobals into faceStencil.
-            merge(-1, -1, eGlobals, faceStencil[faceI]);
+            merge(-1, -1, eGlobals, faceStencil[facei]);
         }
     }
     neiGlobal.clear();
@@ -164,10 +161,10 @@ void Foam::FECCellToFaceStencil::calcFaceStencil
     DynamicList<label> eFacesSet;
     labelHashSet faceStencilSet;
 
-    for (label faceI = 0; faceI < mesh().nInternalFaces(); faceI++)
+    for (label facei = 0; facei < mesh().nInternalFaces(); facei++)
     {
-        label globalOwn = globalNumbering().toGlobal(own[faceI]);
-        label globalNei = globalNumbering().toGlobal(nei[faceI]);
+        label globalOwn = globalNumbering().toGlobal(own[facei]);
+        label globalNei = globalNumbering().toGlobal(nei[facei]);
 
         // Convert any existing faceStencil (from coupled edges) into
         // set and operate on this.
@@ -175,18 +172,18 @@ void Foam::FECCellToFaceStencil::calcFaceStencil
         faceStencilSet.clear();
 
         // Insert all but global owner and neighbour
-        forAll(faceStencil[faceI], i)
+        forAll(faceStencil[facei], i)
         {
-            label globalI = faceStencil[faceI][i];
+            label globalI = faceStencil[facei][i];
             if (globalI != globalOwn && globalI != globalNei)
             {
                 faceStencilSet.insert(globalI);
             }
         }
-        faceStencil[faceI].clear();
+        faceStencil[facei].clear();
 
         // Collect all edge connected (internal) cells
-        const labelList& fEdges = mesh().faceEdges(faceI, fEdgesSet);
+        const labelList& fEdges = mesh().faceEdges(facei, fEdgesSet);
 
         forAll(fEdges, i)
         {
@@ -203,32 +200,32 @@ void Foam::FECCellToFaceStencil::calcFaceStencil
         }
 
         // Extract, guarantee owner first, neighbour second.
-        faceStencil[faceI].setSize(faceStencilSet.size()+2);
+        faceStencil[facei].setSize(faceStencilSet.size()+2);
         label n = 0;
-        faceStencil[faceI][n++] = globalOwn;
-        faceStencil[faceI][n++] = globalNei;
+        faceStencil[facei][n++] = globalOwn;
+        faceStencil[facei][n++] = globalNei;
         forAllConstIter(labelHashSet, faceStencilSet, iter)
         {
             if (iter.key() == globalOwn || iter.key() == globalNei)
             {
-                FatalErrorIn("FECCellToFaceStencil::calcFaceStencil(..)")
+                FatalErrorInFunction
                     << "problem:" << faceStencilSet
                     << abort(FatalError);
             }
-            faceStencil[faceI][n++] = iter.key();
+            faceStencil[facei][n++] = iter.key();
         }
     }
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        const polyPatch& pp = patches[patchI];
-        label faceI = pp.start();
+        const polyPatch& pp = patches[patchi];
+        label facei = pp.start();
 
         if (pp.coupled())
         {
             forAll(pp, i)
             {
-                label globalOwn = globalNumbering().toGlobal(own[faceI]);
-                label globalNei = neiGlobalCell[faceI-mesh().nInternalFaces()];
+                label globalOwn = globalNumbering().toGlobal(own[facei]);
+                label globalNei = neiGlobalCell[facei-mesh().nInternalFaces()];
 
                 // Convert any existing faceStencil (from coupled edges) into
                 // set and operate on this.
@@ -236,18 +233,18 @@ void Foam::FECCellToFaceStencil::calcFaceStencil
                 faceStencilSet.clear();
 
                 // Insert all but global owner and neighbour
-                forAll(faceStencil[faceI], i)
+                forAll(faceStencil[facei], i)
                 {
-                    label globalI = faceStencil[faceI][i];
+                    label globalI = faceStencil[facei][i];
                     if (globalI != globalOwn && globalI != globalNei)
                     {
                         faceStencilSet.insert(globalI);
                     }
                 }
-                faceStencil[faceI].clear();
+                faceStencil[facei].clear();
 
                 // Collect all edge connected (internal) cells
-                const labelList& fEdges = mesh().faceEdges(faceI, fEdgesSet);
+                const labelList& fEdges = mesh().faceEdges(facei, fEdgesSet);
 
                 forAll(fEdges, i)
                 {
@@ -264,38 +261,36 @@ void Foam::FECCellToFaceStencil::calcFaceStencil
                 }
 
                 // Extract, guarantee owner first, neighbour second.
-                faceStencil[faceI].setSize(faceStencilSet.size()+2);
+                faceStencil[facei].setSize(faceStencilSet.size()+2);
                 label n = 0;
-                faceStencil[faceI][n++] = globalOwn;
-                faceStencil[faceI][n++] = globalNei;
+                faceStencil[facei][n++] = globalOwn;
+                faceStencil[facei][n++] = globalNei;
                 forAllConstIter(labelHashSet, faceStencilSet, iter)
                 {
                     if (iter.key() == globalOwn || iter.key() == globalNei)
                     {
-                        FatalErrorIn
-                        (
-                            "FECCellToFaceStencil::calcFaceStencil(..)"
-                        )   << "problem:" << faceStencilSet
+                        FatalErrorInFunction
+                            << "problem:" << faceStencilSet
                             << abort(FatalError);
                     }
-                    faceStencil[faceI][n++] = iter.key();
+                    faceStencil[facei][n++] = iter.key();
                 }
 
-                if (n != faceStencil[faceI].size())
+                if (n != faceStencil[facei].size())
                 {
-                    FatalErrorIn("problem") << "n:" << n
-                        << " size:" << faceStencil[faceI].size()
+                    FatalErrorInFunction
+                        << " size:" << faceStencil[facei].size()
                         << abort(FatalError);
                 }
 
-                faceI++;
+                facei++;
             }
         }
         else if (!isA<emptyPolyPatch>(pp))
         {
             forAll(pp, i)
             {
-                label globalOwn = globalNumbering().toGlobal(own[faceI]);
+                label globalOwn = globalNumbering().toGlobal(own[facei]);
 
                 // Convert any existing faceStencil (from coupled edges) into
                 // set and operate on this.
@@ -303,18 +298,18 @@ void Foam::FECCellToFaceStencil::calcFaceStencil
                 faceStencilSet.clear();
 
                 // Insert all but global owner and neighbour
-                forAll(faceStencil[faceI], i)
+                forAll(faceStencil[facei], i)
                 {
-                    label globalI = faceStencil[faceI][i];
+                    label globalI = faceStencil[facei][i];
                     if (globalI != globalOwn)
                     {
                         faceStencilSet.insert(globalI);
                     }
                 }
-                faceStencil[faceI].clear();
+                faceStencil[facei].clear();
 
                 // Collect all edge connected (internal) cells
-                const labelList& fEdges = mesh().faceEdges(faceI, fEdgesSet);
+                const labelList& fEdges = mesh().faceEdges(facei, fEdgesSet);
 
                 forAll(fEdges, i)
                 {
@@ -331,72 +326,70 @@ void Foam::FECCellToFaceStencil::calcFaceStencil
                 }
 
                 // Extract, guarantee owner first, neighbour second.
-                faceStencil[faceI].setSize(faceStencilSet.size()+1);
+                faceStencil[facei].setSize(faceStencilSet.size()+1);
                 label n = 0;
-                faceStencil[faceI][n++] = globalOwn;
+                faceStencil[facei][n++] = globalOwn;
                 forAllConstIter(labelHashSet, faceStencilSet, iter)
                 {
                     if (iter.key() == globalOwn)
                     {
-                        FatalErrorIn
-                        (
-                            "FECCellToFaceStencil::calcFaceStencil(..)"
-                        )   << "problem:" << faceStencilSet
+                        FatalErrorInFunction
+                            << "problem:" << faceStencilSet
                             << abort(FatalError);
                     }
-                    faceStencil[faceI][n++] = iter.key();
+                    faceStencil[facei][n++] = iter.key();
                 }
 
-                faceI++;
+                facei++;
             }
         }
     }
 
 
-    for (label faceI = 0; faceI < mesh().nInternalFaces(); faceI++)
+    for (label facei = 0; facei < mesh().nInternalFaces(); facei++)
     {
-        label globalOwn = globalNumbering().toGlobal(own[faceI]);
-        if (faceStencil[faceI][0] != globalOwn)
+        label globalOwn = globalNumbering().toGlobal(own[facei]);
+        if (faceStencil[facei][0] != globalOwn)
         {
-            FatalErrorIn("FECCellToFaceStencil::calcFaceStencil(..)")
-                << "problem:" << faceStencil[faceI]
+            FatalErrorInFunction
+                << "problem:" << faceStencil[facei]
                 << " globalOwn:" << globalOwn
                 << abort(FatalError);
         }
-        label globalNei = globalNumbering().toGlobal(nei[faceI]);
-        if (faceStencil[faceI][1] != globalNei)
+        label globalNei = globalNumbering().toGlobal(nei[facei]);
+        if (faceStencil[facei][1] != globalNei)
         {
-            FatalErrorIn("FECCellToFaceStencil::calcFaceStencil(..)")
-                << "problem:" << faceStencil[faceI]
+            FatalErrorInFunction
+                << "problem:" << faceStencil[facei]
                 << " globalNei:" << globalNei
                 << abort(FatalError);
         }
     }
 
 
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        const polyPatch& pp = patches[patchI];
+        const polyPatch& pp = patches[patchi];
 
         if (pp.coupled())
         {
             forAll(pp, i)
             {
-                label faceI = pp.start()+i;
+                label facei = pp.start()+i;
 
-                label globalOwn = globalNumbering().toGlobal(own[faceI]);
-                if (faceStencil[faceI][0] != globalOwn)
+                label globalOwn = globalNumbering().toGlobal(own[facei]);
+                if (faceStencil[facei][0] != globalOwn)
                 {
-                    FatalErrorIn("FECCellToFaceStencil::calcFaceStencil(..)")
-                        << "problem:" << faceStencil[faceI]
+                    FatalErrorInFunction
+                        << "problem:" << faceStencil[facei]
                         << " globalOwn:" << globalOwn
                         << abort(FatalError);
                 }
-                label globalNei = neiGlobalCell[faceI-mesh().nInternalFaces()];
-                if (faceStencil[faceI][1] != globalNei)
+                label globalNei = neiGlobalCell[facei-mesh().nInternalFaces()];
+                if (faceStencil[facei][1] != globalNei)
                 {
-                    FatalErrorIn("FECCellToFaceStencil::calcFaceStencil(..)")
-                        << "problem:" << faceStencil[faceI]
+                    FatalErrorInFunction
+                        << "problem:" << faceStencil[facei]
                         << " globalNei:" << globalNei
                         << abort(FatalError);
                 }
@@ -406,13 +399,13 @@ void Foam::FECCellToFaceStencil::calcFaceStencil
         {
             forAll(pp, i)
             {
-                label faceI = pp.start()+i;
+                label facei = pp.start()+i;
 
-                label globalOwn = globalNumbering().toGlobal(own[faceI]);
-                if (faceStencil[faceI][0] != globalOwn)
+                label globalOwn = globalNumbering().toGlobal(own[facei]);
+                if (faceStencil[facei][0] != globalOwn)
                 {
-                    FatalErrorIn("FECCellToFaceStencil::calcFaceStencil(..)")
-                        << "problem:" << faceStencil[faceI]
+                    FatalErrorInFunction
+                        << "problem:" << faceStencil[facei]
                         << " globalOwn:" << globalOwn
                         << abort(FatalError);
                 }

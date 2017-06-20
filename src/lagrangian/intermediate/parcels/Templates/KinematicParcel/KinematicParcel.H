@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -173,13 +173,13 @@ public:
             // Interpolators for continuous phase fields
 
                 //- Density interpolator
-                autoPtr<interpolation<scalar> > rhoInterp_;
+                autoPtr<interpolation<scalar>> rhoInterp_;
 
                 //- Velocity interpolator
-                autoPtr<interpolation<vector> > UInterp_;
+                autoPtr<interpolation<vector>> UInterp_;
 
                 //- Dynamic viscosity interpolator
-                autoPtr<interpolation<scalar> > muInterp_;
+                autoPtr<interpolation<scalar>> muInterp_;
 
 
             //- Local gravitational or other body-force acceleration
@@ -284,7 +284,7 @@ protected:
         (
             TrackData& td,
             const scalar dt,           // timestep
-            const label cellI,         // owner cell
+            const label celli,         // owner cell
             const scalar Re,           // Reynolds number
             const scalar mu,           // local carrier viscosity
             const scalar mass,         // mass
@@ -326,8 +326,8 @@ public:
         (
             const polyMesh& mesh,
             const vector& position,
-            const label cellI,
-            const label tetFaceI,
+            const label celli,
+            const label tetFacei,
             const label tetPtI
         );
 
@@ -336,8 +336,8 @@ public:
         (
             const polyMesh& mesh,
             const vector& position,
-            const label cellI,
-            const label tetFaceI,
+            const label celli,
+            const label tetFacei,
             const label tetPtI,
             const label typeId,
             const scalar nParticle0,
@@ -386,9 +386,9 @@ public:
                 mesh_(mesh)
             {}
 
-            autoPtr<KinematicParcel<ParcelType> > operator()(Istream& is) const
+            autoPtr<KinematicParcel<ParcelType>> operator()(Istream& is) const
             {
-                return autoPtr<KinematicParcel<ParcelType> >
+                return autoPtr<KinematicParcel<ParcelType>>
                 (
                     new KinematicParcel<ParcelType>(mesh_, is, true)
                 );
@@ -479,7 +479,7 @@ public:
             inline label faceInterpolation() const;
 
             //- Cell owner mass
-            inline scalar massCell(const label cellI) const;
+            inline scalar massCell(const label celli) const;
 
             //- Particle mass
             inline scalar mass() const;
@@ -540,7 +540,7 @@ public:
             (
                 TrackData& td,
                 const scalar dt,
-                const label cellI
+                const label celli
             );
 
             //- Correct cell values using latest transfer information
@@ -549,7 +549,7 @@ public:
             (
                 TrackData& td,
                 const scalar dt,
-                const label cellI
+                const label celli
             );
 
             //- Update parcel properties over the time interval
@@ -558,7 +558,7 @@ public:
             (
                 TrackData& td,
                 const scalar dt,
-                const label cellI
+                const label celli
             );
 
 
@@ -586,7 +586,7 @@ public:
             (
                 const polyPatch& p,
                 TrackData& td,
-                const label patchI,
+                const label patchi,
                 const scalar trackFraction,
                 const tetIndices& tetIs
             );

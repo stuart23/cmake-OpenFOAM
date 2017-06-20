@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -48,10 +48,10 @@ inline const SLGThermo& thermoSingleLayer::thermo() const
 inline tmp<scalarField> thermoSingleLayer::hs
 (
     const scalarField& T,
-    const label patchI
+    const label patchi
 ) const
 {
-    const scalarField& Cp = Cp_.boundaryField()[patchI];
+    const scalarField& Cp = Cp_.boundaryField()[patchi];
     return Cp*(T - 298.15);
 }
 
@@ -73,8 +73,7 @@ inline tmp<volScalarField> thermoSingleLayer::hs
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-            Cp_*(T - (dimensionedScalar("Tstd", dimTemperature, 298.15))),
-            zeroGradientFvPatchScalarField::typeName
+            Cp_*(T - (dimensionedScalar("Tstd", dimTemperature, 298.15)))
         )
     );
 }
@@ -97,13 +96,12 @@ inline tmp<volScalarField> thermoSingleLayer::T
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-            hs/Cp_ + dimensionedScalar("Tstd", dimTemperature, 298.15),
-            zeroGradientFvPatchScalarField::typeName
+            hs/Cp_ + dimensionedScalar("Tstd", dimTemperature, 298.15)
         )
     );
 
-    tT().min(Tmax_);
-    tT().max(Tmin_);
+    tT.ref().min(Tmax_);
+    tT.ref().max(Tmin_);
 
     return tT;
 }
@@ -157,21 +155,21 @@ inline const filmRadiationModel& thermoSingleLayer::radiation() const
 }
 
 
-inline tmp<scalarField> thermoSingleLayer::Qconvw(const label patchI) const
+inline tmp<scalarField> thermoSingleLayer::Qconvw(const label patchi) const
 {
-    const scalarField htc(htcw_->h()().boundaryField()[patchI]);
-    const scalarField& Tp = T_.boundaryField()[patchI];
-    const scalarField& Twp = Tw_.boundaryField()[patchI];
+    const scalarField htc(htcw_->h()().boundaryField()[patchi]);
+    const scalarField& Tp = T_.boundaryField()[patchi];
+    const scalarField& Twp = Tw_.boundaryField()[patchi];
 
     return htc*(Tp - Twp);
 }
 
 
-inline tmp<scalarField> thermoSingleLayer::Qconvp(const label patchI) const
+inline tmp<scalarField> thermoSingleLayer::Qconvp(const label patchi) const
 {
-    const scalarField htc(htcs_->h()().boundaryField()[patchI]);
-    const scalarField& Tp = T_.boundaryField()[patchI];
-    const scalarField& Tpp = TPrimary_.boundaryField()[patchI];
+    const scalarField htc(htcs_->h()().boundaryField()[patchi]);
+    const scalarField& Tp = T_.boundaryField()[patchi];
+    const scalarField& Tpp = TPrimary_.boundaryField()[patchi];
 
     return htc*(Tp - Tpp);
 }

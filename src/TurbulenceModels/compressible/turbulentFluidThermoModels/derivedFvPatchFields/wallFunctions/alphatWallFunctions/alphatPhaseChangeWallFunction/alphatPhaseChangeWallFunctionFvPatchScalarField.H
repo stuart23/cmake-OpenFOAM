@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,8 +30,9 @@ Group
 Description
     Abstract base-class for all alphatWallFunctions supporting phase-change.
 
-SeeAlso
-    Foam::alphatWallFunction
+See also
+    Foam::fixedValueFvPatchScalarField
+    Foam::alphatWallFunctionFvPatchScalarField
 
 SourceFiles
     alphatPhaseChangeWallFunctionFvPatchScalarField.C
@@ -51,7 +52,7 @@ namespace compressible
 {
 
 /*---------------------------------------------------------------------------*\
-            Class alphatPhaseChangeWallFunctionFvPatchScalarField Declaration
+       Class alphatPhaseChangeWallFunctionFvPatchScalarField Declaration
 \*---------------------------------------------------------------------------*/
 
 class alphatPhaseChangeWallFunctionFvPatchScalarField
@@ -64,6 +65,9 @@ protected:
 
         //- Rate of phase-change
         scalarField dmdt_;
+
+        //- Latent heat of the phase-change
+        scalarField mDotL_;
 
 
 public:
@@ -120,6 +124,12 @@ public:
         const scalarField& dmdt() const
         {
             return dmdt_;
+        }
+
+        //- Return the enthelpy source due to phase-change
+        const scalarField& mDotL() const
+        {
+            return mDotL_;
         }
 
         // Evaluation functions

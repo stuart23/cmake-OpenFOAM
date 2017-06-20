@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -45,7 +45,7 @@ SourceFiles
 #include "PtrListDictionary.H"
 
 #include "IOMRFZoneList.H"
-#include "fvIOoptionList.H"
+#include "fvOptions.H"
 
 #include "volFields.H"
 #include "surfaceFields.H"
@@ -57,7 +57,7 @@ namespace Foam
 {
 
 class blendingMethod;
-template <class modelType> class BlendedInterfacialModel;
+template<class modelType> class BlendedInterfacialModel;
 class surfaceTensionModel;
 class aspectRatioModel;
 
@@ -176,9 +176,6 @@ protected:
         //- Optional MRF zones
         IOMRFZoneList MRF_;
 
-        //- Optional FV-options
-        mutable fv::IOoptionList fvOptions_;
-
         //- Blending methods
         blendingMethodTable blendingMethods_;
 
@@ -239,7 +236,7 @@ protected:
             const word& modelName,
             HashTable
             <
-                autoPtr<BlendedInterfacialModel<modelType> >,
+                autoPtr<BlendedInterfacialModel<modelType>>,
                 phasePairKey,
                 phasePairKey::hash
             >& models
@@ -252,7 +249,7 @@ protected:
             const word& modelName,
             HashTable
             <
-                HashTable<autoPtr<modelType> >,
+                HashTable<autoPtr<modelType>>,
                 phasePairKey,
                 phasePairKey::hash
             >& models
@@ -310,6 +307,9 @@ public:
         //- Access the rate of change of the pressure
         inline volScalarField& dpdt();
 
+        //- Return the aspect-ratio
+        tmp<volScalarField> E(const phasePairKey& key) const;
+
         //- Return the surface tension coefficient
         tmp<volScalarField> sigma(const phasePairKey& key) const;
 
@@ -317,14 +317,14 @@ public:
         inline const IOMRFZoneList& MRF() const;
 
         //- Optional FV-options
-        inline fv::IOoptionList& fvOptions() const;
+        inline fv::options& fvOptions() const;
 
         //- Access a sub model between a phase pair
-        template <class modelType>
+        template<class modelType>
         const modelType& lookupSubModel(const phasePair& key) const;
 
         //- Access a sub model between two phases
-        template <class modelType>
+        template<class modelType>
         const modelType& lookupSubModel
         (
             const phaseModel& dispersed,
@@ -365,7 +365,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "phaseSystemTemplates.C"
+    #include "phaseSystemTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

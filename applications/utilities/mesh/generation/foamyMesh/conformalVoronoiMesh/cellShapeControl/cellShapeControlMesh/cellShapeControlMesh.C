@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -65,10 +65,8 @@ word cellShapeControlMesh::meshSubDir = "cellShapeControlMesh";
 //
 //    if (!surfHit.hit())
 //    {
-//        FatalErrorIn
-//        (
-//            "Foam::tensor Foam::conformalVoronoiMesh::requiredAlignment"
-//        )   << "findSurfaceNearest did not find a hit across the surfaces."
+//        FatalErrorInFunction
+//            << "findSurfaceNearest did not find a hit across the surfaces."
 //            << exit(FatalError) << endl;
 //    }
 //
@@ -174,13 +172,8 @@ word cellShapeControlMesh::meshSubDir = "cellShapeControlMesh";
 //
 //    if (closestSpokeSurface == -1)
 //    {
-////        WarningIn
-////        (
-////            "conformalVoronoiMesh::requiredAlignment"
-////            "("
-////                "const Foam::point& pt"
-////            ") const"
-////        )   << "No secondary surface hit found in spoke search "
+////        WarningInFunction
+////            << "No secondary surface hit found in spoke search "
 ////            << "using " << s
 ////            << " spokes, try increasing alignmentSearchSpokes."
 ////            << endl;
@@ -203,7 +196,7 @@ word cellShapeControlMesh::meshSubDir = "cellShapeControlMesh";
 //
 //    if (mag(ns) < SMALL)
 //    {
-//        FatalErrorIn("conformalVoronoiMesh::requiredAlignment")
+//        FatalErrorInFunction
 //            << "Parallel normals detected in spoke search." << nl
 //            << "point: " << pt << nl
 //            << "closest surface point: " << surfHit.hitPoint() << nl
@@ -269,7 +262,7 @@ Foam::label Foam::cellShapeControlMesh::removePoints()
 Foam::tmp<Foam::pointField> Foam::cellShapeControlMesh::cellCentres() const
 {
     tmp<pointField> tcellCentres(new pointField(number_of_finite_cells()));
-    pointField& cellCentres = tcellCentres();
+    pointField& cellCentres = tcellCentres.ref();
 
     label count = 0;
     for
@@ -355,10 +348,8 @@ void Foam::cellShapeControlMesh::writeTriangulation()
     }
     else
     {
-        FatalErrorIn
-        (
-            "Foam::triangulatedMesh::writeRefinementTriangulation()"
-        )   << "Triangulation is not valid"
+        FatalErrorInFunction
+            << "Triangulation is not valid"
             << abort(FatalError);
     }
 }
@@ -440,11 +431,8 @@ Foam::cellShapeControlMesh::cellShapeControlMesh(const Time& runTime)
             }
             else
             {
-                FatalErrorIn
-                (
-                    "Foam::cellShapeControlMesh::cellShapeControlMesh"
-                    "(const Time&)"
-                )   << "Cell size point field is not the same size as the "
+                FatalErrorInFunction
+                    << "Cell size point field is not the same size as the "
                     << "mesh."
                     << abort(FatalError);
             }
@@ -613,7 +601,7 @@ void Foam::cellShapeControlMesh::distribute
 
 Foam::tensorField Foam::cellShapeControlMesh::dumpAlignments() const
 {
-    tensorField alignmentsTmp(number_of_vertices(), tensor::zero);
+    tensorField alignmentsTmp(number_of_vertices(), Zero);
 
     label count = 0;
     for
@@ -758,7 +746,7 @@ Foam::label Foam::cellShapeControlMesh::estimateCellCount
     {
         if (!cit->hasFarPoint() && !is_infinite(cit))
         {
-            // @todo Check if tet centre is on the processor..
+            // TODO: Check if tet centre is on the processor..
             CGAL::Tetrahedron_3<baseK> tet
             (
                 cit->vertex(0)->point(),

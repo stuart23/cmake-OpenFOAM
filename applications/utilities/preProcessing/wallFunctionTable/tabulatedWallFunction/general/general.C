@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -119,15 +119,8 @@ Foam::scalar Foam::tabulatedWallFunctions::general::interpolate
         }
         default:
         {
-            FatalErrorIn
-            (
-                "tabulatedWallFunctions::general::interpolate"
-                "("
-                    "const scalar, "
-                    "const scalarList&, "
-                    "const scalarList&"
-                ")"
-            )   << "Unknown interpolation method" << nl
+            FatalErrorInFunction
+                << "Unknown interpolation method" << nl
                 << abort(FatalError);
         }
     }
@@ -151,17 +144,11 @@ Foam::tabulatedWallFunctions::general::general
     log10YPlus_(coeffDict_.lookup("log10YPlus")),
     log10UPlus_(coeffDict_.lookup("log10UPlus"))
 {
-    List<Tuple2<scalar, scalar> > inputTable = coeffDict_.lookup("inputTable");
+    List<Tuple2<scalar, scalar>> inputTable = coeffDict_.lookup("inputTable");
     if (inputTable.size() < 2)
     {
-        FatalErrorIn
-        (
-            "tabulatedWallFunctions::general::general"
-            "("
-                "const dictionary&, "
-                "const polyMesh&"
-            ")"
-        )   << "Input table must have at least 2 values" << nl
+        FatalErrorInFunction
+            << "Input table must have at least 2 values" << nl
             << exit(FatalError);
     }
 

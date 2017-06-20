@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -40,28 +40,28 @@ Foam::label Foam::fvMeshTools::addPatch
     polyBoundaryMesh& polyPatches =
         const_cast<polyBoundaryMesh&>(mesh.boundaryMesh());
 
-    label patchI = polyPatches.findPatchID(patch.name());
-    if (patchI != -1)
+    label patchi = polyPatches.findPatchID(patch.name());
+    if (patchi != -1)
     {
         // Already there
-        return patchI;
+        return patchi;
     }
 
 
     // Append at end unless there are processor patches
-    label insertPatchI = polyPatches.size();
-    label startFaceI = mesh.nFaces();
+    label insertPatchi = polyPatches.size();
+    label startFacei = mesh.nFaces();
 
     if (!isA<processorPolyPatch>(patch))
     {
-        forAll(polyPatches, patchI)
+        forAll(polyPatches, patchi)
         {
-            const polyPatch& pp = polyPatches[patchI];
+            const polyPatch& pp = polyPatches[patchi];
 
             if (isA<processorPolyPatch>(pp))
             {
-                insertPatchI = patchI;
-                startFaceI = pp.start();
+                insertPatchi = patchi;
+                startFacei = pp.start();
                 break;
             }
         }
@@ -86,9 +86,9 @@ Foam::label Foam::fvMeshTools::addPatch
         patch.clone
         (
             polyPatches,
-            insertPatchI,   //index
+            insertPatchi,   //index
             0,              //size
-            startFaceI      //start
+            startFacei      //start
         )
     );
     fvPatches.setSize(sz+1);
@@ -107,35 +107,35 @@ Foam::label Foam::fvMeshTools::addPatch
         mesh,
         patchFieldDict,
         defaultPatchFieldType,
-        pTraits<scalar>::zero
+        Zero
     );
     addPatchFields<volVectorField>
     (
         mesh,
         patchFieldDict,
         defaultPatchFieldType,
-        pTraits<vector>::zero
+        Zero
     );
     addPatchFields<volSphericalTensorField>
     (
         mesh,
         patchFieldDict,
         defaultPatchFieldType,
-        pTraits<sphericalTensor>::zero
+        Zero
     );
     addPatchFields<volSymmTensorField>
     (
         mesh,
         patchFieldDict,
         defaultPatchFieldType,
-        pTraits<symmTensor>::zero
+        Zero
     );
     addPatchFields<volTensorField>
     (
         mesh,
         patchFieldDict,
         defaultPatchFieldType,
-        pTraits<tensor>::zero
+        Zero
     );
 
     // Surface fields
@@ -145,51 +145,51 @@ Foam::label Foam::fvMeshTools::addPatch
         mesh,
         patchFieldDict,
         defaultPatchFieldType,
-        pTraits<scalar>::zero
+        Zero
     );
     addPatchFields<surfaceVectorField>
     (
         mesh,
         patchFieldDict,
         defaultPatchFieldType,
-        pTraits<vector>::zero
+        Zero
     );
     addPatchFields<surfaceSphericalTensorField>
     (
         mesh,
         patchFieldDict,
         defaultPatchFieldType,
-        pTraits<sphericalTensor>::zero
+        Zero
     );
     addPatchFields<surfaceSymmTensorField>
     (
         mesh,
         patchFieldDict,
         defaultPatchFieldType,
-        pTraits<symmTensor>::zero
+        Zero
     );
     addPatchFields<surfaceTensorField>
     (
         mesh,
         patchFieldDict,
         defaultPatchFieldType,
-        pTraits<tensor>::zero
+        Zero
     );
 
     // Create reordering list
     // patches before insert position stay as is
     labelList oldToNew(sz+1);
-    for (label i = 0; i < insertPatchI; i++)
+    for (label i = 0; i < insertPatchi; i++)
     {
         oldToNew[i] = i;
     }
     // patches after insert position move one up
-    for (label i = insertPatchI; i < sz; i++)
+    for (label i = insertPatchi; i < sz; i++)
     {
         oldToNew[i] = i+1;
     }
     // appended patch gets moved to insert position
-    oldToNew[sz] = insertPatchI;
+    oldToNew[sz] = insertPatchi;
 
     // Shuffle into place
     polyPatches.reorder(oldToNew, validBoundary);
@@ -206,67 +206,67 @@ Foam::label Foam::fvMeshTools::addPatch
     reorderPatchFields<surfaceSymmTensorField>(mesh, oldToNew);
     reorderPatchFields<surfaceTensorField>(mesh, oldToNew);
 
-    return insertPatchI;
+    return insertPatchi;
 }
 
 
 void Foam::fvMeshTools::setPatchFields
 (
     fvMesh& mesh,
-    const label patchI,
+    const label patchi,
     const dictionary& patchFieldDict
 )
 {
-    setPatchFields<volScalarField>(mesh, patchI, patchFieldDict);
-    setPatchFields<volVectorField>(mesh, patchI, patchFieldDict);
-    setPatchFields<volSphericalTensorField>(mesh, patchI, patchFieldDict);
-    setPatchFields<volSymmTensorField>(mesh, patchI, patchFieldDict);
-    setPatchFields<volTensorField>(mesh, patchI, patchFieldDict);
-    setPatchFields<surfaceScalarField>(mesh, patchI, patchFieldDict);
-    setPatchFields<surfaceVectorField>(mesh, patchI, patchFieldDict);
+    setPatchFields<volScalarField>(mesh, patchi, patchFieldDict);
+    setPatchFields<volVectorField>(mesh, patchi, patchFieldDict);
+    setPatchFields<volSphericalTensorField>(mesh, patchi, patchFieldDict);
+    setPatchFields<volSymmTensorField>(mesh, patchi, patchFieldDict);
+    setPatchFields<volTensorField>(mesh, patchi, patchFieldDict);
+    setPatchFields<surfaceScalarField>(mesh, patchi, patchFieldDict);
+    setPatchFields<surfaceVectorField>(mesh, patchi, patchFieldDict);
     setPatchFields<surfaceSphericalTensorField>
     (
         mesh,
-        patchI,
+        patchi,
         patchFieldDict
     );
-    setPatchFields<surfaceSymmTensorField>(mesh, patchI, patchFieldDict);
-    setPatchFields<surfaceTensorField>(mesh, patchI, patchFieldDict);
+    setPatchFields<surfaceSymmTensorField>(mesh, patchi, patchFieldDict);
+    setPatchFields<surfaceTensorField>(mesh, patchi, patchFieldDict);
 }
 
 
-void Foam::fvMeshTools::zeroPatchFields(fvMesh& mesh, const label patchI)
+void Foam::fvMeshTools::zeroPatchFields(fvMesh& mesh, const label patchi)
 {
-    setPatchFields<volScalarField>(mesh, patchI, pTraits<scalar>::zero);
-    setPatchFields<volVectorField>(mesh, patchI, pTraits<vector>::zero);
+    setPatchFields<volScalarField>(mesh, patchi, Zero);
+    setPatchFields<volVectorField>(mesh, patchi, Zero);
     setPatchFields<volSphericalTensorField>
     (
         mesh,
-        patchI,
-        pTraits<sphericalTensor>::zero
+        patchi,
+        Zero
     );
     setPatchFields<volSymmTensorField>
     (
         mesh,
-        patchI,
-        pTraits<symmTensor>::zero
+        patchi,
+        Zero
     );
-    setPatchFields<volTensorField>(mesh, patchI, pTraits<tensor>::zero);
-    setPatchFields<surfaceScalarField>(mesh, patchI, pTraits<scalar>::zero);
-    setPatchFields<surfaceVectorField>(mesh, patchI, pTraits<vector>::zero);
+    setPatchFields<volTensorField>(mesh, patchi, Zero);
+    setPatchFields<surfaceScalarField>(mesh, patchi, Zero);
+    setPatchFields<surfaceVectorField>(mesh, patchi, Zero);
     setPatchFields<surfaceSphericalTensorField>
     (
         mesh,
-        patchI,
-        pTraits<sphericalTensor>::zero
+        patchi,
+        Zero
     );
     setPatchFields<surfaceSymmTensorField>
     (
         mesh,
-        patchI,
-        pTraits<symmTensor>::zero
+        patchi,
+        Zero
     );
-    setPatchFields<surfaceTensorField>(mesh, patchI, pTraits<tensor>::zero);
+    setPatchFields<surfaceTensorField>(mesh, patchi, Zero);
 }
 
 
@@ -282,21 +282,21 @@ void Foam::fvMeshTools::trimPatches(fvMesh& mesh, const label nPatches)
 
     if (polyPatches.empty())
     {
-        FatalErrorIn("fvMeshTools::trimPatches(fvMesh&, const label)")
+        FatalErrorInFunction
             << "No patches in mesh"
             << abort(FatalError);
     }
 
     label nFaces = 0;
-    for (label patchI = nPatches; patchI < polyPatches.size(); patchI++)
+    for (label patchi = nPatches; patchi < polyPatches.size(); patchi++)
     {
-        nFaces += polyPatches[patchI].size();
+        nFaces += polyPatches[patchi].size();
     }
     reduce(nFaces, sumOp<label>());
 
     if (nFaces)
     {
-        FatalErrorIn("fvMeshTools::trimPatches(fvMesh&, const label)")
+        FatalErrorInFunction
             << "There are still " << nFaces
             << " faces in " << polyPatches.size()-nPatches
             << " patches to be deleted" << abort(FatalError);

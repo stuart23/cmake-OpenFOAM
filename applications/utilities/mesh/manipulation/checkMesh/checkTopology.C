@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,6 +33,8 @@ License
 #include "IOmanip.H"
 #include "emptyPolyPatch.H"
 #include "processorPolyPatch.H"
+#include "surfaceWriter.H"
+#include "checkTools.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -40,7 +42,8 @@ Foam::label Foam::checkTopology
 (
     const polyMesh& mesh,
     const bool allTopology,
-    const bool allGeometry
+    const bool allGeometry,
+    const autoPtr<surfaceWriter>& writer
 )
 {
     label noFailedChecks = 0;
@@ -53,11 +56,11 @@ Foam::label Foam::checkTopology
     // Check that empty patches cover all sides of the mesh
     {
         label nEmpty = 0;
-        forAll(mesh.boundaryMesh(), patchI)
+        forAll(mesh.boundaryMesh(), patchi)
         {
-            if (isA<emptyPolyPatch>(mesh.boundaryMesh()[patchI]))
+            if (isA<emptyPolyPatch>(mesh.boundaryMesh()[patchi]))
             {
-                nEmpty += mesh.boundaryMesh()[patchI].size();
+                nEmpty += mesh.boundaryMesh()[patchi].size();
             }
         }
         reduce(nEmpty, sumOp<label>());
@@ -97,19 +100,19 @@ Foam::label Foam::checkTopology
     {
         cellSet cells(mesh, "illegalCells", mesh.nCells()/100);
 
-        forAll(mesh.cells(), cellI)
+        forAll(mesh.cells(), celli)
         {
-            const cell& cFaces = mesh.cells()[cellI];
+            const cell& cFaces = mesh.cells()[celli];
 
             if (cFaces.size() <= 3)
             {
-                cells.insert(cellI);
+                cells.insert(celli);
             }
             forAll(cFaces, i)
             {
                 if (cFaces[i] < 0 || cFaces[i] >= mesh.nFaces())
                 {
-                    cells.insert(cellI);
+                    cells.insert(celli);
                     break;
                 }
             }
@@ -126,6 +129,11 @@ Foam::label Foam::checkTopology
                 << " illegal cells to set " << cells.name() << endl;
             cells.instance() = mesh.pointsInstance();
             cells.write();
+            if (writer.valid())
+            {
+                mergeAndWrite(writer(), cells);
+            }
+
         }
         else
         {
@@ -164,6 +172,10 @@ Foam::label Foam::checkTopology
                 << " unordered faces to set " << faces.name() << endl;
             faces.instance() = mesh.pointsInstance();
             faces.write();
+            if (writer.valid())
+            {
+                mergeAndWrite(writer(), faces);
+            }
         }
     }
 
@@ -180,6 +192,10 @@ Foam::label Foam::checkTopology
                 << faces.name() << endl;
             faces.instance() = mesh.pointsInstance();
             faces.write();
+            if (writer.valid())
+            {
+                mergeAndWrite(writer(), faces);
+            }
         }
     }
 
@@ -197,6 +213,11 @@ Foam::label Foam::checkTopology
                 << endl;
             cells.instance() = mesh.pointsInstance();
             cells.write();
+            if (writer.valid())
+            {
+                mergeAndWrite(writer(), cells);
+            }
+
         }
     }
 
@@ -216,6 +237,10 @@ Foam::label Foam::checkTopology
                 << faces.name() << endl;
             faces.instance() = mesh.pointsInstance();
             faces.write();
+            if (writer.valid())
+            {
+                mergeAndWrite(writer(), faces);
+            }
         }
     }
 
@@ -223,17 +248,17 @@ Foam::label Foam::checkTopology
     {
         labelList nInternalFaces(mesh.nCells(), 0);
 
-        for (label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
+        for (label facei = 0; facei < mesh.nInternalFaces(); facei++)
         {
-            nInternalFaces[mesh.faceOwner()[faceI]]++;
-            nInternalFaces[mesh.faceNeighbour()[faceI]]++;
+            nInternalFaces[mesh.faceOwner()[facei]]++;
+            nInternalFaces[mesh.faceNeighbour()[facei]]++;
         }
         const polyBoundaryMesh& patches = mesh.boundaryMesh();
-        forAll(patches, patchI)
+        forAll(patches, patchi)
         {
-            if (patches[patchI].coupled())
+            if (patches[patchi].coupled())
             {
-                const labelUList& owners = patches[patchI].faceCells();
+                const labelUList& owners = patches[patchi].faceCells();
 
                 forAll(owners, i)
                 {
@@ -245,15 +270,15 @@ Foam::label Foam::checkTopology
         cellSet oneCells(mesh, "oneInternalFaceCells", mesh.nCells()/100);
         cellSet twoCells(mesh, "twoInternalFacesCells", mesh.nCells()/100);
 
-        forAll(nInternalFaces, cellI)
+        forAll(nInternalFaces, celli)
         {
-            if (nInternalFaces[cellI] <= 1)
+            if (nInternalFaces[celli] <= 1)
             {
-                oneCells.insert(cellI);
+                oneCells.insert(celli);
             }
-            else if (nInternalFaces[cellI] == 2)
+            else if (nInternalFaces[celli] == 2)
             {
-                twoCells.insert(cellI);
+                twoCells.insert(celli);
             }
         }
 
@@ -267,6 +292,10 @@ Foam::label Foam::checkTopology
                 << endl;
             oneCells.instance() = mesh.pointsInstance();
             oneCells.write();
+            if (writer.valid())
+            {
+                mergeAndWrite(writer(), oneCells);
+            }
         }
 
         label nTwoCells = returnReduce(twoCells.size(), sumOp<label>());
@@ -279,6 +308,10 @@ Foam::label Foam::checkTopology
                 << endl;
             twoCells.instance() = mesh.pointsInstance();
             twoCells.write();
+            if (writer.valid())
+            {
+                mergeAndWrite(writer(), twoCells);
+            }
         }
     }
 
@@ -316,6 +349,53 @@ Foam::label Foam::checkTopology
             ctr.write();
 
 
+
+            // Is region disconnected
+            boolList regionDisconnected(rs.nRegions(), true);
+            if (allTopology)
+            {
+                // -1   : not assigned
+                // -2   : multiple regions
+                // >= 0 : single region
+                labelList pointToRegion(mesh.nPoints(), -1);
+
+                for
+                (
+                    label faceI = mesh.nInternalFaces();
+                    faceI < mesh.nFaces();
+                    faceI++
+                )
+                {
+                    label regionI = rs[mesh.faceOwner()[faceI]];
+                    const face& f = mesh.faces()[faceI];
+                    forAll(f, fp)
+                    {
+                        label& pRegion = pointToRegion[f[fp]];
+                        if (pRegion == -1)
+                        {
+                            pRegion = regionI;
+                        }
+                        else if (pRegion == -2)
+                        {
+                            // Already marked
+                            regionDisconnected[regionI] = false;
+                        }
+                        else if (pRegion != regionI)
+                        {
+                            // Multiple regions
+                            regionDisconnected[regionI] = false;
+                            regionDisconnected[pRegion] = false;
+                            pRegion = -2;
+                        }
+                    }
+                }
+
+                Pstream::listCombineGather(regionDisconnected, andEqOp<bool>());
+                Pstream::listCombineScatter(regionDisconnected);
+            }
+
+
+
             // write cellSet for each region
             PtrList<cellSet> cellRegions(rs.nRegions());
             for (label i = 0; i < rs.nRegions(); i++)
@@ -339,7 +419,19 @@ Foam::label Foam::checkTopology
 
             for (label i = 0; i < rs.nRegions(); i++)
             {
-                Info<< "  <<Writing region " << i << " with "
+                Info<< "  <<Writing region " << i;
+                if (allTopology)
+                {
+                    if (regionDisconnected[i])
+                    {
+                        Info<< " (fully disconnected)";
+                    }
+                    else
+                    {
+                        Info<< " (point connected)";
+                    }
+                }
+                Info<< " with "
                     << returnReduce(cellRegions[i].size(), sumOp<scalar>())
                     << " cells to cellSet " << cellRegions[i].name() << endl;
 
@@ -387,9 +479,9 @@ Foam::label Foam::checkTopology
         }
         Info<< endl;
 
-        forAll(patches, patchI)
+        forAll(patches, patchi)
         {
-            const polyPatch& pp = patches[patchI];
+            const polyPatch& pp = patches[patchi];
 
             if (!isA<processorPolyPatch>(pp))
             {
@@ -446,7 +538,7 @@ Foam::label Foam::checkTopology
                     if (returnReduce(mp.size(), sumOp<label>()) > 0)
                     {
                         boundBox bb(point::max, point::min);
-                        forAll (mp, i)
+                        forAll(mp, i)
                         {
                             bb.min() = min(bb.min(), pts[mp[i]]);
                             bb.max() = max(bb.max(), pts[mp[i]]);

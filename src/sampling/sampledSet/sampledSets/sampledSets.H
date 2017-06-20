@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -36,6 +36,7 @@ SourceFiles
 #ifndef sampledSets_H
 #define sampledSets_H
 
+#include "functionObject.H"
 #include "sampledSet.H"
 #include "volFieldsFwd.H"
 #include "meshSearch.H"
@@ -49,6 +50,8 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
+class Time;
 class objectRegistry;
 class dictionary;
 class fvMesh;
@@ -59,6 +62,7 @@ class fvMesh;
 
 class sampledSets
 :
+    public functionObject,
     public PtrList<sampledSet>
 {
     // Private classes
@@ -72,7 +76,7 @@ class sampledSets
         public:
 
             //- The set formatter
-            autoPtr< writer<Type> > formatter;
+            autoPtr<writer<Type>> formatter;
 
             //- Construct null
             fieldGroup()
@@ -108,7 +112,7 @@ class sampledSets
         template<class Type>
         class volFieldSampler
         :
-            public List<Field<Type> >
+            public List<Field<Type>>
         {
             //- Name of this collection of values
             const word name_;
@@ -133,7 +137,7 @@ class sampledSets
             //- Construct from components
             volFieldSampler
             (
-                const List<Field<Type> >& values,
+                const List<Field<Type>>& values,
                 const word& name
             );
 
@@ -152,10 +156,6 @@ class sampledSets
 
 
     // Private data
-
-        //- Name of this set of sets,
-        //  Also used as the name of the sampledSets directory.
-        word name_;
 
         //- Const reference to fvMesh
         const fvMesh& mesh_;
@@ -224,16 +224,16 @@ class sampledSets
         template<class T>
         void combineSampledValues
         (
-            const PtrList<volFieldSampler<T> >& sampledFields,
+            const PtrList<volFieldSampler<T>>& sampledFields,
             const labelListList& indexSets,
-            PtrList<volFieldSampler<T> >& masterFields
+            PtrList<volFieldSampler<T>>& masterFields
         );
 
         template<class Type>
         void writeSampleFile
         (
             const coordSet& masterSampleSet,
-            const PtrList<volFieldSampler<Type> >& masterFields,
+            const PtrList<volFieldSampler<Type>>& masterFields,
             const label setI,
             const fileName& timeDir,
             const writer<Type>& formatter
@@ -256,6 +256,14 @@ public:
 
     // Constructors
 
+        //- Construct from Time and dictionary
+        sampledSets
+        (
+            const word& name,
+            const Time& time,
+            const dictionary& dict
+        );
+
         //- Construct for given objectRegistry and dictionary
         //  allow the possibility to load fields from files
         sampledSets
@@ -273,29 +281,17 @@ public:
 
     // Member Functions
 
-        //- Return name of the set of probes
-        virtual const word& name() const
-        {
-            return name_;
-        }
-
         //- Set verbosity level
         void verbose(const bool verbosity = true);
 
+        //- Read the sampledSets
+        virtual bool read(const dictionary&);
+
         //- Execute, currently does nothing
-        virtual void execute();
-
-        //- Execute at the final time-loop, currently does nothing
-        virtual void end();
-
-        //- Called when time was set at the end of the Time::operator++
-        virtual void timeSet();
+        virtual bool execute();
 
         //- Sample and write
-        virtual void write();
-
-        //- Read the sampledSets
-        virtual void read(const dictionary&);
+        virtual bool write();
 
         //- Correct for mesh changes
         void correct();
@@ -318,7 +314,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "sampledSetsTemplates.C"
+    #include "sampledSetsTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

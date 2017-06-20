@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -50,13 +50,13 @@ inline Foam::constAnIsoSolidTransport<Thermo>::constAnIsoSolidTransport
 
 
 template<class Thermo>
-inline Foam::autoPtr<Foam::constAnIsoSolidTransport<Thermo> >
+inline Foam::autoPtr<Foam::constAnIsoSolidTransport<Thermo>>
 Foam::constAnIsoSolidTransport<Thermo>::New
 (
     const dictionary& dict
 )
 {
-    return autoPtr<constAnIsoSolidTransport<Thermo> >
+    return autoPtr<constAnIsoSolidTransport<Thermo>>
     (
         new constAnIsoSolidTransport<Thermo>(dict)
     );
@@ -83,13 +83,7 @@ template<class Thermo>
 inline Foam::scalar Foam::constAnIsoSolidTransport<Thermo>::
 mu(const scalar p, const scalar T) const
 {
-    notImplemented
-    (
-        "Foam::scalar Foam::constAnIsoSolidTransport<Thermo>mu::"
-        "("
-        "    const scalar p, const scalar T"
-        ") const"
-    );
+    NotImplemented;
     return scalar(0);
 }
 
@@ -98,21 +92,18 @@ template<class Thermo>
 inline Foam::vector Foam::constAnIsoSolidTransport<Thermo>::
 alphah(const scalar p, const scalar T) const
 {
-    return kappa_/this->Cpv(p, T);
+    return kappa_/this->Cp(p, T);
 }
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class Thermo>
-inline Foam::constAnIsoSolidTransport<Thermo>&
-Foam::constAnIsoSolidTransport<Thermo>::operator=
+inline void Foam::constAnIsoSolidTransport<Thermo>::operator=
 (
     const constAnIsoSolidTransport<Thermo>& ct
 )
 {
     kappa_ = ct.kappa_;
-
-    return *this;
 }
 
 

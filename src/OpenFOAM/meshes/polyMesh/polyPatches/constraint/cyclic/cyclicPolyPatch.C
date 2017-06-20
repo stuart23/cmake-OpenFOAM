@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -29,11 +29,9 @@ License
 #include "polyMesh.H"
 #include "demandDrivenData.H"
 #include "OFstream.H"
-#include "patchZones.H"
 #include "matchPoints.H"
 #include "EdgeMap.H"
 #include "Time.H"
-#include "diagTensor.H"
 #include "transformField.H"
 #include "SubField.H"
 #include "unitConversion.H"
@@ -60,14 +58,14 @@ Foam::label Foam::cyclicPolyPatch::findMaxArea
     label maxI = -1;
     scalar maxAreaSqr = -GREAT;
 
-    forAll(faces, faceI)
+    forAll(faces, facei)
     {
-        scalar areaSqr = magSqr(faces[faceI].normal(points));
+        scalar areaSqr = magSqr(faces[facei].normal(points));
 
         if (areaSqr > maxAreaSqr)
         {
             maxAreaSqr = areaSqr;
-            maxI = faceI;
+            maxI = facei;
         }
     }
     return maxI;
@@ -155,10 +153,8 @@ void Foam::cyclicPolyPatch::calcTransforms
 
     if (half0Ctrs.size() != half1Ctrs.size())
     {
-        FatalErrorIn
-        (
-            "cyclicPolyPatch::calcTransforms()"
-        )   << "For patch " << name()
+        FatalErrorInFunction
+            << "For patch " << name()
             << " there are " << half0Ctrs.size()
             << " face centres, for the neighbour patch " << neighbPatch().name()
             << " there are " << half1Ctrs.size()
@@ -167,10 +163,8 @@ void Foam::cyclicPolyPatch::calcTransforms
 
     if (transform() != neighbPatch().transform())
     {
-        FatalErrorIn
-        (
-            "cyclicPolyPatch::calcTransforms()"
-        )   << "Patch " << name()
+        FatalErrorInFunction
+            << "Patch " << name()
             << " has transform type " << transformTypeNames[transform()]
             << ", neighbour patch " << neighbPatchName()
             << " has transform type "
@@ -215,10 +209,8 @@ void Foam::cyclicPolyPatch::calcTransforms
 
                 if (areaDiff > matchTolerance())
                 {
-                    FatalErrorIn
-                    (
-                        "cyclicPolyPatch::calcTransforms()"
-                    )   << "face " << facei
+                    FatalErrorInFunction
+                        << "face " << facei
                         << " area does not match neighbour by "
                         << 100*areaDiff
                         << "% -- possible face ordering problem." << endl
@@ -347,10 +339,8 @@ void Foam::cyclicPolyPatch::calcTransforms
                   > avgTol
                 )
                 {
-                    WarningIn
-                    (
-                        "cyclicPolyPatch::calcTransforms()"
-                    )   << "Specified separation vector " << separationVector_
+                    WarningInFunction
+                        << "Specified separation vector " << separationVector_
                         << " differs by that of neighbouring patch "
                         << neighbPatch().separationVector_
                         << " by more than tolerance " << avgTol << endl
@@ -367,10 +357,8 @@ void Foam::cyclicPolyPatch::calcTransforms
                  || mag(separation()[0] - separationVector_) > avgTol
                 )
                 {
-                    WarningIn
-                    (
-                        "cyclicPolyPatch::calcTransforms()"
-                    )   << "Specified separationVector " << separationVector_
+                    WarningInFunction
+                        << "Specified separationVector " << separationVector_
                         << " differs from computed separation vector "
                         << separation() << endl
                         << "This probably means your geometry is not consistent"
@@ -464,20 +452,20 @@ void Foam::cyclicPolyPatch::getCentresAndAnchors
                 const tensor revT(E1.T() & E0);
 
                 // Rotation
-                forAll(half0Ctrs, faceI)
+                forAll(half0Ctrs, facei)
                 {
-                    half0Ctrs[faceI] =
+                    half0Ctrs[facei] =
                         Foam::transform
                         (
                             revT,
-                            half0Ctrs[faceI] - rotationCentre_
+                            half0Ctrs[facei] - rotationCentre_
                         )
                       + rotationCentre_;
-                    anchors0[faceI] =
+                    anchors0[facei] =
                         Foam::transform
                         (
                             revT,
-                            anchors0[faceI] - rotationCentre_
+                            anchors0[facei] - rotationCentre_
                         )
                       + rotationCentre_;
                 }
@@ -532,17 +520,17 @@ void Foam::cyclicPolyPatch::getCentresAndAnchors
                     const tensor revT(rotationTensor(n0, -n1));
 
                     // Rotation
-                    forAll(half0Ctrs, faceI)
+                    forAll(half0Ctrs, facei)
                     {
-                        half0Ctrs[faceI] = Foam::transform
+                        half0Ctrs[facei] = Foam::transform
                         (
                             revT,
-                            half0Ctrs[faceI]
+                            half0Ctrs[facei]
                         );
-                        anchors0[faceI] = Foam::transform
+                        anchors0[facei] = Foam::transform
                         (
                             revT,
-                            anchors0[faceI]
+                            anchors0[facei]
                         );
                     }
                 }
@@ -586,18 +574,18 @@ Foam::vector Foam::cyclicPolyPatch::findFaceMaxRadius
 
     const scalarField magRadSqr(magSqr(n));
 
-    label faceI = findMax(magRadSqr);
+    label facei = findMax(magRadSqr);
 
     if (debug)
     {
         Info<< "findFaceMaxRadius(const pointField&) : patch: " << name() << nl
-            << "    rotFace  = " << faceI << nl
-            << "    point    = " << faceCentres[faceI] << nl
-            << "    distance = " << Foam::sqrt(magRadSqr[faceI])
+            << "    rotFace  = " << facei << nl
+            << "    point    = " << faceCentres[facei] << nl
+            << "    distance = " << Foam::sqrt(magRadSqr[facei])
             << endl;
     }
 
-    return n[faceI];
+    return n[facei];
 }
 
 
@@ -617,9 +605,9 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
     coupledPolyPatch(name, size, start, index, bm, patchType, transform),
     neighbPatchName_(word::null),
     neighbPatchID_(-1),
-    rotationAxis_(vector::zero),
-    rotationCentre_(point::zero),
-    separationVector_(vector::zero),
+    rotationAxis_(Zero),
+    rotationCentre_(Zero),
+    separationVector_(Zero),
     coupledPointsPtr_(NULL),
     coupledEdgesPtr_(NULL)
 {
@@ -669,23 +657,16 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
     neighbPatchName_(dict.lookupOrDefault("neighbourPatch", word::null)),
     coupleGroup_(dict),
     neighbPatchID_(-1),
-    rotationAxis_(vector::zero),
-    rotationCentre_(point::zero),
-    separationVector_(vector::zero),
+    rotationAxis_(Zero),
+    rotationCentre_(Zero),
+    separationVector_(Zero),
     coupledPointsPtr_(NULL),
     coupledEdgesPtr_(NULL)
 {
     if (neighbPatchName_ == word::null && !coupleGroup_.valid())
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "cyclicPolyPatch::cyclicPolyPatch\n"
-            "(\n"
-            "    const word& name,\n"
-            "    const dictionary& dict,\n"
-            "    const label index,\n"
-            "    const polyBoundaryMesh& bm\n"
-            ")",
             dict
         )   << "No \"neighbourPatch\" provided." << endl
             << "Is your mesh uptodate with split cyclics?" << endl
@@ -695,7 +676,7 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
 
     if (neighbPatchName_ == name)
     {
-        FatalIOErrorIn("cyclicPolyPatch::cyclicPolyPatch(..)", dict)
+        FatalIOErrorInFunction(dict)
             << "Neighbour patch name " << neighbPatchName_
             << " cannot be the same as this patch " << name
             << exit(FatalIOError);
@@ -711,7 +692,7 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
             scalar magRot = mag(rotationAxis_);
             if (magRot < SMALL)
             {
-                FatalIOErrorIn("cyclicPolyPatch::cyclicPolyPatch(..)", dict)
+                FatalIOErrorInFunction(dict)
                     << "Illegal rotationAxis " << rotationAxis_ << endl
                     << "Please supply a non-zero vector."
                     << exit(FatalIOError);
@@ -779,7 +760,7 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
 {
     if (neighbName == name())
     {
-        FatalErrorIn("cyclicPolyPatch::cyclicPolyPatch(..)")
+        FatalErrorInFunction
             << "Neighbour patch name " << neighbName
             << " cannot be the same as this patch " << name()
             << exit(FatalError);
@@ -843,7 +824,7 @@ Foam::label Foam::cyclicPolyPatch::neighbPatchID() const
 
         if (neighbPatchID_ == -1)
         {
-            FatalErrorIn("cyclicPolyPatch::neighbPatchID() const")
+            FatalErrorInFunction
                 << "Illegal neighbourPatch name " << neighbPatchName()
                 << endl << "Valid patch names are "
                 << this->boundaryMesh().names()
@@ -858,7 +839,7 @@ Foam::label Foam::cyclicPolyPatch::neighbPatchID() const
 
         if (nbrPatch.neighbPatchName() != name())
         {
-            WarningIn("cyclicPolyPatch::neighbPatchID() const")
+            WarningInFunction
                 << "Patch " << name()
                 << " specifies neighbour patch " << neighbPatchName()
                 << endl << " but that in return specifies "
@@ -1042,10 +1023,10 @@ const Foam::edgeList& Foam::cyclicPolyPatch::coupledPoints() const
         // From local point to nbrPatch or -1.
         labelList coupledPoint(nPoints(), -1);
 
-        forAll(*this, patchFaceI)
+        forAll(*this, patchFacei)
         {
-            const face& fA = localFaces()[patchFaceI];
-            const face& fB = nbrLocalFaces[patchFaceI];
+            const face& fA = localFaces()[patchFacei];
+            const face& fB = nbrLocalFaces[patchFacei];
 
             forAll(fA, indexA)
             {
@@ -1128,9 +1109,9 @@ const Foam::edgeList& Foam::cyclicPolyPatch::coupledEdges() const
         // Map from edge on A to points (in B indices)
         EdgeMap<label> edgeMap(nEdges());
 
-        forAll(*this, patchFaceI)
+        forAll(*this, patchFacei)
         {
-            const labelList& fEdges = faceEdges()[patchFaceI];
+            const labelList& fEdges = faceEdges()[patchFacei];
 
             forAll(fEdges, i)
             {
@@ -1163,9 +1144,9 @@ const Foam::edgeList& Foam::cyclicPolyPatch::coupledEdges() const
         edgeList& coupledEdges = *coupledEdgesPtr_;
         label coupleI = 0;
 
-        forAll(neighbPatch, patchFaceI)
+        forAll(neighbPatch, patchFacei)
         {
-            const labelList& fEdges = neighbPatch.faceEdges()[patchFaceI];
+            const labelList& fEdges = neighbPatch.faceEdges()[patchFacei];
 
             forAll(fEdges, i)
             {
@@ -1207,7 +1188,7 @@ const Foam::edgeList& Foam::cyclicPolyPatch::coupledEdges() const
 
             if (e[0] < 0 || e[1] < 0)
             {
-                FatalErrorIn("cyclicPolyPatch::coupledEdges() const")
+                FatalErrorInFunction
                     << "Problem : at position " << i
                     << " illegal couple:" << e
                     << abort(FatalError);
@@ -1301,9 +1282,9 @@ bool Foam::cyclicPolyPatch::order
     {
         // Do nothing (i.e. identical mapping, zero rotation).
         // See comment at top.
-        forAll(faceMap, patchFaceI)
+        forAll(faceMap, patchFacei)
         {
-            faceMap[patchFaceI] = patchFaceI;
+            faceMap[patchFacei] = patchFacei;
         }
 
         return false;
@@ -1395,11 +1376,8 @@ bool Foam::cyclicPolyPatch::order
 
         if (!matchedAll)
         {
-            SeriousErrorIn
-            (
-                "cyclicPolyPatch::order"
-                "(const primitivePatch&, labelList&, labelList&) const"
-            )   << "Patch:" << name() << " : "
+            SeriousErrorInFunction
+                << "Patch:" << name() << " : "
                 << "Cannot match vectors to faces on both sides of patch"
                 << endl
                 << "    Perhaps your faces do not match?"
@@ -1412,35 +1390,32 @@ bool Foam::cyclicPolyPatch::order
 
 
         // Set rotation.
-        forAll(faceMap, oldFaceI)
+        forAll(faceMap, oldFacei)
         {
-            // The face f will be at newFaceI (after morphing) and we want its
+            // The face f will be at newFacei (after morphing) and we want its
             // anchorPoint (= f[0]) to align with the anchorpoint for the
             // corresponding face on the other side.
 
-            label newFaceI = faceMap[oldFaceI];
+            label newFacei = faceMap[oldFacei];
 
-            const point& wantedAnchor = anchors0[newFaceI];
+            const point& wantedAnchor = anchors0[newFacei];
 
-            rotation[newFaceI] = getRotation
+            rotation[newFacei] = getRotation
             (
                 pp.points(),
-                pp[oldFaceI],
+                pp[oldFacei],
                 wantedAnchor,
-                tols[oldFaceI]
+                tols[oldFacei]
             );
 
-            if (rotation[newFaceI] == -1)
+            if (rotation[newFacei] == -1)
             {
-                SeriousErrorIn
-                (
-                    "cyclicPolyPatch::order(const primitivePatch&"
-                    ", labelList&, labelList&) const"
-                )   << "in patch " << name()
+                SeriousErrorInFunction
+                    << "in patch " << name()
                     << " : "
-                    << "Cannot find point on face " << pp[oldFaceI]
+                    << "Cannot find point on face " << pp[oldFacei]
                     << " with vertices "
-                    << IndirectList<point>(pp.points(), pp[oldFaceI])()
+                    << IndirectList<point>(pp.points(), pp[oldFacei])()
                     << " that matches point " << wantedAnchor
                     << " when matching the halves of processor patch " << name()
                     << "Continuing with incorrect face ordering from now on!"
@@ -1454,9 +1429,9 @@ bool Foam::cyclicPolyPatch::order
 
         // Return false if no change neccesary, true otherwise.
 
-        forAll(faceMap, faceI)
+        forAll(faceMap, facei)
         {
-            if (faceMap[faceI] != faceI || rotation[faceI] != 0)
+            if (faceMap[facei] != facei || rotation[facei] != 0)
             {
                 return true;
             }

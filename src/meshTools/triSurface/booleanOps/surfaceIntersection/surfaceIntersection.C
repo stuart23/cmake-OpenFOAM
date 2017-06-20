@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -52,11 +52,11 @@ bool Foam::surfaceIntersection::excludeEdgeHit
 (
     const triSurface& surf,
     const label edgeI,
-    const label faceI,
+    const label facei,
     const scalar
 )
 {
-    const triSurface::FaceType& f = surf.localFaces()[faceI];
+    const triSurface::FaceType& f = surf.localFaces()[facei];
     const edge& e = surf.edges()[edgeI];
 
     forAll(f, fp)
@@ -72,7 +72,7 @@ bool Foam::surfaceIntersection::excludeEdgeHit
 //        vector eVec = e.vec(surf.localPoints());
 //        eVec /= mag(eVec) + VSMALL;
 //
-//        const labelList& eLabels = surf.faceEdges()[faceI];
+//        const labelList& eLabels = surf.faceEdges()[facei];
 //
 //        // Get edge vector of 0th edge of face
 //        vector e0Vec = surf.edges()[eLabels[0]].vec(surf.localPoints());
@@ -97,12 +97,12 @@ bool Foam::surfaceIntersection::excludeEdgeHit
 //        }
 //
 //        // Check if same as faceNormal
-//        if (mag(n & surf.faceNormals()[faceI]) > 1-tol)
+//        if (mag(n & surf.faceNormals()[facei]) > 1-tol)
 //        {
 //
-//            Pout<< "edge:" << e << "  face:" << faceI
+//            Pout<< "edge:" << e << "  face:" << facei
 //                << "  e0Vec:" << e0Vec << "  n:" << n
-//                << "  normalComponent:" << (n & surf.faceNormals()[faceI])
+//                << "  normalComponent:" << (n & surf.faceNormals()[facei])
 //                << "  tol:" << tol << endl;
 //
 //            return true;
@@ -117,13 +117,13 @@ bool Foam::surfaceIntersection::excludeEdgeHit
 }
 
 
-//// Find intersection of plane with edges of hitFaceI. Returns
+//// Find intersection of plane with edges of hitFacei. Returns
 //// - edgeI
 //// - intersection point
 //Foam::pointIndexHit Foam::surfaceIntersection::faceEdgeIntersection
 //(
 //    const triSurface& surf,
-//    const label hitFaceI,
+//    const label hitFacei,
 //
 //    const vector& n,
 //    const point& eStart,
@@ -134,7 +134,7 @@ bool Foam::surfaceIntersection::excludeEdgeHit
 //
 //    const pointField& points = surf.points();
 //
-//    const triSurface::FaceType& f = surf.localFaces()[hitFaceI];
+//    const triSurface::FaceType& f = surf.localFaces()[hitFacei];
 //
 //    // Plane for intersect test.
 //    plane pl(eStart, n);
@@ -172,7 +172,7 @@ bool Foam::surfaceIntersection::excludeEdgeHit
 //                    meshTools::findEdge
 //                    (
 //                        surf.edges(),
-//                        surf.faceEdges()[hitFaceI],
+//                        surf.faceEdges()[hitFacei],
 //                        f[fp],
 //                        f[fp1]
 //                    );
@@ -184,9 +184,9 @@ bool Foam::surfaceIntersection::excludeEdgeHit
 //        }
 //    }
 //
-//    FatalErrorIn("surfaceIntersection::borderEdgeIntersection")
+//    FatalErrorInFunction
 //        << "Did not find intersection of plane " << pl
-//        << " with edges of face " << hitFaceI << " verts:" << f
+//        << " with edges of face " << hitFacei << " verts:" << f
 //        << abort(FatalError);
 //
 //    return pInter;
@@ -239,13 +239,8 @@ void Foam::surfaceIntersection::storeIntersection
 
             if (mag(prevHit - thisHit) < SMALL)
             {
-                WarningIn
-                (
-                    "Foam::surfaceIntersection::storeIntersection"
-                    "(const bool isFirstSurf, const labelList& facesA,"
-                    "const label faceB, DynamicList<edge>& allCutEdges,"
-                    "DynamicList<point>& allCutPoints)"
-                )   << "Encountered degenerate edge between face "
+                WarningInFunction
+                    << "Encountered degenerate edge between face "
                     << twoFaces[0] << " on first surface"
                     << " and face " << twoFaces[1] << " on second surface"
                     << endl
@@ -287,7 +282,7 @@ void Foam::surfaceIntersection::classifyHit
 
     DynamicList<edge>& allCutEdges,
     DynamicList<point>& allCutPoints,
-    List<DynamicList<label> >& surfEdgeCuts
+    List<DynamicList<label>>& surfEdgeCuts
 )
 {
     const edge& e = surf1.edges()[edgeI];
@@ -295,11 +290,11 @@ void Foam::surfaceIntersection::classifyHit
     const labelList& facesA = surf1.edgeFaces()[edgeI];
 
     // Label of face on surface2 edgeI intersected
-    label surf2FaceI = pHit.index();
+    label surf2Facei = pHit.index();
 
     // Classify point on surface2
 
-    const triSurface::FaceType& f2 = surf2.localFaces()[surf2FaceI];
+    const triSurface::FaceType& f2 = surf2.localFaces()[surf2Facei];
     const pointField& surf2Pts = surf2.localPoints();
 
     label nearType, nearLabel;
@@ -365,7 +360,7 @@ void Foam::surfaceIntersection::classifyHit
         {
             // 3. Point hits edge. Do nothing on this side. Reverse
             // is handled by 2 (edge hits point)
-            label edge2I = getEdge(surf2, surf2FaceI, nearLabel);
+            label edge2I = getEdge(surf2, surf2Facei, nearLabel);
             const edge& e2 = surf2.edges()[edge2I];
 
             if (debug&2)
@@ -385,7 +380,7 @@ void Foam::surfaceIntersection::classifyHit
             // doing the surf2 with surf1 intersection but these
             // are merged later on)
 
-            label edge2I = getEdge(surf2, surf2FaceI, nearLabel);
+            label edge2I = getEdge(surf2, surf2Facei, nearLabel);
             const edge& e2 = surf2.edges()[edge2I];
 
             if (debug&2)
@@ -435,7 +430,7 @@ void Foam::surfaceIntersection::classifyHit
             {
                 Pout<< pHit.hitPoint() << " is surf1:"
                     << " end point of edge " << e
-                    << " surf2: face " << surf2FaceI
+                    << " surf2: face " << surf2Facei
                     << endl;
             }
 
@@ -470,12 +465,12 @@ void Foam::surfaceIntersection::classifyHit
                     << pHit.hitPoint() << " is surf1:"
                     << " end point of edge " << e << " coord:"
                     << surf1.localPoints()[nearVert]
-                    << " surf2: face " << surf2FaceI << endl;
+                    << " surf2: face " << surf2Facei << endl;
             }
 
             vector eVec = otherPt - nearPt;
 
-            if ((surf2.faceNormals()[surf2FaceI] & eVec) > 0)
+            if ((surf2.faceNormals()[surf2Facei] & eVec) > 0)
             {
                 // otherVert on outside of surf2
 
@@ -502,7 +497,7 @@ void Foam::surfaceIntersection::classifyHit
                 (
                     isFirstSurf,
                     facesA,
-                    surf2FaceI,
+                    surf2Facei,
                     allCutEdges,
                     allCutPoints
                 );
@@ -513,7 +508,7 @@ void Foam::surfaceIntersection::classifyHit
                 {
                     Pout<< "Discarding " << pHit.hitPoint()
                         << " since edge " << e << " on inside of surf2."
-                        << " surf2 normal:" << surf2.faceNormals()[surf2FaceI]
+                        << " surf2 normal:" << surf2.faceNormals()[surf2Facei]
                         << endl;
                 }
             }
@@ -525,7 +520,7 @@ void Foam::surfaceIntersection::classifyHit
             {
                 Pout<< pHit.hitPoint() << " is surf1:"
                     << " somewhere on edge " << e
-                    << " surf2: face " << surf2FaceI
+                    << " surf2: face " << surf2Facei
                     << endl;
             }
 
@@ -538,7 +533,7 @@ void Foam::surfaceIntersection::classifyHit
             (
                 isFirstSurf,
                 facesA,
-                surf2FaceI,
+                surf2Facei,
                 allCutEdges,
                 allCutPoints
             );
@@ -568,7 +563,7 @@ void Foam::surfaceIntersection::doCutEdges
 
     DynamicList<edge>& allCutEdges,
     DynamicList<point>& allCutPoints,
-    List<DynamicList<label> >& surfEdgeCuts
+    List<DynamicList<label>>& surfEdgeCuts
 )
 {
     scalar oldTol = intersection::setPlanarTol(1e-3);
@@ -578,11 +573,11 @@ void Foam::surfaceIntersection::doCutEdges
     // Calculate local (to point) tolerance based on min edge length.
     scalarField surf1PointTol(surf1Pts.size());
 
-    forAll(surf1PointTol, pointI)
+    forAll(surf1PointTol, pointi)
     {
-        surf1PointTol[pointI] =
+        surf1PointTol[pointi] =
             intersection::planarTol()
-          * minEdgeLen(surf1, pointI);
+          * minEdgeLen(surf1, pointi);
     }
 
     const triSurface& surf2 = querySurf2.surface();
@@ -616,7 +611,7 @@ void Foam::surfaceIntersection::doCutEdges
                     // is in their plane and they share a point with the edge.
 
                     // Label of face on surface2 edgeI intersected
-                    label hitFaceI = pHit.index();
+                    label hitFacei = pHit.index();
 
                     if
                     (
@@ -624,7 +619,7 @@ void Foam::surfaceIntersection::doCutEdges
                         (
                             surf1,
                             edgeI,
-                            hitFaceI,
+                            hitFacei,
                             0.1         // 1-cos of angle between normals
                         )
                     )
@@ -743,7 +738,7 @@ Foam::surfaceIntersection::surfaceIntersection
 
 
     // From edge to cut index on surface1
-    List<DynamicList<label> > edgeCuts1(query1.surface().nEdges());
+    List<DynamicList<label>> edgeCuts1(query1.surface().nEdges());
 
     doCutEdges
     (
@@ -770,7 +765,7 @@ Foam::surfaceIntersection::surfaceIntersection
     }
 
     // From edge to cut index
-    List<DynamicList<label> > edgeCuts2(query2.surface().nEdges());
+    List<DynamicList<label>> edgeCuts2(query2.surface().nEdges());
 
     doCutEdges
     (
@@ -847,7 +842,7 @@ Foam::surfaceIntersection::surfaceIntersection
 
     {
         // From edge to cut index on surface1
-        List<DynamicList<label> > edgeCuts1(surf1.nEdges());
+        List<DynamicList<label>> edgeCuts1(surf1.nEdges());
 
         forAll(intersections1, edgeI)
         {
@@ -865,7 +860,7 @@ Foam::surfaceIntersection::surfaceIntersection
                 (
                     true,                       // is first surface
                     surf1.edgeFaces()[edgeI],
-                    pHit.index(),               // surf2FaceI
+                    pHit.index(),               // surf2Facei
                     allCutEdges,
                     allCutPoints
                 );
@@ -888,7 +883,7 @@ Foam::surfaceIntersection::surfaceIntersection
 
     {
         // From edge to cut index on surface2
-        List<DynamicList<label> > edgeCuts2(surf2.nEdges());
+        List<DynamicList<label>> edgeCuts2(surf2.nEdges());
 
         forAll(intersections2, edgeI)
         {
@@ -906,7 +901,7 @@ Foam::surfaceIntersection::surfaceIntersection
                 (
                     false,                      // is second surface
                     surf2.edgeFaces()[edgeI],
-                    pHit.index(),               // surf2FaceI
+                    pHit.index(),               // surf2Facei
                     allCutEdges,
                     allCutPoints
                 );
@@ -964,13 +959,13 @@ Foam::surfaceIntersection::surfaceIntersection
 
         forAllConstIter(labelPairLookup, facePairToVertex_, iter)
         {
-            label pointI = iter();
+            label pointi = iter();
 
-            if (!usedPoints.found(pointI))
+            if (!usedPoints.found(pointi))
             {
-                WarningIn("surfaceIntersection::surfaceIntersection")
-                    << "Problem: cut point:" << pointI
-                    << " coord:" << cutPoints_[pointI]
+                WarningInFunction
+                    << "Problem: cut point:" << pointi
+                    << " coord:" << cutPoints_[pointi]
                     << " not used by any edge" << endl;
             }
         }
@@ -1005,7 +1000,7 @@ Foam::surfaceIntersection::surfaceIntersection
     DynamicList<point> allCutPoints;
 
     // From edge to cut index on surface1
-    List<DynamicList<label> > edgeCuts1(query1.surface().nEdges());
+    List<DynamicList<label>> edgeCuts1(query1.surface().nEdges());
 
     doCutEdges
     (

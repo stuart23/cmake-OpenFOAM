@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -63,27 +63,27 @@ void Foam::patchToFace::combine(topoSet& set, const bool add) const
 
     forAllConstIter(labelHashSet, patchIDs, iter)
     {
-        label patchI = iter.key();
+        label patchi = iter.key();
 
-        const polyPatch& pp = mesh_.boundaryMesh()[patchI];
+        const polyPatch& pp = mesh_.boundaryMesh()[patchi];
 
         Info<< "    Found matching patch " << pp.name()
             << " with " << pp.size() << " faces." << endl;
 
         for
         (
-            label faceI = pp.start();
-            faceI < pp.start() + pp.size();
-            faceI++
+            label facei = pp.start();
+            facei < pp.start() + pp.size();
+            facei++
         )
         {
-            addOrDelete(set, faceI, add);
+            addOrDelete(set, facei, add);
         }
     }
 
     if (patchIDs.empty())
     {
-        WarningIn("patchToFace::combine(topoSet&, const bool)")
+        WarningInFunction
             << "Cannot find any patch named " << patchName_ << endl
             << "Valid names are " << mesh_.boundaryMesh().names() << endl;
     }

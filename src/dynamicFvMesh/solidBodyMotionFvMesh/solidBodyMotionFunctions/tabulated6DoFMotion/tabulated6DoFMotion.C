@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -78,10 +78,8 @@ Foam::solidBodyMotionFunctions::tabulated6DoFMotion::transformation() const
 
     if (t < times_[0])
     {
-        FatalErrorIn
-        (
-            "solidBodyMotionFunctions::tabulated6DoFMotion::transformation()"
-        )   << "current time (" << t
+        FatalErrorInFunction
+            << "current time (" << t
             << ") is less than the minimum in the data table ("
             << times_[0] << ')'
             << exit(FatalError);
@@ -89,10 +87,8 @@ Foam::solidBodyMotionFunctions::tabulated6DoFMotion::transformation() const
 
     if (t > times_.last())
     {
-        FatalErrorIn
-        (
-            "solidBodyMotionFunctions::tabulated6DoFMotion::transformation()"
-        )   << "current time (" << t
+        FatalErrorInFunction
+            << "current time (" << t
             << ") is greater than the maximum in the data table ("
             << times_.last() << ')'
             << exit(FatalError);
@@ -108,11 +104,10 @@ Foam::solidBodyMotionFunctions::tabulated6DoFMotion::transformation() const
     // Convert the rotational motion from deg to rad
     TRV[1] *= pi/180.0;
 
-    quaternion R(TRV[1].x(), TRV[1].y(), TRV[1].z());
-    septernion TR(septernion(CofG_ + TRV[0])*R*septernion(-CofG_));
+    quaternion R(quaternion::XYZ, TRV[1]);
+    septernion TR(septernion(-CofG_ + -TRV[0])*R*septernion(CofG_));
 
-    Info<< "solidBodyMotionFunctions::tabulated6DoFMotion::transformation(): "
-        << "Time = " << t << " transformation: " << TR << endl;
+    DebugInFunction << "Time = " << t << " transformation: " << TR << endl;
 
     return TR;
 }
@@ -140,7 +135,7 @@ bool Foam::solidBodyMotionFunctions::tabulated6DoFMotion::read
 
         if (dataStream.good())
         {
-            List<Tuple2<scalar, translationRotationVectors> > timeValues
+            List<Tuple2<scalar, translationRotationVectors>> timeValues
             (
                 dataStream
             );
@@ -156,11 +151,8 @@ bool Foam::solidBodyMotionFunctions::tabulated6DoFMotion::read
         }
         else
         {
-            FatalErrorIn
-            (
-                "solidBodyMotionFunctions::tabulated6DoFMotion::read"
-                "(const dictionary&)"
-            )   << "Cannot open time data file " << timeDataFileName_
+            FatalErrorInFunction
+                << "Cannot open time data file " << timeDataFileName_
                 << exit(FatalError);
         }
     }

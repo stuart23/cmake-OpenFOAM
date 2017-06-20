@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -73,8 +73,6 @@ Foam::primitiveMesh::primitiveMesh()
 {}
 
 
-// Construct from components
-// WARNING: ASSUMES CORRECT ORDERING OF DATA.
 Foam::primitiveMesh::primitiveMesh
 (
     const label nPoints,
@@ -145,17 +143,17 @@ bool Foam::primitiveMesh::calcPointOrder
     // from 0 inside oldToNew. (shifted up later on)
 
     label nBoundaryPoints = 0;
-    for (label faceI = nInternalFaces; faceI < faces.size(); faceI++)
+    for (label facei = nInternalFaces; facei < faces.size(); facei++)
     {
-        const face& f = faces[faceI];
+        const face& f = faces[facei];
 
         forAll(f, fp)
         {
-            label pointI = f[fp];
+            label pointi = f[fp];
 
-            if (oldToNew[pointI] == -1)
+            if (oldToNew[pointi] == -1)
             {
-                oldToNew[pointI] = nBoundaryPoints++;
+                oldToNew[pointi] = nBoundaryPoints++;
             }
         }
     }
@@ -165,11 +163,11 @@ bool Foam::primitiveMesh::calcPointOrder
     nInternalPoints = nPoints - nBoundaryPoints;
 
     // Move the boundary addressing up
-    forAll(oldToNew, pointI)
+    forAll(oldToNew, pointi)
     {
-        if (oldToNew[pointI] != -1)
+        if (oldToNew[pointi] != -1)
         {
-            oldToNew[pointI] += nInternalPoints;
+            oldToNew[pointi] += nInternalPoints;
         }
     }
 
@@ -177,25 +175,25 @@ bool Foam::primitiveMesh::calcPointOrder
     // 2. Compact the internal points. Detect whether internal and boundary
     // points are mixed.
 
-    label internalPointI = 0;
+    label internalPointi = 0;
 
     bool ordered = true;
 
-    for (label faceI = 0; faceI < nInternalFaces; faceI++)
+    for (label facei = 0; facei < nInternalFaces; facei++)
     {
-        const face& f = faces[faceI];
+        const face& f = faces[facei];
 
         forAll(f, fp)
         {
-            label pointI = f[fp];
+            label pointi = f[fp];
 
-            if (oldToNew[pointI] == -1)
+            if (oldToNew[pointi] == -1)
             {
-                if (pointI >= nInternalPoints)
+                if (pointi >= nInternalPoints)
                 {
                     ordered = false;
                 }
-                oldToNew[pointI] = internalPointI++;
+                oldToNew[pointi] = internalPointi++;
             }
         }
     }
@@ -310,11 +308,8 @@ Foam::tmp<Foam::scalarField> Foam::primitiveMesh::movePoints
 {
     if (newPoints.size() <  nPoints() || oldPoints.size() < nPoints())
     {
-        FatalErrorIn
-        (
-            "primitiveMesh::movePoints(const pointField& newPoints, "
-            "const pointField& oldPoints)"
-        )   << "Cannot move points: size of given point list smaller "
+        FatalErrorInFunction
+            << "Cannot move points: size of given point list smaller "
             << "than the number of active points"
             << abort(FatalError);
     }
@@ -323,11 +318,11 @@ Foam::tmp<Foam::scalarField> Foam::primitiveMesh::movePoints
     const faceList& f = faces();
 
     tmp<scalarField> tsweptVols(new scalarField(f.size()));
-    scalarField& sweptVols = tsweptVols();
+    scalarField& sweptVols = tsweptVols.ref();
 
-    forAll(f, faceI)
+    forAll(f, facei)
     {
-        sweptVols[faceI] = f[faceI].sweptVol(oldPoints, newPoints);
+        sweptVols[facei] = f[facei].sweptVol(oldPoints, newPoints);
     }
 
     // Force recalculation of all geometric data with new points

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -61,7 +61,7 @@ inline Foam::DynamicField<T, SizeInc, SizeMult, SizeDiv>::DynamicField
 template<class T, unsigned SizeInc, unsigned SizeMult, unsigned SizeDiv>
 inline Foam::DynamicField<T, SizeInc, SizeMult, SizeDiv>::DynamicField
 (
-    const Xfer<List<T> >& lst
+    const Xfer<List<T>>& lst
 )
 :
     Field<T>(lst),
@@ -121,7 +121,7 @@ inline Foam::DynamicField<T, SizeInc, SizeMult, SizeDiv>::DynamicField
 template<class T, unsigned SizeInc, unsigned SizeMult, unsigned SizeDiv>
 inline Foam::DynamicField<T, SizeInc, SizeMult, SizeDiv>::DynamicField
 (
-    const Xfer<DynamicField<T, SizeInc, SizeMult, SizeDiv> >& lst
+    const Xfer<DynamicField<T, SizeInc, SizeMult, SizeDiv>>& lst
 )
 :
     Field<T>(lst),
@@ -308,10 +308,10 @@ Foam::DynamicField<T, SizeInc, SizeMult, SizeDiv>::shrink()
 
 
 template<class T, unsigned SizeInc, unsigned SizeMult, unsigned SizeDiv>
-inline Foam::Xfer<Foam::List<T> >
+inline Foam::Xfer<Foam::List<T>>
 Foam::DynamicField<T, SizeInc, SizeMult, SizeDiv>::xfer()
 {
-    return xferMoveTo< List<T> >(*this);
+    return xferMoveTo<List<T>>(*this);
 }
 
 
@@ -339,11 +339,8 @@ Foam::DynamicField<T, SizeInc, SizeMult, SizeDiv>::append
 {
     if (this == &lst)
     {
-        FatalErrorIn
-        (
-            "DynamicField<T, SizeInc, SizeMult, SizeDiv>::append"
-            "(const UList<T>&)"
-        )   << "attempted appending to self" << abort(FatalError);
+        FatalErrorInFunction
+            << "attempted appending to self" << abort(FatalError);
     }
 
     label nextFree = List<T>::size();
@@ -364,10 +361,8 @@ inline T Foam::DynamicField<T, SizeInc, SizeMult, SizeDiv>::remove()
 
     if (elemI < 0)
     {
-        FatalErrorIn
-        (
-            "Foam::DynamicField<T, SizeInc, SizeMult, SizeDiv>::remove()"
-        )   << "List is empty" << abort(FatalError);
+        FatalErrorInFunction
+            << "List is empty" << abort(FatalError);
     }
 
     const T& val = List<T>::operator[](elemI);
@@ -413,11 +408,8 @@ inline void Foam::DynamicField<T, SizeInc, SizeMult, SizeDiv>::operator=
 {
     if (this == &lst)
     {
-        FatalErrorIn
-        (
-            "DynamicField<T, SizeInc, SizeMult, SizeDiv>::operator="
-            "(const DynamicField<T, SizeInc, SizeMult, SizeDiv>&)"
-        )   << "attempted assignment to self" << abort(FatalError);
+        FatalErrorInFunction
+            << "attempted assignment to self" << abort(FatalError);
     }
 
     if (capacity_ >= lst.size())

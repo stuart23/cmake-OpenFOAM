@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2014-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,8 +22,6 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
-
-#include "error.H"
 
 #include "uint64.H"
 #include "IOstreams.H"
@@ -59,7 +57,7 @@ Foam::Istream& Foam::operator>>(Istream& is, uint64_t& i)
     else
     {
         is.setBad();
-        FatalIOErrorIn("operator>>(Istream&, uint64_t&)", is)
+        FatalIOErrorInFunction(is)
             << "wrong token type - expected uint64_t, found " << t.info()
             << exit(FatalIOError);
 

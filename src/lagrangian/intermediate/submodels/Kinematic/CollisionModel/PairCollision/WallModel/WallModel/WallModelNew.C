@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::autoPtr<Foam::WallModel<CloudType> >
+Foam::autoPtr<Foam::WallModel<CloudType>>
 Foam::WallModel<CloudType>::New
 (
     const dictionary& dict,
@@ -44,20 +44,14 @@ Foam::WallModel<CloudType>::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "WallModel<CloudType>::New"
-            "("
-                "const dictionary&, "
-                "CloudType&"
-            ")"
-        )   << "Unknown wall model type type " << WallModelType
+        FatalErrorInFunction
+            << "Unknown wall model type type " << WallModelType
             << ", constructor not in hash table" << nl << nl
             << "    Valid wall model types are:" << nl
             << dictionaryConstructorTablePtr_->sortedToc() << exit(FatalError);
     }
 
-    return autoPtr<WallModel<CloudType> >(cstrIter()(dict, owner));
+    return autoPtr<WallModel<CloudType>>(cstrIter()(dict, owner));
 }
 
 

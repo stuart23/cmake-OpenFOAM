@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -71,7 +71,7 @@ void Foam::fv::interRegionHeatTransferModel::setNbrModel()
 
     if (!nbrModelFound)
     {
-        FatalErrorIn("interRegionHeatTransferModel::setNbrModel()")
+        FatalErrorInFunction
             << "Neighbour model not found" << nbrModelName_
             << " in region " << nbrMesh.name() << nl
             << exit(FatalError);
@@ -119,7 +119,7 @@ Foam::fv::interRegionHeatTransferModel::interRegionHeatTransferModel
         dict,
         mesh
     ),
-    nbrModelName_(coeffs_.lookup("nbrModelName")),
+    nbrModelName_(coeffs_.lookup("nbrModel")),
     nbrModel_(NULL),
     firstIter_(true),
     timeIndex_(-1),
@@ -143,12 +143,12 @@ Foam::fv::interRegionHeatTransferModel::interRegionHeatTransferModel
         zeroGradientFvPatchScalarField::typeName
     ),
     semiImplicit_(false),
-    TName_(coeffs_.lookupOrDefault<word>("TName", "T")),
-    TNbrName_(coeffs_.lookupOrDefault<word>("TNbrName", "T"))
+    TName_(coeffs_.lookupOrDefault<word>("T", "T")),
+    TNbrName_(coeffs_.lookupOrDefault<word>("TNbr", "T"))
 {
     if (active())
     {
-        coeffs_.lookup("fieldNames") >> fieldNames_;
+        coeffs_.lookup("fields") >> fieldNames_;
         applied_.setSize(fieldNames_.size(), false);
 
         coeffs_.lookup("semiImplicit") >> semiImplicit_;
@@ -167,7 +167,7 @@ Foam::fv::interRegionHeatTransferModel::~interRegionHeatTransferModel()
 void Foam::fv::interRegionHeatTransferModel::addSup
 (
     fvMatrix<scalar>& eqn,
-    const label fieldI
+    const label fieldi
 )
 {
     setNbrModel();
@@ -194,14 +194,14 @@ void Foam::fv::interRegionHeatTransferModel::addSup
         )
     );
 
-    volScalarField& Tmapped = tTmapped();
+    volScalarField& Tmapped = tTmapped.ref();
 
     const fvMesh& nbrMesh = mesh_.time().lookupObject<fvMesh>(nbrRegionName_);
 
     const volScalarField& Tnbr =
         nbrMesh.lookupObject<volScalarField>(TNbrName_);
 
-    interpolate(Tnbr, Tmapped.internalField());
+    interpolate(Tnbr, Tmapped.primitiveFieldRef());
 
     if (debug)
     {
@@ -209,7 +209,7 @@ void Foam::fv::interRegionHeatTransferModel::addSup
             << fvc::domainIntegrate(htc_).value()
             << endl;
 
-        if (mesh_.time().outputTime())
+        if (mesh_.time().writeTime())
         {
             Tmapped.write();
             htc_.write();
@@ -241,14 +241,8 @@ void Foam::fv::interRegionHeatTransferModel::addSup
             }
             else
             {
-                FatalErrorIn
-                (
-                    "void Foam::fv::interRegionHeatTransferModel::addSup"
-                    "("
-                    "   fvMatrix<scalar>&, "
-                    "   const label "
-                    ")"
-                )   << " on mesh " << mesh_.name()
+                FatalErrorInFunction
+                    << " on mesh " << mesh_.name()
                     << " could not find object basicThermo."
                     << " The available objects are: "
                     << mesh_.names()
@@ -271,10 +265,10 @@ void Foam::fv::interRegionHeatTransferModel::addSup
 (
     const volScalarField& rho,
     fvMatrix<scalar>& eqn,
-    const label fieldI
+    const label fieldi
 )
 {
-    addSup(eqn, fieldI);
+    addSup(eqn, fieldi);
 }
 
 

@@ -1,27 +1,27 @@
 // Fields for data gathering
 
-List< scalarField > allSpeciesN_RU
+List<scalarField> allSpeciesN_RU
 (
     molecules.potential().nIds(),
-    scalarField (mesh.nCells(), 0.0)
+    scalarField(mesh.nCells(), 0.0)
 );
 
-List< scalarField > allSpeciesM_RU
+List<scalarField> allSpeciesM_RU
 (
     molecules.potential().nIds(),
-    scalarField (mesh.nCells(), 0.0)
+    scalarField(mesh.nCells(), 0.0)
 );
 
-List< vectorField > allSpeciesVelocitySum_RU
+List<vectorField> allSpeciesVelocitySum_RU
 (
     molecules.potential().nIds(),
-    vectorField (mesh.nCells(), vector::zero)
+    vectorField(mesh.nCells(), Zero)
 );
 
-List< scalarField > allSpeciesVelocityMagSquaredSum_RU
+List<scalarField> allSpeciesVelocityMagSquaredSum_RU
 (
     molecules.potential().nIds(),
-    scalarField (mesh.nCells(), 0.0)
+    scalarField(mesh.nCells(), 0.0)
 );
 
 // Geometric Fields for IO
@@ -60,7 +60,7 @@ forAll(allSpeciesRhoN, rN)
             "zeroGradient"
         )
     );
-    allSpeciesRhoN[rN].internalField() = scalarField (mesh.nCells(), 0.0);
+    allSpeciesRhoN[rN].primitiveFieldRef() = 0;
     allSpeciesRhoN[rN].correctBoundaryConditions();
 }
 
@@ -80,7 +80,7 @@ volScalarField totalRhoN
     dimless/dimVolume,
     "zeroGradient"
 );
-totalRhoN.internalField() = scalarField (mesh.nCells(), 0.0);
+totalRhoN.primitiveFieldRef() = 0;
 totalRhoN.correctBoundaryConditions();
 
 /*---------------------------------------------------------------------------*\
@@ -115,7 +115,7 @@ forAll(allSpeciesRhoM, rM)
             "zeroGradient"
         )
     );
-    allSpeciesRhoM[rM].internalField() = scalarField (mesh.nCells(), 0.0);
+    allSpeciesRhoM[rM].primitiveFieldRef() = 0;
     allSpeciesRhoM[rM].correctBoundaryConditions();
 }
 
@@ -135,7 +135,7 @@ volScalarField totalRhoM
     dimMass/dimVolume,
     "zeroGradient"
 );
-totalRhoM.internalField() = scalarField (mesh.nCells(), 0.0);
+totalRhoM.primitiveFieldRef() = 0;
 totalRhoM.correctBoundaryConditions();
 
 /*---------------------------------------------------------------------------*\
@@ -170,8 +170,7 @@ forAll(allSpeciesVelocity, v)
             "zeroGradient"
         )
     );
-    allSpeciesVelocity[v].internalField() =
-        vectorField (mesh.nCells(), vector::zero);
+    allSpeciesVelocity[v].primitiveFieldRef() = Zero;
     allSpeciesVelocity[v].correctBoundaryConditions();
 }
 
@@ -191,7 +190,7 @@ Info << "    Creating total velocity field" << endl;
 //     dimVelocity,
 //     "zeroGradient"
 // );
-// totalVelocity.internalField() = vectorField (mesh.nCells(), vector::zero);
+// totalVelocity.primitiveFieldRef() = Zero;
 // totalVelocity.correctBoundaryConditions();
 
 
@@ -209,7 +208,7 @@ volVectorField totalVelocity
 
     ),
     mesh,
-    dimensionedVector("zero", dimVelocity, vector::zero)
+    dimensionedVector("zero", dimVelocity, Zero)
 );
 
 /*---------------------------------------------------------------------------*\
@@ -244,7 +243,7 @@ forAll(allSpeciesTemperature, t)
             "zeroGradient"
         )
     );
-    allSpeciesTemperature[t].internalField() = scalarField (mesh.nCells(), 0.0);
+    allSpeciesTemperature[t].primitiveFieldRef() = 0;
     allSpeciesTemperature[t].correctBoundaryConditions();
 }
 
@@ -264,7 +263,7 @@ volScalarField totalTemperature
     dimTemperature,
     "zeroGradient"
 );
-totalTemperature.internalField() = scalarField (mesh.nCells(), 0.0);
+totalTemperature.primitiveFieldRef() = 0;
 totalTemperature.correctBoundaryConditions();
 
 /*---------------------------------------------------------------------------*\
@@ -300,7 +299,7 @@ forAll(allSpeciesMeanKE, mKE)
             "zeroGradient"
         )
     );
-    allSpeciesMeanKE[mKE].internalField() = scalarField (mesh.nCells(), 0.0);
+    allSpeciesMeanKE[mKE].primitiveFieldRef() = 0;
     allSpeciesMeanKE[mKE].correctBoundaryConditions();
 }
 
@@ -320,5 +319,5 @@ volScalarField totalMeanKE
     dimensionSet(1, 2, -2, 0, 0, 0, 0),
     "zeroGradient"
 );
-totalMeanKE.internalField() = scalarField (mesh.nCells(), 0.0);
+totalMeanKE.primitiveFieldRef() = 0;
 totalMeanKE.correctBoundaryConditions();

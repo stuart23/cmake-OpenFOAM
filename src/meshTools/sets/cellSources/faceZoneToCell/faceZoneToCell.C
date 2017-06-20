@@ -100,7 +100,7 @@ void Foam::faceZoneToCell::combine(topoSet& set, const bool add) const
 
     if (!hasMatched)
     {
-        WarningIn("faceZoneToCell::combine(topoSet&, const bool)")
+        WarningInFunction
             << "Cannot find any faceZone named " << zoneName_ << endl
             << "Valid names are " << mesh_.faceZones().names() << endl;
     }

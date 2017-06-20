@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,23 +26,24 @@ Class
 
 Description
     This boundary condition is designed to be used in conjunction with surface
-    film and pyrolysis modelling.  It provides a velocity boundary condition
-    for patches on the primary region based on whether the patch is seen to
-    be 'wet', retrieved from the film alpha field.
+    film and pyrolysis modelling.
 
-    \li if the patch is wet, the velocity is set using the film velocity
-    \li otherwise, it is set using pyrolysis out-gassing velocity
+    It provides a velocity boundary condition for patches on the primary region
+    based on whether the patch is seen to be 'wet', retrieved from the film
+    alpha field.
+      - if the patch is wet, the velocity is set using the film velocity
+      - otherwise, it is set using pyrolysis out-gassing velocity
 
     Example of the boundary condition specification:
     \verbatim
-        myPatch
-        {
-            type            filmPyrolysisVelocityCoupled;
-            phi             phi;      // name of flux field (default = phi)
-            rho             rho;      // name of density field (default = rho)
-            deltaWet        1e-4;     // threshold height for 'wet' film
-            value           uniform   (0 0 0); // initial velocity / [m/s]
-        }
+    <patchName>
+    {
+        type            filmPyrolysisVelocityCoupled;
+        phi             phi;      // name of flux field (default = phi)
+        rho             rho;      // name of density field (default = rho)
+        deltaWet        1e-4;     // threshold height for 'wet' film
+        value           uniform   (0 0 0); // initial velocity / [m/s]
+    }
     \endverbatim
 
 SourceFiles

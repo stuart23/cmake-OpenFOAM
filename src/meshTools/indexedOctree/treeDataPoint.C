@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -88,8 +88,6 @@ Foam::pointField Foam::treeDataPoint::shapePoints() const
 }
 
 
-//- Get type (inside,outside,mixed,unknown) of point w.r.t. surface.
-//  Only makes sense for closed surfaces.
 Foam::volumeType Foam::treeDataPoint::getVolumeType
 (
     const indexedOctree<treeDataPoint>& oc,
@@ -100,19 +98,17 @@ Foam::volumeType Foam::treeDataPoint::getVolumeType
 }
 
 
-// Check if any point on shape is inside cubeBb.
 bool Foam::treeDataPoint::overlaps
 (
     const label index,
     const treeBoundBox& cubeBb
 ) const
 {
-    label pointI = (useSubset_ ? pointLabels_[index] : index);
-    return cubeBb.contains(points_[pointI]);
+    label pointi = (useSubset_ ? pointLabels_[index] : index);
+    return cubeBb.contains(points_[pointi]);
 }
 
 
-// Check if any point on shape is inside sphere.
 bool Foam::treeDataPoint::overlaps
 (
     const label index,
@@ -120,9 +116,9 @@ bool Foam::treeDataPoint::overlaps
     const scalar radiusSqr
 ) const
 {
-    label pointI = (useSubset_ ? pointLabels_[index] : index);
+    label pointi = (useSubset_ ? pointLabels_[index] : index);
 
-    if (magSqr(points_[pointI] - centre) <= radiusSqr)
+    if (magSqr(points_[pointi] - centre) <= radiusSqr)
     {
         return true;
     }
@@ -146,14 +142,14 @@ void Foam::treeDataPoint::findNearestOp::operator()
     forAll(indices, i)
     {
         const label index = indices[i];
-        label pointI =
+        label pointi =
         (
             shape.useSubset()
           ? shape.pointLabels()[index]
           : index
         );
 
-        const point& pt = shape.points()[pointI];
+        const point& pt = shape.points()[pointi];
 
         scalar distSqr = magSqr(pt - sample);
 
@@ -190,14 +186,14 @@ void Foam::treeDataPoint::findNearestOp::operator()
     forAll(indices, i)
     {
         const label index = indices[i];
-        label pointI =
+        label pointi =
         (
             shape.useSubset()
           ? shape.pointLabels()[index]
           : index
         );
 
-        const point& shapePt = shape.points()[pointI];
+        const point& shapePt = shape.points()[pointi];
 
         if (tightest.contains(shapePt))
         {
@@ -240,11 +236,7 @@ bool Foam::treeDataPoint::findIntersectOp::operator()
     point& result
 ) const
 {
-    notImplemented
-    (
-        "treeDataPoint::intersects(const label, const point&,"
-        "const point&, point&)"
-    );
+    NotImplemented;
     return false;
 }
 

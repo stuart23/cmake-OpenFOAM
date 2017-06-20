@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -76,10 +76,8 @@ bool Foam::layerAdditionRemoval::setLayerPairing() const
     // the master patch
     if (pointsPairingPtr_ || facesPairingPtr_)
     {
-        FatalErrorIn
-        (
-            "void Foam::layerAdditionRemoval::setLayerPairing() const"
-        )   << "Problem with layer pairing data"
+        FatalErrorInFunction
+            << "Problem with layer pairing data"
             << abort(FatalError);
     }
 
@@ -101,20 +99,20 @@ bool Foam::layerAdditionRemoval::setLayerPairing() const
     label nPointErrors = 0;
     label nFaceErrors = 0;
 
-    forAll(mf, faceI)
+    forAll(mf, facei)
     {
         // Get the local master face
-        face curLocalFace = mlf[faceI];
+        face curLocalFace = mlf[facei];
 
         // Flip face based on flip index to recover original orientation
-        if (mfFlip[faceI])
+        if (mfFlip[facei])
         {
             curLocalFace.flip();
         }
 
         // Get the opposing face from the master cell
         oppositeFace lidFace =
-            cells[mc[faceI]].opposingFace(mf[faceI], faces);
+            cells[mc[facei]].opposingFace(mf[facei], faces);
 
         if (!lidFace.found())
         {
@@ -125,8 +123,8 @@ bool Foam::layerAdditionRemoval::setLayerPairing() const
 
         if (debug > 1)
         {
-            Pout<< "curMasterFace: " << faces[mf[faceI]] << nl
-                << "cell shape: " << mesh.cellShapes()[mc[faceI]] << nl
+            Pout<< "curMasterFace: " << faces[mf[facei]] << nl
+                << "cell shape: " << mesh.cellShapes()[mc[facei]] << nl
                 << "curLocalFace: " << curLocalFace << nl
                 << "lidFace: " << lidFace
                 << " master index: " << lidFace.masterIndex()
@@ -134,22 +132,22 @@ bool Foam::layerAdditionRemoval::setLayerPairing() const
         }
 
         // Grab the opposite face for face collapse addressing
-        ftc[faceI] = lidFace.oppositeIndex();
+        ftc[facei] = lidFace.oppositeIndex();
 
         // Using the local face insert the points into the lid list
-        forAll(curLocalFace, pointI)
+        forAll(curLocalFace, pointi)
         {
-            const label clp = curLocalFace[pointI];
+            const label clp = curLocalFace[pointi];
 
             if (ptc[clp] == -1)
             {
                 // Point not mapped yet.  Insert the label
-                ptc[clp] = lidFace[pointI];
+                ptc[clp] = lidFace[pointi];
             }
             else
             {
                 // Point mapped from some other face.  Check the label
-                if (ptc[clp] != lidFace[pointI])
+                if (ptc[clp] != lidFace[pointi])
                 {
                     nPointErrors++;
 
@@ -161,7 +159,7 @@ bool Foam::layerAdditionRemoval::setLayerPairing() const
                             << "consistently.  Please check the "
                             << "face zone flip map." << nl
                             << "First index: " << ptc[clp]
-                            << " new index: " << lidFace[pointI] << endl;
+                            << " new index: " << lidFace[pointi] << endl;
                     }
                 }
             }
@@ -189,10 +187,8 @@ const Foam::labelList& Foam::layerAdditionRemoval::pointsPairing() const
 {
     if (!pointsPairingPtr_)
     {
-        FatalErrorIn
-        (
-            "const labelList& layerAdditionRemoval::pointsPairing() const"
-        )   << "Problem with layer pairing data for object " << name()
+        FatalErrorInFunction
+            << "Problem with layer pairing data for object " << name()
             << abort(FatalError);
     }
 
@@ -203,10 +199,8 @@ const Foam::labelList& Foam::layerAdditionRemoval::facesPairing() const
 {
     if (!facesPairingPtr_)
     {
-        FatalErrorIn
-        (
-            "const labelList& layerAdditionRemoval::facesPairing() const"
-        )   << "Problem with layer pairing data for object " << name()
+        FatalErrorInFunction
+            << "Problem with layer pairing data for object " << name()
             << abort(FatalError);
     }
 

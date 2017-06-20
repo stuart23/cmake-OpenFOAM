@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -35,8 +35,7 @@ Description
 
     The tangential patch velocity can be optionally specified.
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         phi          | flux field name         | no          | phi
@@ -45,7 +44,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            pressureInletOutletVelocity;
         phi             phi;
@@ -162,6 +161,15 @@ public:
 
 
     // Member functions
+
+        // Attributes
+
+            //- Return true: this patch field is altered by assignment
+            virtual bool assignable() const
+            {
+                return true;
+            }
+
 
         // Access
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -121,10 +121,8 @@ void Foam::mappedFixedInternalValueFvPatchField<Type>::updateCoeffs()
     {
         case mappedPatchBase::NEARESTCELL:
         {
-            FatalErrorIn
-            (
-                "void mappedFixedValueFvPatchField<Type>::updateCoeffs()"
-            )   << "Cannot apply "
+            FatalErrorInFunction
+                << "Cannot apply "
                 << mappedPatchBase::sampleModeNames_
                    [
                        mappedPatchBase::NEARESTCELL
@@ -137,9 +135,9 @@ void Foam::mappedFixedInternalValueFvPatchField<Type>::updateCoeffs()
         case mappedPatchBase::NEARESTPATCHFACE:
         case mappedPatchBase::NEARESTPATCHFACEAMI:
         {
-            const label samplePatchI = mpp.samplePolyPatch().index();
+            const label samplePatchi = mpp.samplePolyPatch().index();
             const fvPatchField<Type>& nbrPatchField =
-                this->sampleField().boundaryField()[samplePatchI];
+                this->sampleField().boundaryField()[samplePatchi];
             nbrIntFld = nbrPatchField.patchInternalField();
             mpp.distribute(nbrIntFld);
 
@@ -147,20 +145,20 @@ void Foam::mappedFixedInternalValueFvPatchField<Type>::updateCoeffs()
         }
         case mappedPatchBase::NEARESTFACE:
         {
-            Field<Type> allValues(nbrMesh.nFaces(), pTraits<Type>::zero);
+            Field<Type> allValues(nbrMesh.nFaces(), Zero);
 
             const FieldType& nbrField = this->sampleField();
 
-            forAll(nbrField.boundaryField(), patchI)
+            forAll(nbrField.boundaryField(), patchi)
             {
-                const fvPatchField<Type>& pf = nbrField.boundaryField()[patchI];
+                const fvPatchField<Type>& pf = nbrField.boundaryField()[patchi];
                 const Field<Type> pif(pf.patchInternalField());
 
                 label faceStart = pf.patch().start();
 
-                forAll(pf, faceI)
+                forAll(pf, facei)
                 {
-                    allValues[faceStart++] = pif[faceI];
+                    allValues[faceStart++] = pif[facei];
                 }
             }
 
@@ -171,7 +169,7 @@ void Foam::mappedFixedInternalValueFvPatchField<Type>::updateCoeffs()
         }
         default:
         {
-            FatalErrorIn("mappedFixedValueFvPatchField<Type>::updateCoeffs()")
+            FatalErrorInFunction
                 << "Unknown sampling mode: " << mpp.mode()
                 << abort(FatalError);
         }
@@ -181,7 +179,7 @@ void Foam::mappedFixedInternalValueFvPatchField<Type>::updateCoeffs()
     UPstream::msgType() = oldTag;
 
     // Assign to (this) patch internal field its neighbour values
-    Field<Type>& intFld = const_cast<Field<Type>&>(this->internalField());
+    Field<Type>& intFld = const_cast<Field<Type>&>(this->primitiveField());
     UIndirectList<Type>(intFld, this->patch().faceCells()) = nbrIntFld;
 }
 

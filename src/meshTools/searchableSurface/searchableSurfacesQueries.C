@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,7 +33,7 @@ License
 
 namespace Foam
 {
-defineTypeNameAndDebug(searchableSurfacesQueries, 0);
+    defineTypeNameAndDebug(searchableSurfacesQueries, 0);
 }
 
 
@@ -263,7 +263,7 @@ bool Foam::searchableSurfacesQueries::morphTet
 //    const pointField& start,
 //    const pointField& end,
 //    const vectorField& smallVec,
-//    List<List<pointIndexHit> >& surfaceHitInfo
+//    List<List<pointIndexHit>>& surfaceHitInfo
 //)
 //{
 //    surfaceHitInfo.setSize(start.size());
@@ -460,7 +460,7 @@ void Foam::searchableSurfacesQueries::findAllIntersections
     const pointField& start,
     const pointField& end,
     labelListList& hitSurfaces,
-    List<List<pointIndexHit> >& hitInfo
+    List<List<pointIndexHit>>& hitInfo
 )
 {
     // Note: maybe move the single-surface all intersections test into
@@ -483,19 +483,19 @@ void Foam::searchableSurfacesQueries::findAllIntersections
 
     // Set hitSurfaces and distance
     List<scalarList> hitDistSqr(hitInfo.size());
-    forAll(hitInfo, pointI)
+    forAll(hitInfo, pointi)
     {
-        const List<pointIndexHit>& pHits = hitInfo[pointI];
+        const List<pointIndexHit>& pHits = hitInfo[pointi];
 
-        labelList& pSurfaces = hitSurfaces[pointI];
+        labelList& pSurfaces = hitSurfaces[pointi];
         pSurfaces.setSize(pHits.size());
         pSurfaces = 0;
 
-        scalarList& pDistSqr = hitDistSqr[pointI];
+        scalarList& pDistSqr = hitDistSqr[pointi];
         pDistSqr.setSize(pHits.size());
         forAll(pHits, i)
         {
-            pDistSqr[i] = magSqr(pHits[i].hitPoint() - start[pointI]);
+            pDistSqr[i] = magSqr(pHits[i].hitPoint() - start[pointi]);
         }
     }
 
@@ -505,7 +505,7 @@ void Foam::searchableSurfacesQueries::findAllIntersections
         // Test the other surfaces and merge (according to distance from start).
         for (label testI = 1; testI < surfacesToTest.size(); testI++)
         {
-            List<List<pointIndexHit> > surfHits;
+            List<List<pointIndexHit>> surfHits;
             allSurfaces[surfacesToTest[testI]].findLineAll
             (
                 start,
@@ -513,18 +513,18 @@ void Foam::searchableSurfacesQueries::findAllIntersections
                 surfHits
             );
 
-            forAll(surfHits, pointI)
+            forAll(surfHits, pointi)
             {
                 mergeHits
                 (
-                    start[pointI],          // Current segment
+                    start[pointi],          // Current segment
 
                     testI,                  // Surface and its hits
-                    surfHits[pointI],
+                    surfHits[pointi],
 
-                    hitSurfaces[pointI],    // Merge into overall hit info
-                    hitInfo[pointI],
-                    hitDistSqr[pointI]
+                    hitSurfaces[pointi],    // Merge into overall hit info
+                    hitInfo[pointi],
+                    hitDistSqr[pointi]
                 );
             }
         }
@@ -568,13 +568,13 @@ void Foam::searchableSurfacesQueries::findNearestIntersection
            nearestInfo
        );
 
-       forAll(nearestInfo, pointI)
+       forAll(nearestInfo, pointi)
        {
-           if (nearestInfo[pointI].hit())
+           if (nearestInfo[pointi].hit())
            {
-               hit1[pointI] = nearestInfo[pointI];
-               surface1[pointI] = testI;
-               nearest[pointI] = hit1[pointI].hitPoint();
+               hit1[pointi] = nearestInfo[pointi];
+               surface1[pointi] = testI;
+               nearest[pointi] = hit1[pointi].hitPoint();
            }
        }
    }
@@ -589,16 +589,16 @@ void Foam::searchableSurfacesQueries::findNearestIntersection
    hit2 = hit1;
 
    // Set current end of segment to test.
-   forAll(nearest, pointI)
+   forAll(nearest, pointi)
    {
-       if (hit1[pointI].hit())
+       if (hit1[pointi].hit())
        {
-           nearest[pointI] = hit1[pointI].hitPoint();
+           nearest[pointi] = hit1[pointi].hitPoint();
        }
        else
        {
            // Disable testing by setting to end.
-           nearest[pointI] = end[pointI];
+           nearest[pointi] = end[pointi];
        }
    }
 
@@ -607,13 +607,13 @@ void Foam::searchableSurfacesQueries::findNearestIntersection
        // See if any intersection between end and current nearest
        allSurfaces[surfacesToTest[testI]].findLine(end, nearest, nearestInfo);
 
-       forAll(nearestInfo, pointI)
+       forAll(nearestInfo, pointi)
        {
-           if (nearestInfo[pointI].hit())
+           if (nearestInfo[pointi].hit())
            {
-               hit2[pointI] = nearestInfo[pointI];
-               surface2[pointI] = testI;
-               nearest[pointI] = hit2[pointI].hitPoint();
+               hit2[pointi] = nearestInfo[pointi];
+               surface2[pointi] = testI;
+               nearest[pointi] = hit2[pointi].hitPoint();
            }
        }
    }
@@ -650,17 +650,17 @@ void Foam::searchableSurfacesQueries::findNearest
         );
 
         // Update minDistSqr and arguments
-        forAll(hitInfo, pointI)
+        forAll(hitInfo, pointi)
         {
-            if (hitInfo[pointI].hit())
+            if (hitInfo[pointi].hit())
             {
-                minDistSqr[pointI] = magSqr
+                minDistSqr[pointi] = magSqr
                 (
-                    hitInfo[pointI].hitPoint()
-                  - samples[pointI]
+                    hitInfo[pointi].hitPoint()
+                  - samples[pointi]
                 );
-                nearestInfo[pointI] = hitInfo[pointI];
-                nearestSurfaces[pointI] = testI;
+                nearestInfo[pointi] = hitInfo[pointi];
+                nearestSurfaces[pointi] = testI;
             }
         }
     }
@@ -712,17 +712,17 @@ void Foam::searchableSurfacesQueries::findNearest
         );
 
         // Update minDistSqr and arguments
-        forAll(hitInfo, pointI)
+        forAll(hitInfo, pointi)
         {
-            if (hitInfo[pointI].hit())
+            if (hitInfo[pointi].hit())
             {
-                minDistSqr[pointI] = magSqr
+                minDistSqr[pointi] = magSqr
                 (
-                    hitInfo[pointI].hitPoint()
-                  - samples[pointI]
+                    hitInfo[pointi].hitPoint()
+                  - samples[pointi]
                 );
-                nearestInfo[pointI] = hitInfo[pointI];
-                nearestSurfaces[pointI] = testI;
+                nearestInfo[pointi] = hitInfo[pointi];
+                nearestSurfaces[pointi] = testI;
             }
         }
     }
@@ -781,14 +781,14 @@ void Foam::searchableSurfacesQueries::signedDistance
         // Push back to original
         forAll(volType, i)
         {
-            label pointI = surfIndices[i];
-            scalar dist = mag(samples[pointI] - nearestInfo[pointI].hitPoint());
+            label pointi = surfIndices[i];
+            scalar dist = mag(samples[pointi] - nearestInfo[pointi].hitPoint());
 
             volumeType vT = volType[i];
 
             if (vT == volumeType::OUTSIDE)
             {
-                distance[pointI] = dist;
+                distance[pointi] = dist;
             }
             else if (vT == volumeType::INSIDE)
             {
@@ -800,17 +800,17 @@ void Foam::searchableSurfacesQueries::signedDistance
                 {
                     case volumeType::OUTSIDE:
                     {
-                        distance[pointI] = dist;
+                        distance[pointi] = dist;
                         break;
                     }
                     case volumeType::INSIDE:
                     {
-                        distance[pointI] = -dist;
+                        distance[pointi] = -dist;
                         break;
                     }
                     default:
                     {
-                        FatalErrorIn("signedDistance()")
+                        FatalErrorInFunction
                             << "getVolumeType failure,"
                             << " neither INSIDE or OUTSIDE."
                             << " point:" << surfPoints[i]
@@ -849,7 +849,6 @@ Foam::boundBox Foam::searchableSurfacesQueries::bounds
 }
 
 
-//- Calculate point which is on a set of surfaces.
 Foam::pointIndexHit Foam::searchableSurfacesQueries::facesIntersection
 (
     const PtrList<searchableSurface>& allSurfaces,
@@ -863,7 +862,7 @@ Foam::pointIndexHit Foam::searchableSurfacesQueries::facesIntersection
     // starting point onto the surfaces and the mid point
     List<point> nearest(surfacesToTest.size()+1);
 
-    point sumNearest = vector::zero;
+    point sumNearest = Zero;
 
     forAll(surfacesToTest, i)
     {
@@ -879,11 +878,8 @@ Foam::pointIndexHit Foam::searchableSurfacesQueries::facesIntersection
         }
         else
         {
-            FatalErrorIn
-            (
-                "searchableSurfacesQueries::facesIntersection"
-                "(const labelList&, const scalar, const scalar, const point&)"
-            )   << "Did not find point within distance "
+            FatalErrorInFunction
+                << "Did not find point within distance "
                 << initDistSqr << " of starting point " << start
                 << " on surface "
                 << allSurfaces[surfacesToTest[i]].IOobject::name()

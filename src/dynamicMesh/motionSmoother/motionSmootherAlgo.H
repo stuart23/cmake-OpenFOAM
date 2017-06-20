@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -35,7 +35,7 @@ Description
     E.g.
     \verbatim
         // Construct iterative mesh mover.
-        motionSmoother meshMover(mesh, labelList(1, patchI));
+        motionSmoother meshMover(mesh, labelList(1, patchi));
 
         // Set desired displacement:
         meshMover.displacement() = ..
@@ -171,7 +171,7 @@ class motionSmootherAlgo
 
         //- Average of connected points.
         template<class Type>
-        tmp<GeometricField<Type, pointPatchField, pointMesh> > avg
+        tmp<GeometricField<Type, pointPatchField, pointMesh>> avg
         (
             const GeometricField<Type, pointPatchField, pointMesh>& fld,
             const scalarField& edgeWeight
@@ -179,7 +179,7 @@ class motionSmootherAlgo
 
         //- Average postion of connected points.
         template<class Type>
-        tmp<GeometricField<Type, pointPatchField, pointMesh> > avgPositions
+        tmp<GeometricField<Type, pointPatchField, pointMesh>> avgPositions
         (
             const GeometricField<Type, pointPatchField, pointMesh>& fld,
             const scalarField& edgeWeight
@@ -269,7 +269,7 @@ class motionSmootherAlgo
         ) const;
 
         //- Helper function. Is point internal?
-        bool isInternalPoint(const label pointI) const;
+        bool isInternalPoint(const label pointi) const;
 
         //- Given a set of faces that cause smoothing and a number of
         //  iterations determine the maximum set of points who are affected
@@ -508,7 +508,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "motionSmootherAlgoTemplates.C"
+    #include "motionSmootherAlgoTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

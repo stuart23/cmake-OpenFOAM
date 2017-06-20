@@ -3,7 +3,7 @@
 label faceId(-1);
 label patchId(-1);
 label nWallFaces(0);
-vector wallNormal(vector::zero);
+vector wallNormal(Zero);
 
 const fvPatchList& patches = mesh.boundary();
 
@@ -36,7 +36,7 @@ forAll(patches, patchi)
                  || mag(wallNormal & wallNormal2) < 0.99
                 )
                 {
-                    FatalErrorIn(args.executable())
+                    FatalErrorInFunction
                         << "wall faces are not parallel for patches "
                         << patches[patchId].name() << " and "
                         << currPatch.name() << nl
@@ -45,7 +45,7 @@ forAll(patches, patchi)
             }
             else
             {
-                FatalErrorIn(args.executable()) << "number of wall faces > 2"
+                FatalErrorInFunction
                     << nl << exit(FatalError);
             }
         }
@@ -54,7 +54,7 @@ forAll(patches, patchi)
 
 if (nWallFaces == 0)
 {
-    FatalErrorIn(args.executable()) << "No wall patches identified"
+    FatalErrorInFunction
         << exit(FatalError);
 }
 else
@@ -70,7 +70,7 @@ label cellId = patches[patchId].faceCells()[faceId];
 scalarField y
 (
     wallNormal
-  & (mesh.C().internalField() - mesh.C().boundaryField()[patchId][faceId])
+  & (mesh.C().primitiveField() - mesh.C().boundaryField()[patchId][faceId])
 );
 
 Info<< "    Height to first cell centre y0 = " << y[cellId] << endl;

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -38,9 +38,9 @@ void Foam::fileFormats::VTKsurfaceFormat<Face>::writeHeaderPolygons
 {
     label nNodes = 0;
 
-    forAll(faceLst, faceI)
+    forAll(faceLst, facei)
     {
-        nNodes += faceLst[faceI].size();
+        nNodes += faceLst[facei].size();
     }
 
     os  << nl
@@ -75,10 +75,8 @@ bool Foam::fileFormats::VTKsurfaceFormat<Face>::read
     IFstream is(filename);
     if (!is.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::VTKsurfaceFormat::read(const fileName&)"
-        )   << "Cannot read file " << filename
+        FatalErrorInFunction
+            << "Cannot read file " << filename
             << exit(FatalError);
     }
 
@@ -154,9 +152,9 @@ bool Foam::fileFormats::VTKsurfaceFormat<Face>::read
     label nTri = 0;
     if (mustTriangulate)
     {
-        forAll(faces, faceI)
+        forAll(faces, facei)
         {
-            nTri += faces[faceI].size()-2;
+            nTri += faces[facei].size()-2;
         }
     }
 
@@ -164,15 +162,15 @@ bool Foam::fileFormats::VTKsurfaceFormat<Face>::read
     {
         DynamicList<Face> dynFaces(nTri);
         DynamicList<label> dynZones(nTri);
-        forAll(faces, faceI)
+        forAll(faces, facei)
         {
-            const face& f = faces[faceI];
+            const face& f = faces[facei];
             for (label fp1 = 1; fp1 < f.size() - 1; fp1++)
             {
                 label fp2 = f.fcIndex(fp1);
 
                 dynFaces.append(triFace(f[0], f[fp1], f[fp2]));
-                dynZones.append(zones[faceI]);
+                dynZones.append(zones[facei]);
             }
         }
 
@@ -191,17 +189,17 @@ bool Foam::fileFormats::VTKsurfaceFormat<Face>::read
     else
     {
         DynamicList<Face> dynFaces(faces.size());
-        forAll(faces, faceI)
+        forAll(faces, facei)
         {
-            const face& f = faces[faceI];
+            const face& f = faces[facei];
             dynFaces.append(Face(f));
         }
 
         // Count
         labelList zoneSizes(nZones, 0);
-        forAll(zones, faceI)
+        forAll(zones, facei)
         {
-            zoneSizes[zones[faceI]]++;
+            zoneSizes[zones[facei]]++;
         }
 
         this->sortFacesAndStore(dynFaces.xfer(), zones.xfer(), sorted);
@@ -240,11 +238,7 @@ void Foam::fileFormats::VTKsurfaceFormat<Face>::write
     OFstream os(filename);
     if (!os.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::VTKsurfaceFormat::write"
-            "(const fileName&, const MeshedSurfaceProxy<Face>&)"
-        )
+        FatalErrorInFunction
             << "Cannot open file for writing " << filename
             << exit(FatalError);
     }
@@ -260,7 +254,7 @@ void Foam::fileFormats::VTKsurfaceFormat<Face>::write
 
         if (useFaceMap)
         {
-            forAll(zone, localFaceI)
+            forAll(zone, localFacei)
             {
                 const Face& f = faceLst[faceMap[faceIndex++]];
 
@@ -274,7 +268,7 @@ void Foam::fileFormats::VTKsurfaceFormat<Face>::write
         }
         else
         {
-            forAll(zone, localFaceI)
+            forAll(zone, localFacei)
             {
                 const Face& f = faceLst[faceIndex++];
 
@@ -302,11 +296,7 @@ void Foam::fileFormats::VTKsurfaceFormat<Face>::write
     OFstream os(filename);
     if (!os.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::VTKsurfaceFormat::write"
-            "(const fileName&, const UnsortedMeshedSurface<Face>&)"
-        )
+        FatalErrorInFunction
             << "Cannot open file for writing " << filename
             << exit(FatalError);
     }
@@ -317,9 +307,9 @@ void Foam::fileFormats::VTKsurfaceFormat<Face>::write
     writeHeader(os, surf.points());
     writeHeaderPolygons(os, faceLst);
 
-    forAll(faceLst, faceI)
+    forAll(faceLst, facei)
     {
-        const Face& f = faceLst[faceI];
+        const Face& f = faceLst[facei];
 
         os << f.size();
         forAll(f, fp)

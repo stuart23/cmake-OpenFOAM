@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,7 +33,7 @@ void Foam::lduAddressing::calcLosort() const
 {
     if (losortPtr_)
     {
-        FatalErrorIn("lduAddressing::calcLosort() const")
+        FatalErrorInFunction
             << "losort already calculated"
             << abort(FatalError);
     }
@@ -53,9 +53,9 @@ void Foam::lduAddressing::calcLosort() const
     // Create temporary neighbour addressing
     labelListList cellNbrFaces(size());
 
-    forAll(cellNbrFaces, cellI)
+    forAll(cellNbrFaces, celli)
     {
-        cellNbrFaces[cellI].setSize(nNbrOfFace[cellI]);
+        cellNbrFaces[celli].setSize(nNbrOfFace[celli]);
     }
 
     // Reset the list of number of neighbours to zero
@@ -77,9 +77,9 @@ void Foam::lduAddressing::calcLosort() const
     // Set counter for losort
     label lstI = 0;
 
-    forAll(cellNbrFaces, cellI)
+    forAll(cellNbrFaces, celli)
     {
-        const labelList& curNbr = cellNbrFaces[cellI];
+        const labelList& curNbr = cellNbrFaces[celli];
 
         forAll(curNbr, curNbrI)
         {
@@ -94,7 +94,7 @@ void Foam::lduAddressing::calcOwnerStart() const
 {
     if (ownerStartPtr_)
     {
-        FatalErrorIn("lduAddressing::calcOwnerStart() const")
+        FatalErrorInFunction
             << "owner start already calculated"
             << abort(FatalError);
     }
@@ -110,15 +110,15 @@ void Foam::lduAddressing::calcOwnerStart() const
     label nOwnStart = 0;
     label i = 1;
 
-    forAll(own, faceI)
+    forAll(own, facei)
     {
-        label curOwn = own[faceI];
+        label curOwn = own[facei];
 
         if (curOwn > nOwnStart)
         {
             while (i <= curOwn)
             {
-                ownStart[i++] = faceI;
+                ownStart[i++] = facei;
             }
 
             nOwnStart = curOwn;
@@ -131,7 +131,7 @@ void Foam::lduAddressing::calcLosortStart() const
 {
     if (losortStartPtr_)
     {
-        FatalErrorIn("lduAddressing::calcLosortStart() const")
+        FatalErrorInFunction
             << "losort start already calculated"
             << abort(FatalError);
     }
@@ -149,16 +149,16 @@ void Foam::lduAddressing::calcLosortStart() const
     label nLsrtStart = 0;
     label i = 0;
 
-    forAll(lsrt, faceI)
+    forAll(lsrt, facei)
     {
         // Get neighbour
-        const label curNbr = nbr[lsrt[faceI]];
+        const label curNbr = nbr[lsrt[facei]];
 
         if (curNbr > nLsrtStart)
         {
             while (i <= curNbr)
             {
-                lsrtStart[i++] = faceI;
+                lsrtStart[i++] = facei;
             }
 
             nLsrtStart = curNbr;
@@ -215,7 +215,6 @@ const Foam::labelUList& Foam::lduAddressing::losortStartAddr() const
 }
 
 
-// Return edge index given owner and neighbour label
 Foam::label Foam::lduAddressing::triIndex(const label a, const label b) const
 {
     label own = min(a, b);
@@ -228,7 +227,7 @@ Foam::label Foam::lduAddressing::triIndex(const label a, const label b) const
 
     const labelUList& neighbour = upperAddr();
 
-    for (label i = startLabel; i < endLabel; i++)
+    for (label i=startLabel; i<endLabel; i++)
     {
         if (neighbour[i] == nbr)
         {
@@ -238,10 +237,8 @@ Foam::label Foam::lduAddressing::triIndex(const label a, const label b) const
 
     // If neighbour has not been found, something has gone seriously
     // wrong with the addressing mechanism
-    FatalErrorIn
-    (
-        "lduAddressing::triIndex(const label owner, const label nbr) const"
-    )   << "neighbour " << nbr << " not found for owner " << own << ". "
+    FatalErrorInFunction
+        << "neighbour " << nbr << " not found for owner " << own << ". "
         << "Problem with addressing"
         << abort(FatalError);
 
@@ -256,10 +253,10 @@ Foam::Tuple2<Foam::label, Foam::scalar> Foam::lduAddressing::band() const
 
     labelList cellBandwidth(size(), 0);
 
-    forAll(neighbour, faceI)
+    forAll(neighbour, facei)
     {
-        label own = owner[faceI];
-        label nei = neighbour[faceI];
+        label own = owner[facei];
+        label nei = neighbour[facei];
 
         // Note: mag not necessary for correct (upper-triangular) ordering.
         label diff = nei-own;
@@ -270,9 +267,9 @@ Foam::Tuple2<Foam::label, Foam::scalar> Foam::lduAddressing::band() const
 
     // Do not use field algebra because of conversion label to scalar
     scalar profile = 0.0;
-    forAll(cellBandwidth, cellI)
+    forAll(cellBandwidth, celli)
     {
-        profile += 1.0*cellBandwidth[cellI];
+        profile += 1.0*cellBandwidth[celli];
     }
 
     return Tuple2<label, scalar>(bandwidth, profile);

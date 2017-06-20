@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -32,11 +32,10 @@ Description
     pressure is specified.  The inflow velocity is obtained from the flux with
     a direction normal to the patch faces.
 
-    \heading Patch usage
-
+Usage
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            pressureInletVelocity;
         phi             phi;
@@ -49,7 +48,7 @@ Note
     If reverse flow is possible or expected use
     the pressureInletOutletVelocityFvPatchVectorField condition instead.
 
-SeeAlso
+See also
     Foam::fixedValueFvPatchField
     Foam::pressureInletOutletVelocityFvPatchVectorField
 
@@ -155,6 +154,15 @@ public:
 
 
     // Member functions
+
+        // Attributes
+
+            //- Return true: this patch field is altered by assignment
+            virtual bool assignable() const
+            {
+                return true;
+            }
+
 
         // Access
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2014-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,6 +24,9 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "relativeVelocityModel.H"
+#include "fixedValueFvPatchFields.H"
+#include "slipFvPatchFields.H"
+#include "partialSlipFvPatchFields.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -31,6 +34,34 @@ namespace Foam
 {
     defineTypeNameAndDebug(relativeVelocityModel, 0);
     defineRunTimeSelectionTable(relativeVelocityModel, dictionary);
+}
+
+// * * * * * * * * * * * * * Private Member Functions   * * * * * * * * * * * //
+
+Foam::wordList Foam::relativeVelocityModel::UdmPatchFieldTypes() const
+{
+    const volVectorField& U = mixture_.U();
+
+    wordList UdmTypes
+    (
+        U.boundaryField().size(),
+        calculatedFvPatchScalarField::typeName
+    );
+
+    forAll(U.boundaryField(), i)
+    {
+        if
+        (
+            isA<fixedValueFvPatchVectorField>(U.boundaryField()[i])
+         || isA<slipFvPatchVectorField>(U.boundaryField()[i])
+         || isA<partialSlipFvPatchVectorField>(U.boundaryField()[i])
+        )
+        {
+            UdmTypes[i] = fixedValueFvPatchVectorField::typeName;
+        }
+    }
+
+    return UdmTypes;
 }
 
 
@@ -55,12 +86,12 @@ Foam::relativeVelocityModel::relativeVelocityModel
             "Udm",
             alphac_.time().timeName(),
             alphac_.mesh(),
-            IOobject::NO_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
         alphac_.mesh(),
-        dimensionedVector("Udm", dimVelocity, vector::zero),
-        mixture.U().boundaryField().types()
+        dimensionedVector("Udm", dimVelocity, Zero),
+        UdmPatchFieldTypes()
     )
 {}
 
@@ -82,13 +113,8 @@ Foam::autoPtr<Foam::relativeVelocityModel> Foam::relativeVelocityModel::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "relativeVelocityModel::New"
-            "("
-                "const dictionary&"
-            ")"
-        )   << "Unknown time scale model type " << modelType
+        FatalErrorInFunction
+            << "Unknown time scale model type " << modelType
             << ", constructor not in hash table" << nl << nl
             << "    Valid time scale model types are:" << nl
             << dictionaryConstructorTablePtr_->sortedToc()

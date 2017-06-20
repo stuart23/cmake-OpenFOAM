@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -54,7 +54,7 @@ void Foam::linearValveFvMesh::addZonesAndModifiers()
      || topoChanger_.size()
     )
     {
-        Info<< "void linearValveFvMesh::addZonesAndModifiers() : "
+        InfoInFunction
             << "Zones and modifiers already present.  Skipping."
             << endl;
 
@@ -178,7 +178,7 @@ void Foam::linearValveFvMesh::makeSlidersDead()
         }
         else
         {
-            FatalErrorIn("void Foam::linearValveFvMesh::makeSlidersDead()")
+            FatalErrorInFunction
                 << "Don't know what to do with mesh modifier "
                 << modI << " of type " << topoChanges[modI].type()
                 << abort(FatalError);
@@ -200,7 +200,7 @@ void Foam::linearValveFvMesh::makeSlidersLive()
         }
         else
         {
-            FatalErrorIn("void Foam::linearValveFvMesh::makeLayersLive()")
+            FatalErrorInFunction
                 << "Don't know what to do with mesh modifier "
                 << modI << " of type " << topoChanges[modI].type()
                 << abort(FatalError);
@@ -236,7 +236,7 @@ bool Foam::linearValveFvMesh::attached() const
              != refCast<const slidingInterface>(topoChanges[modI]).attached()
             )
             {
-                FatalErrorIn("bool linearValveFvMesh::attached() const")
+                FatalErrorInFunction
                     << "Slider " << modI
                     << " named " << topoChanges[modI].name()
                     << " out of sync: Should be" << result

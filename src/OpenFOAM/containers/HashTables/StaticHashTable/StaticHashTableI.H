@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -78,7 +78,7 @@ inline bool Foam::StaticHashTable<T, Key, Hash>::set
 
 
 template<class T, class Key, class Hash>
-inline Foam::Xfer<Foam::StaticHashTable<T, Key, Hash> >
+inline Foam::Xfer<Foam::StaticHashTable<T, Key, Hash>>
 Foam::StaticHashTable<T, Key, Hash>::xfer()
 {
     return xferMove(*this);
@@ -94,8 +94,7 @@ inline T& Foam::StaticHashTable<T, Key, Hash>::operator[](const Key& key)
 
     if (iter == end())
     {
-        FatalErrorIn("StaticHashTable<T, Key, Hash>::operator[](const Key&)")
-            << key << " not found in table.  Valid entries: "
+        FatalErrorInFunction
             << toc()
             << exit(FatalError);
     }
@@ -114,10 +113,7 @@ inline const T& Foam::StaticHashTable<T, Key, Hash>::operator[]
 
     if (iter == cend())
     {
-        FatalErrorIn
-        (
-            "StaticHashTable<T, Key, Hash>::operator[](const Key&) const"
-        )   << key << " not found in table.  Valid entries: "
+        FatalErrorInFunction
             << toc()
             << exit(FatalError);
     }
@@ -349,12 +345,12 @@ Foam::StaticHashTable<T, Key, Hash>::begin()
         }
     }
 
-#   ifdef FULLDEBUG
+    #ifdef FULLDEBUG
     if (debug)
     {
         Info<< "StaticHashTable is empty\n";
     }
-#   endif
+    #endif
 
     return StaticHashTable<T, Key, Hash>::endIter_;
 }
@@ -381,12 +377,12 @@ Foam::StaticHashTable<T, Key, Hash>::cbegin() const
         }
     }
 
-#   ifdef FULLDEBUG
+    #ifdef FULLDEBUG
     if (debug)
     {
         Info<< "StaticHashTable is empty\n";
     }
-#   endif
+    #endif
 
     return StaticHashTable<T, Key, Hash>::endConstIter_;
 }

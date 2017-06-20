@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -59,8 +59,8 @@ protected:
         //- Return the true if cells intersect
         virtual bool intersect
         (
-            const label srcCellI,
-            const label tgtCellI
+            const label srcCelli,
+            const label tgtCelli
         ) const;
 
         //- Find indices of overlapping cells in src and tgt meshes - returns
@@ -97,6 +97,11 @@ protected:
             label& srcSeedI,
             label& tgtSeedI
         ) const;
+
+
+private:
+
+    // Private member functions
 
         //- Disallow default bitwise copy construct
         directMethod(const directMethod&);

@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "continuousGasKEpsilon.H"
-#include "addToRunTimeSelectionTable.H"
+#include "fvOptions.H"
 #include "twoPhaseSystem.H"
 #include "virtualMassModel.H"
 
@@ -89,7 +89,6 @@ continuousGasKEpsilon<BasicTurbulenceModel>::continuousGasKEpsilon
 {
     if (type == typeName)
     {
-        kEpsilon<BasicTurbulenceModel>::correctNut();
         this->printCoeffs(type);
     }
 }
@@ -137,6 +136,7 @@ void continuousGasKEpsilon<BasicTurbulenceModel>::correctNut()
     volScalarField omega((1 - expThetar)/(1 + expThetar));
 
     nutEff_ = omega*liquidTurbulence.nut();
+    fv::options::New(this->mesh_).correct(nutEff_);
 }
 
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -55,14 +55,8 @@ Foam::cyclicPointPatchField<Type>::cyclicPointPatchField
 {
     if (!isType<cyclicPointPatch>(p))
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "cyclicPointPatchField<Type>::cyclicPointPatchField\n"
-            "(\n"
-            "    const pointPatch& p,\n"
-            "    const Field<Type>& field,\n"
-            "    const dictionary& dict\n"
-            ")\n",
             dict
         )   << "patch " << this->patch().index() << " not cyclic type. "
             << "Patch type = " << p.type()
@@ -85,16 +79,8 @@ Foam::cyclicPointPatchField<Type>::cyclicPointPatchField
 {
     if (!isType<cyclicPointPatch>(this->patch()))
     {
-        FatalErrorIn
-        (
-            "cyclicPointPatchField<Type>::cyclicPointPatchField\n"
-            "(\n"
-            "    const cyclicPointPatchField<Type>& ptf,\n"
-            "    const pointPatch& p,\n"
-            "    const DimensionedField<Type, pointMesh>& iF,\n"
-            "    const pointPatchFieldMapper& mapper\n"
-            ")\n"
-        )   << "Field type does not correspond to patch type for patch "
+        FatalErrorInFunction
+            << "Field type does not correspond to patch type for patch "
             << this->patch().index() << "." << endl
             << "Field type: " << typeName << endl
             << "Patch type: " << this->patch().type()
@@ -135,13 +121,13 @@ void Foam::cyclicPointPatchField<Type>::swapAddSeparated
 
         // Get neighbouring pointPatchField
         const GeometricField<Type, pointPatchField, pointMesh>& fld =
-            refCast<const GeometricField<Type, pointPatchField, pointMesh> >
+            refCast<const GeometricField<Type, pointPatchField, pointMesh>>
             (
-                this->dimensionedInternalField()
+                this->internalField()
             );
 
         const cyclicPointPatchField<Type>& nbr =
-            refCast<const cyclicPointPatchField<Type> >
+            refCast<const cyclicPointPatchField<Type>>
             (
                 fld.boundaryField()[nbrPatch.index()]
             );

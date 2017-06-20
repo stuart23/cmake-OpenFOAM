@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -49,6 +49,7 @@ Description
 #include "singlePhaseTransportModel.H"
 #include "turbulentTransportModel.H"
 #include "simpleControl.H"
+#include "fvOptions.H"
 
 template<class Type>
 void zeroCells
@@ -59,7 +60,7 @@ void zeroCells
 {
     forAll(cells, i)
     {
-        vf[cells[i]] = pTraits<Type>::zero;
+        vf[cells[i]] = Zero;
     }
 }
 
@@ -68,16 +69,18 @@ void zeroCells
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCase.H"
+    #include "postProcess.H"
 
+    #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
-
-    simpleControl simple(mesh);
-
+    #include "createControl.H"
     #include "createFields.H"
+    #include "createFvOptions.H"
     #include "initContinuityErrs.H"
     #include "initAdjointContinuityErrs.H"
+
+    turbulence->validate();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -103,27 +106,32 @@ int main(int argc, char *argv[])
         {
             // Momentum predictor
 
-            tmp<fvVectorMatrix> UEqn
+            tmp<fvVectorMatrix> tUEqn
             (
                 fvm::div(phi, U)
               + turbulence->divDevReff(U)
               + fvm::Sp(alpha, U)
+             ==
+                fvOptions(U)
             );
+            fvVectorMatrix& UEqn = tUEqn.ref();
 
-            UEqn().relax();
+            UEqn.relax();
 
-            solve(UEqn() == -fvc::grad(p));
+            fvOptions.constrain(UEqn);
 
-            volScalarField rAU(1.0/UEqn().A());
-            volVectorField HbyA("HbyA", U);
-            HbyA = rAU*UEqn().H();
-            UEqn.clear();
-            surfaceScalarField phiHbyA
-            (
-                "phiHbyA",
-                fvc::interpolate(HbyA) & mesh.Sf()
-            );
+            solve(UEqn == -fvc::grad(p));
+
+            fvOptions.correct(U);
+
+            volScalarField rAU(1.0/UEqn.A());
+            volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
+            tUEqn.clear();
+            surfaceScalarField phiHbyA("phiHbyA", fvc::flux(HbyA));
             adjustPhi(phiHbyA, U, p);
+
+            // Update the pressure BCs to ensure flux consistency
+            constrainPressure(p, U, phiHbyA, rAU);
 
             // Non-orthogonal pressure corrector loop
             while (simple.correctNonOrthogonal())
@@ -150,6 +158,7 @@ int main(int argc, char *argv[])
             // Momentum corrector
             U = HbyA - rAU*fvc::grad(p);
             U.correctBoundaryConditions();
+            fvOptions.correct(U);
         }
 
         // Adjoint Pressure-velocity SIMPLE corrector
@@ -161,33 +170,36 @@ int main(int argc, char *argv[])
             //(
             //    fvc::reconstruct
             //    (
-            //        mesh.magSf()*(fvc::snGrad(Ua) & fvc::interpolate(U))
+            //        mesh.magSf()*fvc::dotInterpolate(fvc::snGrad(Ua), U)
             //    )
             //);
 
             zeroCells(adjointTransposeConvection, inletCells);
 
-            tmp<fvVectorMatrix> UaEqn
+            tmp<fvVectorMatrix> tUaEqn
             (
                 fvm::div(-phi, Ua)
               - adjointTransposeConvection
               + turbulence->divDevReff(Ua)
               + fvm::Sp(alpha, Ua)
+             ==
+                fvOptions(Ua)
             );
+            fvVectorMatrix& UaEqn = tUaEqn.ref();
 
-            UaEqn().relax();
+            UaEqn.relax();
 
-            solve(UaEqn() == -fvc::grad(pa));
+            fvOptions.constrain(UaEqn);
 
-            volScalarField rAUa(1.0/UaEqn().A());
+            solve(UaEqn == -fvc::grad(pa));
+
+            fvOptions.correct(Ua);
+
+            volScalarField rAUa(1.0/UaEqn.A());
             volVectorField HbyAa("HbyAa", Ua);
-            HbyAa = rAUa*UaEqn().H();
-            UaEqn.clear();
-            surfaceScalarField phiHbyAa
-            (
-                "phiHbyAa",
-                fvc::interpolate(HbyAa) & mesh.Sf()
-            );
+            HbyAa = rAUa*UaEqn.H();
+            tUaEqn.clear();
+            surfaceScalarField phiHbyAa("phiHbyAa", fvc::flux(HbyAa));
             adjustPhi(phiHbyAa, Ua, pa);
 
             // Non-orthogonal pressure corrector loop
@@ -215,6 +227,7 @@ int main(int argc, char *argv[])
             // Adjoint momentum corrector
             Ua = HbyAa - rAUa*fvc::grad(pa);
             Ua.correctBoundaryConditions();
+            fvOptions.correct(Ua);
         }
 
         laminarTransport.correct();

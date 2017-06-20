@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,22 +28,21 @@ License
 #include "Time.H"
 #include "Pstream.H"
 
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 Foam::Istream& Foam::regIOobject::readStream()
 {
     if (IFstream::debug)
     {
-        Info<< "regIOobject::readStream() : "
-            << "reading object " << name()
+        InfoInFunction
+            << "Reading object " << name()
             << " from file " << objectPath()
             << endl;
     }
 
     if (readOpt() == NO_READ)
     {
-        FatalErrorIn("regIOobject::readStream()")
+        FatalErrorInFunction
             << "NO_READ specified for read-constructor of object " << name()
             << " of class " << headerClassName()
             << abort(FatalError);
@@ -92,7 +91,7 @@ Foam::Istream& Foam::regIOobject::readStream()
         }
         else if (!readHeader(*isPtr_))
         {
-            FatalIOErrorIn("regIOobject::readStream()", *isPtr_)
+            FatalIOErrorInFunction(*isPtr_)
                 << "problem while reading header for object " << name()
                 << exit(FatalIOError);
         }
@@ -112,8 +111,8 @@ Foam::Istream& Foam::regIOobject::readStream(const word& expectName)
 {
     if (IFstream::debug)
     {
-        Info<< "regIOobject::readStream(const word&) : "
-            << "reading object " << name()
+        InfoInFunction
+            << "Reading object " << name()
             << " from file " << objectPath()
             << endl;
     }
@@ -133,7 +132,7 @@ Foam::Istream& Foam::regIOobject::readStream(const word& expectName)
          && headerClassName() != "dictionary"
         )
         {
-            FatalIOErrorIn("regIOobject::readStream(const word&)", *isPtr_)
+            FatalIOErrorInFunction(*isPtr_)
                 << "unexpected class name " << headerClassName()
                 << " expected " << expectName << endl
                 << "    while reading object " << name()
@@ -149,8 +148,8 @@ void Foam::regIOobject::close()
 {
     if (IFstream::debug)
     {
-        Info<< "regIOobject::close() : "
-            << "finished reading " << filePath()
+        InfoInFunction
+            << "Finished reading " << filePath()
             << endl;
     }
 
@@ -249,8 +248,9 @@ bool Foam::regIOobject::read()
             ok = readData(fromAbove);
         }
 
-        // Send to my downstairs neighbours
-        forAll(myComm.below(), belowI)
+        // Send to my downstairs neighbours. Note reverse order not
+        // nessecary here - just for consistency reasons.
+        forAllReverse(myComm.below(), belowI)
         {
             OPstream toBelow
             (
@@ -288,7 +288,8 @@ bool Foam::regIOobject::readIfModified()
         if (modified())
         {
             const fileName& fName = time().getFile(watchIndex_);
-            Info<< "regIOobject::readIfModified() : " << nl
+            InfoInFunction
+                << nl
                 << "    Re-reading object " << name()
                 << " from file " << fName << endl;
             return read();

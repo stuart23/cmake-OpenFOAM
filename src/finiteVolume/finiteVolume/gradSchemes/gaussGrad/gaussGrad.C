@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "gaussGrad.H"
-#include "zeroGradientFvPatchField.H"
+#include "extrapolatedCalculatedFvPatchField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,7 +48,7 @@ Foam::fv::gaussGrad<Type>::gradf
 
     const fvMesh& mesh = ssf.mesh();
 
-    tmp<GeometricField<GradType, fvPatchField, volMesh> > tgGrad
+    tmp<GeometricField<GradType, fvPatchField, volMesh>> tgGrad
     (
         new GeometricField<GradType, fvPatchField, volMesh>
         (
@@ -65,12 +65,12 @@ Foam::fv::gaussGrad<Type>::gradf
             (
                 "0",
                 ssf.dimensions()/dimLength,
-                pTraits<GradType>::zero
+                Zero
             ),
-            zeroGradientFvPatchField<GradType>::typeName
+            extrapolatedCalculatedFvPatchField<GradType>::typeName
         )
     );
-    GeometricField<GradType, fvPatchField, volMesh>& gGrad = tgGrad();
+    GeometricField<GradType, fvPatchField, volMesh>& gGrad = tgGrad.ref();
 
     const labelUList& owner = mesh.owner();
     const labelUList& neighbour = mesh.neighbour();
@@ -128,11 +128,11 @@ Foam::fv::gaussGrad<Type>::calcGrad
 {
     typedef typename outerProduct<vector, Type>::type GradType;
 
-    tmp<GeometricField<GradType, fvPatchField, volMesh> > tgGrad
+    tmp<GeometricField<GradType, fvPatchField, volMesh>> tgGrad
     (
         gradf(tinterpScheme_().interpolate(vsf), name)
     );
-    GeometricField<GradType, fvPatchField, volMesh>& gGrad = tgGrad();
+    GeometricField<GradType, fvPatchField, volMesh>& gGrad = tgGrad.ref();
 
     correctBoundaryConditions(vsf, gGrad);
 
@@ -150,6 +150,11 @@ void Foam::fv::gaussGrad<Type>::correctBoundaryConditions
     >& gGrad
 )
 {
+    typename GeometricField
+    <
+        typename outerProduct<vector, Type>::type, fvPatchField, volMesh
+    >::Boundary& gGradbf = gGrad.boundaryFieldRef();
+
     forAll(vsf.boundaryField(), patchi)
     {
         if (!vsf.boundaryField()[patchi].coupled())
@@ -160,10 +165,10 @@ void Foam::fv::gaussGrad<Type>::correctBoundaryConditions
               / vsf.mesh().magSf().boundaryField()[patchi]
             );
 
-            gGrad.boundaryField()[patchi] += n *
+            gGradbf[patchi] += n *
             (
                 vsf.boundaryField()[patchi].snGrad()
-              - (n & gGrad.boundaryField()[patchi])
+              - (n & gGradbf[patchi])
             );
         }
      }

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -47,11 +47,11 @@ pyrolysisChemistryModel
     cellCounter_(0)
 {
     // create the fields for the chemistry sources
-    forAll(this->RRs_, fieldI)
+    forAll(this->RRs_, fieldi)
     {
         IOobject header
         (
-            this->Ys_[fieldI].name() + "0",
+            this->Ys_[fieldi].name() + "0",
             mesh.time().timeName(),
             mesh,
             IOobject::NO_READ
@@ -62,12 +62,12 @@ pyrolysisChemistryModel
         {
             Ys0_.set
             (
-                fieldI,
+                fieldi,
                 new volScalarField
                 (
                     IOobject
                     (
-                        this->Ys_[fieldI].name() + "0",
+                        this->Ys_[fieldi].name() + "0",
                         mesh.time().timeName(),
                         mesh,
                         IOobject::MUST_READ,
@@ -94,12 +94,12 @@ pyrolysisChemistryModel
 
             Ys0_.set
             (
-                fieldI,
+                fieldi,
                 new volScalarField
                 (
                     IOobject
                     (
-                        this->Ys_[fieldI].name() + "0",
+                        this->Ys_[fieldi].name() + "0",
                         mesh.time().timeName(),
                         mesh,
                         IOobject::NO_READ,
@@ -110,22 +110,22 @@ pyrolysisChemistryModel
             );
 
             // Calculate inital values of Ysi0 = rho*delta*Yi
-            Ys0_[fieldI].internalField() =
+            Ys0_[fieldi].primitiveFieldRef() =
                 this->solidThermo().rho()
-               *max(this->Ys_[fieldI], scalar(0.001))*mesh.V();
+               *max(this->Ys_[fieldi], scalar(0.001))*mesh.V();
         }
     }
 
-    forAll(RRg_, fieldI)
+    forAll(RRg_, fieldi)
     {
         RRg_.set
         (
-            fieldI,
+            fieldi,
             new DimensionedField<scalar, volMesh>
             (
                 IOobject
                 (
-                    "RRg." + pyrolisisGases_[fieldI],
+                    "RRg." + pyrolisisGases_[fieldi],
                     mesh.time().timeName(),
                     mesh,
                     IOobject::NO_READ,
@@ -188,7 +188,7 @@ pyrolysisChemistryModel<CompType, SolidThermo, GasThermo>::omega
     scalar pf, cf, pr, cr;
     label lRef, rRef;
 
-    const label cellI = cellCounter_;
+    const label celli = cellCounter_;
 
     scalarField om(nEqns(), 0.0);
 
@@ -217,7 +217,7 @@ pyrolysisChemistryModel<CompType, SolidThermo, GasThermo>::omega
 
             if (updateC0)
             {
-                Ys0_[si][cellI] += sr*omegai;
+                Ys0_[si][celli] += sr*omegai;
             }
         }
         forAll(R.grhs(), g)
@@ -249,7 +249,7 @@ Foam::pyrolysisChemistryModel<CompType, SolidThermo, GasThermo>::omega
 {
     scalarField c1(nSpecie_, 0.0);
 
-    label cellI = cellCounter_;
+    label celli = cellCounter_;
 
     for (label i=0; i<nSpecie_; i++)
     {
@@ -266,8 +266,8 @@ Foam::pyrolysisChemistryModel<CompType, SolidThermo, GasThermo>::omega
         const scalar exp = R.lhs()[si].exponent;
 
         kf *=
-            pow(c1[si]/Ys0_[si][cellI], exp)
-           *(Ys0_[si][cellI]);
+            pow(c1[si]/Ys0_[si][celli], exp)
+           *(Ys0_[si][celli]);
     }
 
     return kf;
@@ -363,7 +363,7 @@ jacobian
     {
         for (label j=0; j<nEqns(); j++)
         {
-            dfdc[i][j] = 0.0;
+            dfdc(i, j) = 0.0;
         }
     }
 
@@ -619,7 +619,6 @@ Foam::pyrolysisChemistryModel<CompType, SolidThermo, GasThermo>::gasHs
     const label index
 ) const
 {
-
     tmp<volScalarField> tHs
     (
         new volScalarField
@@ -634,18 +633,17 @@ Foam::pyrolysisChemistryModel<CompType, SolidThermo, GasThermo>::gasHs
                 false
             ),
             this->mesh_,
-            dimensionedScalar("zero", dimEnergy/dimMass, 0.0),
-            zeroGradientFvPatchScalarField::typeName
+            dimensionedScalar("zero", dimEnergy/dimMass, 0.0)
         )
     );
 
-    volScalarField::InternalField& gasHs = tHs().internalField();
+    volScalarField::Internal& gasHs = tHs.ref();
 
     const GasThermo& mixture = gasThermo_[index];
 
-    forAll(gasHs, cellI)
+    forAll(gasHs, celli)
     {
-        gasHs[cellI] = mixture.Hs(p[cellI], T[cellI]);
+        gasHs[celli] = mixture.Hs(p[celli], T[celli]);
     }
 
     return tHs;
@@ -662,16 +660,8 @@ void Foam::pyrolysisChemistryModel<CompType, SolidThermo, GasThermo>::solve
     scalar& subDeltaT
 ) const
 {
-    notImplemented
-    (
-        "pyrolysisChemistryModel::solve"
-        "("
-            "scalarField&, "
-            "scalar&, "
-            "scalar&, "
-            "scalar&, "
-            "scalar&  "
-        ") const"
-    );
+    NotImplemented;
 }
+
+
 // ************************************************************************* //

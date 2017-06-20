@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "SpalartAllmarasDES.H"
+#include "fvOptions.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -128,7 +129,7 @@ tmp<volScalarField> SpalartAllmarasDES<BasicTurbulenceModel>::r
             scalar(10)
         )
     );
-    tr().boundaryField() == 0.0;
+    tr.ref().boundaryFieldRef() == 0.0;
 
     return tr;
 }
@@ -157,7 +158,7 @@ tmp<volScalarField> SpalartAllmarasDES<BasicTurbulenceModel>::dTilda
 ) const
 {
     tmp<volScalarField> tdTilda(CDES_*this->delta());
-    min(tdTilda().dimensionedInternalField(), tdTilda(), y_);
+    min(tdTilda.ref().ref(), tdTilda(), y_);
     return tdTilda;
 }
 
@@ -170,6 +171,7 @@ void SpalartAllmarasDES<BasicTurbulenceModel>::correctNut
 {
     this->nut_ = nuTilda_*fv1;
     this->nut_.correctBoundaryConditions();
+    fv::options::New(this->mesh_).correct(this->nut_);
 
     BasicTurbulenceModel::correctNut();
 }
@@ -318,7 +320,6 @@ SpalartAllmarasDES<BasicTurbulenceModel>::SpalartAllmarasDES
 {
     if (type == typeName)
     {
-        correctNut();
         this->printCoeffs(type);
     }
 }
@@ -413,6 +414,7 @@ void SpalartAllmarasDES<BasicTurbulenceModel>::correct()
     const rhoField& rho = this->rho_;
     const surfaceScalarField& alphaRhoPhi = this->alphaRhoPhi_;
     const volVectorField& U = this->U_;
+    fv::options& fvOptions(fv::options::New(this->mesh_));
 
     LESeddyViscosity<BasicTurbulenceModel>::correct();
 
@@ -437,11 +439,14 @@ void SpalartAllmarasDES<BasicTurbulenceModel>::correct()
             Cw1_*alpha*rho*fw(Stilda, dTilda)*nuTilda_/sqr(dTilda),
             nuTilda_
         )
+      + fvOptions(alpha, rho, nuTilda_)
     );
 
-    nuTildaEqn().relax();
+    nuTildaEqn.ref().relax();
+    fvOptions.constrain(nuTildaEqn.ref());
     solve(nuTildaEqn);
-    bound(nuTilda_, dimensionedScalar("zero", nuTilda_.dimensions(), 0.0));
+    fvOptions.correct(nuTilda_);
+    bound(nuTilda_, dimensionedScalar("0", nuTilda_.dimensions(), 0.0));
     nuTilda_.correctBoundaryConditions();
 
     correctNut(fv1);

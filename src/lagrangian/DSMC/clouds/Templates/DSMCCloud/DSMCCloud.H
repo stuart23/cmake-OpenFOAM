@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -93,7 +93,7 @@ class DSMCCloud
         scalar nParticle_;
 
         //- A data structure holding which particles are in which cell
-        List<DynamicList<ParcelType*> > cellOccupancy_;
+        List<DynamicList<ParcelType*>> cellOccupancy_;
 
         //- A field holding the value of (sigmaT * cR)max for each
         //  cell (see Bird p220). Initialised with the parcels,
@@ -149,15 +149,15 @@ class DSMCCloud
         // References to the cloud sub-models
 
             //- Binary collision model
-            autoPtr<BinaryCollisionModel<DSMCCloud<ParcelType> > >
+            autoPtr<BinaryCollisionModel<DSMCCloud<ParcelType>>>
                 binaryCollisionModel_;
 
             //- Wall interaction model
-            autoPtr<WallInteractionModel<DSMCCloud<ParcelType> > >
+            autoPtr<WallInteractionModel<DSMCCloud<ParcelType>>>
                 wallInteractionModel_;
 
             //- Inflow boundary model
-            autoPtr<InflowBoundaryModel<DSMCCloud<ParcelType> > >
+            autoPtr<InflowBoundaryModel<DSMCCloud<ParcelType>>>
                 inflowBoundaryModel_;
 
 
@@ -244,7 +244,7 @@ public:
                 inline scalar nParticle() const;
 
                 //- Return the cell occupancy addressing
-                inline const List<DynamicList<ParcelType*> >&
+                inline const List<DynamicList<ParcelType*>>&
                     cellOccupancy() const;
 
                 //- Return the sigmaTcRMax field.  non-const access to allow
@@ -270,31 +270,31 @@ public:
             // References to the boundary fields for surface data collection
 
                 //- Return non-const heat flux boundary field reference
-                inline volScalarField::GeometricBoundaryField& qBF();
+                inline volScalarField::Boundary& qBF();
 
                 //- Return non-const force density at boundary field reference
-                inline volVectorField::GeometricBoundaryField& fDBF();
+                inline volVectorField::Boundary& fDBF();
 
                 //- Return non-const number density boundary field reference
-                inline volScalarField::GeometricBoundaryField& rhoNBF();
+                inline volScalarField::Boundary& rhoNBF();
 
                 //- Return non-const mass density boundary field reference
-                inline volScalarField::GeometricBoundaryField& rhoMBF();
+                inline volScalarField::Boundary& rhoMBF();
 
                 //- Return non-const linear kinetic energy density boundary
                 //  field reference
-                inline volScalarField::GeometricBoundaryField& linearKEBF();
+                inline volScalarField::Boundary& linearKEBF();
 
                 //- Return non-const internal energy density boundary field
                 // reference
-                inline volScalarField::GeometricBoundaryField& internalEBF();
+                inline volScalarField::Boundary& internalEBF();
 
                 //- Return non-const internal degree of freedom density boundary
                 //  field reference
-                inline volScalarField::GeometricBoundaryField& iDofBF();
+                inline volScalarField::Boundary& iDofBF();
 
                 //- Return non-const momentum density boundary field reference
-                inline volVectorField::GeometricBoundaryField& momentumBF();
+                inline volVectorField::Boundary& momentumBF();
 
 
             // References to the macroscopic fields
@@ -398,27 +398,27 @@ public:
             // Sub-models
 
                 //- Return reference to binary elastic collision model
-                inline const BinaryCollisionModel<DSMCCloud<ParcelType> >&
+                inline const BinaryCollisionModel<DSMCCloud<ParcelType>>&
                     binaryCollision() const;
 
                 //- Return non-const reference to binary elastic collision model
-                inline BinaryCollisionModel<DSMCCloud<ParcelType> >&
+                inline BinaryCollisionModel<DSMCCloud<ParcelType>>&
                     binaryCollision();
 
                 //- Return reference to wall interaction model
-                inline const WallInteractionModel<DSMCCloud<ParcelType> >&
+                inline const WallInteractionModel<DSMCCloud<ParcelType>>&
                     wallInteraction() const;
 
                 //- Return non-const reference to wall interaction model
-                inline WallInteractionModel<DSMCCloud<ParcelType> >&
+                inline WallInteractionModel<DSMCCloud<ParcelType>>&
                     wallInteraction();
 
                 //- Return reference to wall interaction model
-                inline const InflowBoundaryModel<DSMCCloud<ParcelType> >&
+                inline const InflowBoundaryModel<DSMCCloud<ParcelType>>&
                     inflowBoundary() const;
 
                 //- Return non-const reference to wall interaction model
-                inline InflowBoundaryModel<DSMCCloud<ParcelType> >&
+                inline InflowBoundaryModel<DSMCCloud<ParcelType>>&
                     inflowBoundary();
 
 
@@ -453,8 +453,8 @@ public:
                 const vector& position,
                 const vector& U,
                 const scalar Ei,
-                const label cellI,
-                const label tetFaceI,
+                const label celli,
+                const label tetFacei,
                 const label tetPtI,
                 const label typeId
             );
@@ -484,7 +484,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "DSMCCloud.C"
+    #include "DSMCCloud.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

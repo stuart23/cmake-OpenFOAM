@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::autoPtr<Foam::SurfaceReactionModel<CloudType> >
+Foam::autoPtr<Foam::SurfaceReactionModel<CloudType>>
 Foam::SurfaceReactionModel<CloudType>::New
 (
     const dictionary& dict,
@@ -44,21 +44,15 @@ Foam::SurfaceReactionModel<CloudType>::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "SurfaceReactionModel<CloudType>::New"
-            "("
-                "const dictionary&, "
-                "CloudType&"
-            ")"
-        )   << "Unknown surface reaction model type "
+        FatalErrorInFunction
+            << "Unknown surface reaction model type "
             << modelType << nl << nl
             << "Valid surface reaction model types are:" << nl
             << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 
-    return autoPtr<SurfaceReactionModel<CloudType> >(cstrIter()(dict, owner));
+    return autoPtr<SurfaceReactionModel<CloudType>>(cstrIter()(dict, owner));
 }
 
 

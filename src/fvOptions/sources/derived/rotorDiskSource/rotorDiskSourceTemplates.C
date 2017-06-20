@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -54,12 +54,12 @@ void Foam::fv::rotorDiskSource::calculate
     {
         if (area_[i] > ROOTVSMALL)
         {
-            const label cellI = cells_[i];
+            const label celli = cells_[i];
 
             const scalar radius = x_[i].x();
 
             // Transform velocity into local cylindrical reference frame
-            vector Uc = cylindrical_->invTransform(U[cellI], i);
+            vector Uc = cylindrical_->invTransform(U[celli], i);
 
             // Transform velocity into local coning system
             Uc = R_[i] & Uc;
@@ -119,7 +119,7 @@ void Foam::fv::rotorDiskSource::calculate
             scalar tipFactor = neg(radius/rMax_ - tipEffect_);
 
             // Calculate forces perpendicular to blade
-            scalar pDyn = 0.5*rho[cellI]*magSqr(Uc);
+            scalar pDyn = 0.5*rho[celli]*magSqr(Uc);
 
             scalar f = pDyn*chord*nBlades_*area_[i]/radius/mathematical::twoPi;
             vector localForce = vector(0.0, -f*Cd, tipFactor*f*Cl);
@@ -132,11 +132,11 @@ void Foam::fv::rotorDiskSource::calculate
             localForce = invR_[i] & localForce;
 
             // Transform force into global Cartesian co-ordinate system
-            force[cellI] = cylindrical_->transform(localForce, i);
+            force[celli] = cylindrical_->transform(localForce, i);
 
             if (divideVolume)
             {
-                force[cellI] /= V[cellI];
+                force[celli] /= V[celli];
             }
         }
     }
@@ -167,7 +167,7 @@ void Foam::fv::rotorDiskSource::writeField
 {
     typedef GeometricField<Type, fvPatchField, volMesh> fieldType;
 
-    if (mesh_.time().outputTime() || writeNow)
+    if (mesh_.time().writeTime() || writeNow)
     {
         tmp<fieldType> tfield
         (
@@ -182,22 +182,22 @@ void Foam::fv::rotorDiskSource::writeField
                     IOobject::NO_WRITE
                 ),
                 mesh_,
-                dimensioned<Type>("zero", dimless, pTraits<Type>::zero)
+                dimensioned<Type>("zero", dimless, Zero)
             )
         );
 
-        Field<Type>& field = tfield().internalField();
+        Field<Type>& field = tfield.ref().primitiveFieldRef();
 
         if (cells_.size() != values.size())
         {
-            FatalErrorIn("") << "cells_.size() != values_.size()"
+            FatalErrorInFunction
                 << abort(FatalError);
         }
 
         forAll(cells_, i)
         {
-            const label cellI = cells_[i];
-            field[cellI] = values[i];
+            const label celli = cells_[i];
+            field[celli] = values[i];
         }
 
         tfield().write();

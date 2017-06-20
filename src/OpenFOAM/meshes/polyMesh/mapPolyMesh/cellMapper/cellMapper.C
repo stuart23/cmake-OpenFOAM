@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -40,7 +40,7 @@ void Foam::cellMapper::calcAddressing() const
      || insertedCellLabelsPtr_
     )
     {
-        FatalErrorIn("void cellMapper::calcAddressing() const")
+        FatalErrorInFunction
             << "Addressing already calculated."
             << abort(FatalError);
     }
@@ -60,13 +60,13 @@ void Foam::cellMapper::calcAddressing() const
 
         label nInsertedCells = 0;
 
-        forAll(directAddr, cellI)
+        forAll(directAddr, celli)
         {
-            if (directAddr[cellI] < 0)
+            if (directAddr[celli] < 0)
             {
                 // Found inserted cell
-                directAddr[cellI] = 0;
-                insertedCells[nInsertedCells] = cellI;
+                directAddr[celli] = 0;
+                insertedCells[nInsertedCells] = celli;
                 nInsertedCells++;
             }
         }
@@ -90,19 +90,19 @@ void Foam::cellMapper::calcAddressing() const
             // Get addressing
             const labelList& mo = cfp[cfpI].masterObjects();
 
-            label cellI = cfp[cfpI].index();
+            label celli = cfp[cfpI].index();
 
-            if (addr[cellI].size())
+            if (addr[celli].size())
             {
-                FatalErrorIn("void cellMapper::calcAddressing() const")
-                    << "Master cell " << cellI
+                FatalErrorInFunction
+                    << "Master cell " << celli
                     << " mapped from point cells " << mo
                     << " already destination of mapping." << abort(FatalError);
             }
 
             // Map from masters, uniform weights
-            addr[cellI] = mo;
-            w[cellI] = scalarList(mo.size(), 1.0/mo.size());
+            addr[celli] = mo;
+            w[celli] = scalarList(mo.size(), 1.0/mo.size());
         }
 
         const List<objectMap>& cfe = mpm_.cellsFromEdgesMap();
@@ -112,19 +112,19 @@ void Foam::cellMapper::calcAddressing() const
             // Get addressing
             const labelList& mo = cfe[cfeI].masterObjects();
 
-            label cellI = cfe[cfeI].index();
+            label celli = cfe[cfeI].index();
 
-            if (addr[cellI].size())
+            if (addr[celli].size())
             {
-                FatalErrorIn("void cellMapper::calcAddressing() const")
-                    << "Master cell " << cellI
+                FatalErrorInFunction
+                    << "Master cell " << celli
                     << " mapped from edge cells " << mo
                     << " already destination of mapping." << abort(FatalError);
             }
 
             // Map from masters, uniform weights
-            addr[cellI] = mo;
-            w[cellI] = scalarList(mo.size(), 1.0/mo.size());
+            addr[celli] = mo;
+            w[celli] = scalarList(mo.size(), 1.0/mo.size());
         }
 
         const List<objectMap>& cff = mpm_.cellsFromFacesMap();
@@ -134,19 +134,19 @@ void Foam::cellMapper::calcAddressing() const
             // Get addressing
             const labelList& mo = cff[cffI].masterObjects();
 
-            label cellI = cff[cffI].index();
+            label celli = cff[cffI].index();
 
-            if (addr[cellI].size())
+            if (addr[celli].size())
             {
-                FatalErrorIn("void cellMapper::calcAddressing() const")
-                    << "Master cell " << cellI
+                FatalErrorInFunction
+                    << "Master cell " << celli
                     << " mapped from face cells " << mo
                     << " already destination of mapping." << abort(FatalError);
             }
 
             // Map from masters, uniform weights
-            addr[cellI] = mo;
-            w[cellI] = scalarList(mo.size(), 1.0/mo.size());
+            addr[celli] = mo;
+            w[celli] = scalarList(mo.size(), 1.0/mo.size());
         }
 
         // Volume conservative mapping if possible
@@ -158,19 +158,19 @@ void Foam::cellMapper::calcAddressing() const
             // Get addressing
             const labelList& mo = cfc[cfcI].masterObjects();
 
-            label cellI = cfc[cfcI].index();
+            label celli = cfc[cfcI].index();
 
-            if (addr[cellI].size())
+            if (addr[celli].size())
             {
-                FatalErrorIn("void cellMapper::calcAddressing() const")
-                    << "Master cell " << cellI
+                FatalErrorInFunction
+                    << "Master cell " << celli
                     << " mapped from cell cells " << mo
                     << " already destination of mapping."
                     << abort(FatalError);
             }
 
             // Map from masters
-            addr[cellI] = mo;
+            addr[celli] = mo;
         }
 
         if (mpm_.hasOldCellVolumes())
@@ -181,7 +181,7 @@ void Foam::cellMapper::calcAddressing() const
 
             if (V.size() != sizeBeforeMapping())
             {
-                FatalErrorIn("void cellMapper::calcAddressing() const")
+                FatalErrorInFunction
                     << "cellVolumes size " << V.size()
                     << " is not the old number of cells " << sizeBeforeMapping()
                     << ". Are your cellVolumes already mapped?"
@@ -193,29 +193,29 @@ void Foam::cellMapper::calcAddressing() const
             {
                 const labelList& mo = cfc[cfcI].masterObjects();
 
-                label cellI = cfc[cfcI].index();
+                label celli = cfc[cfcI].index();
 
-                w[cellI].setSize(mo.size());
+                w[celli].setSize(mo.size());
 
                 if (mo.size())
                 {
                     scalar sumV = 0;
                     forAll(mo, ci)
                     {
-                        w[cellI][ci] = V[mo[ci]];
+                        w[celli][ci] = V[mo[ci]];
                         sumV += V[mo[ci]];
                     }
                     if (sumV > VSMALL)
                     {
                         forAll(mo, ci)
                         {
-                            w[cellI][ci] /= sumV;
+                            w[celli][ci] /= sumV;
                         }
                     }
                     else
                     {
                         // Exception: zero volume. Use uniform mapping
-                        w[cellI] = scalarList(mo.size(), 1.0/mo.size());
+                        w[celli] = scalarList(mo.size(), 1.0/mo.size());
                     }
                 }
             }
@@ -228,9 +228,9 @@ void Foam::cellMapper::calcAddressing() const
             {
                 const labelList& mo = cfc[cfcI].masterObjects();
 
-                label cellI = cfc[cfcI].index();
+                label celli = cfc[cfcI].index();
 
-                w[cellI] = scalarList(mo.size(), 1.0/mo.size());
+                w[celli] = scalarList(mo.size(), 1.0/mo.size());
             }
         }
 
@@ -240,13 +240,13 @@ void Foam::cellMapper::calcAddressing() const
 
         const labelList& cm = mpm_.cellMap();
 
-        forAll(cm, cellI)
+        forAll(cm, celli)
         {
-            if (cm[cellI] > -1 && addr[cellI].empty())
+            if (cm[celli] > -1 && addr[celli].empty())
             {
                 // Mapped from a single cell
-                addr[cellI] = labelList(1, cm[cellI]);
-                w[cellI] = scalarList(1, 1.0);
+                addr[celli] = labelList(1, cm[celli]);
+                w[celli] = scalarList(1, 1.0);
             }
         }
 
@@ -257,15 +257,15 @@ void Foam::cellMapper::calcAddressing() const
 
         label nInsertedCells = 0;
 
-        forAll(addr, cellI)
+        forAll(addr, celli)
         {
-            if (addr[cellI].empty())
+            if (addr[celli].empty())
             {
                 // Mapped from a dummy cell
-                addr[cellI] = labelList(1, label(0));
-                w[cellI] = scalarList(1, 1.0);
+                addr[celli] = labelList(1, label(0));
+                w[celli] = scalarList(1, 1.0);
 
-                insertedCells[nInsertedCells] = cellI;
+                insertedCells[nInsertedCells] = celli;
                 nInsertedCells++;
             }
         }
@@ -286,7 +286,6 @@ void Foam::cellMapper::clearOut()
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from components
 Foam::cellMapper::cellMapper(const mapPolyMesh& mpm)
 :
     mesh_(mpm.mesh()),
@@ -390,10 +389,8 @@ const Foam::labelUList& Foam::cellMapper::directAddressing() const
 {
     if (!direct())
     {
-        FatalErrorIn
-        (
-            "const labelUList& cellMapper::directAddressing() const"
-        )   << "Requested direct addressing for an interpolative mapper."
+        FatalErrorInFunction
+            << "Requested direct addressing for an interpolative mapper."
             << abort(FatalError);
     }
 
@@ -418,10 +415,8 @@ const Foam::labelListList& Foam::cellMapper::addressing() const
 {
     if (direct())
     {
-        FatalErrorIn
-        (
-            "const labelListList& cellMapper::addressing() const"
-        )   << "Requested interpolative addressing for a direct mapper."
+        FatalErrorInFunction
+            << "Requested interpolative addressing for a direct mapper."
             << abort(FatalError);
     }
 
@@ -438,10 +433,8 @@ const Foam::scalarListList& Foam::cellMapper::weights() const
 {
     if (direct())
     {
-        FatalErrorIn
-        (
-            "const scalarListList& cellMapper::weights() const"
-        )   << "Requested interpolative weights for a direct mapper."
+        FatalErrorInFunction
+            << "Requested interpolative weights for a direct mapper."
             << abort(FatalError);
     }
 

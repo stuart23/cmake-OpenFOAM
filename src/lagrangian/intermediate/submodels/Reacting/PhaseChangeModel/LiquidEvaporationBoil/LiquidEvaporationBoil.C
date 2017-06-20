@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -34,7 +34,7 @@ using namespace Foam::constant::mathematical;
 template<class CloudType>
 Foam::tmp<Foam::scalarField> Foam::LiquidEvaporationBoil<CloudType>::calcXc
 (
-    const label cellI
+    const label celli
 ) const
 {
     scalarField Xc(this->owner().thermo().carrier().Y().size());
@@ -42,7 +42,7 @@ Foam::tmp<Foam::scalarField> Foam::LiquidEvaporationBoil<CloudType>::calcXc
     forAll(Xc, i)
     {
         Xc[i] =
-            this->owner().thermo().carrier().Y()[i][cellI]
+            this->owner().thermo().carrier().Y()[i][celli]
            /this->owner().thermo().carrier().W(i);
     }
 
@@ -78,14 +78,8 @@ Foam::LiquidEvaporationBoil<CloudType>::LiquidEvaporationBoil
 {
     if (activeLiquids_.size() == 0)
     {
-        WarningIn
-        (
-            "Foam::LiquidEvaporationBoil<CloudType>::LiquidEvaporationBoil"
-            "("
-                "const dictionary& dict, "
-                "CloudType& owner"
-            ")"
-        )   << "Evaporation model selected, but no active liquids defined"
+        WarningInFunction
+            << "Evaporation model selected, but no active liquids defined"
             << nl << endl;
     }
     else
@@ -138,7 +132,7 @@ template<class CloudType>
 void Foam::LiquidEvaporationBoil<CloudType>::calculate
 (
     const scalar dt,
-    const label cellI,
+    const label celli,
     const scalar Re,
     const scalar Pr,
     const scalar d,
@@ -156,24 +150,8 @@ void Foam::LiquidEvaporationBoil<CloudType>::calculate
     {
         if (debug)
         {
-            WarningIn
-            (
-                "void Foam::LiquidEvaporationBoil<CloudType>::calculate"
-                "("
-                    "const scalar, "
-                    "const label, "
-                    "const scalar, "
-                    "const scalar, "
-                    "const scalar, "
-                    "const scalar, "
-                    "const scalar, "
-                    "const scalar, "
-                    "const scalar, "
-                    "const scalar, "
-                    "const scalarField&, "
-                    "scalarField&"
-                ") const"
-            )   << "Parcel reached critical conditions: "
+            WarningInFunction
+                << "Parcel reached critical conditions: "
                 << "evaporating all avaliable mass" << endl;
         }
 
@@ -192,8 +170,8 @@ void Foam::LiquidEvaporationBoil<CloudType>::calculate
     // vapour density at droplet surface [kg/m3]
     scalar rhos = ps*liquids_.W(X)/(RR*Ts);
 
-    // construct carrier phase species volume fractions for cell, cellI
-    const scalarField XcMix(calcXc(cellI));
+    // construct carrier phase species volume fractions for cell, celli
+    const scalarField XcMix(calcXc(celli));
 
     // carrier thermo properties
     scalar Hsc = 0.0;
@@ -202,7 +180,7 @@ void Foam::LiquidEvaporationBoil<CloudType>::calculate
     scalar kappac = 0.0;
     forAll(this->owner().thermo().carrier().Y(), i)
     {
-        scalar Yc = this->owner().thermo().carrier().Y()[i][cellI];
+        scalar Yc = this->owner().thermo().carrier().Y()[i][celli];
         Hc += Yc*this->owner().thermo().carrier().Ha(i, pc, Tc);
         Hsc += Yc*this->owner().thermo().carrier().Ha(i, ps, Ts);
         Cpc += Yc*this->owner().thermo().carrier().Cp(i, ps, Ts);
@@ -355,16 +333,8 @@ Foam::scalar Foam::LiquidEvaporationBoil<CloudType>::dh
         }
         default:
         {
-            FatalErrorIn
-            (
-                "Foam::scalar Foam::LiquidEvaporationBoil<CloudType>::dh"
-                "("
-                    "const label, "
-                    "const label, "
-                    "const scalar, "
-                    "const scalar"
-                ") const"
-            )   << "Unknown enthalpyTransfer type" << abort(FatalError);
+            FatalErrorInFunction
+                << "Unknown enthalpyTransfer type" << abort(FatalError);
         }
     }
 

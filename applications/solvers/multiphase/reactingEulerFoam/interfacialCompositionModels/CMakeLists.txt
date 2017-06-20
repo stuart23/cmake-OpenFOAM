@@ -18,6 +18,7 @@ saturationModels/saturationModel/newSaturationModel.C
 saturationModels/Antoine/Antoine.C
 saturationModels/AntoineExtended/AntoineExtended.C
 saturationModels/ArdenBuck/ArdenBuck.C
+saturationModels/polynomial/polynomial.C
 saturationModels/constantSaturationConditions/constantSaturationConditions.C
 
 )

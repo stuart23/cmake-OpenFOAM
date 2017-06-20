@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -78,7 +78,7 @@ void Foam::moleculeCloud::buildConstProps()
 
             if (siteIds[sI] == -1)
             {
-                FatalErrorIn("moleculeCloud::buildConstProps()")
+                FatalErrorInFunction
                     << siteId << " site not found."
                     << nl << abort(FatalError);
             }
@@ -181,7 +181,7 @@ void Foam::moleculeCloud::calculatePairForce()
 
         const labelListList& ril = il_.ril();
 
-        List<IDLList<molecule> >& referredMols = il_.referredParticles();
+        List<IDLList<molecule>>& referredMols = il_.referredParticles();
 
         forAll(ril, r)
         {
@@ -198,11 +198,11 @@ void Foam::moleculeCloud::calculatePairForce()
             {
                 forAll(realCells, rC)
                 {
-                    List<molecule*> cellI = cellOccupancy_[realCells[rC]];
+                    List<molecule*> celli = cellOccupancy_[realCells[rC]];
 
-                    forAll(cellI, cellIMols)
+                    forAll(celli, cellIMols)
                     {
-                        molI = cellI[cellIMols];
+                        molI = celli[cellIMols];
 
                         evaluatePair(*molI, refMol());
                     }
@@ -376,7 +376,7 @@ void Foam::moleculeCloud::removeHighEnergyOverlaps()
 
         const labelListList& ril(il_.ril());
 
-        List<IDLList<molecule> >& referredMols = il_.referredParticles();
+        List<IDLList<molecule>>& referredMols = il_.referredParticles();
 
         forAll(ril, r)
         {
@@ -395,9 +395,9 @@ void Foam::moleculeCloud::removeHighEnergyOverlaps()
 
                 forAll(realCells, rC)
                 {
-                    label cellI = realCells[rC];
+                    label celli = realCells[rC];
 
-                    List<molecule*> cellIMols = cellOccupancy_[cellI];
+                    List<molecule*> cellIMols = cellOccupancy_[celli];
 
                     forAll(cellIMols, cIM)
                     {
@@ -485,7 +485,7 @@ void Foam::moleculeCloud::initialiseMolecules
 
     if (!cellZones.size())
     {
-        FatalErrorIn("void Foam::moleculeCloud::initialiseMolecules")
+        FatalErrorInFunction
             << "No cellZones found in the mesh."
             << abort(FatalError);
     }
@@ -525,7 +525,7 @@ void Foam::moleculeCloud::initialiseMolecules
 
                 if (latticeIds.size() != latticePositions.size())
                 {
-                    FatalErrorIn("Foam::moleculeCloud::initialiseMolecules")
+                    FatalErrorInFunction
                         << "latticeIds and latticePositions must be the same "
                         << " size." << nl
                         << abort(FatalError);
@@ -547,7 +547,7 @@ void Foam::moleculeCloud::initialiseMolecules
 
                     if (numberDensity < VSMALL)
                     {
-                        WarningIn("moleculeCloud::initialiseMolecules")
+                        WarningInFunction
                             << "numberDensity too small, not filling zone "
                             << zone.name() << endl;
 
@@ -580,7 +580,7 @@ void Foam::moleculeCloud::initialiseMolecules
 
                     if (massDensity < VSMALL)
                     {
-                        WarningIn("moleculeCloud::initialiseMolecules")
+                        WarningInFunction
                             << "massDensity too small, not filling zone "
                             << zone.name() << endl;
 
@@ -596,7 +596,7 @@ void Foam::moleculeCloud::initialiseMolecules
                 }
                 else
                 {
-                    FatalErrorIn("Foam::moleculeCloud::initialiseMolecules")
+                    FatalErrorInFunction
                         << "massDensity or numberDensity not specified " << nl
                         << abort(FatalError);
                 }
@@ -963,7 +963,7 @@ void Foam::moleculeCloud::initialiseMolecules
                      && !partOfLayerInBounds
                     )
                     {
-                        WarningIn("Foam::moleculeCloud::initialiseMolecules()")
+                        WarningInFunction
                             << "A whole layer of unit cells was placed "
                             << "outside the bounds of the mesh, but no "
                             << "molecules have been placed in zone '"
@@ -1011,12 +1011,12 @@ void Foam::moleculeCloud::createMolecule
 
     if (cell == -1)
     {
-        FatalErrorIn("Foam::moleculeCloud::createMolecule")
+        FatalErrorInFunction
             << "Position specified does not correspond to a mesh cell." << nl
             << abort(FatalError);
     }
 
-    point specialPosition(vector::zero);
+    point specialPosition(Zero);
 
     label special = 0;
 
@@ -1033,7 +1033,7 @@ void Foam::moleculeCloud::createMolecule
 
     v += bulkVelocity;
 
-    vector pi = vector::zero;
+    vector pi = Zero;
 
     tensor Q = I;
 
@@ -1072,9 +1072,9 @@ void Foam::moleculeCloud::createMolecule
             tetPt,
             Q,
             v,
-            vector::zero,
+            Zero,
             pi,
-            vector::zero,
+            Zero,
             specialPosition,
             constProps(id),
             special,
@@ -1184,11 +1184,11 @@ void Foam::moleculeCloud::calculateForce()
     // Set accumulated quantities to zero
     forAllIter(moleculeCloud, *this, mol)
     {
-        mol().siteForces() = vector::zero;
+        mol().siteForces() = Zero;
 
         mol().potentialEnergy() = 0.0;
 
-        mol().rf() = tensor::zero;
+        mol().rf() = Zero;
     }
 
     calculatePairForce();

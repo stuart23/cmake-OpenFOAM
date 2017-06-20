@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -52,7 +52,7 @@ sixDoFRigidBodyDisplacementPointPatchVectorField
     rhoInf_(1.0),
     rhoName_("rho"),
     lookupGravity_(-1),
-    g_(vector::zero),
+    g_(Zero),
     curTimeIndex_(-1)
 {}
 
@@ -68,9 +68,9 @@ sixDoFRigidBodyDisplacementPointPatchVectorField
     fixedValuePointPatchField<vector>(p, iF, dict),
     motion_(dict, dict),
     rhoInf_(1.0),
-    rhoName_(dict.lookupOrDefault<word>("rhoName", "rho")),
+    rhoName_(dict.lookupOrDefault<word>("rho", "rho")),
     lookupGravity_(-1),
-    g_(vector::zero),
+    g_(Zero),
     curTimeIndex_(-1)
 {
     if (rhoName_ == "rhoInf")
@@ -178,11 +178,7 @@ void sixDoFRigidBodyDisplacementPointPatchVectorField::updateCoeffs()
         {
             if (lookupGravity_ == -2)
             {
-                FatalErrorIn
-                (
-                    "void sixDoFRigidBodyDisplacementPointPatchVectorField"
-                    "::updateCoeffs()"
-                )
+                FatalErrorInFunction
                     << "Specifying the value of g in this boundary condition "
                     << "when g is available from the database is considered "
                     << "a fatal error to avoid the possibility of inconsistency"
@@ -199,7 +195,7 @@ void sixDoFRigidBodyDisplacementPointPatchVectorField::updateCoeffs()
         }
     }
 
-    const polyMesh& mesh = this->dimensionedInternalField().mesh()();
+    const polyMesh& mesh = this->internalField().mesh()();
     const Time& t = mesh.time();
     const pointPatch& ptPatch = this->patch();
 
@@ -214,13 +210,13 @@ void sixDoFRigidBodyDisplacementPointPatchVectorField::updateCoeffs()
 
     dictionary forcesDict;
 
-    forcesDict.add("type", forces::typeName);
+    forcesDict.add("type", functionObjects::forces::typeName);
     forcesDict.add("patches", wordList(1, ptPatch.name()));
     forcesDict.add("rhoInf", rhoInf_);
-    forcesDict.add("rhoName", rhoName_);
+    forcesDict.add("rho", rhoName_);
     forcesDict.add("CofR", motion_.centreOfRotation());
 
-    forces f("forces", db(), forcesDict);
+    functionObjects::forces f("forces", db(), forcesDict);
 
     f.calcForcesMoment();
 
@@ -259,7 +255,7 @@ void sixDoFRigidBodyDisplacementPointPatchVectorField::write(Ostream& os) const
 {
     pointPatchField<vector>::write(os);
 
-    os.writeKeyword("rhoName") << rhoName_ << token::END_STATEMENT << nl;
+    os.writeKeyword("rho") << rhoName_ << token::END_STATEMENT << nl;
 
     if (rhoName_ == "rhoInf")
     {

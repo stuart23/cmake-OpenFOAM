@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -416,7 +416,7 @@ bool Foam::autoDensity::fillBox
 
             label nLine = 6*(surfRes_ - 2);
 
-            pointField linePoints(nLine, vector::zero);
+            pointField linePoints(nLine, Zero);
 
             scalarField lineSizes(nLine, 0.0);
 
@@ -532,7 +532,7 @@ bool Foam::autoDensity::fillBox
         pointField samplePoints
         (
             volRes_*volRes_*volRes_,
-            vector::zero
+            Zero
         );
 
         vector delta = span/volRes_;
@@ -896,14 +896,8 @@ autoDensity::autoDensity
     {
         maxSizeRatio_ = 2.0;
 
-        WarningIn
-        (
-            "autoDensity::autoDensity"
-            "("
-                "const dictionary& initialPointsDict,"
-                "const conformalVoronoiMesh& foamyHexMesh"
-            ")"
-        )   << "The maxSizeRatio must be greater than one to be sensible, "
+        WarningInFunction
+            << "The maxSizeRatio must be greater than one to be sensible, "
             << "setting to " << maxSizeRatio_
             << endl;
     }

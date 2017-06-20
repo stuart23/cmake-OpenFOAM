@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -131,8 +131,8 @@ class FaceCellWave
         //  statistics.
         bool updateCell
         (
-            const label cellI,
-            const label neighbourFaceI,
+            const label celli,
+            const label neighbourFacei,
             const Type& neighbourInfo,
             const scalar tol,
             Type& cellInfo
@@ -142,8 +142,8 @@ class FaceCellWave
         //  statistics.
         bool updateFace
         (
-            const label faceI,
-            const label neighbourCellI,
+            const label facei,
+            const label neighbourCelli,
             const Type& neighbourInfo,
             const scalar tol,
             Type& faceInfo
@@ -153,7 +153,7 @@ class FaceCellWave
         //  statistics.
         bool updateFace
         (
-            const label faceI,
+            const label facei,
             const Type& neighbourInfo,
             const scalar tol,
             Type& faceInfo
@@ -182,7 +182,7 @@ class FaceCellWave
             label getChangedPatchFaces
             (
                 const polyPatch& patch,
-                const label startFaceI,
+                const label startFacei,
                 const label nFaces,
                 labelList& changedPatchFaces,
                 List<Type>& changedPatchFacesInfo
@@ -359,7 +359,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "FaceCellWave.C"
+    #include "FaceCellWave.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

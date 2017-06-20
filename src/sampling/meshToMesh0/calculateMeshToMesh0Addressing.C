@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -41,8 +41,8 @@ void Foam::meshToMesh0::calcAddressing()
 {
     if (debug)
     {
-        Info<< "meshToMesh0::calculateAddressing() : "
-            << "calculating mesh-to-mesh cell addressing" << endl;
+        InfoInFunction
+            << "Calculating mesh-to-mesh cell addressing" << endl;
     }
 
     // set reference to cells
@@ -62,8 +62,7 @@ void Foam::meshToMesh0::calcAddressing()
 
     if (debug)
     {
-        Info<< "meshToMesh0::calculateAddressing() : "
-            << "Setting up rescue" << endl;
+        InfoInFunction << "Setting up rescue" << endl;
     }
 
     List<bool> boundaryCell(fromCells.size(), false);
@@ -71,14 +70,14 @@ void Foam::meshToMesh0::calcAddressing()
     // set reference to boundary
     const polyPatchList& patchesFrom = fromMesh_.boundaryMesh();
 
-    forAll(patchesFrom, patchI)
+    forAll(patchesFrom, patchi)
     {
         // get reference to cells next to the boundary
-        const labelUList& bCells = patchesFrom[patchI].faceCells();
+        const labelUList& bCells = patchesFrom[patchi].faceCells();
 
-        forAll(bCells, faceI)
+        forAll(bCells, facei)
         {
-            boundaryCell[bCells[faceI]] = true;
+            boundaryCell[bCells[facei]] = true;
         }
     }
 
@@ -153,10 +152,11 @@ void Foam::meshToMesh0::calcAddressing()
 
             if (fromPatch.empty())
             {
-                WarningIn("meshToMesh0::calcAddressing()")
+                WarningInFunction
                     << "Source patch " << fromPatch.name()
                     << " has no faces. Not performing mapping for it."
                     << endl;
+                boundaryAddressing_[patchi].setSize(toPatch.size());
                 boundaryAddressing_[patchi] = -1;
             }
             else
@@ -203,8 +203,8 @@ void Foam::meshToMesh0::calcAddressing()
 
     if (debug)
     {
-        Info<< "meshToMesh0::calculateAddressing() : "
-            << "finished calculating mesh-to-mesh cell addressing" << endl;
+        InfoInFunction
+            << "Finished calculating mesh-to-mesh cell addressing" << endl;
     }
 }
 

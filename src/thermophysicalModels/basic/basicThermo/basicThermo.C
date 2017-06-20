@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -49,7 +49,7 @@ const Foam::word Foam::basicThermo::dictName("thermophysicalProperties");
 
 Foam::wordList Foam::basicThermo::heBoundaryBaseTypes()
 {
-    const volScalarField::GeometricBoundaryField& tbf =
+    const volScalarField::Boundary& tbf =
         this->T_.boundaryField();
 
     wordList hbt(tbf.size(), word::null);
@@ -81,7 +81,7 @@ Foam::wordList Foam::basicThermo::heBoundaryBaseTypes()
 
 Foam::wordList Foam::basicThermo::heBoundaryTypes()
 {
-    const volScalarField::GeometricBoundaryField& tbf =
+    const volScalarField::Boundary& tbf =
         this->T_.boundaryField();
 
     wordList hbt = tbf.types();
@@ -308,8 +308,8 @@ const Foam::basicThermo& Foam::basicThermo::lookupThermo
         {
             if
             (
-                &(iter()->he().dimensionedInternalField())
-              == &(pf.dimensionedInternalField())
+                &(iter()->he().internalField())
+              == &(pf.internalField())
             )
             {
                 return *iter();
@@ -329,7 +329,7 @@ void Foam::basicThermo::validate
 {
     if (!(he().name() == phasePropertyName(a)))
     {
-        FatalErrorIn(app)
+        FatalErrorInFunction
             << "Supported energy type is " << phasePropertyName(a)
             << ", thermodynamics package provides " << he().name()
             << exit(FatalError);
@@ -351,7 +351,7 @@ void Foam::basicThermo::validate
         )
     )
     {
-        FatalErrorIn(app)
+        FatalErrorInFunction
             << "Supported energy types are " << phasePropertyName(a)
             << " and " << phasePropertyName(b)
             << ", thermodynamics package provides " << he().name()
@@ -376,7 +376,7 @@ void Foam::basicThermo::validate
         )
     )
     {
-        FatalErrorIn(app)
+        FatalErrorInFunction
             << "Supported energy types are " << phasePropertyName(a)
             << ", " << phasePropertyName(b)
             << " and " << phasePropertyName(c)
@@ -404,7 +404,7 @@ void Foam::basicThermo::validate
         )
     )
     {
-        FatalErrorIn(app)
+        FatalErrorInFunction
             << "Supported energy types are " << phasePropertyName(a)
             << ", " << phasePropertyName(b)
             << ", " << phasePropertyName(c)

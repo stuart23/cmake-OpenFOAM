@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,8 +30,7 @@ Group
 Description
     This boundary condition provides a rotational velocity condition.
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         origin       | origin of rotation in Cartesian co-ordinates | yes|
@@ -41,7 +40,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            rotatingWallVelocity;
         origin          (0 0 0);
@@ -50,12 +49,11 @@ Description
     }
     \endverbatim
 
-    The \c omega entry is a DataEntry type, able to describe time varying
-    functions.
+    The \c omega entry is a Function1 of time, see Foam::Function1Types.
 
-SeeAlso
-    Foam::DataEntry
+See also
     Foam::fixedValueFvPatchField
+    Foam::Function1Types
 
 SourceFiles
     rotatingWallVelocityFvPatchVectorField.C
@@ -66,7 +64,7 @@ SourceFiles
 #define rotatingWallVelocityFvPatchVectorField_H
 
 #include "fixedValueFvPatchFields.H"
-#include "DataEntry.H"
+#include "Function1.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -90,7 +88,7 @@ class rotatingWallVelocityFvPatchVectorField
         vector axis_;
 
         //- Rotational speed
-        autoPtr<DataEntry<scalar> > omega_;
+        autoPtr<Function1<scalar>> omega_;
 
 
 public:

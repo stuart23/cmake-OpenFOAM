@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -116,14 +116,14 @@ public:
             const polyPatch& patch,
             const label nWallFaces,
             const labelList& wallFaces,
-            label& meshFaceI
+            label& meshFacei
         ) const;
 
         //- Get faces sharing point with face on patch
         label getPointNeighbours
         (
             const primitivePatch&,
-            const label patchFaceI,
+            const label patchFacei,
             labelList&
         ) const;
 
@@ -162,7 +162,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "cellDistFuncsTemplates.C"
+    #include "cellDistFuncsTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

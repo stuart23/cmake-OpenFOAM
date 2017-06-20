@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -94,7 +94,7 @@ class patchProbes
 
         //- Sample a volume field at all locations
         template<class Type>
-        tmp<Field<Type> > sample
+        tmp<Field<Type>> sample
         (
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
@@ -102,7 +102,7 @@ class patchProbes
 
         //- Sample a surface field at all locations
         template<class Type>
-        tmp<Field<Type> > sample
+        tmp<Field<Type>> sample
         (
             const GeometricField<Type, fvsPatchField, surfaceMesh>&
         ) const;
@@ -110,7 +110,7 @@ class patchProbes
 
         //- Sample a single field on all sample locations
         template<class Type>
-        tmp<Field<Type> > sample(const word& fieldName) const;
+        tmp<Field<Type>> sample(const word& fieldName) const;
 
 
         //- Disallow default bitwise copy construct
@@ -128,6 +128,14 @@ public:
 
     // Constructors
 
+        //- Construct from Time and dictionary
+        patchProbes
+        (
+            const word& name,
+            const Time& time,
+            const dictionary& dict
+        );
+
         //- Construct for given objectRegistry and dictionary.
         //  Allow the possibility to load fields from files
         patchProbes
@@ -142,17 +150,19 @@ public:
     //- Destructor
     virtual ~patchProbes();
 
+
     //- Public members
 
         //- Sample and write
-        virtual void write();
+        virtual bool write();
 
         //- Read
-        virtual void read(const dictionary&);
+        virtual bool read(const dictionary&);
 
         //- Find elements containing patchProbes
         virtual void findElements(const fvMesh&);
 };
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -161,7 +171,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "patchProbesTemplates.C"
+    #include "patchProbesTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

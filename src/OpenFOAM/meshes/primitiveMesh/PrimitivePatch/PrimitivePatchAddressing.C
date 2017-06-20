@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -62,11 +62,8 @@ calcAddressing() const
     {
         // it is considered an error to attempt to recalculate
         // if already allocated
-        FatalErrorIn
-        (
-            "PrimitivePatch<Face, FaceList, PointField, PointType>::"
-            "calcAddressing()"
-        )   << "addressing already calculated"
+        FatalErrorInFunction
+            << "addressing already calculated"
             << abort(FatalError);
     }
 
@@ -78,9 +75,9 @@ calcAddressing() const
 
     // Guess the max number of edges and neighbours for a face
     label maxEdges = 0;
-    forAll(locFcs, faceI)
+    forAll(locFcs, facei)
     {
-        maxEdges += locFcs[faceI].size();
+        maxEdges += locFcs[facei].size();
     }
 
     // create the lists for the various results. (resized on completion)
@@ -92,7 +89,7 @@ calcAddressing() const
 
     // faceFaces created using a dynamic list.  Cannot guess size because
     // of multiple connections
-    List<DynamicList<label> > ff(locFcs.size());
+    List<DynamicList<label>> ff(locFcs.size());
 
     faceEdgesPtr_ = new labelListList(locFcs.size());
     labelListList& faceEdges = *faceEdgesPtr_;
@@ -103,12 +100,12 @@ calcAddressing() const
     // initialise the lists of subshapes for each face to avoid duplication
     edgeListList faceIntoEdges(locFcs.size());
 
-    forAll(locFcs, faceI)
+    forAll(locFcs, facei)
     {
-        faceIntoEdges[faceI] = locFcs[faceI].edges();
+        faceIntoEdges[facei] = locFcs[facei].edges();
 
-        labelList& curFaceEdges = faceEdges[faceI];
-        curFaceEdges.setSize(faceIntoEdges[faceI].size());
+        labelList& curFaceEdges = faceEdges[facei];
+        curFaceEdges.setSize(faceIntoEdges[facei].size());
 
         forAll(curFaceEdges, faceEdgeI)
         {
@@ -128,15 +125,15 @@ calcAddressing() const
     // in face (i.e. curEdges[0] is edge between f[0] and f[1])
 
     // For all local faces ...
-    forAll(locFcs, faceI)
+    forAll(locFcs, facei)
     {
         // Get reference to vertices of current face and corresponding edges.
-        const Face& curF = locFcs[faceI];
-        const edgeList& curEdges = faceIntoEdges[faceI];
+        const Face& curF = locFcs[facei];
+        const edgeList& curEdges = faceIntoEdges[facei];
 
         // Record the neighbour face.  Multiple connectivity allowed
-        List<DynamicList<label> > neiFaces(curF.size());
-        List<DynamicList<label> > edgeOfNeiFace(curF.size());
+        List<DynamicList<label>> neiFaces(curF.size());
+        List<DynamicList<label>> edgeOfNeiFace(curF.size());
 
         label nNeighbours = 0;
 
@@ -144,7 +141,7 @@ calcAddressing() const
         forAll(curEdges, edgeI)
         {
             // If the edge is already detected, skip
-            if (faceEdges[faceI][edgeI] >= 0) continue;
+            if (faceEdges[facei][edgeI] >= 0) continue;
 
             found = false;
 
@@ -155,13 +152,13 @@ calcAddressing() const
 
             const labelList& nbrFaces = pf[e.start()];
 
-            forAll(nbrFaces, nbrFaceI)
+            forAll(nbrFaces, nbrFacei)
             {
                 // set reference to the current neighbour
-                label curNei = nbrFaces[nbrFaceI];
+                label curNei = nbrFaces[nbrFacei];
 
                 // Reject neighbours with the lower label
-                if (curNei > faceI)
+                if (curNei > facei)
                 {
                     // get the reference to subshapes of the neighbour
                     const edgeList& searchEdges = faceIntoEdges[curNei];
@@ -177,8 +174,8 @@ calcAddressing() const
                             edgeOfNeiFace[edgeI].append(neiEdgeI);
 
                             // Record faceFaces both ways
-                            ff[faceI].append(curNei);
-                            ff[curNei].append(faceI);
+                            ff[facei].append(curNei);
+                            ff[curNei].append(facei);
 
                             // Keep searching due to multiple connectivity
                         }
@@ -219,7 +216,7 @@ calcAddressing() const
                 edges[nEdges] = curEdges[nextNei];
 
                 // Set face-edge and face-neighbour-edge to current face label
-                faceEdges[faceI][nextNei] = nEdges;
+                faceEdges[facei][nextNei] = nEdges;
 
                 DynamicList<label>& cnf = neiFaces[nextNei];
                 DynamicList<label>& eonf = edgeOfNeiFace[nextNei];
@@ -227,7 +224,7 @@ calcAddressing() const
                 // Set edge-face addressing
                 labelList& curEf = edgeFaces[nEdges];
                 curEf.setSize(cnf.size() + 1);
-                curEf[0] = faceI;
+                curEf[0] = facei;
 
                 forAll(cnf, cnfI)
                 {
@@ -245,11 +242,8 @@ calcAddressing() const
             }
             else
             {
-                FatalErrorIn
-                (
-                    "PrimitivePatch<Face, FaceList, PointField, PointType>::"
-                    "calcAddressing()"
-                )   << "Error in internal edge insertion"
+                FatalErrorInFunction
+                    << "Error in internal edge insertion"
                     << abort(FatalError);
             }
         }
@@ -259,22 +253,22 @@ calcAddressing() const
 
     // Do boundary faces
 
-    forAll(faceEdges, faceI)
+    forAll(faceEdges, facei)
     {
-        labelList& curEdges = faceEdges[faceI];
+        labelList& curEdges = faceEdges[facei];
 
         forAll(curEdges, edgeI)
         {
             if (curEdges[edgeI] < 0)
             {
                 // Grab edge and faceEdge
-                edges[nEdges] = faceIntoEdges[faceI][edgeI];
+                edges[nEdges] = faceIntoEdges[facei][edgeI];
                 curEdges[edgeI] = nEdges;
 
                 // Add edgeFace
                 labelList& curEf = edgeFaces[nEdges];
                 curEf.setSize(1);
-                curEf[0] = faceI;
+                curEf[0] = facei;
 
                 nEdges++;
             }
@@ -291,9 +285,9 @@ calcAddressing() const
     faceFacesPtr_ = new labelListList(locFcs.size());
     labelListList& faceFaces = *faceFacesPtr_;
 
-    forAll(faceFaces, faceI)
+    forAll(faceFaces, facei)
     {
-        faceFaces[faceI].transfer(ff[faceI]);
+        faceFaces[facei].transfer(ff[facei]);
     }
 
 

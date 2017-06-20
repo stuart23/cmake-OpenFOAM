@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,27 +33,20 @@ License
 #include "cyclicFvPatchFields.H"
 #include "cyclicAMIFvPatchFields.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void fvMesh::makeSf() const
+void Foam::fvMesh::makeSf() const
 {
     if (debug)
     {
-        Info<< "void fvMesh::makeSf() : "
-            << "assembling face areas"
-            << endl;
+        InfoInFunction << "Assembling face areas" << endl;
     }
 
     // It is an error to attempt to recalculate
     // if the pointer is already set
     if (SfPtr_)
     {
-        FatalErrorIn("fvMesh::makeSf()")
+        FatalErrorInFunction
             << "face areas already exist"
             << abort(FatalError);
     }
@@ -77,20 +70,18 @@ void fvMesh::makeSf() const
 }
 
 
-void fvMesh::makeMagSf() const
+void Foam::fvMesh::makeMagSf() const
 {
     if (debug)
     {
-        Info<< "void fvMesh::makeMagSf() : "
-            << "assembling mag face areas"
-            << endl;
+        InfoInFunction << "Assembling mag face areas" << endl;
     }
 
     // It is an error to attempt to recalculate
     // if the pointer is already set
     if (magSfPtr_)
     {
-        FatalErrorIn("void fvMesh::makeMagSf()")
+        FatalErrorInFunction
             << "mag face areas already exist"
             << abort(FatalError);
     }
@@ -115,20 +106,18 @@ void fvMesh::makeMagSf() const
 }
 
 
-void fvMesh::makeC() const
+void Foam::fvMesh::makeC() const
 {
     if (debug)
     {
-        Info<< "void fvMesh::makeC() : "
-            << "assembling cell centres"
-            << endl;
+        InfoInFunction << "Assembling cell centres" << endl;
     }
 
     // It is an error to attempt to recalculate
     // if the pointer is already set
     if (CPtr_)
     {
-        FatalErrorIn("fvMesh::makeC()")
+        FatalErrorInFunction
             << "cell centres already exist"
             << abort(FatalError);
     }
@@ -157,20 +146,18 @@ void fvMesh::makeC() const
 }
 
 
-void fvMesh::makeCf() const
+void Foam::fvMesh::makeCf() const
 {
     if (debug)
     {
-        Info<< "void fvMesh::makeCf() : "
-            << "assembling face centres"
-            << endl;
+        InfoInFunction << "Assembling face centres" << endl;
     }
 
     // It is an error to attempt to recalculate
     // if the pointer is already set
     if (CfPtr_)
     {
-        FatalErrorIn("fvMesh::makeCf()")
+        FatalErrorInFunction
             << "face centres already exist"
             << abort(FatalError);
     }
@@ -196,18 +183,17 @@ void fvMesh::makeCf() const
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const volScalarField::DimensionedInternalField& fvMesh::V() const
+const Foam::volScalarField::Internal& Foam::fvMesh::V() const
 {
     if (!VPtr_)
     {
         if (debug)
         {
-            Info<< "fvMesh::V() const: "
-                << "constructing from primitiveMesh::cellVolumes()"
-                << endl;
+            InfoInFunction
+                << "Constructing from primitiveMesh::cellVolumes()" << endl;
         }
 
-        VPtr_ = new slicedVolScalarField::DimensionedInternalField
+        VPtr_ = new slicedVolScalarField::Internal
         (
             IOobject
             (
@@ -224,15 +210,15 @@ const volScalarField::DimensionedInternalField& fvMesh::V() const
         );
     }
 
-    return *static_cast<slicedVolScalarField::DimensionedInternalField*>(VPtr_);
+    return *static_cast<slicedVolScalarField::Internal*>(VPtr_);
 }
 
 
-const volScalarField::DimensionedInternalField& fvMesh::V0() const
+const Foam::volScalarField::Internal& Foam::fvMesh::V0() const
 {
     if (!V0Ptr_)
     {
-        FatalErrorIn("fvMesh::V0() const")
+        FatalErrorInFunction
             << "V0 is not available"
             << abort(FatalError);
     }
@@ -241,11 +227,11 @@ const volScalarField::DimensionedInternalField& fvMesh::V0() const
 }
 
 
-volScalarField::DimensionedInternalField& fvMesh::setV0()
+Foam::volScalarField::Internal& Foam::fvMesh::setV0()
 {
     if (!V0Ptr_)
     {
-        FatalErrorIn("fvMesh::setV0()")
+        FatalErrorInFunction
             << "V0 is not available"
             << abort(FatalError);
     }
@@ -254,15 +240,13 @@ volScalarField::DimensionedInternalField& fvMesh::setV0()
 }
 
 
-const volScalarField::DimensionedInternalField& fvMesh::V00() const
+const Foam::volScalarField::Internal& Foam::fvMesh::V00() const
 {
     if (!V00Ptr_)
     {
         if (debug)
         {
-            Info<< "fvMesh::V00() const: "
-                << "constructing from V0"
-                << endl;
+            InfoInFunction << "Constructing from V0" << endl;
         }
 
         V00Ptr_ = new DimensionedField<scalar, volMesh>
@@ -287,7 +271,8 @@ const volScalarField::DimensionedInternalField& fvMesh::V00() const
 }
 
 
-tmp<volScalarField::DimensionedInternalField> fvMesh::Vsc() const
+Foam::tmp<Foam::volScalarField::Internal>
+Foam::fvMesh::Vsc() const
 {
     if (moving() && time().subCycling())
     {
@@ -315,7 +300,8 @@ tmp<volScalarField::DimensionedInternalField> fvMesh::Vsc() const
 }
 
 
-tmp<volScalarField::DimensionedInternalField> fvMesh::Vsc0() const
+Foam::tmp<Foam::volScalarField::Internal>
+Foam::fvMesh::Vsc0() const
 {
     if (moving() && time().subCycling())
     {
@@ -344,7 +330,7 @@ tmp<volScalarField::DimensionedInternalField> fvMesh::Vsc0() const
 }
 
 
-const surfaceVectorField& fvMesh::Sf() const
+const Foam::surfaceVectorField& Foam::fvMesh::Sf() const
 {
     if (!SfPtr_)
     {
@@ -355,7 +341,7 @@ const surfaceVectorField& fvMesh::Sf() const
 }
 
 
-const surfaceScalarField& fvMesh::magSf() const
+const Foam::surfaceScalarField& Foam::fvMesh::magSf() const
 {
     if (!magSfPtr_)
     {
@@ -366,7 +352,7 @@ const surfaceScalarField& fvMesh::magSf() const
 }
 
 
-const volVectorField& fvMesh::C() const
+const Foam::volVectorField& Foam::fvMesh::C() const
 {
     if (!CPtr_)
     {
@@ -377,7 +363,7 @@ const volVectorField& fvMesh::C() const
 }
 
 
-const surfaceVectorField& fvMesh::Cf() const
+const Foam::surfaceVectorField& Foam::fvMesh::Cf() const
 {
     if (!CfPtr_)
     {
@@ -388,13 +374,11 @@ const surfaceVectorField& fvMesh::Cf() const
 }
 
 
-tmp<surfaceVectorField> fvMesh::delta() const
+Foam::tmp<Foam::surfaceVectorField> Foam::fvMesh::delta() const
 {
     if (debug)
     {
-        Info<< "void fvMesh::delta() : "
-            << "calculating face deltas"
-            << endl;
+        InfoInFunction << "Calculating face deltas" << endl;
     }
 
     tmp<surfaceVectorField> tdelta
@@ -415,7 +399,7 @@ tmp<surfaceVectorField> fvMesh::delta() const
             dimLength
         )
     );
-    surfaceVectorField& delta = tdelta();
+    surfaceVectorField& delta = tdelta.ref();
 
     const volVectorField& C = this->C();
     const labelUList& owner = this->owner();
@@ -426,20 +410,23 @@ tmp<surfaceVectorField> fvMesh::delta() const
         delta[facei] = C[neighbour[facei]] - C[owner[facei]];
     }
 
-    forAll(delta.boundaryField(), patchi)
+    surfaceVectorField::Boundary& deltabf =
+        delta.boundaryFieldRef();
+
+    forAll(deltabf, patchi)
     {
-        delta.boundaryField()[patchi] = boundary()[patchi].delta();
+        deltabf[patchi] = boundary()[patchi].delta();
     }
 
     return tdelta;
 }
 
 
-const surfaceScalarField& fvMesh::phi() const
+const Foam::surfaceScalarField& Foam::fvMesh::phi() const
 {
     if (!phiPtr_)
     {
-        FatalErrorIn("fvMesh::phi()")
+        FatalErrorInFunction
             << "mesh flux field does not exist, is the mesh actually moving?"
             << abort(FatalError);
     }
@@ -455,11 +442,11 @@ const surfaceScalarField& fvMesh::phi() const
 }
 
 
-surfaceScalarField& fvMesh::setPhi()
+Foam::surfaceScalarField& Foam::fvMesh::setPhi()
 {
     if (!phiPtr_)
     {
-        FatalErrorIn("fvMesh::setPhi()")
+        FatalErrorInFunction
             << "mesh flux field does not exist, is the mesh actually moving?"
             << abort(FatalError);
     }
@@ -467,9 +454,5 @@ surfaceScalarField& fvMesh::setPhi()
     return *phiPtr_;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

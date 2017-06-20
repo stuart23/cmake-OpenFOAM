@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -27,7 +27,7 @@ Class
 Description
     A face is a list of labels corresponding to mesh vertices.
 
-SeeAlso
+See also
     Foam::triFace
 
 SourceFiles
@@ -426,7 +426,7 @@ label longestEdge(const face& f, const pointField& pts);
 #include "faceI.H"
 
 #ifdef NoRepository
-#   include "faceTemplates.C"
+    #include "faceTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

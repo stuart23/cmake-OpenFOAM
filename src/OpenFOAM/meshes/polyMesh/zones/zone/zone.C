@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -32,7 +32,7 @@ License
 
 namespace Foam
 {
-defineTypeNameAndDebug(zone, 0);
+    defineTypeNameAndDebug(zone, 0);
 }
 
 
@@ -53,14 +53,12 @@ void Foam::zone::calcLookupMap() const
 {
     if (debug)
     {
-        Info<< "void zone::calcLookupMap() const: "
-            << "Calculating lookup map"
-            << endl;
+        InfoInFunction << "Calculating lookup map" << endl;
     }
 
     if (lookupMapPtr_)
     {
-        FatalErrorIn("void zone::calcLookupMap() const")
+        FatalErrorInFunction
             << "Lookup map already calculated" << nl
             << abort(FatalError);
     }
@@ -77,9 +75,7 @@ void Foam::zone::calcLookupMap() const
 
     if (debug)
     {
-        Info<< "void zone::calcLookupMap() const: "
-            << "Finished calculating lookup map"
-            << endl;
+        InfoInFunction << "Finished calculating lookup map" << endl;
     }
 }
 
@@ -207,11 +203,8 @@ bool Foam::zone::checkDefinition(const label maxSize, const bool report) const
 
             if (report)
             {
-                SeriousErrorIn
-                (
-                    "bool zone::checkDefinition("
-                    "const label maxSize, const bool report) const"
-                )   << "Zone " << name_
+                SeriousErrorInFunction
+                    << "Zone " << name_
                     << " contains invalid index label " << addr[i] << nl
                     << "Valid index labels are 0.."
                     << maxSize-1 << endl;
@@ -226,11 +219,8 @@ bool Foam::zone::checkDefinition(const label maxSize, const bool report) const
         {
             if (report)
             {
-                WarningIn
-                (
-                    "bool zone::checkDefinition("
-                    "const label maxSize, const bool report) const"
-                )   << "Zone " << name_
+                WarningInFunction
+                    << "Zone " << name_
                     << " contains duplicate index label " << addr[i] << endl;
             }
         }

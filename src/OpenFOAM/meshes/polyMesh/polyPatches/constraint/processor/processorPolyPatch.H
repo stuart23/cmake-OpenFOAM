@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -81,6 +81,23 @@ class processorPolyPatch
 
 protected:
 
+    // Protected constructors
+
+        //- Construct from components with specified name
+        processorPolyPatch
+        (
+            const word& name,
+            const label size,
+            const label start,
+            const label index,
+            const polyBoundaryMesh& bm,
+            const int myProcNo,
+            const int neighbProcNo,
+            const transformType transform = UNKNOWN,  // transformation type
+            const word& patchType = typeName
+        );
+
+
     // Protected Member functions
 
         //- Initialise the calculation of the patch geometry
@@ -102,7 +119,7 @@ protected:
             const pointField& nbrCc
         )
         {
-            notImplemented("processorPolyPatch::calcGeometry(..)");
+            NotImplemented;
         }
 
         //- Initialise the patches for moving points
@@ -126,10 +143,9 @@ public:
 
     // Constructors
 
-        //- Construct from components
+        //- Construct from components with automatically generated standard name
         processorPolyPatch
         (
-            const word& name,
             const label size,
             const label start,
             const label index,
@@ -270,6 +286,14 @@ public:
             return !owner();
         }
 
+        //- Return the name of a processorPolyPatch
+        //  constructed from the processor IDs
+        static word newName
+        (
+            const label myProcNo,
+            const label neighbProcNo
+        );
+
         //- Return processor-neighbbour patch face centres
         const vectorField& neighbFaceCentres() const
         {
@@ -318,6 +342,10 @@ public:
         //  refer to *this (except for name() and type() etc.)
         virtual void initOrder(PstreamBuffers&, const primitivePatch&) const;
 
+        //- Returns rotation.
+        //    -1 : no match
+        //     0 : match
+        //    >0 : match if rotated clockwise by this amount
         static label matchFace
         (
             const face& localFace,

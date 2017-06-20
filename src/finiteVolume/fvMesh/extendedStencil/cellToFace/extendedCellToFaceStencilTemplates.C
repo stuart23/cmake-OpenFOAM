@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,21 +33,21 @@ void Foam::extendedCellToFaceStencil::collectData
     const mapDistribute& map,
     const labelListList& stencil,
     const GeometricField<Type, fvPatchField, volMesh>& fld,
-    List<List<Type> >& stencilFld
+    List<List<Type>>& stencilFld
 )
 {
     // 1. Construct cell data in compact addressing
-    List<Type> flatFld(map.constructSize(), pTraits<Type>::zero);
+    List<Type> flatFld(map.constructSize(), Zero);
 
     // Insert my internal values
-    forAll(fld, cellI)
+    forAll(fld, celli)
     {
-        flatFld[cellI] = fld[cellI];
+        flatFld[celli] = fld[celli];
     }
     // Insert my boundary values
-    forAll(fld.boundaryField(), patchI)
+    forAll(fld.boundaryField(), patchi)
     {
-        const fvPatchField<Type>& pfld = fld.boundaryField()[patchI];
+        const fvPatchField<Type>& pfld = fld.boundaryField()[patchi];
 
         label nCompact =
             pfld.patch().start()
@@ -66,37 +66,37 @@ void Foam::extendedCellToFaceStencil::collectData
     // 2. Pull to stencil
     stencilFld.setSize(stencil.size());
 
-    forAll(stencil, faceI)
+    forAll(stencil, facei)
     {
-        const labelList& compactCells = stencil[faceI];
+        const labelList& compactCells = stencil[facei];
 
-        stencilFld[faceI].setSize(compactCells.size());
+        stencilFld[facei].setSize(compactCells.size());
 
         forAll(compactCells, i)
         {
-            stencilFld[faceI][i] = flatFld[compactCells[i]];
+            stencilFld[facei][i] = flatFld[compactCells[i]];
         }
     }
 }
 
 
 template<class Type>
-Foam::tmp<Foam::GeometricField<Type, Foam::fvsPatchField, Foam::surfaceMesh> >
+Foam::tmp<Foam::GeometricField<Type, Foam::fvsPatchField, Foam::surfaceMesh>>
 Foam::extendedCellToFaceStencil::weightedSum
 (
     const mapDistribute& map,
     const labelListList& stencil,
     const GeometricField<Type, fvPatchField, volMesh>& fld,
-    const List<List<scalar> >& stencilWeights
+    const List<List<scalar>>& stencilWeights
 )
 {
     const fvMesh& mesh = fld.mesh();
 
     // Collect internal and boundary values
-    List<List<Type> > stencilFld;
+    List<List<Type>> stencilFld;
     collectData(map, stencil, fld, stencilFld);
 
-    tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > tsfCorr
+    tmp<GeometricField<Type, fvsPatchField, surfaceMesh>> tsfCorr
     (
         new GeometricField<Type, fvsPatchField, surfaceMesh>
         (
@@ -114,28 +114,28 @@ Foam::extendedCellToFaceStencil::weightedSum
             (
                 fld.name(),
                 fld.dimensions(),
-                pTraits<Type>::zero
+                Zero
             )
         )
     );
-    GeometricField<Type, fvsPatchField, surfaceMesh>& sf = tsfCorr();
+    GeometricField<Type, fvsPatchField, surfaceMesh>& sf = tsfCorr.ref();
 
     // Internal faces
-    for (label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
+    for (label facei = 0; facei < mesh.nInternalFaces(); facei++)
     {
-        const List<Type>& stField = stencilFld[faceI];
-        const List<scalar>& stWeight = stencilWeights[faceI];
+        const List<Type>& stField = stencilFld[facei];
+        const List<scalar>& stWeight = stencilWeights[facei];
 
         forAll(stField, i)
         {
-            sf[faceI] += stField[i]*stWeight[i];
+            sf[facei] += stField[i]*stWeight[i];
         }
     }
 
     // Boundaries. Either constrained or calculated so assign value
     // directly (instead of nicely using operator==)
     typename GeometricField<Type, fvsPatchField, surfaceMesh>::
-        GeometricBoundaryField& bSfCorr = sf.boundaryField();
+        Boundary& bSfCorr = sf.boundaryFieldRef();
 
     forAll(bSfCorr, patchi)
     {
@@ -143,19 +143,19 @@ Foam::extendedCellToFaceStencil::weightedSum
 
         if (pSfCorr.coupled())
         {
-            label faceI = pSfCorr.patch().start();
+            label facei = pSfCorr.patch().start();
 
             forAll(pSfCorr, i)
             {
-                const List<Type>& stField = stencilFld[faceI];
-                const List<scalar>& stWeight = stencilWeights[faceI];
+                const List<Type>& stField = stencilFld[facei];
+                const List<scalar>& stWeight = stencilWeights[facei];
 
                 forAll(stField, j)
                 {
                     pSfCorr[i] += stField[j]*stWeight[j];
                 }
 
-                faceI++;
+                facei++;
             }
         }
     }

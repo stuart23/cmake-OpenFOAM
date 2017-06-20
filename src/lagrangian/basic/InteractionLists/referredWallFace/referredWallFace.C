@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -31,7 +31,7 @@ Foam::referredWallFace::referredWallFace()
 :
     face(),
     pts_(),
-    patchI_()
+    patchi_()
 {}
 
 
@@ -39,24 +39,17 @@ Foam::referredWallFace::referredWallFace
 (
     const face& f,
     const pointField& pts,
-    label patchI
+    label patchi
 )
 :
     face(f),
     pts_(pts),
-    patchI_(patchI)
+    patchi_(patchi)
 {
     if (this->size() != pts_.size())
     {
-        FatalErrorIn
-        (
-            "Foam::referredWallFace::referredWallFace"
-            "("
-                "const face& f, "
-                "const pointField& pts, "
-                "label patchI"
-            ")"
-        )   << "Face and pointField are not the same size. " << nl << (*this)
+        FatalErrorInFunction
+            << "Face and pointField are not the same size. " << nl << (*this)
             << abort(FatalError);
     }
 }
@@ -66,17 +59,12 @@ Foam::referredWallFace::referredWallFace(const referredWallFace& rWF)
 :
     face(rWF),
     pts_(rWF.pts_),
-    patchI_(rWF.patchI_)
+    patchi_(rWF.patchi_)
 {
     if (this->size() != pts_.size())
     {
-        FatalErrorIn
-        (
-            "Foam::referredWallFace::referredWallFace"
-            "("
-                "const referredWallFace& rWF"
-            ")"
-        )   << "Face and pointField are not the same size. " << nl << (*this)
+        FatalErrorInFunction
+            << "Face and pointField are not the same size. " << nl << (*this)
             << abort(FatalError);
     }
 }
@@ -96,7 +84,7 @@ bool Foam::referredWallFace::operator==(const referredWallFace& rhs) const
     (
         static_cast<const face&>(rhs) == static_cast<face>(*this)
      && rhs.pts_ == pts_
-     && rhs.patchI_ == patchI_
+     && rhs.patchi_ == patchi_
     );
 }
 
@@ -111,7 +99,7 @@ bool Foam::referredWallFace::operator!=(const referredWallFace& rhs) const
 
 Foam::Istream& Foam::operator>>(Istream& is, referredWallFace& rWF)
 {
-    is  >> static_cast<face&>(rWF) >> rWF.pts_ >> rWF.patchI_;
+    is  >> static_cast<face&>(rWF) >> rWF.pts_ >> rWF.patchi_;
 
     // Check state of Istream
     is.check
@@ -128,7 +116,7 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const referredWallFace& rWF)
 {
     os  << static_cast<const face&>(rWF) << token::SPACE
         << rWF.pts_ << token::SPACE
-        << rWF.patchI_;
+        << rWF.patchi_;
 
     // Check state of Ostream
     os.check

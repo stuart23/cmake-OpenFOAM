@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,9 +25,8 @@ Application
     simpleReactingParcelFoam
 
 Description
-    Steady state SIMPLE solver for compressible, laminar or turbulent flow with
-    reacting multiphase Lagrangian parcels, including run-time selectable
-    finite volume options, e.g. sources, constraints
+    Steady state solver for compressible, turbulent flow with reacting,
+    multiphase particle clouds and optional sources/constraints.
 
 \*---------------------------------------------------------------------------*/
 
@@ -37,7 +36,7 @@ Description
 #include "rhoCombustionModel.H"
 #include "radiationModel.H"
 #include "IOporosityModelList.H"
-#include "fvIOoptionList.H"
+#include "fvOptions.H"
 #include "SLGThermo.H"
 #include "simpleControl.H"
 
@@ -45,20 +44,18 @@ Description
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCase.H"
+    #include "postProcess.H"
 
+    #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
-    #include "readGravitationalAcceleration.H"
-
-    simpleControl simple(mesh);
-
+    #include "createControl.H"
     #include "createFields.H"
-    #include "createRadiationModel.H"
-    #include "createClouds.H"
-    #include "createMRF.H"
+    #include "createFieldRefs.H"
     #include "createFvOptions.H"
     #include "initContinuityErrs.H"
+
+    turbulence->validate();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

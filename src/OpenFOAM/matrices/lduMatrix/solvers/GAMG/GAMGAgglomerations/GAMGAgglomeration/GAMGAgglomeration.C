@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -302,11 +302,8 @@ const Foam::GAMGAgglomeration& Foam::GAMGAgglomeration::New
 
         if (cstrIter == lduMeshConstructorTablePtr_->end())
         {
-            FatalErrorIn
-            (
-                "GAMGAgglomeration::New"
-                "(const lduMesh& mesh, const dictionary& controlDict)"
-            )   << "Unknown GAMGAgglomeration type "
+            FatalErrorInFunction
+                << "Unknown GAMGAgglomeration type "
                 << agglomeratorType << ".\n"
                 << "Valid matrix GAMGAgglomeration types are :"
                 << lduMatrixConstructorTablePtr_->sortedToc() << endl
@@ -406,12 +403,8 @@ Foam::autoPtr<Foam::GAMGAgglomeration> Foam::GAMGAgglomeration::New
 
     if (cstrIter == geometryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "GAMGAgglomeration::New"
-            "(const lduMesh& mesh, const scalarField&"
-            ", const vectorField&, const dictionary& controlDict)"
-        )   << "Unknown GAMGAgglomeration type "
+        FatalErrorInFunction
+            << "Unknown GAMGAgglomeration type "
             << agglomeratorType << ".\n"
             << "Valid geometric GAMGAgglomeration types are :"
             << geometryConstructorTablePtr_->sortedToc()
@@ -581,10 +574,8 @@ bool Foam::GAMGAgglomeration::checkRestriction
 {
     if (fineAddressing.size() != restrict.size())
     {
-        FatalErrorIn
-        (
-            "checkRestriction(..)"
-        )   << "nCells:" << fineAddressing.size()
+        FatalErrorInFunction
+            << "nCells:" << fineAddressing.size()
             << " agglom:" << restrict.size()
             << abort(FatalError);
     }
@@ -600,10 +591,10 @@ bool Foam::GAMGAgglomeration::checkRestriction
     {
         label nChanged = 0;
 
-        forAll(lower, faceI)
+        forAll(lower, facei)
         {
-            label own = lower[faceI];
-            label nei = upper[faceI];
+            label own = lower[facei];
+            label nei = upper[facei];
 
             if (restrict[own] == restrict[nei])
             {
@@ -634,20 +625,20 @@ bool Foam::GAMGAgglomeration::checkRestriction
     // Count number of regions/masters per coarse cell
     labelListList coarseToMasters(nCoarse);
     nNewCoarse = 0;
-    forAll(restrict, cellI)
+    forAll(restrict, celli)
     {
-        labelList& masters = coarseToMasters[restrict[cellI]];
+        labelList& masters = coarseToMasters[restrict[celli]];
 
-        if (findIndex(masters, master[cellI]) == -1)
+        if (findIndex(masters, master[celli]) == -1)
         {
-            masters.append(master[cellI]);
+            masters.append(master[celli]);
             nNewCoarse++;
         }
     }
 
     if (nNewCoarse > nCoarse)
     {
-        //WarningIn("GAMGAgglomeration::checkRestriction(..)")
+        //WarningInFunction
         //    << "Have " << nCoarse
         //    << " agglomerated cells but " << nNewCoarse
         //    << " disconnected regions" << endl;
@@ -665,19 +656,19 @@ bool Foam::GAMGAgglomeration::checkRestriction
             labelList& newCoarse = coarseToNewCoarse[coarseI];
             newCoarse.setSize(masters.size());
             newCoarse[0] = coarseI;
-            for (label i = 1; i < newCoarse.size(); i++)
+            for (label i=1; i<newCoarse.size(); i++)
             {
                 newCoarse[i] = nNewCoarse++;
             }
         }
 
         newRestrict.setSize(fineAddressing.size());
-        forAll(restrict, cellI)
+        forAll(restrict, celli)
         {
-            label coarseI = restrict[cellI];
+            label coarseI = restrict[celli];
 
-            label index = findIndex(coarseToMasters[coarseI], master[cellI]);
-            newRestrict[cellI] = coarseToNewCoarse[coarseI][index];
+            label index = findIndex(coarseToMasters[coarseI], master[celli]);
+            newRestrict[celli] = coarseToNewCoarse[coarseI][index];
         }
 
         return false;

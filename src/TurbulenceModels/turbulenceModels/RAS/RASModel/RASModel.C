@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -111,7 +111,7 @@ Foam::RASModel<BasicTurbulenceModel>::RASModel
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 
 template<class BasicTurbulenceModel>
-Foam::autoPtr<Foam::RASModel<BasicTurbulenceModel> >
+Foam::autoPtr<Foam::RASModel<BasicTurbulenceModel>>
 Foam::RASModel<BasicTurbulenceModel>::New
 (
     const alphaField& alpha,
@@ -148,17 +148,8 @@ Foam::RASModel<BasicTurbulenceModel>::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "RASModel::New"
-            "("
-                "const volScalarField&, "
-                "const volVectorField&, "
-                "const surfaceScalarField&, "
-                "transportModel&, "
-                "const word&"
-            ")"
-        )   << "Unknown RASModel type "
+        FatalErrorInFunction
+            << "Unknown RASModel type "
             << modelType << nl << nl
             << "Valid RASModel types:" << endl
             << dictionaryConstructorTablePtr_->sortedToc()

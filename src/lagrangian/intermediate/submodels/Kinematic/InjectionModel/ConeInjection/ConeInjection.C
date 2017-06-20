@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "ConeInjection.H"
-#include "TimeDataEntry.H"
+#include "TimeFunction1.H"
 #include "mathematicalConstants.H"
 #include "unitConversion.H"
 
@@ -52,7 +52,7 @@ Foam::ConeInjection<CloudType>::ConeInjection
     ),
     flowRateProfile_
     (
-        TimeDataEntry<scalar>
+        TimeFunction1<scalar>
         (
             owner.db().time(),
             "flowRateProfile",
@@ -61,7 +61,7 @@ Foam::ConeInjection<CloudType>::ConeInjection
     ),
     Umag_
     (
-        TimeDataEntry<scalar>
+        TimeFunction1<scalar>
         (
             owner.db().time(),
             "Umag",
@@ -70,7 +70,7 @@ Foam::ConeInjection<CloudType>::ConeInjection
     ),
     thetaInner_
     (
-        TimeDataEntry<scalar>
+        TimeFunction1<scalar>
         (
             owner.db().time(),
             "thetaInner",
@@ -79,7 +79,7 @@ Foam::ConeInjection<CloudType>::ConeInjection
     ),
     thetaOuter_
     (
-        TimeDataEntry<scalar>
+        TimeFunction1<scalar>
         (
             owner.db().time(),
             "thetaOuter",
@@ -107,7 +107,7 @@ Foam::ConeInjection<CloudType>::ConeInjection
 
         axis /= mag(axis);
 
-        vector tangent = vector::zero;
+        vector tangent = Zero;
         scalar magTangent = 0.0;
 
         cachedRandom& rnd = this->owner().rndGen();
@@ -240,7 +240,7 @@ void Foam::ConeInjection<CloudType>::setPositionAndCell
     const scalar,
     vector& position,
     label& cellOwner,
-    label& tetFaceI,
+    label& tetFacei,
     label& tetPtI
 )
 {
@@ -248,7 +248,7 @@ void Foam::ConeInjection<CloudType>::setPositionAndCell
 
     position = positionAxis_[i].first();
     cellOwner = injectorCells_[i];
-    tetFaceI = injectorTetFaces_[i];
+    tetFacei = injectorTetFaces_[i];
     tetPtI = injectorTetPts_[i];
 }
 

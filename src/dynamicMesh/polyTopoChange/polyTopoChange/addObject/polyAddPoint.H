@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -77,7 +77,7 @@ public:
         //- Construct null.  Used only for list construction
         polyAddPoint()
         :
-            p_(vector::zero),
+            p_(Zero),
             masterPointID_(-1),
             zoneID_(-1),
             inCell_(false)
@@ -99,16 +99,7 @@ public:
         {
             if (zoneID_ < 0 && !inCell)
             {
-                FatalErrorIn
-                (
-                    "polyAddPoint\n"
-                    "(\n"
-                    "    const point& p,\n"
-                    "    const label masterPointID,\n"
-                    "    const label zoneID,\n"
-                    "    const bool inCell\n"
-                    ")"
-                )   << "Point is not in a cell and not in a zone.  "
+                FatalErrorInFunction
                     << "This is not allowed.\n"
                     << "point: " << p
                     << " master: " << masterPointID_

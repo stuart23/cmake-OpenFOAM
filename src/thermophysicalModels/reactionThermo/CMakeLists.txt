@@ -23,6 +23,8 @@ derivedFvPatchFields/fixedUnburntEnthalpy/fixedUnburntEnthalpyFvPatchScalarField
 derivedFvPatchFields/gradientUnburntEnthalpy/gradientUnburntEnthalpyFvPatchScalarField.C
 derivedFvPatchFields/mixedUnburntEnthalpy/mixedUnburntEnthalpyFvPatchScalarField.C
 
+functionObjects/moleFractions/moleFractionsFunctionObjects.C
+
 )
 
 ## Define the output

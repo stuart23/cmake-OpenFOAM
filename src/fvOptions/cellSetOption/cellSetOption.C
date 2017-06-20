@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -79,7 +79,7 @@ void Foam::fv::cellSetOption::setSelection(const dictionary& dict)
         }
         default:
         {
-            FatalErrorIn("::setSelection(const dictionary&)")
+            FatalErrorInFunction
                 << "Unknown selectionMode "
                 << selectionModeTypeNames_[selectionMode_]
                 << ". Valid selectionMode types are" << selectionModeTypeNames_
@@ -101,16 +101,16 @@ void Foam::fv::cellSetOption::setCellSet()
 
             forAll(points_, i)
             {
-                label cellI = mesh_.findCell(points_[i]);
-                if (cellI >= 0)
+                label celli = mesh_.findCell(points_[i]);
+                if (celli >= 0)
                 {
-                    selectedCells.insert(cellI);
+                    selectedCells.insert(celli);
                 }
 
-                label globalCellI = returnReduce(cellI, maxOp<label>());
-                if (globalCellI < 0)
+                label globalCelli = returnReduce(celli, maxOp<label>());
+                if (globalCelli < 0)
                 {
-                    WarningIn("cellSetOption::setCellSet()")
+                    WarningInFunction
                         << "Unable to find owner cell for point " << points_[i]
                         << endl;
                 }
@@ -139,7 +139,7 @@ void Foam::fv::cellSetOption::setCellSet()
             label zoneID = mesh_.cellZones().findZoneID(cellSetName_);
             if (zoneID == -1)
             {
-                FatalErrorIn("cellSetOption::setCellIds()")
+                FatalErrorInFunction
                     << "Cannot find cellZone " << cellSetName_ << endl
                     << "Valid cellZones are " << mesh_.cellZones().names()
                     << exit(FatalError);
@@ -157,7 +157,7 @@ void Foam::fv::cellSetOption::setCellSet()
         }
         default:
         {
-            FatalErrorIn("cellSetOption::setCellSet()")
+            FatalErrorInFunction
                 << "Unknown selectionMode "
                 << selectionModeTypeNames_[selectionMode_]
                 << ". Valid selectionMode types are" << selectionModeTypeNames_

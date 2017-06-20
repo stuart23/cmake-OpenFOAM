@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,7 +25,8 @@ Application
     chtMultiRegionSimpleFoam
 
 Description
-    Steady-state version of chtMultiRegionFoam
+    Steady-state solver for buoyant, turbulent fluid flow and solid heat
+    conduction with conjugate heat transfer between solid and fluid regions.
 
 \*---------------------------------------------------------------------------*/
 
@@ -36,25 +37,21 @@ Description
 #include "regionProperties.H"
 #include "solidThermo.H"
 #include "radiationModel.H"
-#include "fvIOoptionList.H"
+#include "fvOptions.H"
 #include "coordinateSystem.H"
-#include "fixedFluxPressureFvPatchScalarField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
+    #define NO_CONTROL
+    #define CREATE_MESH createMeshesPostProcess.H
+    #include "postProcess.H"
+
     #include "setRootCase.H"
     #include "createTime.H"
-
-    regionProperties rp(runTime);
-
-    #include "createFluidMeshes.H"
-    #include "createSolidMeshes.H"
-
-    #include "createFluidFields.H"
-    #include "createSolidFields.H"
-
+    #include "createMeshes.H"
+    #include "createFields.H"
     #include "initContinuityErrs.H"
 
 

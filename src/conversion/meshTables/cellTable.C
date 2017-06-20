@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -444,14 +444,14 @@ void Foam::cellTable::addCellZones
 ) const
 {
     Map<label> typeToZone = zoneMap();
-    List<DynamicList<label> > zoneCells(size());
+    List<DynamicList<label>> zoneCells(size());
 
-    forAll(tableIds, cellI)
+    forAll(tableIds, celli)
     {
-        Map<label>::const_iterator iter = typeToZone.find(tableIds[cellI]);
+        Map<label>::const_iterator iter = typeToZone.find(tableIds[celli]);
         if (iter != typeToZone.end())
         {
-            zoneCells[iter()].append(cellI);
+            zoneCells[iter()].append(celli);
         }
     }
 

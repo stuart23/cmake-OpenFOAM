@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -62,7 +62,7 @@ class fvMeshTools
     static void setPatchFields
     (
         fvMesh& mesh,
-        const label patchI,
+        const label patchi,
         const dictionary& patchFieldDict
     );
 
@@ -71,7 +71,7 @@ class fvMeshTools
     static void setPatchFields
     (
         fvMesh& mesh,
-        const label patchI,
+        const label patchi,
         const typename GeoField::value_type& value
     );
 
@@ -105,14 +105,14 @@ public:
     static void setPatchFields
     (
         fvMesh& mesh,
-        const label patchI,
+        const label patchi,
         const dictionary& patchFieldDict
     );
 
     //- Change patchField to zero on registered fields
-    static void zeroPatchFields(fvMesh& mesh, const label patchI);
+    static void zeroPatchFields(fvMesh& mesh, const label patchi);
 
-    // -Reorder and remove trailing patches. If validBoundary call is parallel
+    //- Reorder and remove trailing patches. If validBoundary call is parallel
     //  synced and all add the same patch with same settings
     static void reorderPatches
     (
@@ -121,7 +121,6 @@ public:
         const label nPatches,
         const bool validBoundary
     );
-
 };
 
 
@@ -132,7 +131,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "fvMeshToolsTemplates.C"
+    #include "fvMeshToolsTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

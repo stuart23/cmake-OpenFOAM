@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -59,21 +59,12 @@ mappedVelocityFluxFixedValueFvPatchField
 {
     if (!isA<mappedPatchBase>(this->patch().patch()))
     {
-        FatalErrorIn
-        (
-            "mappedVelocityFluxFixedValueFvPatchField::"
-            "mappedVelocityFluxFixedValueFvPatchField"
-            "("
-                "const mappedVelocityFluxFixedValueFvPatchField&, "
-                "const fvPatch&, "
-                "const DimensionedField<vector, volMesh>&, "
-                "const fvPatchFieldMapper&"
-            ")"
-        )   << "Patch type '" << p.type()
+        FatalErrorInFunction
+            << "Patch type '" << p.type()
             << "' not type '" << mappedPatchBase::typeName << "'"
             << " for patch " << p.name()
-            << " of field " << dimensionedInternalField().name()
-            << " in file " << dimensionedInternalField().objectPath()
+            << " of field " << internalField().name()
+            << " in file " << internalField().objectPath()
             << exit(FatalError);
     }
 }
@@ -92,20 +83,12 @@ mappedVelocityFluxFixedValueFvPatchField
 {
     if (!isA<mappedPatchBase>(this->patch().patch()))
     {
-        FatalErrorIn
-        (
-            "mappedVelocityFluxFixedValueFvPatchField::"
-            "mappedVelocityFluxFixedValueFvPatchField"
-            "("
-                "const fvPatch&, "
-                "const DimensionedField<vector, volMesh>&, "
-                "const dictionary&"
-            ")"
-        )   << "Patch type '" << p.type()
+        FatalErrorInFunction
+            << "Patch type '" << p.type()
             << "' not type '" << mappedPatchBase::typeName << "'"
             << " for patch " << p.name()
-            << " of field " << dimensionedInternalField().name()
-            << " in file " << dimensionedInternalField().objectPath()
+            << " of field " << internalField().name()
+            << " in file " << internalField().objectPath()
             << exit(FatalError);
     }
 
@@ -115,20 +98,12 @@ mappedVelocityFluxFixedValueFvPatchField
     );
     if (mpp.mode() == mappedPolyPatch::NEARESTCELL)
     {
-        FatalErrorIn
-        (
-            "mappedVelocityFluxFixedValueFvPatchField::"
-            "mappedVelocityFluxFixedValueFvPatchField"
-            "("
-                "const fvPatch&, "
-                "const DimensionedField<vector, volMesh>&, "
-                "const dictionary&"
-            ")"
-        )   << "Patch " << p.name()
+        FatalErrorInFunction
+            << "Patch " << p.name()
             << " of type '" << p.type()
             << "' can not be used in 'nearestCell' mode"
-            << " of field " << dimensionedInternalField().name()
-            << " in file " << dimensionedInternalField().objectPath()
+            << " of field " << internalField().name()
+            << " in file " << internalField().objectPath()
             << exit(FatalError);
     }
 }
@@ -177,14 +152,12 @@ void Foam::mappedVelocityFluxFixedValueFvPatchField::updateCoeffs()
         mappedVelocityFluxFixedValueFvPatchField::patch().patch()
     );
     const fvMesh& nbrMesh = refCast<const fvMesh>(mpp.sampleMesh());
-    const word& fieldName = dimensionedInternalField().name();
+    const word& fieldName = internalField().name();
     const volVectorField& UField =
         nbrMesh.lookupObject<volVectorField>(fieldName);
 
-    surfaceScalarField& phiField = const_cast<surfaceScalarField&>
-    (
-        nbrMesh.lookupObject<surfaceScalarField>(phiName_)
-    );
+    const surfaceScalarField& phiField =
+        nbrMesh.lookupObject<surfaceScalarField>(phiName_);
 
     vectorField newUValues;
     scalarField newPhiValues;
@@ -193,20 +166,20 @@ void Foam::mappedVelocityFluxFixedValueFvPatchField::updateCoeffs()
     {
         case mappedPolyPatch::NEARESTFACE:
         {
-            vectorField allUValues(nbrMesh.nFaces(), vector::zero);
+            vectorField allUValues(nbrMesh.nFaces(), Zero);
             scalarField allPhiValues(nbrMesh.nFaces(), 0.0);
 
-            forAll(UField.boundaryField(), patchI)
+            forAll(UField.boundaryField(), patchi)
             {
-                const fvPatchVectorField& Upf = UField.boundaryField()[patchI];
-                const scalarField& phipf = phiField.boundaryField()[patchI];
+                const fvPatchVectorField& Upf = UField.boundaryField()[patchi];
+                const scalarField& phipf = phiField.boundaryField()[patchi];
 
                 label faceStart = Upf.patch().start();
 
-                forAll(Upf, faceI)
+                forAll(Upf, facei)
                 {
-                    allUValues[faceStart + faceI] = Upf[faceI];
-                    allPhiValues[faceStart + faceI] = phipf[faceI];
+                    allUValues[faceStart + facei] = Upf[facei];
+                    allPhiValues[faceStart + facei] = phipf[facei];
                 }
             }
 
@@ -234,18 +207,18 @@ void Foam::mappedVelocityFluxFixedValueFvPatchField::updateCoeffs()
         }
         default:
         {
-            FatalErrorIn
-            (
-                "mappedVelocityFluxFixedValueFvPatchField::"
-                "updateCoeffs()"
-            )   << "patch can only be used in NEARESTPATCHFACE, "
+            FatalErrorInFunction
+                << "patch can only be used in NEARESTPATCHFACE, "
                 << "NEARESTPATCHFACEAMI or NEARESTFACE mode" << nl
                 << abort(FatalError);
         }
     }
 
     operator==(newUValues);
-    phiField.boundaryField()[patch().index()] == newPhiValues;
+    const_cast<surfaceScalarField&>
+    (
+        phiField
+    ).boundaryFieldRef()[patch().index()] == newPhiValues;
 
     // Restore tag
     UPstream::msgType() = oldTag;

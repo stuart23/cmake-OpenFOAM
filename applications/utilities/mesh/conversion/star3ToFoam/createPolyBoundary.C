@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -41,17 +41,17 @@ void Foam::starMesh::createPolyBoundary()
 
     const labelListList& PointCells = pointCells();
 
-    forAll(boundary_, patchI)
+    forAll(boundary_, patchi)
     {
-        const faceList& curShapePatch = boundary_[patchI];
+        const faceList& curShapePatch = boundary_[patchi];
 
-        polyBoundaryPatchStartIndices_[patchI] = nCreatedFaces;
+        polyBoundaryPatchStartIndices_[patchi] = nCreatedFaces;
 
-        forAll(curShapePatch, faceI)
+        forAll(curShapePatch, facei)
         {
             bool found = false;
 
-            const face& curFace = curShapePatch[faceI];
+            const face& curFace = curShapePatch[facei];
 
             meshFaces_[nCreatedFaces] = curFace;
 
@@ -59,19 +59,19 @@ void Foam::starMesh::createPolyBoundary()
             // mark it in the cellPolys_
             const labelList& facePoints = curFace;
 
-            forAll(facePoints, pointI)
+            forAll(facePoints, pointi)
             {
                 const labelList& facePointCells =
-                    PointCells[facePoints[pointI]];
+                    PointCells[facePoints[pointi]];
 
-                forAll(facePointCells, cellI)
+                forAll(facePointCells, celli)
                 {
                     const faceList& curCellFaces =
-                        cellFaces_[facePointCells[cellI]];
+                        cellFaces_[facePointCells[celli]];
 
-                    forAll(curCellFaces, cellFaceI)
+                    forAll(curCellFaces, cellFacei)
                     {
-                        if (curCellFaces[cellFaceI] == curFace)
+                        if (curCellFaces[cellFacei] == curFace)
                         {
                             // Found the cell face corresponding to this face
                             found = true;
@@ -79,41 +79,39 @@ void Foam::starMesh::createPolyBoundary()
                             // Debugging
                             if
                             (
-                                cellPolys_[facePointCells[cellI]][cellFaceI]
+                                cellPolys_[facePointCells[celli]][cellFacei]
                              != -1
                             )
                             {
                                 if
                                 (
-                                    cellPolys_[facePointCells[cellI]][cellFaceI]
+                                    cellPolys_[facePointCells[celli]][cellFacei]
                                   > nInternalFaces_
                                 )
                                 {
-                                    Info
-                                        << "void starMesh::createPolyBoundary()"
-                                        << ": Problem with face: " << curFace
+                                    InfoInFunction
+                                        << "Problem with face: " << curFace
                                         << "\nProbably multiple definitions "
                                         << "of a single boundary face. " << endl
                                         << "Other boundary face: "
-                                        << curCellFaces[cellFaceI]
+                                        << curCellFaces[cellFacei]
                                         << endl;
 
                                     Info<< "PROSTAR Command: vset,news,vlis";
-                                    forAll(curCellFaces[cellFaceI], spI)
+                                    forAll(curCellFaces[cellFacei], spI)
                                     {
                                         // check if the point is given by STAR
                                         // or created locally
                                         if
                                         (
-                                            curCellFaces[cellFaceI][spI] > -1
-                                         && curCellFaces[cellFaceI][spI]
+                                            curCellFaces[cellFacei][spI] > -1
+                                         && curCellFaces[cellFacei][spI]
                                                 < starPointID_.size()
                                         )
                                         {
-                                            Info
-                                                << ","
+                                            Info<< ","
                                                 << starPointID_
-                                                 [curCellFaces[cellFaceI][spI]];
+                                                 [curCellFaces[cellFacei][spI]];
                                         }
                                         else
                                         {
@@ -124,32 +122,30 @@ void Foam::starMesh::createPolyBoundary()
                                 }
                                 else
                                 {
-                                    Info
-                                        << "void starMesh::createPolyBoundary()"
-                                        << ": Problem with face: " << curFace
+                                    InfoInFunction
+                                        << "Problem with face: " << curFace
                                         << "\nProbably trying to define a "
                                         << "boundary face on a previously "
                                         << "matched internal face. " << endl
                                         << "Internal face: "
-                                        << curCellFaces[cellFaceI]
+                                        << curCellFaces[cellFacei]
                                         << endl;
 
                                     Info<< "PROSTAR Command: vset,news,vlis";
-                                    forAll(curCellFaces[cellFaceI], spI)
+                                    forAll(curCellFaces[cellFacei], spI)
                                     {
                                         // check if the point is given by STAR
                                         // or created locally
                                         if
                                         (
-                                            curCellFaces[cellFaceI][spI] > -1
-                                         && curCellFaces[cellFaceI][spI]
+                                            curCellFaces[cellFacei][spI] > -1
+                                         && curCellFaces[cellFacei][spI]
                                                 < starPointID_.size()
                                         )
                                         {
-                                            Info
-                                                << ","
+                                            Info<< ","
                                                 << starPointID_
-                                                 [curCellFaces[cellFaceI][spI]];
+                                                 [curCellFaces[cellFacei][spI]];
                                         }
                                         else
                                         {
@@ -161,7 +157,7 @@ void Foam::starMesh::createPolyBoundary()
                                 }
                             }
 
-                            cellPolys_[facePointCells[cellI]][cellFaceI] =
+                            cellPolys_[facePointCells[celli]][cellFacei] =
                                 nCreatedFaces;
 
                             nBoundaryFacesFound++;
@@ -180,20 +176,20 @@ void Foam::starMesh::createPolyBoundary()
     // check all cellPolys_ to see if there are any missing faces
     label nMissingFaceFound = 0;
 
-    forAll(cellPolys_, cellI)
+    forAll(cellPolys_, celli)
     {
-        const labelList& curFaces = cellPolys_[cellI];
+        const labelList& curFaces = cellPolys_[celli];
 
-        forAll(curFaces, faceI)
+        forAll(curFaces, facei)
         {
-            if (curFaces[faceI] < 0)
+            if (curFaces[facei] < 0)
             {
-                const face& missingFace = cellFaces_[cellI][faceI];
+                const face& missingFace = cellFaces_[celli][facei];
 
-                Info<< "starMesh::createPolyBoundary() : "
-                    << "missing face found in cell " << cellI
-                    << ".\nType: " << cellShapes_[cellI].model().name()
-                    << ". STAR cell number: " << starCellID_[cellI]
+                InfoInFunction
+                    << "Missing face found in cell " << celli
+                    << ".\nType: " << cellShapes_[celli].model().name()
+                    << ". STAR cell number: " << starCellID_[celli]
                     << ". Face: " << missingFace << endl;
 
                 nMissingFaceFound++;
@@ -232,13 +228,13 @@ void Foam::starMesh::createPolyBoundary()
     // (faces addressed once or more than twice)
     labelList markupFaces(meshFaces_.size(), 0);
 
-    forAll(cellPolys_, cellI)
+    forAll(cellPolys_, celli)
     {
-        const labelList& curFaces = cellPolys_[cellI];
+        const labelList& curFaces = cellPolys_[celli];
 
-        forAll(curFaces, faceI)
+        forAll(curFaces, facei)
         {
-            markupFaces[curFaces[faceI]]++;
+            markupFaces[curFaces[facei]]++;
         }
     }
 
@@ -249,15 +245,15 @@ void Foam::starMesh::createPolyBoundary()
 
     label nProblemFacesFound = 0;
 
-    forAll(markupFaces, faceI)
+    forAll(markupFaces, facei)
     {
-        if (markupFaces[faceI] != 2)
+        if (markupFaces[facei] != 2)
         {
-            const face& problemFace = meshFaces_[faceI];
+            const face& problemFace = meshFaces_[facei];
 
-            Info<< "starMesh::createPolyBoundary() : "
-                << "problem with face " << faceI << ": addressed "
-                << markupFaces[faceI] << " times (should be 2!). Face: "
+            InfoInFunction
+                << "Problem with face " << facei << ": addressed "
+                << markupFaces[facei] << " times (should be 2!). Face: "
                 << problemFace << endl;
 
             nProblemFacesFound++;
@@ -299,15 +295,15 @@ Foam::starMesh::polyBoundaryPatches(const polyMesh& pMesh)
 {
     List<polyPatch*> p(boundary_.size());
 
-    forAll(boundary_, patchI)
+    forAll(boundary_, patchi)
     {
-        p[patchI] = polyPatch::New
+        p[patchi] = polyPatch::New
         (
-            patchTypes_[patchI],
-            patchNames_[patchI],
-            boundary_[patchI].size(),
-            polyBoundaryPatchStartIndices_[patchI],
-            patchI,
+            patchTypes_[patchi],
+            patchNames_[patchi],
+            boundary_[patchi].size(),
+            polyBoundaryPatchStartIndices_[patchi],
+            patchi,
             pMesh.boundaryMesh()
         ).ptr();
     }

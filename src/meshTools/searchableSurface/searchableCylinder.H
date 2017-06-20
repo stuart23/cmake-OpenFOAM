@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -171,10 +171,7 @@ public:
         //- Does any part of the surface overlap the supplied bound box?
         virtual bool overlaps(const boundBox& bb) const
         {
-            notImplemented
-            (
-                "searchableCylinder::overlaps(const boundBox&) const"
-            );
+            NotImplemented;
 
             return false;
         }
@@ -208,7 +205,7 @@ public:
             (
                 const pointField& start,
                 const pointField& end,
-                List<List<pointIndexHit> >&
+                List<List<pointIndexHit>>&
             ) const;
 
             //- From a set of points and indices get the region
@@ -238,7 +235,7 @@ public:
 
             bool writeData(Ostream&) const
             {
-                notImplemented("searchableCylinder::writeData(Ostream&) const");
+                NotImplemented;
                 return false;
             }
 

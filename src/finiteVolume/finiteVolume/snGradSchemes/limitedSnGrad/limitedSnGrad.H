@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -34,11 +34,11 @@ Description
     non-orthogonal contribution does not exceed the orthogonal part.
 
     Format:
-        limited <corrected scheme> <coefficient>;
+        limited \<corrected scheme\> \<coefficient\>;
 
         or
 
-        limited <coefficient>;  // Backward compatibility
+        limited \<coefficient\>;  // Backward compatibility
 
 SourceFiles
     limitedSnGrad.C
@@ -71,7 +71,7 @@ class limitedSnGrad
 {
     // Private data
 
-        tmp<snGradScheme<Type> > correctedScheme_;
+        tmp<snGradScheme<Type>> correctedScheme_;
 
         scalar limitCoeff_;
 
@@ -83,14 +83,14 @@ class limitedSnGrad
 
         //- Lookup function for the corrected to support backward compatibility
         //  of dictionary specification
-        tmp<snGradScheme<Type> > lookupCorrectedScheme(Istream& schemeData)
+        tmp<snGradScheme<Type>> lookupCorrectedScheme(Istream& schemeData)
         {
             token nextToken(schemeData);
 
             if (nextToken.isNumber())
             {
                 limitCoeff_ = nextToken.number();
-                return tmp<snGradScheme<Type> >
+                return tmp<snGradScheme<Type>>
                 (
                     new correctedSnGrad<Type>(this->mesh())
                 );
@@ -98,7 +98,7 @@ class limitedSnGrad
             else
             {
                 schemeData.putBack(nextToken);
-                tmp<snGradScheme<Type> > tcorrectedScheme
+                tmp<snGradScheme<Type>> tcorrectedScheme
                 (
                     fv::snGradScheme<Type>::New(this->mesh(), schemeData)
                 );
@@ -135,9 +135,8 @@ public:
         {
             if (limitCoeff_ < 0 || limitCoeff_ > 1)
             {
-                FatalIOErrorIn
+                FatalIOErrorInFunction
                 (
-                    "limitedSnGrad(const fvMesh& mesh, Istream& schemeData) : ",
                     schemeData
                 )   << "limitCoeff is specified as " << limitCoeff_
                     << " but should be >= 0 && <= 1"
@@ -169,7 +168,7 @@ public:
 
         //- Return the explicit correction to the limitedSnGrad
         //  for the given field
-        virtual tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
+        virtual tmp<GeometricField<Type, fvsPatchField, surfaceMesh>>
         correction(const GeometricField<Type, fvPatchField, volMesh>&) const;
 };
 
@@ -185,7 +184,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "limitedSnGrad.C"
+    #include "limitedSnGrad.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

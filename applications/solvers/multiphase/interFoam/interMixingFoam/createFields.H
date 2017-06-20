@@ -50,8 +50,7 @@ volScalarField rho
         mesh,
         IOobject::READ_IF_PRESENT
     ),
-    alpha1*rho1 + alpha2*rho2 + alpha3*rho3,
-    alpha1.boundaryField().types()
+    alpha1*rho1 + alpha2*rho2 + alpha3*rho3
 );
 rho.oldTime();
 
@@ -79,9 +78,11 @@ autoPtr<incompressible::turbulenceModel> turbulence
     incompressible::turbulenceModel::New(U, phi, mixture)
 );
 
+
 #include "readGravitationalAcceleration.H"
 #include "readhRef.H"
 #include "gh.H"
+
 
 volScalarField p
 (
@@ -120,3 +121,5 @@ if (p_rgh.needReference())
 
 mesh.setFluxRequired(p_rgh.name());
 mesh.setFluxRequired(alpha2.name());
+
+#include "createMRF.H"

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -62,11 +62,7 @@ void Foam::fileFormats::SMESHsurfaceFormat<Face>::write
     OFstream os(filename);
     if (!os.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::SMESHsurfaceFormat::write"
-            "(const fileName&, const MeshedSurfaceProxy<Face>&)"
-        )
+        FatalErrorInFunction
             << "Cannot open file for writing " << filename
             << exit(FatalError);
     }
@@ -98,7 +94,7 @@ void Foam::fileFormats::SMESHsurfaceFormat<Face>::write
 
         if (useFaceMap)
         {
-            forAll(zone, localFaceI)
+            forAll(zone, localFacei)
             {
                 const Face& f = faceLst[faceMap[faceIndex++]];
 
@@ -112,7 +108,7 @@ void Foam::fileFormats::SMESHsurfaceFormat<Face>::write
         }
         else
         {
-            forAll(zones[zoneI], localFaceI)
+            forAll(zones[zoneI], localFacei)
             {
                 const Face& f = faceLst[faceIndex++];
 

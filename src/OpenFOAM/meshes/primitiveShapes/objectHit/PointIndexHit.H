@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -89,7 +89,7 @@ public:
         PointIndexHit()
         :
             hit_(false),
-            hitPoint_(vector::zero),
+            hitPoint_(Zero),
             index_(-1)
         {}
 
@@ -119,7 +119,7 @@ public:
         {
             if (!hit_)
             {
-                FatalErrorIn("PointIndexHit::hitPoint() const")
+                FatalErrorInFunction
                     << "requested a hit point for a miss"
                     << abort(FatalError);
             }
@@ -132,7 +132,7 @@ public:
         {
             if (hit_)
             {
-                FatalErrorIn("PointIndexHit::missPoint() const")
+                FatalErrorInFunction
                     << "requested a miss point for a hit"
                     << abort(FatalError);
             }

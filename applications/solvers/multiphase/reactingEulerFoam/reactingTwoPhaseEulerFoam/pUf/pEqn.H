@@ -161,7 +161,7 @@ while (pimple.correct())
        *(
             (alphaRhof10 + Vmf)
            *MRF.absolute(phi1.oldTime())/runTime.deltaT()
-          + (fvc::interpolate(U1Eqn.H()) & mesh.Sf())
+          + fvc::flux(U1Eqn.H())
           + Vmf*ddtPhi2
           + Kdf*MRF.absolute(phi2)
           - Ff1()
@@ -179,7 +179,7 @@ while (pimple.correct())
        *(
             (alphaRhof20 + Vmf)
            *MRF.absolute(phi2.oldTime())/runTime.deltaT()
-          + (fvc::interpolate(U2Eqn.H()) & mesh.Sf())
+          + fvc::flux(U2Eqn.H())
           + Vmf*ddtPhi1
           + Kdf*MRF.absolute(phi1)
           - Ff2()
@@ -205,7 +205,7 @@ while (pimple.correct())
     // Update the fixedFluxPressure BCs to ensure flux consistency
     setSnGrad<fixedFluxPressureFvPatchScalarField>
     (
-        p_rgh.boundaryField(),
+        p_rgh.boundaryFieldRef(),
         (
             phiHbyA.boundaryField()
           - (
@@ -238,13 +238,16 @@ while (pimple.correct())
                 phase1.continuityError()
               - fvc::Sp(fvc::ddt(alpha1) + fvc::div(alphaPhi1), rho1)
             )/rho1
-          + (alpha1/rho1)*correction
+          + correction
             (
-                psi1*fvm::ddt(p_rgh)
-              + fvm::div(phid1, p_rgh) - fvm::Sp(fvc::div(phid1), p_rgh)
+                (alpha1/rho1)*
+                (
+                    psi1*fvm::ddt(p_rgh)
+                  + fvm::div(phid1, p_rgh) - fvm::Sp(fvc::div(phid1), p_rgh)
+                )
             );
-            deleteDemandDrivenData(pEqnComp1().faceFluxCorrectionPtr());
-            pEqnComp1().relax();
+            deleteDemandDrivenData(pEqnComp1.ref().faceFluxCorrectionPtr());
+            pEqnComp1.ref().relax();
         }
 
         if (phase2.compressible())
@@ -254,13 +257,16 @@ while (pimple.correct())
                 phase2.continuityError()
               - fvc::Sp(fvc::ddt(alpha2) + fvc::div(alphaPhi2), rho2)
             )/rho2
-          + (alpha2/rho2)*correction
+          + correction
             (
-                psi2*fvm::ddt(p_rgh)
-              + fvm::div(phid2, p_rgh) - fvm::Sp(fvc::div(phid2), p_rgh)
+                (alpha2/rho2)*
+                (
+                    psi2*fvm::ddt(p_rgh)
+                  + fvm::div(phid2, p_rgh) - fvm::Sp(fvc::div(phid2), p_rgh)
+                )
             );
-            deleteDemandDrivenData(pEqnComp2().faceFluxCorrectionPtr());
-            pEqnComp2().relax();
+            deleteDemandDrivenData(pEqnComp2.ref().faceFluxCorrectionPtr());
+            pEqnComp2.ref().relax();
         }
     }
     else
@@ -290,7 +296,7 @@ while (pimple.correct())
     {
         if (pEqnComp1.valid())
         {
-            pEqnComp1() -= fluid.dmdt()/rho1;
+            pEqnComp1.ref() -= fluid.dmdt()/rho1;
         }
         else
         {
@@ -299,7 +305,7 @@ while (pimple.correct())
 
         if (pEqnComp2.valid())
         {
-            pEqnComp2() += fluid.dmdt()/rho2;
+            pEqnComp2.ref() += fluid.dmdt()/rho2;
         }
         else
         {
@@ -385,12 +391,6 @@ while (pimple.correct())
                 phase2.divU(-pEqnComp2 & p_rgh);
             }
         }
-    }
-
-    Info<< "min(p) = " << min(p_rgh + rho*gh).value() << endl;
-    if (min(p_rgh + rho*gh) < pMin)
-    {
-        Info<< "Clipping p" << endl;
     }
 
     // Update and limit the static pressure

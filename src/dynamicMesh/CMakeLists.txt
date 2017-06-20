@@ -27,16 +27,18 @@ polyTopoChange/polyTopoChange/addPatchCellLayer.C
 polyTopoChange/polyTopoChange/pointEdgeCollapse/pointEdgeCollapse.C
 polyTopoChange/polyTopoChange/edgeCollapser.C
 polyTopoChange/polyTopoChange/faceCollapser.C
-polyTopoChange/polyTopoChange/hexRef8.C
 polyTopoChange/polyTopoChange/removeCells.C
 polyTopoChange/polyTopoChange/removeFaces.C
 polyTopoChange/polyTopoChange/refinementData.C
 polyTopoChange/polyTopoChange/refinementDistanceData.C
-polyTopoChange/polyTopoChange/refinementHistory.C
 polyTopoChange/polyTopoChange/removePoints.C
 polyTopoChange/polyTopoChange/combineFaces.C
 polyTopoChange/polyTopoChange/duplicatePoints.C
 polyTopoChange/polyTopoChange/tetDecomposer.C
+
+polyTopoChange/polyTopoChange/hexRef8/hexRef8.C
+polyTopoChange/polyTopoChange/hexRef8/hexRef8Data.C
+polyTopoChange/polyTopoChange/hexRef8/refinementHistory.C
 
 slidingInterface/slidingInterface.C
 slidingInterface/slidingInterfaceProjectPoints.C
@@ -81,6 +83,8 @@ polyMeshAdder/polyMeshAdder.C
 
 fvMeshTools/fvMeshTools.C
 
+fvMeshSubset/fvMeshSubset.C
+
 motionSmoother/motionSmoother.C
 motionSmoother/motionSmootherAlgo.C
 motionSmoother/motionSmootherAlgoCheck.C
@@ -101,6 +105,9 @@ extrudePatchMesh/extrudePatchMesh.C
 
 polyMeshFilter/polyMeshFilterSettings.C
 polyMeshFilter/polyMeshFilter.C
+
+pointPatchDist/externalPointEdgePoint.C
+pointPatchDist/pointPatchDist.C
 
 )
 

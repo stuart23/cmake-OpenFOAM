@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,7 @@ Description
     A triangular face using a FixedList of labels corresponding to mesh
     vertices.
 
-SeeAlso
+See also
     Foam::face, Foam::triangle
 
 SourceFiles
@@ -293,7 +293,7 @@ public:
 #include "triFaceI.H"
 
 #ifdef NoRepository
-#   include "triFaceTemplates.C"
+    #include "triFaceTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

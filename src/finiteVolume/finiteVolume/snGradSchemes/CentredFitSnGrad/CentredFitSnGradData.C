@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -52,16 +52,15 @@ Foam::CentredFitSnGradData<Polynomial>::CentredFitSnGradData
 {
     if (debug)
     {
-        Info<< "Contructing CentredFitSnGradData<Polynomial>" << endl;
+        InfoInFunction
+            << "Contructing CentredFitSnGradData<Polynomial>" << endl;
     }
 
     calcFit();
 
     if (debug)
     {
-        Info<< "CentredFitSnGradData<Polynomial>::CentredFitSnGradData() :"
-            << "Finished constructing polynomialFit data"
-            << endl;
+        Info<< "    Finished constructing polynomialFit data" << endl;
     }
 }
 
@@ -121,10 +120,10 @@ void Foam::CentredFitSnGradData<Polynomial>::calcFit
     }
 
     // Additional weighting for constant and linear terms
-    for (label i = 0; i < B.n(); i++)
+    for (label i = 0; i < B.m(); i++)
     {
-        B[i][0] *= wts[0];
-        B[i][1] *= wts[0];
+        B(i, 0) *= wts[0];
+        B(i, 1) *= wts[0];
     }
 
     // Set the fit
@@ -138,14 +137,14 @@ void Foam::CentredFitSnGradData<Polynomial>::calcFit
 
         for (label i=0; i<stencilSize; i++)
         {
-            coeffsi[i] = wts[1]*wts[i]*svd.VSinvUt()[1][i]/scale;
+            coeffsi[i] = wts[1]*wts[i]*svd.VSinvUt()(1, i)/scale;
         }
 
         goodFit =
         (
-            mag(wts[0]*wts[0]*svd.VSinvUt()[0][0] - wLin)
+            mag(wts[0]*wts[0]*svd.VSinvUt()(0, 0) - wLin)
           < this->linearLimitFactor()*wLin)
-         && (mag(wts[0]*wts[1]*svd.VSinvUt()[0][1] - (1 - wLin)
+         && (mag(wts[0]*wts[1]*svd.VSinvUt()(0, 1) - (1 - wLin)
         ) < this->linearLimitFactor()*(1 - wLin))
          && coeffsi[0] < 0 && coeffsi[1] > 0
          && mag(coeffsi[0] + deltaCoeff) < 0.5*deltaCoeff
@@ -156,36 +155,33 @@ void Foam::CentredFitSnGradData<Polynomial>::calcFit
             // (not good fit so increase weight in the centre and weight
             //  for constant and linear terms)
 
-            WarningIn
-            (
-                "CentredFitSnGradData<Polynomial>::calcFit"
-                "(const List<point>& C, const label facei"
-            )   << "Cannot fit face " << facei << " iteration " << iIt
+            WarningInFunction
+                << "Cannot fit face " << facei << " iteration " << iIt
                 << " with sum of weights " << sum(coeffsi) << nl
                 << "    Weights " << coeffsi << nl
                 << "    Linear weights " << wLin << " " << 1 - wLin << nl
                 << "    deltaCoeff " << deltaCoeff << nl
                 << "    sing vals " << svd.S() << nl
                 << "Components of goodFit:\n"
-                << "    wts[0]*wts[0]*svd.VSinvUt()[0][0] = "
-                << wts[0]*wts[0]*svd.VSinvUt()[0][0] << nl
-                << "    wts[0]*wts[1]*svd.VSinvUt()[0][1] = "
-                << wts[0]*wts[1]*svd.VSinvUt()[0][1]
+                << "    wts[0]*wts[0]*svd.VSinvUt()(0, 0) = "
+                << wts[0]*wts[0]*svd.VSinvUt()(0, 0) << nl
+                << "    wts[0]*wts[1]*svd.VSinvUt()(0, 1) = "
+                << wts[0]*wts[1]*svd.VSinvUt()(0, 1)
                 << " dim = " << this->dim() << endl;
 
             wts[0] *= 10;
             wts[1] *= 10;
 
-            for (label j = 0; j < B.m(); j++)
+            for (label j = 0; j < B.n(); j++)
             {
-                B[0][j] *= 10;
-                B[1][j] *= 10;
+                B(0, j) *= 10;
+                B(1, j) *= 10;
             }
 
-            for (label i = 0; i < B.n(); i++)
+            for (label i = 0; i < B.m(); i++)
             {
-                B[i][0] *= 10;
-                B[i][1] *= 10;
+                B(i, 0) *= 10;
+                B(i, 1) *= 10;
             }
         }
     }
@@ -198,10 +194,8 @@ void Foam::CentredFitSnGradData<Polynomial>::calcFit
     }
     else
     {
-        WarningIn
-        (
-            "CentredFitSnGradData<Polynomial>::calcFit(..)"
-        )   << "Could not fit face " << facei
+        WarningInFunction
+            << "Could not fit face " << facei
             << "    Coefficients = " << coeffsi
             << ", reverting to uncorrected." << endl;
 
@@ -218,7 +212,7 @@ void Foam::CentredFitSnGradData<Polynomial>::calcFit()
     // Get the cell/face centres in stencil order.
     // Centred face stencils no good for triangles or tets.
     // Need bigger stencils
-    List<List<point> > stencilPoints(mesh.nFaces());
+    List<List<point>> stencilPoints(mesh.nFaces());
     this->stencil().collectData(mesh.C(), stencilPoints);
 
     // find the fit coefficients for every face in the mesh
@@ -238,8 +232,8 @@ void Foam::CentredFitSnGradData<Polynomial>::calcFit()
         );
     }
 
-    const surfaceScalarField::GeometricBoundaryField& bw = w.boundaryField();
-    const surfaceScalarField::GeometricBoundaryField& bdC = dC.boundaryField();
+    const surfaceScalarField::Boundary& bw = w.boundaryField();
+    const surfaceScalarField::Boundary& bdC = dC.boundaryField();
 
     forAll(bw, patchi)
     {

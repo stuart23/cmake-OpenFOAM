@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,11 +25,9 @@ Application
     chemFoam
 
 Description
-    Solver for chemistry problems
-    - designed for use on single cell cases to provide comparison against
-      other chemistry solvers
-    - single cell mesh created on-the-fly
-    - fields created on the fly from the initial conditions
+    Solver for chemistry problems, designed for use on single cell cases to
+    provide comparison against other chemistry solvers, that uses a single cell
+    mesh, and fields created from the initial conditions.
 
 \*---------------------------------------------------------------------------*/
 
@@ -48,10 +46,15 @@ int main(int argc, char *argv[])
 {
     argList::noParallel();
 
+    #define CREATE_MESH createSingleCellMesh.H
+    #define NO_CONTROL
+    #include "postProcess.H"
+
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createSingleCellMesh.H"
     #include "createFields.H"
+    #include "createFieldRefs.H"
     #include "readInitialConditions.H"
     #include "createControls.H"
 

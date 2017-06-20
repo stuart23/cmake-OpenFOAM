@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -84,16 +84,16 @@ void Foam::DelaunayMesh<Triangulation>::addPatches
     faceList& faces,
     labelList& owner,
     PtrList<dictionary>& patchDicts,
-    const List<DynamicList<face> >& patchFaces,
-    const List<DynamicList<label> >& patchOwners
+    const List<DynamicList<face>>& patchFaces,
+    const List<DynamicList<label>>& patchOwners
 ) const
 {
     label nPatches = patchFaces.size();
 
     patchDicts.setSize(nPatches);
-    forAll(patchDicts, patchI)
+    forAll(patchDicts, patchi)
     {
-        patchDicts.set(patchI, new dictionary());
+        patchDicts.set(patchi, new dictionary());
     }
 
     label nBoundaryFaces = 0;
@@ -109,16 +109,16 @@ void Foam::DelaunayMesh<Triangulation>::addPatches
     faces.setSize(nInternalFaces + nBoundaryFaces);
     owner.setSize(nInternalFaces + nBoundaryFaces);
 
-    label faceI = nInternalFaces;
+    label facei = nInternalFaces;
 
     forAll(patchFaces, p)
     {
         forAll(patchFaces[p], f)
         {
-            faces[faceI] = patchFaces[p][f];
-            owner[faceI] = patchOwners[p][f];
+            faces[facei] = patchFaces[p][f];
+            owner[facei] = patchOwners[p][f];
 
-            faceI++;
+            facei++;
         }
     }
 }
@@ -306,7 +306,7 @@ void Foam::DelaunayMesh<Triangulation>::printVertexInfo(Ostream& os) const
 
     if (nTotalVertices != label(Triangulation::number_of_vertices()))
     {
-        WarningIn("Foam::conformalVoronoiMesh::printVertexInfo()")
+        WarningInFunction
             << nTotalVertices << " does not equal "
             << Triangulation::number_of_vertices()
             << endl;
@@ -353,8 +353,8 @@ Foam::DelaunayMesh<Triangulation>::createMesh
     PtrList<dictionary> patchDicts(1);
     patchDicts.set(0, new dictionary());
 
-    List<DynamicList<face> > patchFaces(1, DynamicList<face>());
-    List<DynamicList<label> > patchOwners(1, DynamicList<label>());
+    List<DynamicList<face>> patchFaces(1, DynamicList<face>());
+    List<DynamicList<label>> patchOwners(1, DynamicList<label>());
 
     vertexMap.resize(vertexCount());
     cellMap.setSize(Triangulation::number_of_finite_cells(), -1);
@@ -429,7 +429,7 @@ Foam::DelaunayMesh<Triangulation>::createMesh
 
 
     // Index the cells
-    label cellI = 0;
+    label celli = 0;
 
     for
     (
@@ -445,11 +445,11 @@ Foam::DelaunayMesh<Triangulation>::createMesh
          && cit->real()
         )
         {
-            cellMap[cit->cellIndex()] = cellI++;
+            cellMap[cit->cellIndex()] = celli++;
         }
     }
 
-    label faceI = 0;
+    label facei = 0;
     labelList verticesOnTriFace(3, label(-1));
     face newFace(verticesOnTriFace);
 
@@ -566,16 +566,16 @@ Foam::DelaunayMesh<Triangulation>::createMesh
                 neighbourCell = c1I;
             }
 
-            faces[faceI] = newFace;
-            owner[faceI] = ownerCell;
-            neighbour[faceI] = neighbourCell;
-            faceI++;
+            faces[facei] = newFace;
+            owner[facei] = ownerCell;
+            neighbour[facei] = neighbourCell;
+            facei++;
         }
     }
 
-    faces.setSize(faceI);
-    owner.setSize(faceI);
-    neighbour.setSize(faceI);
+    faces.setSize(facei);
+    owner.setSize(facei);
+    neighbour.setSize(facei);
 
     sortFaces(faces, owner, neighbour);
 
@@ -583,7 +583,7 @@ Foam::DelaunayMesh<Triangulation>::createMesh
 
     addPatches
     (
-        faceI,
+        facei,
         faces,
         owner,
         patchDicts,

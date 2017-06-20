@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -156,7 +156,7 @@ class dictionary
         DLList<entry*> patternEntries_;
 
         //- Patterns as precompiled regular expressions
-        DLList<autoPtr<regExp> > patternRegexps_;
+        DLList<autoPtr<regExp>> patternRegexps_;
 
 
    // Private Member Functions
@@ -167,7 +167,7 @@ class dictionary
             const bool patternMatch,
             const word& Keyword,
             DLList<entry*>::const_iterator& wcLink,
-            DLList<autoPtr<regExp> >::const_iterator& reLink
+            DLList<autoPtr<regExp>>::const_iterator& reLink
         ) const;
 
         //- Search patterns table for exact match or regular expression match
@@ -176,7 +176,7 @@ class dictionary
             const bool patternMatch,
             const word& Keyword,
             DLList<entry*>::iterator& wcLink,
-            DLList<autoPtr<regExp> >::iterator& reLink
+            DLList<autoPtr<regExp>>::iterator& reLink
         );
 
 
@@ -396,6 +396,9 @@ public:
             //- Return the table of contents
             wordList toc() const;
 
+            //- Return the sorted table of contents
+            wordList sortedToc() const;
+
             //- Return the list of available keys or patterns
             List<keyType> keys(bool patterns=false) const;
 
@@ -554,7 +557,7 @@ dictionary operator|(const dictionary& dict1, const dictionary& dict2);
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "dictionaryTemplates.C"
+    #include "dictionaryTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

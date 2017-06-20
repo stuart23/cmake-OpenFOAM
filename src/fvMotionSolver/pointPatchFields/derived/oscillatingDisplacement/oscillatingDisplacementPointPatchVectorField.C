@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -44,7 +44,7 @@ oscillatingDisplacementPointPatchVectorField
 )
 :
     fixedValuePointPatchField<vector>(p, iF),
-    amplitude_(vector::zero),
+    amplitude_(Zero),
     omega_(0.0)
 {}
 
@@ -105,7 +105,7 @@ void oscillatingDisplacementPointPatchVectorField::updateCoeffs()
         return;
     }
 
-    const polyMesh& mesh = this->dimensionedInternalField().mesh()();
+    const polyMesh& mesh = this->internalField().mesh()();
     const Time& t = mesh.time();
 
     Field<vector>::operator=(amplitude_*sin(omega_*t.value()));

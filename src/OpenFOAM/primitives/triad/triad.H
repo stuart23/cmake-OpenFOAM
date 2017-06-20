@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -27,7 +27,7 @@ Class
 Description
     Representation of a 3D Cartesian coordinate system as a Vector of vectors.
 
-See Also
+See also
     Foam::quaternion
 
 SourceFiles
@@ -96,12 +96,6 @@ public:
 
     // Static data members
 
-        static const triad zero;
-        static const triad one;
-        static const triad max;
-        static const triad min;
-        static const triad rootMax;
-        static const triad rootMin;
         static const triad I;
         static const triad unset;
 

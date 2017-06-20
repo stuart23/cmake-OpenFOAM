@@ -1,4 +1,4 @@
-set( EXE_NAME snappyHexMesh )
+set( EXE_NAME snappyHexMesh_exe )
 
 set( SOURCES
 
@@ -9,6 +9,9 @@ snappyHexMesh.C
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 install( TARGETS ${EXE_NAME} DESTINATION bin )
+set_target_properties( ${EXE_NAME} PROPERTIES
+	OUTPUT_NAME snappyHexMesh
+)	
 
 target_link_libraries( ${EXE_NAME} finiteVolume decompositionMethods ptscotchDecomp meshTools surfMesh fileFormats dynamicMesh autoMesh OpenFOAM dl m )
 

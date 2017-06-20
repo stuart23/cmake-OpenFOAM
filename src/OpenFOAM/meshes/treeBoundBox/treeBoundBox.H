@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -68,6 +68,18 @@ namespace Foam
 {
 
 class Random;
+
+
+// Forward declaration of friend functions and operators
+
+class treeBoundBox;
+
+bool operator==(const treeBoundBox&, const treeBoundBox&);
+bool operator!=(const treeBoundBox&, const treeBoundBox&);
+
+Istream& operator>>(Istream& is, treeBoundBox&);
+Ostream& operator<<(Ostream& os, const treeBoundBox&);
+
 
 /*---------------------------------------------------------------------------*\
                         Class treeBoundBox Declaration
@@ -346,7 +358,6 @@ public:
 
         friend Istream& operator>>(Istream& is, treeBoundBox&);
         friend Ostream& operator<<(Ostream& os, const treeBoundBox&);
-
 };
 
 
@@ -362,7 +373,7 @@ inline bool contiguous<treeBoundBox>() {return contiguous<boundBox>();}
 #include "treeBoundBoxI.H"
 
 #ifdef NoRepository
-#   include "treeBoundBoxTemplates.C"
+    #include "treeBoundBoxTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

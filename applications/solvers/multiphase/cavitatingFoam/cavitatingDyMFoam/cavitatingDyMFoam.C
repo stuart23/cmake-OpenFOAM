@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,7 +26,8 @@ Application
 
 Description
     Transient cavitation code based on the homogeneous equilibrium model
-    from which the compressibility of the liquid/vapour "mixture" is obtained.
+    from which the compressibility of the liquid/vapour "mixture" is obtained,
+    with optional mesh motion and mesh topology changes.
 
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
 
@@ -44,20 +45,20 @@ Description
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCase.H"
+    #include "postProcess.H"
 
+    #include "setRootCase.H"
     #include "createTime.H"
     #include "createDynamicFvMesh.H"
-
-    pimpleControl pimple(mesh);
-
-    #include "readThermodynamicProperties.H"
+    #include "createControl.H"
     #include "createControls.H"
     #include "createFields.H"
     #include "createUf.H"
     #include "createPcorrTypes.H"
     #include "CourantNo.H"
     #include "setInitialDeltaT.H"
+
+    turbulence->validate();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

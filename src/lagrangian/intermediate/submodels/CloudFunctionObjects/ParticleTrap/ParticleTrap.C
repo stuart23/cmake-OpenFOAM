@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -39,7 +39,7 @@ Foam::ParticleTrap<CloudType>::ParticleTrap
     CloudFunctionObject<CloudType>(dict, owner, modelName, typeName),
     alphaName_
     (
-        this->coeffDict().template lookupOrDefault<word>("alphaName", "alpha")
+        this->coeffDict().template lookupOrDefault<word>("alpha", "alpha")
     ),
     alphaPtr_(NULL),
     gradAlphaPtr_(NULL),
@@ -104,15 +104,15 @@ template<class CloudType>
 void Foam::ParticleTrap<CloudType>::postMove
 (
     parcelType& p,
-    const label cellI,
+    const label celli,
     const scalar,
     const point&,
     bool&
 )
 {
-    if (alphaPtr_->internalField()[cellI] < threshold_)
+    if (alphaPtr_->primitiveField()[celli] < threshold_)
     {
-        const vector& gradAlpha = gradAlphaPtr_()[cellI];
+        const vector& gradAlpha = gradAlphaPtr_()[celli];
         vector nHat = gradAlpha/mag(gradAlpha);
         scalar nHatU = nHat & p.U();
 

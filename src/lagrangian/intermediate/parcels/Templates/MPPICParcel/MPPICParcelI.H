@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,13 +30,13 @@ inline Foam::MPPICParcel<ParcelType>::MPPICParcel
 (
     const polyMesh& owner,
     const vector& position,
-    const label cellI,
-    const label tetFaceI,
+    const label celli,
+    const label tetFacei,
     const label tetPtI
 )
 :
-    ParcelType(owner, position, cellI, tetFaceI, tetPtI),
-    UCorrect_(vector::zero)
+    ParcelType(owner, position, celli, tetFacei, tetPtI),
+    UCorrect_(Zero)
 {}
 
 
@@ -45,8 +45,8 @@ inline Foam::MPPICParcel<ParcelType>::MPPICParcel
 (
     const polyMesh& owner,
     const vector& position,
-    const label cellI,
-    const label tetFaceI,
+    const label celli,
+    const label tetFacei,
     const label tetPtI,
     const label typeId,
     const scalar nParticle0,
@@ -61,8 +61,8 @@ inline Foam::MPPICParcel<ParcelType>::MPPICParcel
     (
         owner,
         position,
-        cellI,
-        tetFaceI,
+        celli,
+        tetFacei,
         tetPtI,
         typeId,
         nParticle0,

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -56,11 +56,8 @@ const
         }
     }
 
-    FatalErrorIn
-    (
-        "PhaseChangeModel<CloudType>::enthalpyTransferType"
-        "PhaseChangeModel<CloudType>::wordToEnthalpyTransfer(const word&) const"
-    )   << "Unknown enthalpyType " << etName << ". Valid selections are:" << nl
+    FatalErrorInFunction
+        << "Unknown enthalpyType " << etName << ". Valid selections are:" << nl
         << enthalpyTransferTypeNames << exit(FatalError);
 
     return enthalpyTransferType(0);
@@ -173,7 +170,7 @@ void Foam::PhaseChangeModel<CloudType>::info(Ostream& os)
 
     Info<< "    Mass transfer phase change      = " << massTotal << nl;
 
-    if (this->outputTime())
+    if (this->writeTime())
     {
         this->setBaseProperty("mass", massTotal);
         dMass_ = 0.0;

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "kEqn.H"
+#include "fvOptions.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -39,6 +40,7 @@ void kEqn<BasicTurbulenceModel>::correctNut()
 {
     this->nut_ = Ck_*sqrt(k_)*this->delta();
     this->nut_.correctBoundaryConditions();
+    fv::options::New(this->mesh_).correct(this->nut_);
 
     BasicTurbulenceModel::correctNut();
 }
@@ -113,7 +115,6 @@ kEqn<BasicTurbulenceModel>::kEqn
 
     if (type == typeName)
     {
-        correctNut();
         this->printCoeffs(type);
     }
 }
@@ -172,6 +173,7 @@ void kEqn<BasicTurbulenceModel>::correct()
     const surfaceScalarField& alphaRhoPhi = this->alphaRhoPhi_;
     const volVectorField& U = this->U_;
     volScalarField& nut = this->nut_;
+    fv::options& fvOptions(fv::options::New(this->mesh_));
 
     LESeddyViscosity<BasicTurbulenceModel>::correct();
 
@@ -191,10 +193,13 @@ void kEqn<BasicTurbulenceModel>::correct()
       - fvm::SuSp((2.0/3.0)*alpha*rho*divU, k_)
       - fvm::Sp(this->Ce_*alpha*rho*sqrt(k_)/this->delta(), k_)
       + kSource()
+      + fvOptions(alpha, rho, k_)
     );
 
-    kEqn().relax();
+    kEqn.ref().relax();
+    fvOptions.constrain(kEqn.ref());
     solve(kEqn);
+    fvOptions.correct(k_);
     bound(k_, this->kMin_);
 
     correctNut();

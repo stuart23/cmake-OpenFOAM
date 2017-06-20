@@ -1,3 +1,5 @@
+#include "readGravitationalAcceleration.H"
+
 Info<< "Creating combustion model\n" << endl;
 
 autoPtr<combustionModels::psiCombustionModel> combustion
@@ -17,7 +19,7 @@ const word inertSpecie(thermo.lookup("inertSpecie"));
 
 if (!composition.contains(inertSpecie))
 {
-    FatalErrorIn(args.executable())
+    FatalErrorInFunction
         << "Specified inert specie '" << inertSpecie << "' not found in "
         << "species list. Available species:" << composition.species()
         << exit(FatalError);
@@ -141,3 +143,7 @@ volScalarField dQ
     mesh,
     dimensionedScalar("dQ", dimEnergy/dimTime, 0.0)
 );
+
+#include "createMRF.H"
+#include "createClouds.H"
+#include "createRadiationModel.H"

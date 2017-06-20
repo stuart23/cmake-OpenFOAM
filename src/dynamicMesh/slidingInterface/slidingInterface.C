@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -79,10 +79,8 @@ void Foam::slidingInterface::checkDefinition()
      || !slavePatchID_.active()
     )
     {
-        FatalErrorIn
-        (
-            "void slidingInterface::checkDefinition()"
-        )   << "Not all zones and patches needed in the definition "
+        FatalErrorInFunction
+            << "Not all zones and patches needed in the definition "
             << "have been found.  Please check your mesh definition."
             << abort(FatalError);
     }
@@ -94,8 +92,7 @@ void Foam::slidingInterface::checkDefinition()
      || mesh.faceZones()[slaveFaceZoneID_.index()].empty()
     )
     {
-        FatalErrorIn("void slidingInterface::checkDefinition()")
-            << "Master or slave face zone contain no faces.  "
+        FatalErrorInFunction
             << "Please check your mesh definition."
             << abort(FatalError);
     }
@@ -199,23 +196,8 @@ Foam::slidingInterface::slidingInterface
 
     if (attached_)
     {
-        FatalErrorIn
-        (
-            "Foam::slidingInterface::slidingInterface\n"
-            "(\n"
-            "    const word& name,\n"
-            "    const label index,\n"
-            "    const polyTopoChanger& mme,\n"
-            "    const word& masterFaceZoneName,\n"
-            "    const word& slaveFaceZoneName,\n"
-            "    const word& cutFaceZoneName,\n"
-            "    const word& cutPointZoneName,\n"
-            "    const word& masterPatchName,\n"
-            "    const word& slavePatchName,\n"
-            "    const typeOfMatch tom,\n"
-            "    const bool coupleDecouple\n"
-            ")"
-        )   << "Creation of a sliding interface from components "
+        FatalErrorInFunction
+            << "Creation of a sliding interface from components "
             << "in attached state not supported."
             << abort(FatalError);
     }
@@ -316,7 +298,7 @@ Foam::slidingInterface::slidingInterface
 
         retiredPointMapPtr_ = new Map<label>(dict.lookup("retiredPointMap"));
         cutPointEdgePairMapPtr_ =
-            new Map<Pair<edge> >(dict.lookup("cutPointEdgePairMap"));
+            new Map<Pair<edge>>(dict.lookup("cutPointEdgePairMap"));
     }
     else
     {
@@ -452,7 +434,7 @@ void Foam::slidingInterface::modifyMotionPoints(pointField& motionPoints) const
 
         const Map<label>& rpm = retiredPointMap();
 
-        const Map<Pair<edge> >& cpepm = cutPointEdgePairMap();
+        const Map<Pair<edge>>& cpepm = cutPointEdgePairMap();
 
         const Map<label>& slaveZonePointMap =
             mesh.faceZones()[slaveFaceZoneID_.index()]().meshPointMap();
@@ -468,10 +450,10 @@ void Foam::slidingInterface::modifyMotionPoints(pointField& motionPoints) const
         const pointField& slaveLocalPoints = slavePatch.localPoints();
         const vectorField& slavePointNormals = slavePatch.pointNormals();
 
-        forAll(cutPoints, pointI)
+        forAll(cutPoints, pointi)
         {
             // Try to find the cut point in retired points
-            Map<label>::const_iterator rpmIter = rpm.find(cutPoints[pointI]);
+            Map<label>::const_iterator rpmIter = rpm.find(cutPoints[pointi]);
 
             if (rpmIter != rpm.end())
             {
@@ -481,7 +463,7 @@ void Foam::slidingInterface::modifyMotionPoints(pointField& motionPoints) const
                 }
 
                 // Cut point is a retired point
-                motionPoints[cutPoints[pointI]] =
+                motionPoints[cutPoints[pointi]] =
                     projectedSlavePoints[slaveZonePointMap.find(rpmIter())()];
             }
             else
@@ -489,13 +471,13 @@ void Foam::slidingInterface::modifyMotionPoints(pointField& motionPoints) const
                 // A cut point is not a projected slave point.  Therefore, it
                 // must be an edge-to-edge intersection.
 
-                Map<Pair<edge> >::const_iterator cpepmIter =
-                    cpepm.find(cutPoints[pointI]);
+                Map<Pair<edge>>::const_iterator cpepmIter =
+                    cpepm.find(cutPoints[pointi]);
 
                 if (cpepmIter != cpepm.end())
                 {
                     // Pout<< "Need to re-create hit for point "
-                    //     << cutPoints[pointI]
+                    //     << cutPoints[pointi]
                     //     << " lookup: " << cpepmIter()
                     //     << endl;
 
@@ -615,7 +597,7 @@ void Foam::slidingInterface::modifyMotionPoints(pointField& motionPoints) const
                             )
                             {
                                 // Cut both master and slave.
-                                motionPoints[cutPoints[pointI]] =
+                                motionPoints[cutPoints[pointi]] =
                                     masterCutPoint;
                             }
                         }
@@ -644,11 +626,8 @@ void Foam::slidingInterface::modifyMotionPoints(pointField& motionPoints) const
                 }
                 else
                 {
-                    FatalErrorIn
-                    (
-                        "void slidingInterface::modifyMotionPoints"
-                        "(pointField&) const"
-                    )   << "Cut point " << cutPoints[pointI]
+                    FatalErrorInFunction
+                        << "Cut point " << cutPoints[pointi]
                         << " not recognised as either the projected "
                         << "or as intersection point.  Error in point "
                         << "projection or data mapping"

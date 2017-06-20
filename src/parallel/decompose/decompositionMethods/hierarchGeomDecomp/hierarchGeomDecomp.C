@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -50,10 +50,8 @@ void Foam::hierarchGeomDecomp::setDecompOrder()
 
     if (order.size() != 3)
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "hierarchGeomDecomp::hierarchGeomDecomp"
-            "(const dictionary& decompositionDict)",
             decompositionDict_
         )   << "number of characters in order (" << order << ") != 3"
             << exit(FatalIOError);
@@ -75,10 +73,8 @@ void Foam::hierarchGeomDecomp::setDecompOrder()
         }
         else
         {
-            FatalIOErrorIn
+            FatalIOErrorInFunction
             (
-                "hierarchGeomDecomp::hierarchGeomDecomp"
-                "(const dictionary& decompositionDict)",
                 decompositionDict_
             )   << "Illegal decomposition order " << order << endl
                 << "It should only contain x, y or z" << exit(FatalError);
@@ -151,8 +147,8 @@ void Foam::hierarchGeomDecomp::calculateSortedWeightedSizes
     sortedWeightedSizes[0] = 0;
     forAll(current, i)
     {
-        label pointI = current[indices[i]];
-        sortedWeightedSizes[i + 1] = sortedWeightedSizes[i] + weights[pointI];
+        label pointi = current[indices[i]];
+        sortedWeightedSizes[i + 1] = sortedWeightedSizes[i] + weights[pointi];
     }
     // Non-dimensionalise and multiply by size.
     scalar globalCurrentLength = returnReduce
@@ -229,7 +225,7 @@ void Foam::hierarchGeomDecomp::findBinary
 
         if (returnReduce(hasNotChanged, andOp<bool>()))
         {
-            WarningIn("hierarchGeomDecomp::findBinary(..)")
+            WarningInFunction
                 << "unable to find desired decomposition split, making do!"
                 << endl;
             break;
@@ -309,7 +305,7 @@ void Foam::hierarchGeomDecomp::findBinary
 
         if (returnReduce(hasNotChanged, andOp<bool>()))
         {
-            WarningIn("hierarchGeomDecomp::findBinary(..)")
+            WarningInFunction
                 << "unable to find desired deomposition split, making do!"
                 << endl;
             break;
@@ -345,9 +341,9 @@ void Foam::hierarchGeomDecomp::sortComponent
 
     forAll(current, i)
     {
-        label pointI = current[i];
+        label pointi = current[i];
 
-        sortedCoord[i] = points[pointI][compI];
+        sortedCoord[i] = points[pointi][compI];
     }
     sortedCoord.sort();
 
@@ -452,13 +448,13 @@ void Foam::hierarchGeomDecomp::sortComponent
 
         forAll(slice, i)
         {
-            label pointI = current[sortedCoord.indices()[leftIndex+i]];
+            label pointi = current[sortedCoord.indices()[leftIndex+i]];
 
             // Mark point into correct bin
-            finalDecomp[pointI] += bin*mult;
+            finalDecomp[pointi] += bin*mult;
 
             // And collect for next sorting action
-            slice[i] = pointI;
+            slice[i] = pointi;
         }
 
         // Sort slice in next component
@@ -520,9 +516,9 @@ void Foam::hierarchGeomDecomp::sortComponent
 
     forAll(current, i)
     {
-        label pointI = current[i];
+        label pointi = current[i];
 
-        sortedCoord[i] = points[pointI][compI];
+        sortedCoord[i] = points[pointi][compI];
     }
     sortedCoord.sort();
 
@@ -635,13 +631,13 @@ void Foam::hierarchGeomDecomp::sortComponent
 
         forAll(slice, i)
         {
-            label pointI = current[sortedCoord.indices()[leftIndex+i]];
+            label pointi = current[sortedCoord.indices()[leftIndex+i]];
 
             // Mark point into correct bin
-            finalDecomp[pointI] += bin*mult;
+            finalDecomp[pointi] += bin*mult;
 
             // And collect for next sorting action
-            slice[i] = pointI;
+            slice[i] = pointi;
         }
 
         // Sort slice in next component

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -76,15 +76,15 @@ int main(int argc, char *argv[])
     scalar minCmptVal = bb.min()[planeNormalCmpt];
     scalar maxCmptVal = bb.max()[planeNormalCmpt];
 
-    forAll(points, pointI)
+    forAll(points, pointi)
     {
-        if (points[pointI][planeNormalCmpt] < midCmptVal)
+        if (points[pointi][planeNormalCmpt] < midCmptVal)
         {
-            points[pointI][planeNormalCmpt] = minCmptVal;
+            points[pointi][planeNormalCmpt] = minCmptVal;
         }
         else
         {
-            points[pointI][planeNormalCmpt] = maxCmptVal;
+            points[pointi][planeNormalCmpt] = maxCmptVal;
         }
     }
 
@@ -95,6 +95,8 @@ int main(int argc, char *argv[])
 
     Info<< "Writing points into directory " << points.path() << nl << endl;
     points.write();
+
+    Info<< "End\n" << endl;
 
     return 0;
 }

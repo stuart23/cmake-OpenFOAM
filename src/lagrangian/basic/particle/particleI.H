@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -51,8 +51,8 @@ inline void Foam::particle::findTris
             i,
             tetAreas[i],
             tetPlaneBasePtIs[i],
-            cellI_,
-            tetFaceI_,
+            celli_,
+            tetFacei_,
             tetPtI_,
             tol
         );
@@ -72,8 +72,8 @@ inline Foam::scalar Foam::particle::tetLambda
     const label triI,
     const vector& n,
     const label tetPlaneBasePtI,
-    const label cellI,
-    const label tetFaceI,
+    const label celli,
+    const label tetFacei,
     const label tetPtI,
     const scalar tol
 ) const
@@ -89,8 +89,8 @@ inline Foam::scalar Foam::particle::tetLambda
             triI,
             n,
             tetPlaneBasePtI,
-            cellI,
-            tetFaceI,
+            celli,
+            tetFacei,
             tetPtI,
             tol
         );
@@ -144,8 +144,8 @@ inline Foam::scalar Foam::particle::movingTetLambda
     const label triI,
     const vector& n,
     const label tetPlaneBasePtI,
-    const label cellI,
-    const label tetFaceI,
+    const label celli,
+    const label tetFacei,
     const label tetPtI,
     const scalar tol
 ) const
@@ -166,10 +166,10 @@ inline Foam::scalar Foam::particle::movingTetLambda
     point b0 = b00 + stepFraction_*(b - b00);
 
     // Normal of plane at start of tracking portion
-    vector n0 = vector::zero;
+    vector n0 = Zero;
 
     {
-        tetIndices tetIs(cellI, tetFaceI, tetPtI, mesh_);
+        tetIndices tetIs(celli, tetFacei, tetPtI, mesh_);
 
         // Tet at timestep start
         tetPointRef tet00 = tetIs.oldTet(mesh_);
@@ -323,19 +323,16 @@ inline void Foam::particle::tetNeighbour(label triI)
     const labelList& pOwner = mesh_.faceOwner();
     const faceList& pFaces = mesh_.faces();
 
-    bool own = (pOwner[tetFaceI_] == cellI_);
+    bool own = (pOwner[tetFacei_] == celli_);
 
-    const Foam::face& f = pFaces[tetFaceI_];
+    const Foam::face& f = pFaces[tetFacei_];
 
-    label tetBasePtI = mesh_.tetBasePtIs()[tetFaceI_];
+    label tetBasePtI = mesh_.tetBasePtIs()[tetFacei_];
 
     if (tetBasePtI == -1)
     {
-        FatalErrorIn
-        (
-            "inline void Foam::particle::tetNeighbour(label triI)"
-        )
-            << "No base point for face " << tetFaceI_ << ", " << f
+        FatalErrorInFunction
+            << "No base point for face " << tetFacei_ << ", " << f
             << ", produces a valid tet decomposition."
             << abort(FatalError);
     }
@@ -348,10 +345,10 @@ inline void Foam::particle::tetNeighbour(label triI)
         case 0:
         {
             // Crossing this triangle changes tet to that in the
-            // neighbour cell over tetFaceI
+            // neighbour cell over tetFacei
 
-            // Modification of cellI_ will happen by other indexing,
-            // tetFaceI_ and tetPtI don't change.
+            // Modification of celli_ will happen by other indexing,
+            // tetFacei_ and tetPtI don't change.
 
             break;
         }
@@ -359,8 +356,8 @@ inline void Foam::particle::tetNeighbour(label triI)
         {
             crossEdgeConnectedFace
             (
-                cellI_,
-                tetFaceI_,
+                celli_,
+                tetFacei_,
                 tetPtI_,
                 Foam::edge(f[facePtI], f[otherFacePtI])
             );
@@ -379,8 +376,8 @@ inline void Foam::particle::tetNeighbour(label triI)
                 {
                     crossEdgeConnectedFace
                     (
-                        cellI_,
-                        tetFaceI_,
+                        celli_,
+                        tetFacei_,
                         tetPtI_,
                         Foam::edge(f[tetBasePtI], f[otherFacePtI])
                     );
@@ -396,8 +393,8 @@ inline void Foam::particle::tetNeighbour(label triI)
                 {
                     crossEdgeConnectedFace
                     (
-                        cellI_,
-                        tetFaceI_,
+                        celli_,
+                        tetFacei_,
                         tetPtI_,
                         Foam::edge(f[tetBasePtI], f[facePtI])
                     );
@@ -418,8 +415,8 @@ inline void Foam::particle::tetNeighbour(label triI)
                 {
                     crossEdgeConnectedFace
                     (
-                        cellI_,
-                        tetFaceI_,
+                        celli_,
+                        tetFacei_,
                         tetPtI_,
                         Foam::edge(f[tetBasePtI], f[facePtI])
                     );
@@ -435,8 +432,8 @@ inline void Foam::particle::tetNeighbour(label triI)
                 {
                     crossEdgeConnectedFace
                     (
-                        cellI_,
-                        tetFaceI_,
+                        celli_,
+                        tetFacei_,
                         tetPtI_,
                         Foam::edge(f[tetBasePtI], f[otherFacePtI])
                     );
@@ -447,11 +444,7 @@ inline void Foam::particle::tetNeighbour(label triI)
         }
         default:
         {
-            FatalErrorIn
-            (
-                "inline void "
-                "Foam::particle::tetNeighbour(label triI)"
-            )
+            FatalErrorInFunction
                 << "Tet tri face index error, can only be 0..3, supplied "
                 << triI << abort(FatalError);
 
@@ -463,8 +456,8 @@ inline void Foam::particle::tetNeighbour(label triI)
 
 inline void Foam::particle::crossEdgeConnectedFace
 (
-    const label& cellI,
-    label& tetFaceI,
+    const label& celli,
+    label& tetFacei,
     label& tetPtI,
     const edge& e
 )
@@ -472,9 +465,9 @@ inline void Foam::particle::crossEdgeConnectedFace
     const faceList& pFaces = mesh_.faces();
     const cellList& pCells = mesh_.cells();
 
-    const Foam::face& f = pFaces[tetFaceI];
+    const Foam::face& f = pFaces[tetFacei];
 
-    const Foam::cell& thisCell = pCells[cellI];
+    const Foam::cell& thisCell = pCells[celli];
 
     forAll(thisCell, cFI)
     {
@@ -483,7 +476,7 @@ inline void Foam::particle::crossEdgeConnectedFace
 
         label fI = thisCell[cFI];
 
-        if (tetFaceI == fI)
+        if (tetFacei == fI)
         {
             continue;
         }
@@ -508,7 +501,7 @@ inline void Foam::particle::crossEdgeConnectedFace
         else
         {
             //Found edge on other face
-            tetFaceI = fI;
+            tetFacei = fI;
 
             label eIndex = -1;
 
@@ -530,17 +523,7 @@ inline void Foam::particle::crossEdgeConnectedFace
 
             if (tetBasePtI == -1)
             {
-                FatalErrorIn
-                (
-                    "inline void "
-                    "Foam::particle::crossEdgeConnectedFace"
-                    "("
-                        "const label& cellI,"
-                        "label& tetFaceI,"
-                        "label& tetPtI,"
-                        "const edge& e"
-                    ")"
-                )
+                FatalErrorInFunction
                     << "No base point for face " << fI << ", " << f
                     << ", produces a decomposition that has a minimum "
                     << "volume greater than tolerance."
@@ -586,7 +569,7 @@ inline Foam::label Foam::particle::getNewParticleID() const
 
     if (id == labelMax)
     {
-        WarningIn("particle::getNewParticleID() const")
+        WarningInFunction
             << "Particle counter has overflowed. This might cause problems"
             << " when reconstructing particle tracks." << endl;
     }
@@ -614,25 +597,25 @@ inline Foam::vector& Foam::particle::position()
 
 inline Foam::label Foam::particle::cell() const
 {
-    return cellI_;
+    return celli_;
 }
 
 
 inline Foam::label& Foam::particle::cell()
 {
-    return cellI_;
+    return celli_;
 }
 
 
 inline Foam::label Foam::particle::tetFace() const
 {
-    return tetFaceI_;
+    return tetFacei_;
 }
 
 
 inline Foam::label& Foam::particle::tetFace()
 {
-    return tetFaceI_;
+    return tetFacei_;
 }
 
 
@@ -650,7 +633,7 @@ inline Foam::label& Foam::particle::tetPt()
 
 inline Foam::tetIndices Foam::particle::currentTetIndices() const
 {
-    return tetIndices(cellI_, tetFaceI_, tetPtI_, mesh_);
+    return tetIndices(celli_, tetFacei_, tetPtI_, mesh_);
 }
 
 
@@ -674,68 +657,67 @@ inline Foam::vector Foam::particle::oldNormal() const
 
 inline Foam::label Foam::particle::face() const
 {
-    return faceI_;
+    return facei_;
 }
 
 
 inline Foam::label& Foam::particle::face()
 {
-    return faceI_;
+    return facei_;
 }
 
 
 inline void Foam::particle::initCellFacePt()
 {
-    if (cellI_ == -1)
+    if (celli_ == -1)
     {
         mesh_.findCellFacePt
         (
             position_,
-            cellI_,
-            tetFaceI_,
+            celli_,
+            tetFacei_,
             tetPtI_
         );
 
-        if (cellI_ == -1)
+        if (celli_ == -1)
         {
-            FatalErrorIn("void Foam::particle::initCellFacePt()")
+            FatalErrorInFunction
                 << "cell, tetFace and tetPt search failure at position "
                 << position_ << abort(FatalError);
         }
     }
     else
     {
-        mesh_.findTetFacePt(cellI_, position_, tetFaceI_, tetPtI_);
+        mesh_.findTetFacePt(celli_, position_, tetFacei_, tetPtI_);
 
-        if (tetFaceI_ == -1 || tetPtI_ == -1)
+        if (tetFacei_ == -1 || tetPtI_ == -1)
         {
-            label oldCellI = cellI_;
+            label oldCelli = celli_;
 
             mesh_.findCellFacePt
             (
                 position_,
-                cellI_,
-                tetFaceI_,
+                celli_,
+                tetFacei_,
                 tetPtI_
             );
 
-            if (cellI_ == -1 || tetFaceI_ == -1 || tetPtI_ == -1)
+            if (celli_ == -1 || tetFacei_ == -1 || tetPtI_ == -1)
             {
                 // The particle has entered this function with a cell
                 // number, but hasn't been able to find a cell to
                 // occupy.
 
-                if (!mesh_.pointInCellBB(position_, oldCellI, 0.1))
+                if (!mesh_.pointInCellBB(position_, oldCelli, 0.1))
                 {
                     // If the position is not inside the (slightly
                     // extended) bound-box of the cell that it thought
                     // it should be in, then this is considered an
                     // error.
 
-                    FatalErrorIn("void Foam::particle::initCellFacePt()")
-                        << "    cell, tetFace and tetPt search failure at "
+                    FatalErrorInFunction
                         << "position " << position_ << nl
-                        << "    for requested cell " << oldCellI << nl
+                        << "    for requested cell " << oldCelli << nl
                         << "    If this is a restart or "
                            "reconstruction/decomposition etc. it is likely that"
                            " the write precision is not sufficient.\n"
@@ -755,11 +737,11 @@ inline void Foam::particle::initCellFacePt()
                 // the particle towards the centre of the cell that it
                 // thought that it was in.
 
-                cellI_ = oldCellI;
+                celli_ = oldCelli;
 
                 point newPosition = position_;
 
-                const point& cC = mesh_.cellCentres()[cellI_];
+                const point& cC = mesh_.cellCentres()[celli_];
 
                 label trap(1.0/trackingCorrectionTol + 1);
 
@@ -771,30 +753,30 @@ inline void Foam::particle::initCellFacePt()
 
                     mesh_.findTetFacePt
                     (
-                        cellI_,
+                        celli_,
                         newPosition,
-                        tetFaceI_,
+                        tetFacei_,
                         tetPtI_
                     );
 
                     iterNo++;
 
-                } while (tetFaceI_ < 0  && iterNo <= trap);
+                } while (tetFacei_ < 0  && iterNo <= trap);
 
-                if (tetFaceI_ == -1)
+                if (tetFacei_ == -1)
                 {
-                    FatalErrorIn("void Foam::particle::initCellFacePt()")
+                    FatalErrorInFunction
                         << "cell, tetFace and tetPt search failure at position "
                         << position_ << abort(FatalError);
                 }
 
                 if (debug)
                 {
-                    WarningIn("void Foam::particle::initCellFacePt()")
+                    WarningInFunction
                         << "Particle moved from " << position_
                         << " to " << newPosition
-                        << " in cell " << cellI_
-                        << " tetFace " << tetFaceI_
+                        << " in cell " << celli_
+                        << " tetFace " << tetFacei_
                         << " tetPt " << tetPtI_ << nl
                         << "    (A fraction of "
                         << 1.0 - mag(cC - newPosition)/mag(cC - position_)
@@ -807,17 +789,17 @@ inline void Foam::particle::initCellFacePt()
                 position_ = newPosition;
             }
 
-            if (debug && cellI_ != oldCellI)
+            if (debug && celli_ != oldCelli)
             {
-                WarningIn("void Foam::particle::initCellFacePt()")
+                WarningInFunction
                     << "Particle at position " << position_
                     << " searched for a cell, tetFace and tetPt." << nl
                     << "    Found"
-                    << " cell " << cellI_
-                    << " tetFace " << tetFaceI_
+                    << " cell " << celli_
+                    << " tetFace " << tetFacei_
                     << " tetPt " << tetPtI_ << nl
                     << "    This is a different cell to that which was supplied"
-                    << " (" << oldCellI << ")." << nl
+                    << " (" << oldCelli << ")." << nl
                     << endl;
             }
         }
@@ -827,7 +809,7 @@ inline void Foam::particle::initCellFacePt()
 
 inline bool Foam::particle::onBoundary() const
 {
-    return faceI_ != -1 && faceI_ >= mesh_.nInternalFaces();
+    return facei_ != -1 && facei_ >= mesh_.nInternalFaces();
 }
 
 
@@ -881,37 +863,37 @@ inline Foam::scalar Foam::particle::currentTime() const
 }
 
 
-inline bool Foam::particle::internalFace(const label faceI) const
+inline bool Foam::particle::internalFace(const label facei) const
 {
-    return mesh_.isInternalFace(faceI);
+    return mesh_.isInternalFace(facei);
 }
 
 
-bool Foam::particle::boundaryFace(const label faceI) const
+bool Foam::particle::boundaryFace(const label facei) const
 {
-    return !internalFace(faceI);
+    return !internalFace(facei);
 }
 
 
-inline Foam::label Foam::particle::patch(const label faceI) const
+inline Foam::label Foam::particle::patch(const label facei) const
 {
-    return mesh_.boundaryMesh().whichPatch(faceI);
+    return mesh_.boundaryMesh().whichPatch(facei);
 }
 
 
 inline Foam::label Foam::particle::patchFace
 (
-    const label patchI,
-    const label faceI
+    const label patchi,
+    const label facei
 ) const
 {
-    return mesh_.boundaryMesh()[patchI].whichFace(faceI);
+    return mesh_.boundaryMesh()[patchi].whichFace(facei);
 }
 
 
 inline Foam::label Foam::particle::faceInterpolation() const
 {
-    return faceI_;
+    return facei_;
 }
 
 

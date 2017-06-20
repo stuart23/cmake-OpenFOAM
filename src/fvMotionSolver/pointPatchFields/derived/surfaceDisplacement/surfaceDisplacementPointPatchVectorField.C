@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -72,7 +72,7 @@ void surfaceDisplacementPointPatchVectorField::calcProjection
     const scalar projectLen = mag(mesh.bounds().max()-mesh.bounds().min());
 
     // For case of fixed projection vector:
-    vector projectVec(vector::zero);
+    vector projectVec(Zero);
     if (projectMode_ == FIXEDNORMAL)
     {
         vector n = projectDir_/mag(projectDir_);
@@ -308,9 +308,9 @@ surfaceDisplacementPointPatchVectorField
 )
 :
     fixedValuePointPatchVectorField(p, iF),
-    velocity_(vector::zero),
+    velocity_(Zero),
     projectMode_(NEAREST),
-    projectDir_(vector::zero),
+    projectDir_(Zero),
     wedgePlane_(-1)
 {}
 
@@ -333,16 +333,8 @@ surfaceDisplacementPointPatchVectorField
 {
     if (velocity_.x() < 0 || velocity_.y() < 0 || velocity_.z() < 0)
     {
-        FatalErrorIn
-        (
-            "surfaceDisplacementPointPatchVectorField::\n"
-            "surfaceDisplacementPointPatchVectorField\n"
-            "(\n"
-            "    const pointPatch& p,\n"
-            "    const DimensionedField<vector, pointMesh>& iF,\n"
-            "    const dictionary& dict\n"
-            ")\n"
-        )   << "All components of velocity have to be positive : "
+        FatalErrorInFunction
+            << "All components of velocity have to be positive : "
             << velocity_ << nl
             << "Set velocity components to a great value if no clipping"
             << " necessary." << exit(FatalError);

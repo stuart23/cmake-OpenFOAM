@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -37,21 +37,20 @@ Description
     codeAddSup
     (
         fvMatrix<Type}>& eqn,
-        const label fieldI
+        const label fieldi
     )
 
     constrain
     (
         fvMatrix<Type}>& eqn,
-        const label fieldI
+        const label fieldi
     )
 
     where :
         field is the field in fieldNames
         eqn is the fvMatrix
 
-    \heading Source usage
-
+Usage
     Example usage in controlDict:
     \verbatim
     energySource
@@ -65,7 +64,7 @@ Description
             selectionMode   all;
 
             fieldNames      (h);
-            redirectType    sourceTime;
+            name    sourceTime;
 
             codeInclude
             #{
@@ -141,7 +140,7 @@ protected:
 
     // Protected data
 
-        word redirectType_;
+        word name_;
 
         string codeCorrect_;
         string codeAddSup_;
@@ -204,7 +203,7 @@ public:
             virtual void addSup
             (
                 fvMatrix<Type>& eqn,
-                const label fieldI
+                const label fieldi
             );
 
             //- Explicit and implicit matrix contributions
@@ -213,14 +212,14 @@ public:
             (
                 const volScalarField& rho,
                 fvMatrix<Type>& eqn,
-                const label fieldI
+                const label fieldi
             );
 
             //- Set value
             virtual void constrain
             (
                 fvMatrix<Type>& eqn,
-                const label fieldI
+                const label fieldi
             );
 
 
@@ -239,8 +238,8 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "CodedSource.C"
-#   include "CodedSourceIO.C"
+    #include "CodedSource.C"
+    #include "CodedSourceIO.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

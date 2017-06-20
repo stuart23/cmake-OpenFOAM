@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -55,7 +55,7 @@ using namespace Foam;
 void writeProcStats
 (
     const triSurface& s,
-    const List<List<treeBoundBox> >& meshBb
+    const List<List<treeBoundBox>>& meshBb
 )
 {
     // Determine surface bounding boxes, faces, points
@@ -76,19 +76,19 @@ void writeProcStats
     Pstream::gatherList(nFaces);
     Pstream::scatterList(nFaces);
 
-    forAll(surfBb, procI)
+    forAll(surfBb, proci)
     {
-        const List<treeBoundBox>& bbs = meshBb[procI];
+        const List<treeBoundBox>& bbs = meshBb[proci];
 
-        Info<< "processor" << procI << nl
+        Info<< "processor" << proci << nl
             << "\tMesh bounds          : " << bbs[0] << nl;
         for (label i = 1; i < bbs.size(); i++)
         {
             Info<< "\t                       " << bbs[i]<< nl;
         }
-        Info<< "\tSurface bounding box : " << surfBb[procI] << nl
-            << "\tTriangles            : " << nFaces[procI] << nl
-            << "\tVertices             : " << nPoints[procI]
+        Info<< "\tSurface bounding box : " << surfBb[proci] << nl
+            << "\tTriangles            : " << nFaces[proci] << nl
+            << "\tVertices             : " << nPoints[proci]
             << endl;
     }
     Info<< endl;
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
 
     if (!Pstream::parRun())
     {
-        FatalErrorIn(args.executable())
+        FatalErrorInFunction
             << "Please run this program on the decomposed case."
             << " It will read surface " << surfFileName
             << " and decompose it such that it overlaps the mesh bounding box."
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     Random rndGen(653213);
 
     // Determine mesh bounding boxes:
-    List<List<treeBoundBox> > meshBb(Pstream::nProcs());
+    List<List<treeBoundBox>> meshBb(Pstream::nProcs());
     {
         meshBb[Pstream::myProcNo()] = List<treeBoundBox>
         (

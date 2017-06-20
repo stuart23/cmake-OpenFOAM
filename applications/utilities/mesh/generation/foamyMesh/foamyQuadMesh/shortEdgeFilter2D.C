@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -52,7 +52,7 @@ void Foam::shortEdgeFilter2D::addRegion
 
 void Foam::shortEdgeFilter2D::assignBoundaryPointRegions
 (
-    List<DynamicList<label> >& boundaryPointRegions
+    List<DynamicList<label>>& boundaryPointRegions
 ) const
 {
     forAllConstIter(EdgeMap<label>, mapEdgesRegion_, iter)
@@ -72,7 +72,7 @@ void Foam::shortEdgeFilter2D::assignBoundaryPointRegions
 void Foam::shortEdgeFilter2D::updateEdgeRegionMap
 (
     const MeshedSurface<face>& surfMesh,
-    const List<DynamicList<label> >& boundaryPtRegions,
+    const List<DynamicList<label>>& boundaryPtRegions,
     const labelList& surfPtToBoundaryPt,
     EdgeMap<label>& mapEdgesRegion,
     labelList& patchSizes
@@ -109,7 +109,7 @@ void Foam::shortEdgeFilter2D::updateEdgeRegionMap
         {
             region = startPtRegions[0];
 
-            WarningIn("shortEdgeFilter2D()")
+            WarningInFunction
                 << "Both points in edge are in different regions."
                 << " Assigning edge to region " << region
                 << endl;
@@ -243,14 +243,14 @@ Foam::shortEdgeFilter2D::filter()
 
     // List of number of vertices in a face.
     labelList newFaceVertexCount(faces.size(), -1);
-    forAll(faces, faceI)
+    forAll(faces, facei)
     {
-        newFaceVertexCount[faceI] = faces[faceI].size();
+        newFaceVertexCount[facei] = faces[facei].size();
     }
 
     // Check if the point is a boundary point. Flag if it is so that
     // it will not be deleted.
-    List<DynamicList<label> > boundaryPointRegions
+    List<DynamicList<label>> boundaryPointRegions
     (
         points.size(),
         DynamicList<label>()
@@ -352,29 +352,29 @@ Foam::shortEdgeFilter2D::filter()
             bool flagDegenerateFace = false;
             const labelList& pFaces = ms_.pointFaces()[startVertex];
 
-            forAll(pFaces, pFaceI)
+            forAll(pFaces, pFacei)
             {
-                const face& f = ms_.localFaces()[pFaces[pFaceI]];
+                const face& f = ms_.localFaces()[pFaces[pFacei]];
                 forAll(f, fp)
                 {
                     // If the edge is part of this face...
                     if (f[fp] == endVertex)
                     {
                         // If deleting vertex would create a triangle, don't!
-                        if (newFaceVertexCount[pFaces[pFaceI]] < 4)
+                        if (newFaceVertexCount[pFaces[pFacei]] < 4)
                         {
                             flagDegenerateFace = true;
                         }
                         else
                         {
-                            newFaceVertexCount[pFaces[pFaceI]]--;
+                            newFaceVertexCount[pFaces[pFacei]]--;
                         }
                     }
                     // If the edge is not part of this face...
                     else
                     {
                         // Deleting vertex of a triangle...
-                        if (newFaceVertexCount[pFaces[pFaceI]] < 3)
+                        if (newFaceVertexCount[pFaces[pFacei]] < 3)
                         {
                             flagDegenerateFace = true;
                         }
@@ -426,21 +426,21 @@ Foam::shortEdgeFilter2D::filter()
 
     label totalNewPoints = points.size() - nPointsToRemove;
 
-    pointField newPoints(totalNewPoints, vector::zero);
+    pointField newPoints(totalNewPoints, Zero);
     labelList newPointNumbers(points.size(), -1);
     label numberRemoved = 0;
 
     // Maintain addressing from new to old point field
     labelList newPtToOldPt(totalNewPoints, -1);
 
-    forAll(points, pointI)
+    forAll(points, pointi)
     {
         // If the point is NOT going to be removed.
-        if (pointsToRemove[pointI] == -1)
+        if (pointsToRemove[pointi] == -1)
         {
-            newPoints[pointI - numberRemoved] = points[pointI];
-            newPointNumbers[pointI] =  pointI - numberRemoved;
-            newPtToOldPt[pointI - numberRemoved] = pointI;
+            newPoints[pointi - numberRemoved] = points[pointi];
+            newPointNumbers[pointi] =  pointi - numberRemoved;
+            newPtToOldPt[pointi - numberRemoved] = pointi;
         }
         else
         {
@@ -450,15 +450,15 @@ Foam::shortEdgeFilter2D::filter()
 
     // Need a new faceList
     faceList newFaces(faces.size());
-    label newFaceI = 0;
+    label newFacei = 0;
 
     labelList newFace;
     label newFaceSize = 0;
 
     // Now need to iterate over the faces and remove points. Global index.
-    forAll(faces, faceI)
+    forAll(faces, facei)
     {
-        const face& f = faces[faceI];
+        const face& f = faces[facei];
 
         newFace.clear();
         newFace.setSize(f.size());
@@ -466,39 +466,39 @@ Foam::shortEdgeFilter2D::filter()
 
         forAll(f, fp)
         {
-            label pointI = f[fp];
+            label pointi = f[fp];
             // If not removing the point, then add it to the new face.
-            if (pointsToRemove[pointI] == -1)
+            if (pointsToRemove[pointi] == -1)
             {
-                newFace[newFaceSize++] = newPointNumbers[pointI];
+                newFace[newFaceSize++] = newPointNumbers[pointi];
             }
             else
             {
-                label newPointI = pointsToRemove[pointI];
+                label newPointi = pointsToRemove[pointi];
                 // Replace deleted point with point that it is being
                 // collapsed to.
                 if
                 (
-                    f.nextLabel(fp) != newPointI
-                 && f.prevLabel(fp) != newPointI
+                    f.nextLabel(fp) != newPointi
+                 && f.prevLabel(fp) != newPointi
                 )
                 {
-                    label pChain = newPointI;
+                    label pChain = newPointi;
                     label totalChain = 0;
                     for (label nChain = 0; nChain <= totalChain; ++nChain)
                     {
                         if (newPointNumbers[pChain] != -1)
                         {
                             newFace[newFaceSize++] = newPointNumbers[pChain];
-                            newPointNumbers[pointI] = newPointNumbers[pChain];
+                            newPointNumbers[pointi] = newPointNumbers[pChain];
                             maxChain = max(totalChain, maxChain);
                         }
                         else
                         {
-                            WarningIn("shortEdgeFilter")
+                            WarningInFunction
                                 << "Point " << pChain
                                 << " marked for deletion as well as point "
-                                << pointI << nl
+                                << pointi << nl
                                 << "    Incrementing maxChain by 1 from "
                                 << totalChain << " to " << totalChain + 1
                                 << endl;
@@ -509,9 +509,9 @@ Foam::shortEdgeFilter2D::filter()
                 }
                 else
                 {
-                    if (newPointNumbers[newPointI] != -1)
+                    if (newPointNumbers[newPointi] != -1)
                     {
-                        newPointNumbers[pointI] = newPointNumbers[newPointI];
+                        newPointNumbers[pointi] = newPointNumbers[newPointi];
                     }
                 }
             }
@@ -521,17 +521,17 @@ Foam::shortEdgeFilter2D::filter()
 
         if (newFace.size() > 2)
         {
-            newFaces[newFaceI++] = face(newFace);
+            newFaces[newFacei++] = face(newFace);
         }
         else
         {
-            FatalErrorIn("shortEdgeFilter")
-                << "Only " << newFace.size() << " in face " << faceI
+            FatalErrorInFunction
+                << "Only " << newFace.size() << " in face " << facei
                 << exit(FatalError);
         }
     }
 
-    newFaces.setSize(newFaceI);
+    newFaces.setSize(newFacei);
 
     MeshedSurface<face> fMesh
     (
@@ -549,12 +549,12 @@ Foam::shortEdgeFilter2D::filter()
         patchSizes_
     );
 
-    forAll(newPointNumbers, pointI)
+    forAll(newPointNumbers, pointi)
     {
-        if (newPointNumbers[pointI] == -1)
+        if (newPointNumbers[pointi] == -1)
         {
-            WarningIn("shortEdgeFilter")
-                << pointI << " will be deleted and " << newPointNumbers[pointI]
+            WarningInFunction
+                << pointi << " will be deleted and " << newPointNumbers[pointi]
                 << ", so it will not be replaced. "
                 << "This will cause edges to be deleted." << endl;
         }
@@ -578,10 +578,10 @@ void Foam::shortEdgeFilter2D::writeInfo(Ostream& os)
         << "    edgeAttachedToBoundaryFactor: " << edgeAttachedToBoundaryFactor_
         << endl;
 
-    forAll(patchNames_, patchI)
+    forAll(patchNames_, patchi)
     {
-        os  << "    Patch " << patchNames_[patchI]
-            << ", size " << patchSizes_[patchI] << endl;
+        os  << "    Patch " << patchNames_[patchi]
+            << ", size " << patchSizes_[patchi] << endl;
     }
 
     os  << "    There are " << mapEdgesRegion_.size()

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -76,7 +76,7 @@ void thermalBaffleModel::init()
         reduce(nTotalEdges, sumOp<label>());
 
         label nFaces = 0;
-        forAll (rbm, patchi)
+        forAll(rbm, patchi)
         {
             if (
                    rbm[patchi].size()
@@ -104,8 +104,8 @@ void thermalBaffleModel::init()
 
         forAll(intCoupledPatchIDs_, i)
         {
-            const label patchI = intCoupledPatchIDs_[i];
-            const polyPatch& pp = rbm[patchI];
+            const label patchi = intCoupledPatchIDs_[i];
+            const polyPatch& pp = rbm[patchi];
 
             if
             (
@@ -114,14 +114,7 @@ void thermalBaffleModel::init()
              && !constantThickness_
             )
             {
-                FatalErrorIn
-                (
-                    "thermalBaffleModel::thermalBaffleModel"
-                    "("
-                    "   const word&,"
-                    "   const fvMesh&"
-                    ")"
-                )   << "\n    patch type '" << pp.type()
+                FatalErrorInFunction
                     << "' not type '"
                     << mappedVariableThicknessWallPolyPatch::typeName
                     << "'. This is necessary for 1D solution "
@@ -131,14 +124,7 @@ void thermalBaffleModel::init()
             }
             else if (!isA<mappedWallPolyPatch>(pp))
             {
-                FatalErrorIn
-                (
-                    "thermalBaffleModel::thermalBaffleModel"
-                    "("
-                    "   const word&,"
-                    "   const fvMesh&"
-                    ")"
-                )   << "\n    patch type '" << pp.type()
+                FatalErrorInFunction
                     << "' not type '"
                     << mappedWallPolyPatch::typeName
                     << "'. This is necessary for 3D solution"
@@ -149,8 +135,8 @@ void thermalBaffleModel::init()
 
         if (oneD_ && !constantThickness_)
         {
-            const label patchI = intCoupledPatchIDs_[0];
-            const polyPatch& pp = rbm[patchI];
+            const label patchi = intCoupledPatchIDs_[0];
+            const polyPatch& pp = rbm[patchi];
             const mappedVariableThicknessWallPolyPatch& ppCoupled =
                 refCast
                 <
@@ -162,14 +148,8 @@ void thermalBaffleModel::init()
             // Check that thickness has the right size
             if (thickness_.size() != pp.size())
             {
-                FatalErrorIn
-                (
-                    "thermalBaffleModel::thermalBaffleModel"
-                    "("
-                    "   const word&,"
-                    "   const fvMesh&"
-                    ")"
-                )   << " coupled patches in thermalBaffle are " << nl
+                FatalErrorInFunction
+                    << " coupled patches in thermalBaffle are " << nl
                     << " different sizes from list thickness" << nl
                     << exit(FatalError);
             }
@@ -177,16 +157,16 @@ void thermalBaffleModel::init()
             // Calculate thickness of the baffle on the first face only.
             if (delta_.value() == 0.0)
             {
-                forAll (ppCoupled, localFaceI)
+                forAll(ppCoupled, localFacei)
                 {
-                    label faceI = ppCoupled.start() + localFaceI;
+                    label facei = ppCoupled.start() + localFacei;
 
                     label faceO =
-                        boundaryFaceOppositeFace_[localFaceI];
+                        boundaryFaceOppositeFace_[localFacei];
 
                     delta_.value() = mag
                     (
-                        regionMesh().faceCentres()[faceI]
+                        regionMesh().faceCentres()[facei]
                       - regionMesh().faceCentres()[faceO]
                     );
                     break;

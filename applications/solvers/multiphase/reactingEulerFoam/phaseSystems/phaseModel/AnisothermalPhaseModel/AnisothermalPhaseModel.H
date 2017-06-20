@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -54,9 +54,6 @@ class AnisothermalPhaseModel
 {
     // Private data
 
-        //- Dilatation rate
-        tmp<volScalarField> divU_;
-
         //- Kinetic energy
         volScalarField K_;
 
@@ -94,12 +91,6 @@ public:
             //- Return true if the phase is compressible otherwise false
             virtual bool compressible() const;
 
-            //- Return the phase dilatation rate (d(alpha)/dt + div(alpha*phi))
-            virtual const tmp<volScalarField>& divU() const;
-
-            //- Set the phase dilatation rate (d(alpha)/dt + div(alpha*phi))
-            virtual void divU(const tmp<volScalarField>& divU);
-
             //- Return the phase kinetic energy
             virtual const volScalarField& K() const;
 };
@@ -112,7 +103,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "AnisothermalPhaseModel.C"
+    #include "AnisothermalPhaseModel.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

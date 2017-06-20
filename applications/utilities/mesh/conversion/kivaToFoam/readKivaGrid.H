@@ -2,7 +2,7 @@ ifstream kivaFile(kivaFileName.c_str());
 
 if (!kivaFile.good())
 {
-    FatalErrorIn(args.executable())
+    FatalErrorInFunction
         << "Cannot open file " << kivaFileName
         << exit(FatalError);
 }
@@ -76,7 +76,7 @@ kivaFile >> mTable;
 
 if (mTable == 0)
 {
-    FatalErrorIn(args.executable())
+    FatalErrorInFunction
         << "mTable == 0. This is not supported."
            " kivaToFoam needs complete neighbour information"
         << exit(FatalError);
@@ -232,7 +232,7 @@ const char* kivaPatchNames[nBCs] =
 };
 
 
-List<SLList<face> > pFaces[nBCs];
+List<SLList<face>> pFaces[nBCs];
 
 face quadFace(4);
 face triFace(3);
@@ -546,14 +546,14 @@ preservePatchTypes
     defaultFacesType
 );
 // Add information to dictionary
-forAll(patchNames, patchI)
+forAll(patchNames, patchi)
 {
-    if (!patchDicts.set(patchI))
+    if (!patchDicts.set(patchi))
     {
-        patchDicts.set(patchI, new dictionary());
+        patchDicts.set(patchi, new dictionary());
     }
     // Add but not overwrite
-    patchDicts[patchI].add("type", patchTypes[patchI], false);
+    patchDicts[patchi].add("type", patchTypes[patchi], false);
 }
 
 // Build the mesh and write it out

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,12 +24,12 @@ License
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::regionModels::regionModel::mapRegionPatchField
 (
     const regionModel& nbrRegion,
-    const label regionPatchI,
-    const label nbrPatchI,
+    const label regionPatchi,
+    const label nbrPatchi,
     const Field<Type>& nbrField,
     const bool flip
 ) const
@@ -38,9 +38,9 @@ Foam::regionModels::regionModel::mapRegionPatchField
     UPstream::msgType() = oldTag + 1;
 
     const AMIPatchToPatchInterpolation& ami =
-        interRegionAMI(nbrRegion, regionPatchI, nbrPatchI, flip);
+        interRegionAMI(nbrRegion, regionPatchi, nbrPatchi, flip);
 
-    tmp<Field<Type> > tresult(ami.interpolateToSource(nbrField));
+    tmp<Field<Type>> tresult(ami.interpolateToSource(nbrField));
 
     UPstream::msgType() = oldTag;
 
@@ -49,12 +49,12 @@ Foam::regionModels::regionModel::mapRegionPatchField
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::regionModels::regionModel::mapRegionPatchField
 (
     const regionModel& nbrRegion,
     const word& fieldName,
-    const label regionPatchI,
+    const label regionPatchi,
     const bool flip
 ) const
 {
@@ -64,20 +64,20 @@ Foam::regionModels::regionModel::mapRegionPatchField
 
     if (nbrRegionMesh.foundObject<fieldType>(fieldName))
     {
-        const label nbrPatchI = nbrCoupledPatchID(nbrRegion, regionPatchI);
+        const label nbrPatchi = nbrCoupledPatchID(nbrRegion, regionPatchi);
 
         int oldTag = UPstream::msgType();
         UPstream::msgType() = oldTag + 1;
 
         const AMIPatchToPatchInterpolation& ami =
-            interRegionAMI(nbrRegion, regionPatchI, nbrPatchI, flip);
+            interRegionAMI(nbrRegion, regionPatchi, nbrPatchi, flip);
 
         const fieldType& nbrField =
             nbrRegionMesh.lookupObject<fieldType>(fieldName);
 
-        const Field<Type>& nbrFieldp = nbrField.boundaryField()[nbrPatchI];
+        const Field<Type>& nbrFieldp = nbrField.boundaryField()[nbrPatchi];
 
-        tmp<Field<Type> > tresult(ami.interpolateToSource(nbrFieldp));
+        tmp<Field<Type>> tresult(ami.interpolateToSource(nbrFieldp));
 
         UPstream::msgType() = oldTag;
 
@@ -85,15 +85,15 @@ Foam::regionModels::regionModel::mapRegionPatchField
     }
     else
     {
-        const polyPatch& p = regionMesh().boundaryMesh()[regionPatchI];
+        const polyPatch& p = regionMesh().boundaryMesh()[regionPatchi];
 
         return
-            tmp<Field<Type> >
+            tmp<Field<Type>>
             (
                 new Field<Type>
                 (
                     p.size(),
-                    pTraits<Type>::zero
+                    Zero
                 )
             );
     }
@@ -101,12 +101,12 @@ Foam::regionModels::regionModel::mapRegionPatchField
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::regionModels::regionModel::mapRegionPatchInternalField
 (
     const regionModel& nbrRegion,
     const word& fieldName,
-    const label regionPatchI,
+    const label regionPatchi,
     const bool flip
 ) const
 {
@@ -116,21 +116,21 @@ Foam::regionModels::regionModel::mapRegionPatchInternalField
 
     if (nbrRegionMesh.foundObject<fieldType>(fieldName))
     {
-        const label nbrPatchI = nbrCoupledPatchID(nbrRegion, regionPatchI);
+        const label nbrPatchi = nbrCoupledPatchID(nbrRegion, regionPatchi);
 
         int oldTag = UPstream::msgType();
         UPstream::msgType() = oldTag + 1;
 
         const AMIPatchToPatchInterpolation& ami =
-            interRegionAMI(nbrRegion, regionPatchI, nbrPatchI, flip);
+            interRegionAMI(nbrRegion, regionPatchi, nbrPatchi, flip);
 
         const fieldType& nbrField =
             nbrRegionMesh.lookupObject<fieldType>(fieldName);
 
         const fvPatchField<Type>& nbrFieldp =
-            nbrField.boundaryField()[nbrPatchI];
+            nbrField.boundaryField()[nbrPatchi];
 
-        tmp<Field<Type> > tresult
+        tmp<Field<Type>> tresult
         (
             ami.interpolateToSource(nbrFieldp.patchInternalField())
         );
@@ -141,15 +141,15 @@ Foam::regionModels::regionModel::mapRegionPatchInternalField
     }
     else
     {
-        const polyPatch& p = regionMesh().boundaryMesh()[regionPatchI];
+        const polyPatch& p = regionMesh().boundaryMesh()[regionPatchi];
 
         return
-            tmp<Field<Type> >
+            tmp<Field<Type>>
             (
                 new Field<Type>
                 (
                     p.size(),
-                    pTraits<Type>::zero
+                    Zero
                 )
             );
     }
@@ -159,26 +159,26 @@ Foam::regionModels::regionModel::mapRegionPatchInternalField
 template<class Type>
 void Foam::regionModels::regionModel::toPrimary
 (
-    const label regionPatchI,
+    const label regionPatchi,
     List<Type>& regionField
 ) const
 {
     forAll(intCoupledPatchIDs_, i)
     {
-        if (intCoupledPatchIDs_[i] == regionPatchI)
+        if (intCoupledPatchIDs_[i] == regionPatchi)
         {
             const mappedPatchBase& mpb =
                 refCast<const mappedPatchBase>
                 (
-                    regionMesh().boundaryMesh()[regionPatchI]
+                    regionMesh().boundaryMesh()[regionPatchi]
                 );
             mpb.reverseDistribute(regionField);
             return;
         }
     }
 
-    FatalErrorIn("const void toPrimary(const label, List<Type>&) const")
-        << "Region patch ID " << regionPatchI << " not found in region mesh"
+    FatalErrorInFunction
+        << "Region patch ID " << regionPatchi << " not found in region mesh"
         << abort(FatalError);
 }
 
@@ -186,26 +186,26 @@ void Foam::regionModels::regionModel::toPrimary
 template<class Type>
 void Foam::regionModels::regionModel::toRegion
 (
-    const label regionPatchI,
+    const label regionPatchi,
     List<Type>& primaryField
 ) const
 {
     forAll(intCoupledPatchIDs_, i)
     {
-        if (intCoupledPatchIDs_[i] == regionPatchI)
+        if (intCoupledPatchIDs_[i] == regionPatchi)
         {
             const mappedPatchBase& mpb =
                 refCast<const mappedPatchBase>
                 (
-                    regionMesh().boundaryMesh()[regionPatchI]
+                    regionMesh().boundaryMesh()[regionPatchi]
                 );
             mpb.distribute(primaryField);
             return;
         }
     }
 
-    FatalErrorIn("const void toRegion(const label, List<Type>&) const")
-        << "Region patch ID " << regionPatchI << " not found in region mesh"
+    FatalErrorInFunction
+        << "Region patch ID " << regionPatchi << " not found in region mesh"
         << abort(FatalError);
 }
 
@@ -213,34 +213,27 @@ void Foam::regionModels::regionModel::toRegion
 template<class Type, class CombineOp>
 void Foam::regionModels::regionModel::toPrimary
 (
-    const label regionPatchI,
+    const label regionPatchi,
     List<Type>& regionField,
     const CombineOp& cop
 ) const
 {
     forAll(intCoupledPatchIDs_, i)
     {
-        if (intCoupledPatchIDs_[i] == regionPatchI)
+        if (intCoupledPatchIDs_[i] == regionPatchi)
         {
             const mappedPatchBase& mpb =
                 refCast<const mappedPatchBase>
                 (
-                    regionMesh().boundaryMesh()[regionPatchI]
+                    regionMesh().boundaryMesh()[regionPatchi]
                 );
             mpb.reverseDistribute(regionField, cop);
             return;
         }
     }
 
-    FatalErrorIn
-    (
-        "const void toPrimary"
-        "("
-            "const label, "
-            "List<Type>&, "
-            "const CombineOp&"
-        ") const"
-    )   << "Region patch ID " << regionPatchI << " not found in region mesh"
+    FatalErrorInFunction
+        << "Region patch ID " << regionPatchi << " not found in region mesh"
         << abort(FatalError);
 }
 
@@ -248,29 +241,27 @@ void Foam::regionModels::regionModel::toPrimary
 template<class Type, class CombineOp>
 void Foam::regionModels::regionModel::toRegion
 (
-    const label regionPatchI,
+    const label regionPatchi,
     List<Type>& primaryField,
     const CombineOp& cop
 ) const
 {
     forAll(intCoupledPatchIDs_, i)
     {
-        if (intCoupledPatchIDs_[i] == regionPatchI)
+        if (intCoupledPatchIDs_[i] == regionPatchi)
         {
             const mappedPatchBase& mpb =
                 refCast<const mappedPatchBase>
                 (
-                    regionMesh().boundaryMesh()[regionPatchI]
+                    regionMesh().boundaryMesh()[regionPatchi]
                 );
             mpb.distribute(primaryField, cop);
             return;
         }
     }
 
-    FatalErrorIn
-    (
-        "const void toRegion(const label, List<Type>&, const CombineOp&) const"
-    )   << "Region patch ID " << regionPatchI << " not found in region mesh"
+    FatalErrorInFunction
+        << "Region patch ID " << regionPatchi << " not found in region mesh"
         << abort(FatalError);
 }
 

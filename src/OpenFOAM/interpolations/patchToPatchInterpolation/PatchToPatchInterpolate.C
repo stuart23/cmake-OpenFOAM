@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,10 +33,9 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-//- Interpolate point field
 template<class FromPatch, class ToPatch>
 template<class Type>
-tmp<Field<Type> >
+tmp<Field<Type>>
 PatchToPatchInterpolation<FromPatch, ToPatch>::pointInterpolate
 (
     const Field<Type>& pf
@@ -44,25 +43,18 @@ PatchToPatchInterpolation<FromPatch, ToPatch>::pointInterpolate
 {
     if (pf.size() != fromPatch_.nPoints())
     {
-        FatalErrorIn
-        (
-            "PatchToPatchInterpolation::pointInterpolate"
-            "(const Field<Type> pf)"
-        )   << "given field does not correspond to patch. Patch size: "
+        FatalErrorInFunction
+            << "given field does not correspond to patch. Patch size: "
             << fromPatch_.nPoints() << " field size: " << pf.size()
             << abort(FatalError);
     }
 
-    tmp<Field<Type> > tresult
+    tmp<Field<Type>> tresult
     (
-        new Field<Type>
-        (
-            toPatch_.nPoints(),
-            pTraits<Type>::zero
-        )
+        new Field<Type>(toPatch_.nPoints(), Zero)
     );
 
-    Field<Type>& result = tresult();
+    Field<Type>& result = tresult.ref();
 
     const List<typename FromPatch::FaceType>& fromPatchLocalFaces =
         fromPatch_.localFaces();
@@ -71,18 +63,18 @@ PatchToPatchInterpolation<FromPatch, ToPatch>::pointInterpolate
 
     const labelList& addr = pointAddr();
 
-    forAll(result, pointI)
+    forAll(result, pointi)
     {
-        const scalarField& curWeights = weights[pointI];
+        const scalarField& curWeights = weights[pointi];
 
-        if (addr[pointI] > -1)
+        if (addr[pointi] > -1)
         {
             const labelList& hitFacePoints =
-                fromPatchLocalFaces[addr[pointI]];
+                fromPatchLocalFaces[addr[pointi]];
 
             forAll(curWeights, wI)
             {
-                result[pointI] += curWeights[wI]*pf[hitFacePoints[wI]];
+                result[pointi] += curWeights[wI]*pf[hitFacePoints[wI]];
             }
         }
     }
@@ -93,22 +85,21 @@ PatchToPatchInterpolation<FromPatch, ToPatch>::pointInterpolate
 
 template<class FromPatch, class ToPatch>
 template<class Type>
-tmp<Field<Type> >
+tmp<Field<Type>>
 PatchToPatchInterpolation<FromPatch, ToPatch>::pointInterpolate
 (
-    const tmp<Field<Type> >& tpf
+    const tmp<Field<Type>>& tpf
 ) const
 {
-    tmp<Field<Type> > tint = pointInterpolate<Type>(tpf());
+    tmp<Field<Type>> tint = pointInterpolate<Type>(tpf());
     tpf.clear();
     return tint;
 }
 
 
-//- Interpolate face field
 template<class FromPatch, class ToPatch>
 template<class Type>
-tmp<Field<Type> >
+tmp<Field<Type>>
 PatchToPatchInterpolation<FromPatch, ToPatch>::faceInterpolate
 (
     const Field<Type>& ff
@@ -116,25 +107,18 @@ PatchToPatchInterpolation<FromPatch, ToPatch>::faceInterpolate
 {
     if (ff.size() != fromPatch_.size())
     {
-        FatalErrorIn
-        (
-            "PatchToPatchInterpolation::faceInterpolate"
-            "(const Field<Type> ff)"
-        )   << "given field does not correspond to patch. Patch size: "
+        FatalErrorInFunction
+            << "given field does not correspond to patch. Patch size: "
             << fromPatch_.size() << " field size: " << ff.size()
             << abort(FatalError);
     }
 
-    tmp<Field<Type> > tresult
+    tmp<Field<Type>> tresult
     (
-        new Field<Type>
-        (
-            toPatch_.size(),
-            pTraits<Type>::zero
-        )
+        new Field<Type>(toPatch_.size(), Zero)
     );
 
-    Field<Type>& result = tresult();
+    Field<Type>& result = tresult.ref();
 
     const labelListList& fromPatchFaceFaces = fromPatch_.faceFaces();
 
@@ -142,21 +126,21 @@ PatchToPatchInterpolation<FromPatch, ToPatch>::faceInterpolate
 
     const labelList& addr = faceAddr();
 
-    forAll(result, faceI)
+    forAll(result, facei)
     {
-        const scalarField& curWeights = weights[faceI];
+        const scalarField& curWeights = weights[facei];
 
-        if (addr[faceI] > -1)
+        if (addr[facei] > -1)
         {
             const labelList& hitFaceFaces =
-                fromPatchFaceFaces[addr[faceI]];
+                fromPatchFaceFaces[addr[facei]];
 
             // first add the hit face
-            result[faceI] += ff[addr[faceI]]*curWeights[0];
+            result[facei] += ff[addr[facei]]*curWeights[0];
 
             for (label wI = 1; wI < curWeights.size(); wI++)
             {
-                result[faceI] += ff[hitFaceFaces[wI - 1]]*curWeights[wI];
+                result[facei] += ff[hitFaceFaces[wI - 1]]*curWeights[wI];
             }
         }
     }
@@ -167,13 +151,13 @@ PatchToPatchInterpolation<FromPatch, ToPatch>::faceInterpolate
 
 template<class FromPatch, class ToPatch>
 template<class Type>
-tmp<Field<Type> >
+tmp<Field<Type>>
 PatchToPatchInterpolation<FromPatch, ToPatch>::faceInterpolate
 (
-    const tmp<Field<Type> >& tff
+    const tmp<Field<Type>>& tff
 ) const
 {
-    tmp<Field<Type> > tint = faceInterpolate(tff());
+    tmp<Field<Type>> tint = faceInterpolate(tff());
     tff.clear();
     return tint;
 }

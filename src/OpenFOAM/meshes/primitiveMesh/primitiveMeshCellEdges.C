@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -44,7 +44,7 @@ void Foam::primitiveMesh::calcCellEdges() const
         {
             // For checking calls:abort so we can quickly hunt down
             // origin of call
-            FatalErrorIn("primitiveMesh::calcCellEdges()")
+            FatalErrorInFunction
                 << abort(FatalError);
         }
     }
@@ -53,14 +53,14 @@ void Foam::primitiveMesh::calcCellEdges() const
     // if the pointer is already set
     if (cePtr_)
     {
-        FatalErrorIn("primitiveMesh::calcCellEdges() const")
+        FatalErrorInFunction
             << "cellEdges already calculated"
             << abort(FatalError);
     }
     else
     {
         // Set up temporary storage
-        List<DynamicList<label, edgesPerCell_> > ce(nCells());
+        List<DynamicList<label, edgesPerCell_>> ce(nCells());
 
 
         // Get reference to faceCells and faceEdges
@@ -69,11 +69,11 @@ void Foam::primitiveMesh::calcCellEdges() const
         const labelListList& fe = faceEdges();
 
         // loop through the list again and add edges; checking for duplicates
-        forAll(own, faceI)
+        forAll(own, facei)
         {
-            DynamicList<label, edgesPerCell_>& curCellEdges = ce[own[faceI]];
+            DynamicList<label, edgesPerCell_>& curCellEdges = ce[own[facei]];
 
-            const labelList& curEdges = fe[faceI];
+            const labelList& curEdges = fe[facei];
 
             forAll(curEdges, edgeI)
             {
@@ -85,11 +85,11 @@ void Foam::primitiveMesh::calcCellEdges() const
             }
         }
 
-        forAll(nei, faceI)
+        forAll(nei, facei)
         {
-            DynamicList<label, edgesPerCell_>& curCellEdges = ce[nei[faceI]];
+            DynamicList<label, edgesPerCell_>& curCellEdges = ce[nei[facei]];
 
-            const labelList& curEdges = fe[faceI];
+            const labelList& curEdges = fe[facei];
 
             forAll(curEdges, edgeI)
             {
@@ -105,9 +105,9 @@ void Foam::primitiveMesh::calcCellEdges() const
         labelListList& cellEdgeAddr = *cePtr_;
 
         // reset the size
-        forAll(ce, cellI)
+        forAll(ce, celli)
         {
-            cellEdgeAddr[cellI].transfer(ce[cellI]);
+            cellEdgeAddr[celli].transfer(ce[celli]);
         }
     }
 }

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -51,11 +51,8 @@ void fft::transform
         unsigned int dimCount = nn[idim];
         if (!dimCount || (dimCount & (dimCount - 1)))
         {
-            FatalErrorIn
-            (
-                 "fft::transform(complexField&, const labelList&, "
-                 "transformDirection)"
-            )   << "number of elements in direction " << idim
+            FatalErrorInFunction
+                << "number of elements in direction " << idim
                 << " is not a power of 2" << endl
                 << "    Number of elements in each direction = " << nn
                 << abort(FatalError);
@@ -194,7 +191,7 @@ tmp<complexField> fft::forwardTransform
 {
     tmp<complexField> tfftField(new complexField(tfield));
 
-    transform(tfftField(), nn, FORWARD_TRANSFORM);
+    transform(tfftField.ref(), nn, FORWARD_TRANSFORM);
 
     tfield.clear();
 
@@ -210,7 +207,7 @@ tmp<complexField> fft::reverseTransform
 {
     tmp<complexField> tifftField(new complexField(tfield));
 
-    transform(tifftField(), nn, REVERSE_TRANSFORM);
+    transform(tifftField.ref(), nn, REVERSE_TRANSFORM);
 
     tfield.clear();
 
@@ -234,7 +231,7 @@ tmp<complexVectorField> fft::forwardTransform
 
     for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
     {
-        tfftVectorField().replace
+        tfftVectorField.ref().replace
         (
             cmpt,
             forwardTransform(tfield().component(cmpt), nn)
@@ -263,7 +260,7 @@ tmp<complexVectorField> fft::reverseTransform
 
     for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
     {
-        tifftVectorField().replace
+        tifftVectorField.ref().replace
         (
             cmpt,
             reverseTransform(tfield().component(cmpt), nn)

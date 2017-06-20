@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -27,6 +27,7 @@ License
 #include "AMIMethod.H"
 #include "meshTools.H"
 #include "mapDistribute.H"
+#include "flipOp.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -63,15 +64,7 @@ Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolationMethodToWord
         }
         default:
         {
-            FatalErrorIn
-            (
-                "const Foam::word"
-                "Foam::AMIInterpolation<SourcePatch, TargetPatch>::"
-                "interpolationMethodToWord"
-                "("
-                    "const interpolationMethod&"
-                ")"
-            )
+            FatalErrorInFunction
                 << "Unhandled interpolationMethod enumeration " << method
                 << abort(FatalError);
         }
@@ -121,16 +114,7 @@ Foam::AMIInterpolation<SourcePatch, TargetPatch>::wordTointerpolationMethod
     }
     else
     {
-        FatalErrorIn
-        (
-            "Foam::AMIInterpolation<SourcePatch, TargetPatch>::"
-            "interpolationMethod"
-            "Foam::AMIInterpolation<SourcePatch, TargetPatch>::"
-            "wordTointerpolationMethod"
-            "("
-                "const word&"
-            ")"
-        )
+        FatalErrorInFunction
             << "Invalid interpolationMethod " << im
             << ".  Valid methods are:" << methods
             << exit(FatalError);
@@ -176,15 +160,7 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::projectPointsToSurface
 
     if (nMiss > 0)
     {
-        FatalErrorIn
-        (
-            "void Foam::AMIInterpolation<SourcePatch, TargetPatch>::"
-            "projectPointsToSurface"
-            "("
-                "const searchableSurface&, "
-                "pointField&"
-            ") const"
-        )
+        FatalErrorInFunction
             << "Error projecting points to surface: "
             << nMiss << " faces could not be determined"
             << abort(FatalError);
@@ -209,13 +185,13 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::normaliseWeights
     wghtSum.setSize(wght.size(), 0.0);
     label nLowWeight = 0;
 
-    forAll(wght, faceI)
+    forAll(wght, facei)
     {
-        scalarList& w = wght[faceI];
+        scalarList& w = wght[facei];
 
         if (w.size())
         {
-            scalar denom = patchAreas[faceI];
+            scalar denom = patchAreas[facei];
 
             scalar s = sum(w);
             scalar t = s/denom;
@@ -230,7 +206,7 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::normaliseWeights
                 w[i] /= denom;
             }
 
-            wghtSum[faceI] = t;
+            wghtSum[facei] = t;
 
             if (t < lowWeightTol)
             {
@@ -239,7 +215,7 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::normaliseWeights
         }
         else
         {
-            wghtSum[faceI] = 0;
+            wghtSum[facei] = 0;
         }
     }
 
@@ -307,10 +283,10 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::agglomerate
     // Agglomerate face areas
     {
         srcMagSf.setSize(sourceRestrictAddressing.size(), 0.0);
-        forAll(sourceRestrictAddressing, faceI)
+        forAll(sourceRestrictAddressing, facei)
         {
-            label coarseFaceI = sourceRestrictAddressing[faceI];
-            srcMagSf[coarseFaceI] += fineSrcMagSf[faceI];
+            label coarseFacei = sourceRestrictAddressing[facei];
+            srcMagSf[coarseFacei] += fineSrcMagSf[facei];
         }
     }
 
@@ -336,16 +312,16 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::agglomerate
             tgtSubMap[Pstream::myProcNo()] = identity(targetCoarseSize);
         }
 
-        forAll(map.subMap(), procI)
+        forAll(map.subMap(), proci)
         {
-            if (procI != Pstream::myProcNo())
+            if (proci != Pstream::myProcNo())
             {
                 // Combine entries that point to the same coarse element. All
                 // the elements refer to local data so index into
                 // targetRestrictAddressing or allRestrict (since the same
                 // for local data).
-                const labelList& elems = map.subMap()[procI];
-                labelList& newSubMap = tgtSubMap[procI];
+                const labelList& elems = map.subMap()[proci];
+                labelList& newSubMap = tgtSubMap[proci];
                 newSubMap.setSize(elems.size());
 
                 labelList oldToNew(targetCoarseSize, -1);
@@ -384,16 +360,16 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::agglomerate
         label compactI = targetCoarseSize;
 
         // Compact data from other processors
-        forAll(map.constructMap(), procI)
+        forAll(map.constructMap(), proci)
         {
-            if (procI != Pstream::myProcNo())
+            if (proci != Pstream::myProcNo())
             {
                 // Combine entries that point to the same coarse element. All
                 // elements now are remote data so we cannot use any local
                 // data here - use allRestrict instead.
-                const labelList& elems = map.constructMap()[procI];
+                const labelList& elems = map.constructMap()[proci];
 
-                labelList& newConstructMap = tgtConstructMap[procI];
+                labelList& newConstructMap = tgtConstructMap[proci];
                 newConstructMap.setSize(elems.size());
 
                 if (elems.size())
@@ -411,14 +387,14 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::agglomerate
                     }
                     remoteTargetCoarseSize += 1;
 
-                    // Combine locally data coming from procI
+                    // Combine locally data coming from proci
                     labelList oldToNew(remoteTargetCoarseSize, -1);
                     label newI = 0;
 
                     forAll(elems, i)
                     {
                         label fineElem = elems[i];
-                        // fineElem now points to section from procI
+                        // fineElem now points to section from proci
                         label coarseElem = allRestrict[fineElem];
                         if (oldToNew[coarseElem] == -1)
                         {
@@ -443,18 +419,18 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::agglomerate
         srcAddress.setSize(sourceCoarseSize);
         srcWeights.setSize(sourceCoarseSize);
 
-        forAll(fineSrcAddress, faceI)
+        forAll(fineSrcAddress, facei)
         {
-            // All the elements contributing to faceI. Are slots in
+            // All the elements contributing to facei. Are slots in
             // mapDistribute'd data.
-            const labelList& elems = fineSrcAddress[faceI];
-            const scalarList& weights = fineSrcWeights[faceI];
-            const scalar fineArea = fineSrcMagSf[faceI];
+            const labelList& elems = fineSrcAddress[facei];
+            const scalarList& weights = fineSrcWeights[facei];
+            const scalar fineArea = fineSrcMagSf[facei];
 
-            label coarseFaceI = sourceRestrictAddressing[faceI];
+            label coarseFacei = sourceRestrictAddressing[facei];
 
-            labelList& newElems = srcAddress[coarseFaceI];
-            scalarList& newWeights = srcWeights[coarseFaceI];
+            labelList& newElems = srcAddress[coarseFacei];
+            scalarList& newWeights = srcWeights[coarseFacei];
 
             forAll(elems, i)
             {
@@ -489,18 +465,18 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::agglomerate
         srcAddress.setSize(sourceCoarseSize);
         srcWeights.setSize(sourceCoarseSize);
 
-        forAll(fineSrcAddress, faceI)
+        forAll(fineSrcAddress, facei)
         {
-            // All the elements contributing to faceI. Are slots in
+            // All the elements contributing to facei. Are slots in
             // mapDistribute'd data.
-            const labelList& elems = fineSrcAddress[faceI];
-            const scalarList& weights = fineSrcWeights[faceI];
-            const scalar fineArea = fineSrcMagSf[faceI];
+            const labelList& elems = fineSrcAddress[facei];
+            const scalarList& weights = fineSrcWeights[facei];
+            const scalar fineArea = fineSrcMagSf[facei];
 
-            label coarseFaceI = sourceRestrictAddressing[faceI];
+            label coarseFacei = sourceRestrictAddressing[facei];
 
-            labelList& newElems = srcAddress[coarseFaceI];
-            scalarList& newWeights = srcWeights[coarseFaceI];
+            labelList& newElems = srcAddress[coarseFacei];
+            scalarList& newWeights = srcWeights[coarseFacei];
 
             forAll(elems, i)
             {
@@ -786,15 +762,8 @@ Foam::AMIInterpolation<SourcePatch, TargetPatch>::AMIInterpolation
      || fineAMI.tgtAddress().size() != targetRestrictAddressing.size()
     )
     {
-        FatalErrorIn
-        (
-            "AMIInterpolation<SourcePatch, TargetPatch>::AMIInterpolation"
-            "("
-                "const AMIInterpolation<SourcePatch, TargetPatch>&, "
-                "const labelList&, "
-                "const labelList&"
-            ")"
-        )   << "Size mismatch." << nl
+        FatalErrorInFunction
+            << "Size mismatch." << nl
             << "Source patch size:" << fineAMI.srcAddress().size() << nl
             << "Source agglomeration size:"
             << sourceRestrictAddressing.size() << nl
@@ -899,14 +868,14 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::update
 
     // Calculate face areas
     srcMagSf_.setSize(srcPatch.size());
-    forAll(srcMagSf_, faceI)
+    forAll(srcMagSf_, facei)
     {
-        srcMagSf_[faceI] = srcPatch[faceI].mag(srcPatch.points());
+        srcMagSf_[facei] = srcPatch[facei].mag(srcPatch.points());
     }
     tgtMagSf_.setSize(tgtPatch.size());
-    forAll(tgtMagSf_, faceI)
+    forAll(tgtMagSf_, facei)
     {
-        tgtMagSf_[faceI] = tgtPatch[faceI].mag(tgtPatch.points());
+        tgtMagSf_[facei] = tgtPatch[facei].mag(tgtPatch.points());
     }
 
     // Calculate if patches present on multiple processors
@@ -954,7 +923,7 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::update
             );
 
         // calculate AMI interpolation
-        autoPtr<AMIMethod<SourcePatch, TargetPatch> > AMIPtr
+        autoPtr<AMIMethod<SourcePatch, TargetPatch>> AMIPtr
         (
             AMIMethod<SourcePatch, TargetPatch>::New
             (
@@ -965,7 +934,7 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::update
                 tgtMagSf_,
                 triMode_,
                 reverseTarget_,
-                requireMatch_
+                requireMatch_ && (lowWeightCorrection_ < 0)
             )
         );
 
@@ -1010,27 +979,33 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::update
         // send data back to originating procs. Note that contributions
         // from different processors get added (ListAppendEqOp)
 
-        mapDistribute::distribute
+        mapDistributeBase::distribute
         (
             Pstream::nonBlocking,
             List<labelPair>(),
             tgtPatch.size(),
             map.constructMap(),
+            false,                      // has flip
             map.subMap(),
+            false,                      // has flip
             tgtAddress_,
             ListAppendEqOp<label>(),
+            flipOp(),                   // flip operation
             labelList()
         );
 
-        mapDistribute::distribute
+        mapDistributeBase::distribute
         (
             Pstream::nonBlocking,
             List<labelPair>(),
             tgtPatch.size(),
             map.constructMap(),
+            false,
             map.subMap(),
+            false,
             tgtWeights_,
             ListAppendEqOp<scalar>(),
+            flipOp(),
             scalarList()
         );
 
@@ -1059,7 +1034,7 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::update
         );
 
         // cache maps and reset addresses
-        List<Map<label> > cMap;
+        List<Map<label>> cMap;
         srcMapPtr_.reset(new mapDistribute(globalSrcFaces, tgtAddress_, cMap));
         tgtMapPtr_.reset(new mapDistribute(globalTgtFaces, srcAddress_, cMap));
 
@@ -1071,7 +1046,7 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::update
     else
     {
         // calculate AMI interpolation
-        autoPtr<AMIMethod<SourcePatch, TargetPatch> > AMIPtr
+        autoPtr<AMIMethod<SourcePatch, TargetPatch>> AMIPtr
         (
             AMIMethod<SourcePatch, TargetPatch>::New
             (
@@ -1082,7 +1057,7 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::update
                 tgtMagSf_,
                 triMode_,
                 reverseTarget_,
-                requireMatch_
+                requireMatch_ && (lowWeightCorrection_ < 0)
             )
         );
 
@@ -1143,16 +1118,8 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToTarget
 {
     if (fld.size() != srcAddress_.size())
     {
-        FatalErrorIn
-        (
-            "AMIInterpolation::interpolateToTarget"
-            "("
-                "const UList<Type>&, "
-                "const CombineOp&, "
-                "List<Type>&, "
-                "const UList<Type>&"
-            ") const"
-        )   << "Supplied field size is not equal to source patch size" << nl
+        FatalErrorInFunction
+            << "Supplied field size is not equal to source patch size" << nl
             << "    source patch   = " << srcAddress_.size() << nl
             << "    target patch   = " << tgtAddress_.size() << nl
             << "    supplied field = " << fld.size()
@@ -1163,16 +1130,8 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToTarget
     {
         if (defaultValues.size() != tgtAddress_.size())
         {
-            FatalErrorIn
-            (
-                "AMIInterpolation::interpolateToTarget"
-                "("
-                    "const UList<Type>&, "
-                    "const CombineOp&, "
-                    "List<Type>&, "
-                    "const UList<Type>&"
-                ") const"
-            )   << "Employing default values when sum of weights falls below "
+            FatalErrorInFunction
+                << "Employing default values when sum of weights falls below "
                 << lowWeightCorrection_
                 << " but supplied default field size is not equal to target "
                 << "patch size" << nl
@@ -1191,40 +1150,40 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToTarget
         List<Type> work(fld);
         map.distribute(work);
 
-        forAll(result, faceI)
+        forAll(result, facei)
         {
-            if (tgtWeightsSum_[faceI] < lowWeightCorrection_)
+            if (tgtWeightsSum_[facei] < lowWeightCorrection_)
             {
-                result[faceI] = defaultValues[faceI];
+                result[facei] = defaultValues[facei];
             }
             else
             {
-                const labelList& faces = tgtAddress_[faceI];
-                const scalarList& weights = tgtWeights_[faceI];
+                const labelList& faces = tgtAddress_[facei];
+                const scalarList& weights = tgtWeights_[facei];
 
                 forAll(faces, i)
                 {
-                    cop(result[faceI], faceI, work[faces[i]], weights[i]);
+                    cop(result[facei], facei, work[faces[i]], weights[i]);
                 }
             }
         }
     }
     else
     {
-        forAll(result, faceI)
+        forAll(result, facei)
         {
-            if (tgtWeightsSum_[faceI] < lowWeightCorrection_)
+            if (tgtWeightsSum_[facei] < lowWeightCorrection_)
             {
-                result[faceI] = defaultValues[faceI];
+                result[facei] = defaultValues[facei];
             }
             else
             {
-                const labelList& faces = tgtAddress_[faceI];
-                const scalarList& weights = tgtWeights_[faceI];
+                const labelList& faces = tgtAddress_[facei];
+                const scalarList& weights = tgtWeights_[facei];
 
                 forAll(faces, i)
                 {
-                    cop(result[faceI], faceI, fld[faces[i]], weights[i]);
+                    cop(result[facei], facei, fld[faces[i]], weights[i]);
                 }
             }
         }
@@ -1244,16 +1203,8 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToSource
 {
     if (fld.size() != tgtAddress_.size())
     {
-        FatalErrorIn
-        (
-            "AMIInterpolation::interpolateToSource"
-            "("
-                "const UList<Type>&, "
-                "const CombineOp&, "
-                "List<Type>&, "
-                "const UList<Type>&"
-            ") const"
-        )   << "Supplied field size is not equal to target patch size" << nl
+        FatalErrorInFunction
+            << "Supplied field size is not equal to target patch size" << nl
             << "    source patch   = " << srcAddress_.size() << nl
             << "    target patch   = " << tgtAddress_.size() << nl
             << "    supplied field = " << fld.size()
@@ -1264,16 +1215,8 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToSource
     {
         if (defaultValues.size() != srcAddress_.size())
         {
-            FatalErrorIn
-            (
-                "AMIInterpolation::interpolateToSource"
-                "("
-                    "const UList<Type>&, "
-                    "const CombineOp&, "
-                    "List<Type>&, "
-                    "const UList<Type>&"
-                ") const"
-            )   << "Employing default values when sum of weights falls below "
+            FatalErrorInFunction
+                << "Employing default values when sum of weights falls below "
                 << lowWeightCorrection_
                 << " but supplied default field size is not equal to target "
                 << "patch size" << nl
@@ -1292,40 +1235,40 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToSource
         List<Type> work(fld);
         map.distribute(work);
 
-        forAll(result, faceI)
+        forAll(result, facei)
         {
-            if (srcWeightsSum_[faceI] < lowWeightCorrection_)
+            if (srcWeightsSum_[facei] < lowWeightCorrection_)
             {
-                result[faceI] = defaultValues[faceI];
+                result[facei] = defaultValues[facei];
             }
             else
             {
-                const labelList& faces = srcAddress_[faceI];
-                const scalarList& weights = srcWeights_[faceI];
+                const labelList& faces = srcAddress_[facei];
+                const scalarList& weights = srcWeights_[facei];
 
                 forAll(faces, i)
                 {
-                    cop(result[faceI], faceI, work[faces[i]], weights[i]);
+                    cop(result[facei], facei, work[faces[i]], weights[i]);
                 }
             }
         }
     }
     else
     {
-        forAll(result, faceI)
+        forAll(result, facei)
         {
-            if (srcWeightsSum_[faceI] < lowWeightCorrection_)
+            if (srcWeightsSum_[facei] < lowWeightCorrection_)
             {
-                result[faceI] = defaultValues[faceI];
+                result[facei] = defaultValues[facei];
             }
             else
             {
-                const labelList& faces = srcAddress_[faceI];
-                const scalarList& weights = srcWeights_[faceI];
+                const labelList& faces = srcAddress_[facei];
+                const scalarList& weights = srcWeights_[facei];
 
                 forAll(faces, i)
                 {
-                    cop(result[faceI], faceI, fld[faces[i]], weights[i]);
+                    cop(result[facei], facei, fld[faces[i]], weights[i]);
                 }
             }
         }
@@ -1335,7 +1278,7 @@ void Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToSource
 
 template<class SourcePatch, class TargetPatch>
 template<class Type, class CombineOp>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToSource
 (
     const Field<Type>& fld,
@@ -1343,12 +1286,12 @@ Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToSource
     const UList<Type>& defaultValues
 ) const
 {
-    tmp<Field<Type> > tresult
+    tmp<Field<Type>> tresult
     (
         new Field<Type>
         (
             srcAddress_.size(),
-            pTraits<Type>::zero
+            Zero
         )
     );
 
@@ -1356,7 +1299,7 @@ Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToSource
     (
         fld,
         multiplyWeightedOp<Type, CombineOp>(cop),
-        tresult(),
+        tresult.ref(),
         defaultValues
     );
 
@@ -1366,10 +1309,10 @@ Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToSource
 
 template<class SourcePatch, class TargetPatch>
 template<class Type, class CombineOp>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToSource
 (
-    const tmp<Field<Type> >& tFld,
+    const tmp<Field<Type>>& tFld,
     const CombineOp& cop,
     const UList<Type>& defaultValues
 ) const
@@ -1380,7 +1323,7 @@ Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToSource
 
 template<class SourcePatch, class TargetPatch>
 template<class Type, class CombineOp>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToTarget
 (
     const Field<Type>& fld,
@@ -1388,12 +1331,12 @@ Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToTarget
     const UList<Type>& defaultValues
 ) const
 {
-    tmp<Field<Type> > tresult
+    tmp<Field<Type>> tresult
     (
         new Field<Type>
         (
             tgtAddress_.size(),
-            pTraits<Type>::zero
+            Zero
         )
     );
 
@@ -1401,7 +1344,7 @@ Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToTarget
     (
         fld,
         multiplyWeightedOp<Type, CombineOp>(cop),
-        tresult(),
+        tresult.ref(),
         defaultValues
     );
 
@@ -1411,10 +1354,10 @@ Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToTarget
 
 template<class SourcePatch, class TargetPatch>
 template<class Type, class CombineOp>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToTarget
 (
-    const tmp<Field<Type> >& tFld,
+    const tmp<Field<Type>>& tFld,
     const CombineOp& cop,
     const UList<Type>& defaultValues
 ) const
@@ -1425,7 +1368,7 @@ Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToTarget
 
 template<class SourcePatch, class TargetPatch>
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToSource
 (
     const Field<Type>& fld,
@@ -1438,10 +1381,10 @@ Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToSource
 
 template<class SourcePatch, class TargetPatch>
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToSource
 (
-    const tmp<Field<Type> >& tFld,
+    const tmp<Field<Type>>& tFld,
     const UList<Type>& defaultValues
 ) const
 {
@@ -1451,7 +1394,7 @@ Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToSource
 
 template<class SourcePatch, class TargetPatch>
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToTarget
 (
     const Field<Type>& fld,
@@ -1464,10 +1407,10 @@ Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToTarget
 
 template<class SourcePatch, class TargetPatch>
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::AMIInterpolation<SourcePatch, TargetPatch>::interpolateToTarget
 (
-    const tmp<Field<Type> >& tFld,
+    const tmp<Field<Type>>& tFld,
     const UList<Type>& defaultValues
 ) const
 {
@@ -1481,20 +1424,20 @@ Foam::label Foam::AMIInterpolation<SourcePatch, TargetPatch>::srcPointFace
     const SourcePatch& srcPatch,
     const TargetPatch& tgtPatch,
     const vector& n,
-    const label tgtFaceI,
+    const label tgtFacei,
     point& tgtPoint
 )
 const
 {
     const pointField& srcPoints = srcPatch.points();
 
-    // source face addresses that intersect target face tgtFaceI
-    const labelList& addr = tgtAddress_[tgtFaceI];
+    // source face addresses that intersect target face tgtFacei
+    const labelList& addr = tgtAddress_[tgtFacei];
 
     forAll(addr, i)
     {
-        label srcFaceI = addr[i];
-        const face& f = srcPatch[srcFaceI];
+        label srcFacei = addr[i];
+        const face& f = srcPatch[srcFacei];
 
         pointHit ray = f.ray(tgtPoint, n, srcPoints);
 
@@ -1502,18 +1445,18 @@ const
         {
             tgtPoint = ray.rawPoint();
 
-            return srcFaceI;
+            return srcFacei;
         }
     }
 
     // no hit registered - try with face normal instead of input normal
     forAll(addr, i)
     {
-        label srcFaceI = addr[i];
-        const face& f = srcPatch[srcFaceI];
+        label srcFacei = addr[i];
+        const face& f = srcPatch[srcFacei];
 
-        vector nFace(-srcPatch.faceNormals()[srcFaceI]);
-        nFace += tgtPatch.faceNormals()[tgtFaceI];
+        vector nFace(-srcPatch.faceNormals()[srcFacei]);
+        nFace += tgtPatch.faceNormals()[tgtFacei];
 
         pointHit ray = f.ray(tgtPoint, nFace, srcPoints);
 
@@ -1521,7 +1464,7 @@ const
         {
             tgtPoint = ray.rawPoint();
 
-            return srcFaceI;
+            return srcFacei;
         }
     }
 
@@ -1535,20 +1478,20 @@ Foam::label Foam::AMIInterpolation<SourcePatch, TargetPatch>::tgtPointFace
     const SourcePatch& srcPatch,
     const TargetPatch& tgtPatch,
     const vector& n,
-    const label srcFaceI,
+    const label srcFacei,
     point& srcPoint
 )
 const
 {
     const pointField& tgtPoints = tgtPatch.points();
 
-    // target face addresses that intersect source face srcFaceI
-    const labelList& addr = srcAddress_[srcFaceI];
+    // target face addresses that intersect source face srcFacei
+    const labelList& addr = srcAddress_[srcFacei];
 
     forAll(addr, i)
     {
-        label tgtFaceI = addr[i];
-        const face& f = tgtPatch[tgtFaceI];
+        label tgtFacei = addr[i];
+        const face& f = tgtPatch[tgtFacei];
 
         pointHit ray = f.ray(srcPoint, n, tgtPoints);
 
@@ -1556,18 +1499,18 @@ const
         {
             srcPoint = ray.rawPoint();
 
-            return tgtFaceI;
+            return tgtFacei;
         }
     }
 
     // no hit registered - try with face normal instead of input normal
     forAll(addr, i)
     {
-        label tgtFaceI = addr[i];
-        const face& f = tgtPatch[tgtFaceI];
+        label tgtFacei = addr[i];
+        const face& f = tgtPatch[tgtFacei];
 
-        vector nFace(-srcPatch.faceNormals()[srcFaceI]);
-        nFace += tgtPatch.faceNormals()[tgtFaceI];
+        vector nFace(-srcPatch.faceNormals()[srcFacei]);
+        nFace += tgtPatch.faceNormals()[tgtFacei];
 
         pointHit ray = f.ray(srcPoint, n, tgtPoints);
 
@@ -1575,7 +1518,7 @@ const
         {
             srcPoint = ray.rawPoint();
 
-            return tgtFaceI;
+            return tgtFacei;
         }
     }
 

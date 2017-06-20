@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -71,9 +71,12 @@ class surfaceFeatures;
 class objectRegistry;
 
 // Forward declaration of friend functions and operators
+
 class extendedEdgeMesh;
+
 Istream& operator>>(Istream&, extendedEdgeMesh&);
 Ostream& operator<<(Ostream&, const extendedEdgeMesh&);
+
 
 /*---------------------------------------------------------------------------*\
                        Class extendedEdgeMesh Declaration
@@ -191,13 +194,13 @@ protected:
         labelList regionEdges_;
 
         //- Search tree for all feature points
-        mutable autoPtr<indexedOctree<treeDataPoint> > pointTree_;
+        mutable autoPtr<indexedOctree<treeDataPoint>> pointTree_;
 
         //- Search tree for all edges
-        mutable autoPtr<indexedOctree<treeDataEdge> > edgeTree_;
+        mutable autoPtr<indexedOctree<treeDataEdge>> edgeTree_;
 
         //- Individual search trees for each type of edge
-        mutable PtrList<indexedOctree<treeDataEdge> > edgeTreesByType_;
+        mutable PtrList<indexedOctree<treeDataEdge>> edgeTreesByType_;
 
 
     // Private Member Functions
@@ -479,7 +482,7 @@ public:
             const indexedOctree<treeDataEdge>& edgeTree() const;
 
             //- Demand driven construction of octree for boundary edges by type
-            const PtrList<indexedOctree<treeDataEdge> >&
+            const PtrList<indexedOctree<treeDataEdge>>&
             edgeTreesByType() const;
 
 
@@ -540,6 +543,10 @@ public:
 };
 
 
+Istream& operator>>(Istream& is, extendedEdgeMesh::sideVolumeType& vt);
+Ostream& operator<<(Ostream& os, const extendedEdgeMesh::sideVolumeType& vt);
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
@@ -549,7 +556,7 @@ public:
 #include "extendedEdgeMeshI.H"
 
 #ifdef NoRepository
-#   include "extendedEdgeMeshTemplates.C"
+    #include "extendedEdgeMeshTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

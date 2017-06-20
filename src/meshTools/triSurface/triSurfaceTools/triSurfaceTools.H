@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -75,15 +75,15 @@ class triSurfaceTools
             static void calcRefineStatus
             (
                 const triSurface& surf,
-                const label faceI,
+                const label facei,
                 List<refineType>& refine
             );
             static void greenRefine
             (
                 const triSurface& surf,
-                const label faceI,
+                const label facei,
                 const label edgeI,
-                const label newPointI,
+                const label newPointi,
                 DynamicList<labelledTri>& newFaces
             );
             static triSurface doRefine
@@ -139,11 +139,11 @@ class triSurfaceTools
                 const triSurface& surf,
                 const label edgeI,
                 const labelHashSet& collapsedFaces,
-                HashTable<label, label, Hash<label> >& edgeToEdge,
-                HashTable<label, label, Hash<label> >& edgeToFace
+                HashTable<label, label, Hash<label>>& edgeToEdge,
+                HashTable<label, label, Hash<label>>& edgeToFace
             );
 
-            //- Calculates (cos of) angle across edgeI of faceI,
+            //- Calculates (cos of) angle across edgeI of facei,
             //  taking into account updated addressing (resulting from edge
             //  collapse)
             static scalar edgeCosAngle
@@ -152,9 +152,9 @@ class triSurfaceTools
                 const label v1,
                 const point& pt,
                 const labelHashSet& collapsedFaces,
-                const HashTable<label, label, Hash<label> >& edgeToEdge,
-                const HashTable<label, label, Hash<label> >& edgeToFace,
-                const label faceI,
+                const HashTable<label, label, Hash<label>>& edgeToEdge,
+                const HashTable<label, label, Hash<label>>& edgeToFace,
+                const label facei,
                 const label edgeI
             );
 
@@ -168,8 +168,8 @@ class triSurfaceTools
                 const label v1,
                 const point& pt,
                 const labelHashSet& collapsedFaces,
-                const HashTable<label, label, Hash<label> >& edgeToEdge,
-                const HashTable<label, label, Hash<label> >& edgeToFace
+                const HashTable<label, label, Hash<label>>& edgeToEdge,
+                const HashTable<label, label, Hash<label>>& edgeToFace
             );
 
             //- Like collapseMinCosAngle but return true for value < minCos
@@ -179,8 +179,8 @@ class triSurfaceTools
                 const label v1,
                 const point& pt,
                 const labelHashSet& collapsedFaces,
-                const HashTable<label, label, Hash<label> >& edgeToEdge,
-                const HashTable<label, label, Hash<label> >& edgeToFace,
+                const HashTable<label, label, Hash<label>>& edgeToEdge,
+                const HashTable<label, label, Hash<label>>& edgeToFace,
                 const scalar minCos
             );
 
@@ -190,7 +190,7 @@ class triSurfaceTools
             //(
             //    const triSurface& surf,
             //    const label edgeI,
-            //    const HashTable<bool, label, Hash<label> >& collapsedFaces
+            //    const HashTable<bool, label, Hash<label>>& collapsedFaces
             //);
 
         // Tracking
@@ -205,7 +205,7 @@ class triSurfaceTools
                 const triSurface& s,
                 const label triI,
                 const label excludeEdgeI,
-                const label excludePointI,
+                const label excludePointi,
                 const point& triPoint,
                 const plane& cutPlane,
                 const point& toPoint
@@ -234,7 +234,7 @@ class triSurfaceTools
                 const labelList& eFaces,
                 const surfaceLocation& start,
                 const label excludeEdgeI,
-                const label excludePointI,
+                const label excludePointi,
                 const surfaceLocation& end,
                 const plane& cutPlane
             );
@@ -287,30 +287,30 @@ public:
         //    label& vB
         //);
 
-        //- Get face connected to edge not faceI
+        //- Get face connected to edge not facei
         static label otherFace
         (
             const triSurface& surf,
-            const label faceI,
+            const label facei,
             const label edgeI
         );
 
-        //- Get the two edges on faceI counterclockwise after edgeI
+        //- Get the two edges on facei counterclockwise after edgeI
         static void otherEdges
         (
             const triSurface& surf,
-            const label faceI,
+            const label facei,
             const label edgeI,
             label& e1,
             label& e2
         );
 
-        //- Get the two vertices (local numbering) on faceI counterclockwise
+        //- Get the two vertices (local numbering) on facei counterclockwise
         //  vertI
         static void otherVertices
         (
             const triSurface& surf,
-            const label faceI,
+            const label facei,
             const label vertI,
             label& vert1I,
             label& vert2I
@@ -320,7 +320,7 @@ public:
         static label oppositeEdge
         (
             const triSurface& surf,
-            const label faceI,
+            const label facei,
             const label vertI
         );
 
@@ -328,7 +328,7 @@ public:
         static label oppositeVertex
         (
             const triSurface& surf,
-            const label faceI,
+            const label facei,
             const label edgeI
         );
 
@@ -429,7 +429,7 @@ public:
         static vector surfaceNormal
         (
             const triSurface& surf,
-            const label nearestFaceI,
+            const label nearestFacei,
             const point& nearestPt
         );
 
@@ -458,7 +458,7 @@ public:
         (
             const triSurface& surf,
             const point& sample,
-            const label nearestFaceI
+            const label nearestFacei
         );
 
     // Triangulation of faces
@@ -507,8 +507,8 @@ public:
         (
             const triSurface& s,
             const pointField& samplePts,
-            List<FixedList<label, 3> >& verts,
-            List<FixedList<scalar, 3> >& weights
+            List<FixedList<label, 3>>& verts,
+            List<FixedList<scalar, 3>>& weights
         );
 
         //- Do unconstrained Delaunay of points. Returns triSurface with 3D

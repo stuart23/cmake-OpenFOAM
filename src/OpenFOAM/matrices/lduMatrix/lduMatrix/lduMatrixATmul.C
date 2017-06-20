@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -184,12 +184,12 @@ void Foam::lduMatrix::sumA
 
     // Add the interface internal coefficients to diagonal
     // and the interface boundary coefficients to the sum-off-diagonal
-    forAll(interfaces, patchI)
+    forAll(interfaces, patchi)
     {
-        if (interfaces.set(patchI))
+        if (interfaces.set(patchi))
         {
-            const labelUList& pa = lduAddr().patchAddr(patchI);
-            const scalarField& pCoeffs = interfaceBouCoeffs[patchI];
+            const labelUList& pa = lduAddr().patchAddr(patchi);
+            const scalarField& pCoeffs = interfaceBouCoeffs[patchi];
 
             forAll(pa, face)
             {
@@ -290,7 +290,7 @@ Foam::tmp<Foam::scalarField> Foam::lduMatrix::residual
 ) const
 {
     tmp<scalarField> trA(new scalarField(psi.size()));
-    residual(trA(), psi, source, interfaceBouCoeffs, interfaces, cmpt);
+    residual(trA.ref(), psi, source, interfaceBouCoeffs, interfaces, cmpt);
     return trA;
 }
 
@@ -304,7 +304,7 @@ Foam::tmp<Foam::scalarField > Foam::lduMatrix::H1() const
 
     if (lowerPtr_ || upperPtr_)
     {
-        scalarField& H1_ = tH1();
+        scalarField& H1_ = tH1.ref();
 
         scalar* __restrict__ H1Ptr = H1_.begin();
 

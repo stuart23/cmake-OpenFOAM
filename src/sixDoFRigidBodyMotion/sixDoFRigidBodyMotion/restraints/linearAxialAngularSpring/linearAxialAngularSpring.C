@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -120,13 +120,13 @@ Foam::sixDoFRigidBodyMotionRestraints::linearAxialAngularSpring::restrain
     }
     else
     {
-        a = vector::zero;
+        a = Zero;
     }
 
     // Damping of along axis angular velocity only
     restraintMoment = -stiffness_*theta*a - damping_*(motion.omega() & a)*a;
 
-    restraintForce = vector::zero;
+    restraintForce = Zero;
 
     // Not needed to be altered as restraintForce is zero, but set to
     // centreOfRotation to be sure of no spurious moment
@@ -152,14 +152,7 @@ bool Foam::sixDoFRigidBodyMotionRestraints::linearAxialAngularSpring::read
 
     if (mag(mag(refQ_) - sqrt(3.0)) > 1e-9)
     {
-        FatalErrorIn
-        (
-            "Foam::sixDoFRigidBodyMotionRestraints::linearAxialAngularSpring::"
-            "read"
-            "("
-                "const dictionary& sDoFRBMRDict"
-            ")"
-        )
+        FatalErrorInFunction
             << "referenceOrientation " << refQ_ << " is not a rotation tensor. "
             << "mag(referenceOrientation) - sqrt(3) = "
             << mag(refQ_) - sqrt(3.0) << nl
@@ -176,14 +169,7 @@ bool Foam::sixDoFRigidBodyMotionRestraints::linearAxialAngularSpring::read
     }
     else
     {
-        FatalErrorIn
-        (
-            "Foam::sixDoFRigidBodyMotionRestraints::linearAxialAngularSpring::"
-            "read"
-            "("
-                "const dictionary& sDoFRBMCDict"
-            ")"
-        )
+        FatalErrorInFunction
             << "axis has zero length"
             << abort(FatalError);
     }

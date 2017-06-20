@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -46,20 +46,15 @@ calcPointEdges() const
 {
     if (debug)
     {
-        Info<< "PrimitivePatch<Face, FaceList, PointField, PointType>::"
-            << "calcPointEdges() : calculating pointEdges"
-            << endl;
+        InfoInFunction << "Calculating pointEdges" << endl;
     }
 
     if (pointEdgesPtr_)
     {
         // it is considered an error to attempt to recalculate
         // if already allocated
-        FatalErrorIn
-        (
-            "PrimitivePatch<Face, FaceList, PointField, PointType>::"
-            "calcPointEdges()"
-        )   << "pointEdges already calculated"
+        FatalErrorInFunction
+            << "pointEdges already calculated"
             << abort(FatalError);
     }
 
@@ -71,9 +66,7 @@ calcPointEdges() const
 
     if (debug)
     {
-        Info<< "PrimitivePatch<Face, FaceList, PointField, PointType>::"
-            << "calcPointEdges() finished calculating pointEdges"
-            << endl;
+        Info<< "    Finished." << endl;
     }
 }
 
@@ -91,35 +84,30 @@ calcPointFaces() const
 {
     if (debug)
     {
-        Info<< "PrimitivePatch<Face, FaceList, PointField, PointType>::"
-            << "calcPointFaces() : calculating pointFaces"
-            << endl;
+        InfoInFunction << "Calculating pointFaces" << endl;
     }
 
     if (pointFacesPtr_)
     {
         // it is considered an error to attempt to recalculate
         // if already allocated
-        FatalErrorIn
-        (
-            "PrimitivePatch<Face, FaceList, PointField, PointType>::"
-            "calcPointFaces()"
-        )   << "pointFaces already calculated"
+        FatalErrorInFunction
+            << "pointFaces already calculated"
             << abort(FatalError);
     }
 
     const List<Face>& f = localFaces();
 
     // set up storage for pointFaces
-    List<SLList<label> > pointFcs(meshPoints().size());
+    List<SLList<label>> pointFcs(meshPoints().size());
 
-    forAll(f, faceI)
+    forAll(f, facei)
     {
-        const Face& curPoints = f[faceI];
+        const Face& curPoints = f[facei];
 
-        forAll(curPoints, pointI)
+        forAll(curPoints, pointi)
         {
-            pointFcs[curPoints[pointI]].append(faceI);
+            pointFcs[curPoints[pointi]].append(facei);
         }
     }
 
@@ -128,22 +116,20 @@ calcPointFaces() const
 
     labelListList& pf = *pointFacesPtr_;
 
-    forAll(pointFcs, pointI)
+    forAll(pointFcs, pointi)
     {
-        pf[pointI].setSize(pointFcs[pointI].size());
+        pf[pointi].setSize(pointFcs[pointi].size());
 
         label i = 0;
-        forAllIter(SLList<label>, pointFcs[pointI], curFacesIter)
+        forAllIter(SLList<label>, pointFcs[pointi], curFacesIter)
         {
-            pf[pointI][i++] = curFacesIter();
+            pf[pointi][i++] = curFacesIter();
         }
     }
 
     if (debug)
     {
-        Info<< "PrimitivePatch<Face, FaceList, PointField, PointType>::"
-            << "calcPointFaces() finished calculating pointFaces"
-            << endl;
+        Info<< "    Finished." << endl;
     }
 }
 

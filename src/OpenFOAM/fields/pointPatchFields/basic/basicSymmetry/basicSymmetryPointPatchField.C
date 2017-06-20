@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -87,7 +87,7 @@ void Foam::basicSymmetryPointPatchField<Type>::evaluate
 {
     const vectorField& nHat = this->patch().pointNormals();
 
-    tmp<Field<Type> > tvalues =
+    tmp<Field<Type>> tvalues =
     (
         (
             this->patchInternalField()
@@ -96,7 +96,7 @@ void Foam::basicSymmetryPointPatchField<Type>::evaluate
     );
 
     // Get internal field to insert values into
-    Field<Type>& iF = const_cast<Field<Type>&>(this->internalField());
+    Field<Type>& iF = const_cast<Field<Type>&>(this->primitiveField());
 
     this->setInInternalField(iF, tvalues());
 }

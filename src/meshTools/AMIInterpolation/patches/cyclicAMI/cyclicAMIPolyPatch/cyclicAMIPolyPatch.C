@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -52,18 +52,18 @@ Foam::vector Foam::cyclicAMIPolyPatch::findFaceNormalMaxRadius
 
     const scalarField magRadSqr(magSqr(n));
 
-    label faceI = findMax(magRadSqr);
+    label facei = findMax(magRadSqr);
 
     if (debug)
     {
         Info<< "findFaceMaxRadius(const pointField&) : patch: " << name() << nl
-            << "    rotFace  = " << faceI << nl
-            << "    point    = " << faceCentres[faceI] << nl
-            << "    distance = " << Foam::sqrt(magRadSqr[faceI])
+            << "    rotFace  = " << facei << nl
+            << "    point    = " << faceCentres[facei] << nl
+            << "    distance = " << Foam::sqrt(magRadSqr[facei])
             << endl;
     }
 
-    return n[faceI];
+    return n[facei];
 }
 
 
@@ -116,7 +116,7 @@ void Foam::cyclicAMIPolyPatch::calcTransforms
 {
     if (transform() != neighbPatch().transform())
     {
-        FatalErrorIn("cyclicAMIPolyPatch::calcTransforms()")
+        FatalErrorInFunction
             << "Patch " << name()
             << " has transform type " << transformTypeNames[transform()]
             << ", neighbour patch " << neighbPatchName()
@@ -132,7 +132,7 @@ void Foam::cyclicAMIPolyPatch::calcTransforms
     {
         case ROTATIONAL:
         {
-            tensor revT = tensor::zero;
+            tensor revT = Zero;
 
             if (rotationAngleDefined_)
             {
@@ -188,17 +188,8 @@ void Foam::cyclicAMIPolyPatch::calcTransforms
 
                 if (areaError > matchTolerance())
                 {
-                    WarningIn
-                    (
-                        "void Foam::cyclicAMIPolyPatch::calcTransforms"
-                        "("
-                            "const primitivePatch&, "
-                            "const pointField&, "
-                            "const vectorField&, "
-                            "const pointField&, "
-                            "const vectorField&"
-                        ")"
-                    )   << "Patch areas are not consistent within "
+                    WarningInFunction
+                        << "Patch areas are not consistent within "
                         << 100*matchTolerance()
                         << " % indicating a possible error in the specified "
                         << "angle of rotation" << nl
@@ -226,8 +217,8 @@ void Foam::cyclicAMIPolyPatch::calcTransforms
             }
             else
             {
-                point n0 = vector::zero;
-                point n1 = vector::zero;
+                point n0 = Zero;
+                point n1 = Zero;
                 if (half0Ctrs.size())
                 {
                     n0 = findFaceNormalMaxRadius(half0Ctrs);
@@ -494,11 +485,11 @@ Foam::cyclicAMIPolyPatch::cyclicAMIPolyPatch
     coupledPolyPatch(name, size, start, index, bm, patchType, transform),
     nbrPatchName_(word::null),
     nbrPatchID_(-1),
-    rotationAxis_(vector::zero),
+    rotationAxis_(Zero),
     rotationCentre_(point::zero),
     rotationAngleDefined_(false),
     rotationAngle_(0.0),
-    separationVector_(vector::zero),
+    separationVector_(Zero),
     AMIPtr_(NULL),
     AMIReverse_(false),
     AMIRequireMatch_(true),
@@ -524,11 +515,11 @@ Foam::cyclicAMIPolyPatch::cyclicAMIPolyPatch
     nbrPatchName_(dict.lookupOrDefault<word>("neighbourPatch", "")),
     coupleGroup_(dict),
     nbrPatchID_(-1),
-    rotationAxis_(vector::zero),
+    rotationAxis_(Zero),
     rotationCentre_(point::zero),
     rotationAngleDefined_(false),
     rotationAngle_(0.0),
-    separationVector_(vector::zero),
+    separationVector_(Zero),
     AMIPtr_(NULL),
     AMIReverse_(dict.lookupOrDefault<bool>("flipNormals", false)),
     AMIRequireMatch_(true),
@@ -538,15 +529,8 @@ Foam::cyclicAMIPolyPatch::cyclicAMIPolyPatch
 {
     if (nbrPatchName_ == word::null && !coupleGroup_.valid())
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "cyclicAMIPolyPatch::cyclicAMIPolyPatch"
-            "("
-                "const word&, "
-                "const dictionary&, "
-                "const label, "
-                "const polyBoundaryMesh&"
-            ")",
             dict
         )   << "No \"neighbourPatch\" or \"coupleGroup\" provided."
             << exit(FatalIOError);
@@ -554,15 +538,8 @@ Foam::cyclicAMIPolyPatch::cyclicAMIPolyPatch
 
     if (nbrPatchName_ == name)
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "cyclicAMIPolyPatch::cyclicAMIPolyPatch"
-            "("
-                "const word&, "
-                "const dictionary&, "
-                "const label, "
-                "const polyBoundaryMesh&"
-            ")",
             dict
         )   << "Neighbour patch name " << nbrPatchName_
             << " cannot be the same as this patch " << name
@@ -590,15 +567,8 @@ Foam::cyclicAMIPolyPatch::cyclicAMIPolyPatch
             scalar magRot = mag(rotationAxis_);
             if (magRot < SMALL)
             {
-                FatalIOErrorIn
+                FatalIOErrorInFunction
                 (
-                    "cyclicAMIPolyPatch::cyclicAMIPolyPatch"
-                    "("
-                        "const word&, "
-                        "const dictionary&, "
-                        "const label, "
-                        "const polyBoundaryMesh&"
-                    ")",
                     dict
                 )   << "Illegal rotationAxis " << rotationAxis_ << endl
                     << "Please supply a non-zero vector."
@@ -679,15 +649,8 @@ Foam::cyclicAMIPolyPatch::cyclicAMIPolyPatch
 {
     if (nbrPatchName_ == name())
     {
-        FatalErrorIn
-        (
-            "const cyclicAMIPolyPatch& "
-            "const polyBoundaryMesh&, "
-            "const label, "
-            "const label, "
-            "const label, "
-            "const word&"
-        )   << "Neighbour patch name " << nbrPatchName_
+        FatalErrorInFunction
+            << "Neighbour patch name " << nbrPatchName_
             << " cannot be the same as this patch " << name()
             << exit(FatalError);
     }
@@ -740,7 +703,7 @@ Foam::label Foam::cyclicAMIPolyPatch::neighbPatchID() const
 
         if (nbrPatchID_ == -1)
         {
-            FatalErrorIn("cyclicPolyAMIPatch::neighbPatchID() const")
+            FatalErrorInFunction
                 << "Illegal neighbourPatch name " << neighbPatchName()
                 << nl << "Valid patch names are "
                 << this->boundaryMesh().names()
@@ -756,7 +719,7 @@ Foam::label Foam::cyclicAMIPolyPatch::neighbPatchID() const
 
         if (nbrPatch.neighbPatchName() != name())
         {
-            WarningIn("cyclicAMIPolyPatch::neighbPatchID() const")
+            WarningInFunction
                 << "Patch " << name()
                 << " specifies neighbour patch " << neighbPatchName()
                 << nl << " but that in return specifies "
@@ -817,10 +780,7 @@ const Foam::AMIPatchToPatchInterpolation& Foam::cyclicAMIPolyPatch::AMI() const
 {
     if (!owner())
     {
-        FatalErrorIn
-        (
-            "const AMIPatchToPatchInterpolation& cyclicAMIPolyPatch::AMI()"
-        )
+        FatalErrorInFunction
             << "AMI interpolator only available to owner patch"
             << abort(FatalError);
     }
@@ -885,7 +845,7 @@ void Foam::cyclicAMIPolyPatch::transformPosition(pointField& l) const
 void Foam::cyclicAMIPolyPatch::transformPosition
 (
     point& l,
-    const label faceI
+    const label facei
 ) const
 {
     if (!parallel())
@@ -894,7 +854,7 @@ void Foam::cyclicAMIPolyPatch::transformPosition
         (
             forwardT().size() == 1
           ? forwardT()[0]
-          : forwardT()[faceI]
+          : forwardT()[facei]
         );
 
         if (transform() == ROTATIONAL)
@@ -912,7 +872,7 @@ void Foam::cyclicAMIPolyPatch::transformPosition
         (
             separation().size() == 1
           ? separation()[0]
-          : separation()[faceI]
+          : separation()[facei]
         );
 
         l -= s;
@@ -923,7 +883,7 @@ void Foam::cyclicAMIPolyPatch::transformPosition
 void Foam::cyclicAMIPolyPatch::reverseTransformPosition
 (
     point& l,
-    const label faceI
+    const label facei
 ) const
 {
     if (!parallel())
@@ -932,7 +892,7 @@ void Foam::cyclicAMIPolyPatch::reverseTransformPosition
         (
             reverseT().size() == 1
           ? reverseT()[0]
-          : reverseT()[faceI]
+          : reverseT()[facei]
         );
 
         if (transform() == ROTATIONAL)
@@ -950,7 +910,7 @@ void Foam::cyclicAMIPolyPatch::reverseTransformPosition
         (
             separation().size() == 1
           ? separation()[0]
-          : separation()[faceI]
+          : separation()[facei]
         );
 
         l += s;
@@ -961,7 +921,7 @@ void Foam::cyclicAMIPolyPatch::reverseTransformPosition
 void Foam::cyclicAMIPolyPatch::reverseTransformDirection
 (
     vector& d,
-    const label faceI
+    const label facei
 ) const
 {
     if (!parallel())
@@ -970,7 +930,7 @@ void Foam::cyclicAMIPolyPatch::reverseTransformDirection
         (
             reverseT().size() == 1
           ? reverseT()[0]
-          : reverseT()[faceI]
+          : reverseT()[facei]
         );
 
         d = Foam::transform(T, d);
@@ -1028,48 +988,48 @@ bool Foam::cyclicAMIPolyPatch::order
 
 Foam::label Foam::cyclicAMIPolyPatch::pointFace
 (
-    const label faceI,
+    const label facei,
     const vector& n,
     point& p
 ) const
 {
     point prt(p);
-    reverseTransformPosition(prt, faceI);
+    reverseTransformPosition(prt, facei);
 
     vector nrt(n);
-    reverseTransformDirection(nrt, faceI);
+    reverseTransformDirection(nrt, facei);
 
-    label nbrFaceI = -1;
+    label nbrFacei = -1;
 
     if (owner())
     {
-        nbrFaceI = AMI().tgtPointFace
+        nbrFacei = AMI().tgtPointFace
         (
             *this,
             neighbPatch(),
             nrt,
-            faceI,
+            facei,
             prt
         );
     }
     else
     {
-        nbrFaceI = neighbPatch().AMI().srcPointFace
+        nbrFacei = neighbPatch().AMI().srcPointFace
         (
             neighbPatch(),
             *this,
             nrt,
-            faceI,
+            facei,
             prt
         );
     }
 
-    if (nbrFaceI >= 0)
+    if (nbrFacei >= 0)
     {
         p = prt;
     }
 
-    return nbrFaceI;
+    return nbrFacei;
 }
 
 

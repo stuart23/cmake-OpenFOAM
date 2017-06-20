@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -68,8 +68,8 @@ private:
             virtual void setNextFaces
             (
                 label& startSeedI,
-                label& srcFaceI,
-                label& tgtFaceI,
+                label& srcFacei,
+                label& tgtFacei,
                 const boolList& mapFlag,
                 labelList& seedFaces,
                 const DynamicList<label>& visitedFaces,
@@ -119,8 +119,8 @@ public:
                 scalarListList& srcWeights,
                 labelListList& tgtAddress,
                 scalarListList& tgtWeights,
-                label srcFaceI = -1,
-                label tgtFaceI = -1
+                label srcFacei = -1,
+                label tgtFacei = -1
             );
 };
 
@@ -132,7 +132,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "partialFaceAreaWeightAMI.C"
+    #include "partialFaceAreaWeightAMI.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

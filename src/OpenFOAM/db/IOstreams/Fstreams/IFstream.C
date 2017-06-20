@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -31,7 +31,7 @@ License
 
 namespace Foam
 {
-defineTypeNameAndDebug(IFstream, 0);
+    defineTypeNameAndDebug(IFstream, 0);
 }
 
 
@@ -46,8 +46,7 @@ Foam::IFstreamAllocator::IFstreamAllocator(const fileName& pathname)
     {
         if (IFstream::debug)
         {
-            Info<< "IFstreamAllocator::IFstreamAllocator(const fileName&) : "
-                    "cannot open null file " << endl;
+            InfoInFunction << "Cannot open null file " << endl;
         }
     }
 
@@ -58,8 +57,7 @@ Foam::IFstreamAllocator::IFstreamAllocator(const fileName& pathname)
     {
         if (IFstream::debug)
         {
-            Info<< "IFstreamAllocator::IFstreamAllocator(const fileName&) : "
-                    "decompressing " << pathname + ".gz" << endl;
+            InfoInFunction << "Decompressing " << pathname + ".gz" << endl;
         }
 
         delete ifPtr_;
@@ -108,11 +106,8 @@ Foam::IFstream::IFstream
     {
         if (debug)
         {
-            Info<< "IFstream::IFstream(const fileName&,"
-                   "streamFormat=ASCII,"
-                   "versionNumber=currentVersion) : "
-                   "could not open file for input"
-                << endl << info() << endl;
+            InfoInFunction
+                << "Could not open file for input" << endl << info() << endl;
         }
 
         setBad();
@@ -138,7 +133,7 @@ std::istream& Foam::IFstream::stdStream()
 {
     if (!ifPtr_)
     {
-        FatalErrorIn("IFstream::stdStream()")
+        FatalErrorInFunction
             << "No stream allocated" << abort(FatalError);
     }
     return *ifPtr_;
@@ -149,7 +144,7 @@ const std::istream& Foam::IFstream::stdStream() const
 {
     if (!ifPtr_)
     {
-        FatalErrorIn("IFstream::stdStream() const")
+        FatalErrorInFunction
             << "No stream allocated" << abort(FatalError);
     }
     return *ifPtr_;
@@ -178,7 +173,7 @@ Foam::IFstream& Foam::IFstream::operator()() const
         }
         else
         {
-            FatalIOErrorIn("IFstream::operator()", *this)
+            FatalIOErrorInFunction(*this)
                 << "file " << pathname_ << " does not exist"
                 << exit(FatalIOError);
         }

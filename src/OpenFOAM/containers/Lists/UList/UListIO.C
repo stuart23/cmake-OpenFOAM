@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -152,7 +152,7 @@ Foam::Istream& Foam::operator>>(Istream& is, UList<T>& L)
         List<T> elems;
         elems.transfer
         (
-            dynamicCast<token::Compound<List<T> > >
+            dynamicCast<token::Compound<List<T>>>
             (
                 firstToken.transferCompoundToken(is)
             )
@@ -162,7 +162,7 @@ Foam::Istream& Foam::operator>>(Istream& is, UList<T>& L)
 
         if (s != L.size())
         {
-            FatalIOErrorIn("operator>>(Istream&, UList<T>&)", is)
+            FatalIOErrorInFunction(is)
                 << "incorrect length for UList. Read " << s
                 << " expected " << L.size()
                 << exit(FatalIOError);
@@ -179,7 +179,7 @@ Foam::Istream& Foam::operator>>(Istream& is, UList<T>& L)
         // Set list length to that read
         if (s != L.size())
         {
-            FatalIOErrorIn("operator>>(Istream&, UList<T>&)", is)
+            FatalIOErrorInFunction(is)
                 << "incorrect length for UList. Read " << s
                 << " expected " << L.size()
                 << exit(FatalIOError);
@@ -244,7 +244,7 @@ Foam::Istream& Foam::operator>>(Istream& is, UList<T>& L)
     {
         if (firstToken.pToken() != token::BEGIN_LIST)
         {
-            FatalIOErrorIn("operator>>(Istream&, UList<T>&)", is)
+            FatalIOErrorInFunction(is)
                 << "incorrect first token, expected '(', found "
                 << firstToken.info()
                 << exit(FatalIOError);
@@ -258,7 +258,7 @@ Foam::Istream& Foam::operator>>(Istream& is, UList<T>& L)
 
         if (sll.size() != L.size())
         {
-            FatalIOErrorIn("operator>>(Istream&, UList<T>&)", is)
+            FatalIOErrorInFunction(is)
                 << "incorrect length for UList. Read " << sll.size()
                 << " expected " << L.size()
                 << exit(FatalIOError);
@@ -279,7 +279,7 @@ Foam::Istream& Foam::operator>>(Istream& is, UList<T>& L)
     }
     else
     {
-        FatalIOErrorIn("operator>>(Istream&, UList<T>&)", is)
+        FatalIOErrorInFunction(is)
             << "incorrect first token, expected <int> or '(', found "
             << firstToken.info()
             << exit(FatalIOError);

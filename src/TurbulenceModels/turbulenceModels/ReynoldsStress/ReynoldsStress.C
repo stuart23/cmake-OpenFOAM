@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -63,13 +63,15 @@ void Foam::ReynoldsStress<BasicTurbulenceModel>::correctWallShearStress
 {
     const fvPatchList& patches = this->mesh_.boundary();
 
+    volSymmTensorField::Boundary& RBf = R.boundaryFieldRef();
+
     forAll(patches, patchi)
     {
         const fvPatch& curPatch = patches[patchi];
 
         if (isA<wallFvPatch>(curPatch))
         {
-            symmTensorField& Rw = R.boundaryField()[patchi];
+            symmTensorField& Rw = RBf[patchi];
 
             const scalarField& nutw = this->nut_.boundaryField()[patchi];
 
@@ -168,10 +170,8 @@ Foam::ReynoldsStress<BasicTurbulenceModel>::ReynoldsStress
 {
     if (couplingFactor_.value() < 0.0 || couplingFactor_.value() > 1.0)
     {
-        FatalErrorIn
-        (
-            "ReynoldsStress::ReynoldsStress"
-        )   << "couplingFactor = " << couplingFactor_
+        FatalErrorInFunction
+            << "couplingFactor = " << couplingFactor_
             << " is not in range 0 - 1" << nl
             << exit(FatalError);
     }
@@ -200,7 +200,7 @@ Foam::tmp<Foam::volScalarField>
 Foam::ReynoldsStress<BasicTurbulenceModel>::k() const
 {
     tmp<Foam::volScalarField> tk(0.5*tr(R_));
-    tk().rename("k");
+    tk.ref().rename("k");
     return tk;
 }
 
@@ -240,43 +240,43 @@ Foam::ReynoldsStress<BasicTurbulenceModel>::divDevRhoReff
     {
         return
         (
-            fvc::div
+            fvc::laplacian
+            (
+                (1.0 - couplingFactor_)*this->alpha_*this->rho_*this->nut(),
+                U,
+                "laplacian(nuEff,U)"
+            )
+          + fvc::div
             (
                 this->alpha_*this->rho_*R_
               + couplingFactor_
                *this->alpha_*this->rho_*this->nut()*fvc::grad(U),
                 "div(devRhoReff)"
             )
-          + fvc::laplacian
-            (
-                (1.0 - couplingFactor_)*this->alpha_*this->rho_*this->nut(),
-                U,
-                "laplacian(nuEff,U)"
-            )
-          - fvm::laplacian(this->alpha_*this->rho_*this->nuEff(), U)
           - fvc::div(this->alpha_*this->rho_*this->nu()*dev2(T(fvc::grad(U))))
+          - fvm::laplacian(this->alpha_*this->rho_*this->nuEff(), U)
         );
     }
     else
     {
         return
         (
-            fvc::div(this->alpha_*this->rho_*R_)
-          + fvc::laplacian
+            fvc::laplacian
             (
                 this->alpha_*this->rho_*this->nut(),
                 U,
                 "laplacian(nuEff,U)"
             )
-          - fvm::laplacian(this->alpha_*this->rho_*this->nuEff(), U)
+          + fvc::div(this->alpha_*this->rho_*R_)
           - fvc::div(this->alpha_*this->rho_*this->nu()*dev2(T(fvc::grad(U))))
+          - fvm::laplacian(this->alpha_*this->rho_*this->nuEff(), U)
         );
     }
 
     return
     (
-      - fvm::laplacian(this->alpha_*this->rho_*this->nuEff(), U)
       - fvc::div((this->alpha_*this->rho_*this->nuEff())*dev2(T(fvc::grad(U))))
+      - fvm::laplacian(this->alpha_*this->rho_*this->nuEff(), U)
     );
 }
 
@@ -291,9 +291,16 @@ Foam::ReynoldsStress<BasicTurbulenceModel>::divDevRhoReff
 {
     return
     (
-      - fvm::laplacian(this->alpha_*rho*this->nuEff(), U)
       - fvc::div((this->alpha_*rho*this->nuEff())*dev2(T(fvc::grad(U))))
+      - fvm::laplacian(this->alpha_*rho*this->nuEff(), U)
     );
+}
+
+
+template<class BasicTurbulenceModel>
+void Foam::ReynoldsStress<BasicTurbulenceModel>::validate()
+{
+    correctNut();
 }
 
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -61,7 +61,7 @@ inline Foam::pointEdgeStructuredWalk::pointEdgeStructuredWalk()
     point0_(vector::max),
     previousPoint_(vector::max),
     dist_(0),
-    data_(vector::zero)
+    data_(Zero)
 {}
 
 
@@ -147,7 +147,7 @@ template<class TrackingData>
 inline void Foam::pointEdgeStructuredWalk::leaveDomain
 (
     const polyPatch& patch,
-    const label patchPointI,
+    const label patchPointi,
     const point& coord,
     TrackingData& td
 )
@@ -173,7 +173,7 @@ template<class TrackingData>
 inline void Foam::pointEdgeStructuredWalk::enterDomain
 (
     const polyPatch& patch,
-    const label patchPointI,
+    const label patchPointi,
     const point& coord,
     TrackingData& td
 )
@@ -188,7 +188,7 @@ template<class TrackingData>
 inline bool Foam::pointEdgeStructuredWalk::updatePoint
 (
     const polyMesh& mesh,
-    const label pointI,
+    const label pointi,
     const label edgeI,
     const pointEdgeStructuredWalk& edgeInfo,
     const scalar tol,
@@ -211,7 +211,7 @@ template<class TrackingData>
 inline bool Foam::pointEdgeStructuredWalk::updatePoint
 (
     const polyMesh& mesh,
-    const label pointI,
+    const label pointi,
     const pointEdgeStructuredWalk& newPointInfo,
     const scalar tol,
     TrackingData& td
@@ -247,7 +247,7 @@ inline bool Foam::pointEdgeStructuredWalk::updateEdge
 (
     const polyMesh& mesh,
     const label edgeI,
-    const label pointI,
+    const label pointi,
     const pointEdgeStructuredWalk& pointInfo,
     const scalar tol,
     TrackingData& td

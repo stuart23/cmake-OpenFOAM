@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -50,13 +50,11 @@ Foam::processorCyclicFvPatchField<Type>::processorCyclicFvPatchField
     const Field<Type>& f
 )
 :
-    //coupledFvPatchField<Type>(p, iF, f),
     processorFvPatchField<Type>(p, iF, f),
     procPatch_(refCast<const processorCyclicFvPatch>(p))
 {}
 
 
-// Construct by mapping given processorCyclicFvPatchField<Type>
 template<class Type>
 Foam::processorCyclicFvPatchField<Type>::processorCyclicFvPatchField
 (
@@ -66,26 +64,16 @@ Foam::processorCyclicFvPatchField<Type>::processorCyclicFvPatchField
     const fvPatchFieldMapper& mapper
 )
 :
-    //coupledFvPatchField<Type>(ptf, p, iF, mapper),
     processorFvPatchField<Type>(ptf, p, iF, mapper),
     procPatch_(refCast<const processorCyclicFvPatch>(p))
 {
     if (!isType<processorCyclicFvPatch>(this->patch()))
     {
-        FatalErrorIn
-        (
-            "processorCyclicFvPatchField<Type>::processorCyclicFvPatchField\n"
-            "(\n"
-            "    const processorCyclicFvPatchField<Type>& ptf,\n"
-            "    const fvPatch& p,\n"
-            "    const DimensionedField<Type, volMesh>& iF,\n"
-            "    const fvPatchFieldMapper& mapper\n"
-            ")\n"
-        )   << "\n    patch type '" << p.type()
+        FatalErrorInFunction
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
             << exit(FatalIOError);
     }
 }
@@ -99,40 +87,26 @@ Foam::processorCyclicFvPatchField<Type>::processorCyclicFvPatchField
     const dictionary& dict
 )
 :
-    //coupledFvPatchField<Type>(p, iF, dict),
     processorFvPatchField<Type>(p, iF, dict),
     procPatch_(refCast<const processorCyclicFvPatch>(p))
 {
     if (!isType<processorCyclicFvPatch>(p))
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "processorCyclicFvPatchField<Type>::processorCyclicFvPatchField\n"
-            "(\n"
-            "    const fvPatch& p,\n"
-            "    const Field<Type>& field,\n"
-            "    const dictionary& dict\n"
-            ")\n",
             dict
         )   << "\n    patch type '" << p.type()
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
             << exit(FatalIOError);
     }
 
     if (Pstream::defaultCommsType == Pstream::scheduled)
     {
-        WarningIn
-        (
-            "processorCyclicFvPatchField<Type>::processorCyclicFvPatchField\n"
-            "(\n"
-            "    const fvPatch& p,\n"
-            "    const DimensionedField<Type, volMesh>& iF,\n"
-            "    const dictionary& dict\n"
-            ")\n"
-        )   << "Scheduled communication with split cyclics not supported."
+        WarningInFunction
+            << "Scheduled communication with split cyclics not supported."
             << endl;
     }
 }
@@ -144,8 +118,6 @@ Foam::processorCyclicFvPatchField<Type>::processorCyclicFvPatchField
     const processorCyclicFvPatchField<Type>& ptf
 )
 :
-    //processorLduInterfaceField(),
-    //coupledFvPatchField<Type>(ptf),
     processorFvPatchField<Type>(ptf),
     procPatch_(refCast<const processorCyclicFvPatch>(ptf.patch()))
 {}
@@ -158,7 +130,6 @@ Foam::processorCyclicFvPatchField<Type>::processorCyclicFvPatchField
     const DimensionedField<Type, volMesh>& iF
 )
 :
-    //coupledFvPatchField<Type>(ptf, iF),
     processorFvPatchField<Type>(ptf, iF),
     procPatch_(refCast<const processorCyclicFvPatch>(ptf.patch()))
 {}

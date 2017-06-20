@@ -2,7 +2,7 @@
     PtrList<coordinateSystem> coordinates(solidRegions.size());
     PtrList<solidThermo> thermos(solidRegions.size());
     PtrList<radiation::radiationModel> radiations(solidRegions.size());
-    PtrList<fv::IOoptionList> solidHeatSources(solidRegions.size());
+    PtrList<fv::options> solidHeatSources(solidRegions.size());
     PtrList<volScalarField> betavSolid(solidRegions.size());
     PtrList<volSymmTensorField> aniAlphas(solidRegions.size());
 
@@ -22,7 +22,7 @@
         solidHeatSources.set
         (
             i,
-            new fv::IOoptionList(solidRegions[i])
+            new fv::options(solidRegions[i])
         );
 
         if (!thermos[i].isotropic())
@@ -55,13 +55,13 @@
                     (
                         "zero",
                         tkappaByCp().dimensions(),
-                        symmTensor::zero
+                        Zero
                     ),
                     zeroGradientFvPatchSymmTensorField::typeName
                 )
             );
 
-            aniAlphas[i].internalField() =
+            aniAlphas[i].primitiveFieldRef() =
                 coordinates[i].R().transformVector(tkappaByCp());
             aniAlphas[i].correctBoundaryConditions();
 

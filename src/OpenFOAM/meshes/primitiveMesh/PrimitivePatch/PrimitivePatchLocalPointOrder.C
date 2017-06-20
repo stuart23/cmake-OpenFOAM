@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -58,11 +58,8 @@ calcLocalPointOrder() const
     {
         // it is considered an error to attempt to recalculate
         // if already allocated
-        FatalErrorIn
-        (
-            "PrimitivePatch<Face, FaceList, PointField, PointType>::"
-            "calcLocalPointOrder()"
-        )   << "local point order already calculated"
+        FatalErrorInFunction
+            << "local point order already calculated"
             << abort(FatalError);
     }
 
@@ -80,11 +77,11 @@ calcLocalPointOrder() const
 
     label nPoints = 0;
 
-    forAll(lf, faceI)
+    forAll(lf, facei)
     {
-        if (!visitedFace[faceI])
+        if (!visitedFace[facei])
         {
-            SLList<label> faceOrder(faceI);
+            SLList<label> faceOrder(facei);
 
             do
             {
@@ -99,13 +96,13 @@ calcLocalPointOrder() const
                     const labelList& curPoints = lf[curFace];
 
                     // mark points
-                    forAll(curPoints, pointI)
+                    forAll(curPoints, pointi)
                     {
-                        if (!visitedPoint[curPoints[pointI]])
+                        if (!visitedPoint[curPoints[pointi]])
                         {
-                            visitedPoint[curPoints[pointI]] = true;
+                            visitedPoint[curPoints[pointi]] = true;
 
-                            pointOrder[nPoints] = curPoints[pointI];
+                            pointOrder[nPoints] = curPoints[pointi];
 
                             nPoints++;
                         }

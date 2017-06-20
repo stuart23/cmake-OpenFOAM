@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -96,7 +96,7 @@ class SpalartAllmarasIDDES
 
         // Disallow default bitwise copy construct and assignment
         SpalartAllmarasIDDES(const SpalartAllmarasIDDES&);
-        SpalartAllmarasIDDES& operator=(const SpalartAllmarasIDDES&);
+        void operator=(const SpalartAllmarasIDDES&);
 
 
 protected:
@@ -146,7 +146,7 @@ public:
 
     // Member Functions
 
-        //- Read LESProperties dictionary
+        //- Read model coefficients if they have changed
         virtual bool read();
 };
 
@@ -159,7 +159,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "SpalartAllmarasIDDES.C"
+    #include "SpalartAllmarasIDDES.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

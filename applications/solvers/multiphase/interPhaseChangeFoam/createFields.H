@@ -38,7 +38,6 @@ volScalarField& alpha2(mixture->alpha2());
 
 const dimensionedScalar& rho1 = mixture->rho1();
 const dimensionedScalar& rho2 = mixture->rho2();
-const dimensionedScalar& pSat = mixture->pSat();
 
 
 // Need to store rho for ddt(rho, U)
@@ -51,8 +50,7 @@ volScalarField rho
         mesh,
         IOobject::READ_IF_PRESENT
     ),
-    alpha1*rho1 + alpha2*rho2,
-    alpha1.boundaryField().types()
+    alpha1*rho1 + alpha2*rho2
 );
 rho.oldTime();
 

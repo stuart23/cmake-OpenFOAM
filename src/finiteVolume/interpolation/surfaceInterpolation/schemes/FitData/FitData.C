@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -55,7 +55,7 @@ Foam::FitData<Form, ExtendedStencil, Polynomial>::FitData
     // Check input
     if (linearLimitFactor <= SMALL || linearLimitFactor > 3)
     {
-        FatalErrorIn("FitData<Polynomial>::FitData(..)")
+        FatalErrorInFunction
             << "linearLimitFactor requested = " << linearLimitFactor
             << " should be between zero and 3"
             << exit(FatalError);
@@ -114,7 +114,7 @@ void Foam::FitData<FitDataType, ExtendedStencil, Polynomial>::findFaceDirs
 
         if (magk < SMALL)
         {
-            FatalErrorIn("findFaceDirs(..)") << " calculated kdir = zero"
+            FatalErrorInFunction
                 << exit(FatalError);
         }
         else
@@ -194,10 +194,10 @@ void Foam::FitData<FitDataType, ExtendedStencil, Polynomial>::calcFit
     }
 
     // Additional weighting for constant and linear terms
-    for (label i = 0; i < B.n(); i++)
+    for (label i = 0; i < B.m(); i++)
     {
-        B[i][0] *= wts[0];
-        B[i][1] *= wts[0];
+        B(i, 0) *= wts[0];
+        B(i, 1) *= wts[0];
     }
 
     // Set the fit
@@ -214,7 +214,7 @@ void Foam::FitData<FitDataType, ExtendedStencil, Polynomial>::calcFit
 
         for (label i=0; i<stencilSize; i++)
         {
-            coeffsi[i] = wts[0]*wts[i]*svd.VSinvUt()[0][i];
+            coeffsi[i] = wts[0]*wts[i]*svd.VSinvUt()(0, i);
             if (mag(coeffsi[i]) > maxCoeff)
             {
                 maxCoeff = mag(coeffsi[i]);
@@ -253,11 +253,8 @@ void Foam::FitData<FitDataType, ExtendedStencil, Polynomial>::calcFit
         {
             // if (iIt == 7)
             // {
-            //     WarningIn
-            //     (
-            //         "FitData<Polynomial>::calcFit"
-            //         "(const List<point>& C, const label facei"
-            //     )   << "Cannot fit face " << facei << " iteration " << iIt
+            //     WarningInFunction
+            //         << "Cannot fit face " << facei << " iteration " << iIt
             //         << " with sum of weights " << sum(coeffsi) << nl
             //         << "    Weights " << coeffsi << nl
             //         << "    Linear weights " << wLin << " " << 1 - wLin << nl
@@ -270,16 +267,16 @@ void Foam::FitData<FitDataType, ExtendedStencil, Polynomial>::calcFit
                 wts[1] *= 10;
             }
 
-            for (label j = 0; j < B.m(); j++)
+            for (label j = 0; j < B.n(); j++)
             {
-                B[0][j] *= 10;
-                B[1][j] *= 10;
+                B(0, j) *= 10;
+                B(1, j) *= 10;
             }
 
-            for (label i = 0; i < B.n(); i++)
+            for (label i = 0; i < B.m(); i++)
             {
-                B[i][0] *= 10;
-                B[i][1] *= 10;
+                B(i, 0) *= 10;
+                B(i, 1) *= 10;
             }
         }
     }
@@ -302,10 +299,8 @@ void Foam::FitData<FitDataType, ExtendedStencil, Polynomial>::calcFit
     {
         // if (debug)
         // {
-            WarningIn
-            (
-                "FitData<Polynomial>::calcFit(..)"
-            )   << "Could not fit face " << facei
+            WarningInFunction
+                << "Could not fit face " << facei
                 << "    Weights = " << coeffsi
                 << ", reverting to linear." << nl
                 << "    Linear weights " << wLin << " " << 1 - wLin << endl;

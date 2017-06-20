@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -171,7 +171,7 @@ protected:
                 regionModels::surfaceFilmModels::surfaceFilmModel& filmModel,
                 const parcelType& p,
                 const polyPatch& pp,
-                const label faceI,
+                const label facei,
                 const scalar mass,
                 bool& keepParticle
             );
@@ -181,7 +181,7 @@ protected:
             (
                 parcelType& p,
                 const polyPatch& pp,
-                const label faceI,
+                const label facei,
                 bool& keepParticle
             ) const;
 
@@ -191,7 +191,7 @@ protected:
                 regionModels::surfaceFilmModels::surfaceFilmModel& filmModel,
                 const parcelType& p,
                 const polyPatch& pp,
-                const label faceI,
+                const label facei,
                 bool& keepParticle
             );
 
@@ -201,7 +201,7 @@ protected:
                 regionModels::surfaceFilmModels::surfaceFilmModel& filmModel,
                 parcelType& p,
                 const polyPatch& pp,
-                const label faceI,
+                const label facei,
                 bool& keepParticle
             );
 
@@ -211,7 +211,7 @@ protected:
                 regionModels::surfaceFilmModels::surfaceFilmModel& filmModel,
                 const parcelType& p,
                 const polyPatch& pp,
-                const label faceI,
+                const label facei,
                 const scalar mRatio,
                 const scalar We,
                 const scalar Wec,
@@ -225,8 +225,8 @@ protected:
             //- Cache the film fields in preparation for injection
             virtual void cacheFilmFields
             (
-                const label filmPatchI,
-                const label primaryPatchI,
+                const label filmPatchi,
+                const label primaryPatchi,
                 const regionModels::surfaceFilmModels::surfaceFilmModel&
                     filmModel
             );
@@ -235,7 +235,7 @@ protected:
             virtual void setParcelProperties
             (
                 parcelType& p,
-                const label filmFaceI
+                const label filmFacei
             ) const;
 
 
@@ -254,9 +254,9 @@ public:
         ThermoSurfaceFilm(const ThermoSurfaceFilm<CloudType>& sfm);
 
         //- Construct and return a clone using supplied owner cloud
-        virtual autoPtr<SurfaceFilmModel<CloudType> > clone() const
+        virtual autoPtr<SurfaceFilmModel<CloudType>> clone() const
         {
-            return autoPtr<SurfaceFilmModel<CloudType> >
+            return autoPtr<SurfaceFilmModel<CloudType>>
             (
                 new ThermoSurfaceFilm<CloudType>(*this)
             );
@@ -295,7 +295,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "ThermoSurfaceFilm.C"
+    #include "ThermoSurfaceFilm.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

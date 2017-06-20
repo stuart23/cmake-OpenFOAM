@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -43,7 +43,7 @@ void Foam::conformationSurfaces::hasBoundedVolume
     List<volumeType>& referenceVolumeTypes
 ) const
 {
-    vector sum(vector::zero);
+    vector sum(Zero);
     label totalTriangles = 0;
 
     forAll(surfaces_, s)
@@ -187,11 +187,8 @@ void Foam::conformationSurfaces::readFeatures
         }
         else
         {
-            WarningIn
-            (
-                "Foam::conformationSurfaces::readFeatures"
-                "(const label, const dictionary&, const word&, label&)"
-            )   << surface.name() << " of type "
+            WarningInFunction
+                << surface.name() << " of type "
                 << surface.type() << " does not have features"
                 << endl;
         }
@@ -202,7 +199,7 @@ void Foam::conformationSurfaces::readFeatures
     }
     else
     {
-        FatalErrorIn("Foam::conformationSurfaces::readFeatures")
+        FatalErrorInFunction
             << "No valid featureMethod found for surface " << surfaceName
             << nl << "Use \"extendedFeatureEdgeMesh\" "
             << "or \"extractFeatures\"."
@@ -252,7 +249,7 @@ void Foam::conformationSurfaces::readFeatures
     }
     else
     {
-        FatalErrorIn("Foam::conformationSurfaces::readFeatures")
+        FatalErrorInFunction
             << "No valid featureMethod found for surface " << surfaceName
             << nl << "Use \"extendedFeatureEdgeMesh\" "
             << "or \"extractFeatures\"."
@@ -330,9 +327,9 @@ Foam::conformationSurfaces::conformationSurfaces
     regionOffset_.setSize(surfI, 0);
 
     PtrList<dictionary> globalPatchInfo(surfI);
-    List<Map<autoPtr<dictionary> > > regionPatchInfo(surfI);
+    List<Map<autoPtr<dictionary>>> regionPatchInfo(surfI);
     List<sideVolumeType> globalVolumeTypes(surfI);
-    List<Map<sideVolumeType> > regionVolumeTypes(surfI);
+    List<Map<sideVolumeType>> regionVolumeTypes(surfI);
 
     HashSet<word> unmatchedKeys(surfacesDict.toc());
 
@@ -383,7 +380,7 @@ Foam::conformationSurfaces::conformationSurfaces
             {
                 if (!surface.hasVolumeType())
                 {
-                    WarningIn("conformationSurfaces::conformationSurfaces(..)")
+                    WarningInFunction
                         << "Non-baffle surface "
                         << surface.name()
                         << " does not allow inside/outside queries."
@@ -463,9 +460,8 @@ Foam::conformationSurfaces::conformationSurfaces
 
     if (unmatchedKeys.size() > 0)
     {
-        IOWarningIn
+        IOWarningInFunction
         (
-            "conformationSurfaces::conformationSurfaces(..)",
             surfacesDict
         )   << "Not all entries in conformationSurfaces dictionary were used."
             << " The following entries were not used : "
@@ -518,8 +514,8 @@ Foam::conformationSurfaces::conformationSurfaces
                 regionVolumeTypes[surfI][iter.key()];
         }
 
-        const Map<autoPtr<dictionary> >& localInfo = regionPatchInfo[surfI];
-        forAllConstIter(Map<autoPtr<dictionary> >, localInfo, iter)
+        const Map<autoPtr<dictionary>>& localInfo = regionPatchInfo[surfI];
+        forAllConstIter(Map<autoPtr<dictionary>>, localInfo, iter)
         {
             label globalRegionI = regionOffset_[surfI] + iter.key();
 
@@ -663,7 +659,7 @@ Foam::Field<bool> Foam::conformationSurfaces::wellInOutSide
     const bool testForInside
 ) const
 {
-    List<List<volumeType> > surfaceVolumeTests
+    List<List<volumeType>> surfaceVolumeTests
     (
         surfaces_.size(),
         List<volumeType>
@@ -900,7 +896,7 @@ void Foam::conformationSurfaces::findSurfaceAllIntersections
 ) const
 {
     labelListList hitSurfaces;
-    List<List<pointIndexHit> > hitInfo;
+    List<List<pointIndexHit>> hitInfo;
 
     searchableSurfacesQueries::findAllIntersections
     (
@@ -1116,17 +1112,17 @@ void Foam::conformationSurfaces::findEdgeNearest
         );
 
         // Update minDistSqr and arguments
-        forAll(hitInfo, pointI)
+        forAll(hitInfo, pointi)
         {
-            if (hitInfo[pointI].hit())
+            if (hitInfo[pointi].hit())
             {
-                minDistSqr[pointI] = magSqr
+                minDistSqr[pointi] = magSqr
                 (
-                    hitInfo[pointI].hitPoint()
-                  - samples[pointI]
+                    hitInfo[pointi].hitPoint()
+                  - samples[pointi]
                 );
-                edgeHits[pointI] = hitInfo[pointI];
-                featuresHit[pointI] = testI;
+                edgeHits[pointi] = hitInfo[pointi];
+                featuresHit[pointi] = testI;
             }
         }
     }
@@ -1177,7 +1173,7 @@ void Foam::conformationSurfaces::findAllNearestEdges
 (
     const point& sample,
     const scalar searchRadiusSqr,
-    List<List<pointIndexHit> >& edgeHitsByFeature,
+    List<List<pointIndexHit>>& edgeHitsByFeature,
     List<label>& featuresHit
 ) const
 {

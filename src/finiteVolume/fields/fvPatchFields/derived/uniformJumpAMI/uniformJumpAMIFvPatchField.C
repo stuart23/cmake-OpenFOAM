@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -49,7 +49,7 @@ Foam::uniformJumpAMIFvPatchField<Type>::uniformJumpAMIFvPatchField
 )
 :
     fixedJumpAMIFvPatchField<Type>(ptf, p, iF, mapper),
-    jumpTable_(ptf.jumpTable_().clone().ptr())
+    jumpTable_(ptf.jumpTable_, false)
 {}
 
 
@@ -62,11 +62,11 @@ Foam::uniformJumpAMIFvPatchField<Type>::uniformJumpAMIFvPatchField
 )
 :
     fixedJumpAMIFvPatchField<Type>(p, iF),
-    jumpTable_(new DataEntry<Type>("jumpTable"))
+    jumpTable_(new Function1<Type>("jumpTable"))
 {
     if (this->cyclicAMIPatch().owner())
     {
-        jumpTable_ = DataEntry<Type>::New("jumpTable", dict);
+        jumpTable_ = Function1<Type>::New("jumpTable", dict);
     }
 
     if (dict.found("value"))
@@ -87,7 +87,7 @@ Foam::uniformJumpAMIFvPatchField<Type>::uniformJumpAMIFvPatchField
 )
 :
     fixedJumpAMIFvPatchField<Type>(ptf),
-    jumpTable_(ptf.jumpTable_().clone().ptr())
+    jumpTable_(ptf.jumpTable_, false)
 {}
 
 
@@ -99,7 +99,7 @@ Foam::uniformJumpAMIFvPatchField<Type>::uniformJumpAMIFvPatchField
 )
 :
     fixedJumpAMIFvPatchField<Type>(ptf, iF),
-    jumpTable_(ptf.jumpTable_().clone().ptr())
+    jumpTable_(ptf.jumpTable_, false)
 {}
 
 

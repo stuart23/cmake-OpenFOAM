@@ -1,10 +1,16 @@
 rho = thermo.rho();
+rho = max(rho, rhoMin);
+rho = min(rho, rhoMax);
+rho.relax();
 
 volScalarField rAU(1.0/UEqn.A());
 surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rho*rAU));
+volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
 
-volVectorField HbyA("HbyA", U);
-HbyA = rAU*UEqn.H();
+if (pimple.nCorrPISO() <= 1)
+{
+    tUEqn.clear();
+}
 
 if (pimple.transonic())
 {
@@ -13,7 +19,7 @@ if (pimple.transonic())
         "phid",
         fvc::interpolate(psi)
        *(
-            (fvc::interpolate(HbyA) & mesh.Sf())
+            fvc::flux(HbyA)
           + rhorAUf*fvc::ddtCorr(rho, U, phi)/fvc::interpolate(rho)
         )
     );
@@ -26,7 +32,7 @@ if (pimple.transonic())
         (
             fvm::ddt(psi, p)
           + fvm::div(phid, p)
-          - fvm::laplacian(rho*rAU, p)
+          - fvm::laplacian(rhorAUf, p)
          ==
             fvOptions(psi, p, rho.name())
         );
@@ -45,12 +51,15 @@ else
     (
         "phiHbyA",
         (
-            (fvc::interpolate(rho*HbyA) & mesh.Sf())
+            fvc::flux(rho*HbyA)
           + rhorAUf*fvc::ddtCorr(rho, U, phi)
         )
     );
 
     MRF.makeRelative(fvc::interpolate(rho), phiHbyA);
+
+    // Update the pressure BCs to ensure flux consistency
+    constrainPressure(p, rho, U, phiHbyA, rhorAUf, MRF);
 
     while (pimple.correctNonOrthogonal())
     {
@@ -58,7 +67,7 @@ else
         (
             fvm::ddt(psi, p)
           + fvc::div(phiHbyA)
-          - fvm::laplacian(rho*rAU, p)
+          - fvm::laplacian(rhorAUf, p)
          ==
             fvOptions(psi, p, rho.name())
         );
@@ -74,6 +83,17 @@ else
 
 #include "rhoEqn.H"
 #include "compressibleContinuityErrs.H"
+
+// Explicitly relax pressure for momentum corrector
+p.relax();
+
+// Recalculate density from the relaxed pressure
+rho = thermo.rho();
+rho = max(rho, rhoMin);
+rho = min(rho, rhoMax);
+rho.relax();
+Info<< "rho max/min : " << max(rho).value()
+    << " " << min(rho).value() << endl;
 
 U = HbyA - rAU*fvc::grad(p);
 U.correctBoundaryConditions();

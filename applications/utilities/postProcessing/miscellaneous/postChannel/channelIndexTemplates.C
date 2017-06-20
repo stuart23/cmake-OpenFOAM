@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,11 +30,11 @@ License
 template<class T>
 Foam::Field<T> Foam::channelIndex::regionSum(const Field<T>& cellField) const
 {
-    Field<T> regionField(cellRegion_().nRegions(), pTraits<T>::zero);
+    Field<T> regionField(cellRegion_().nRegions(), Zero);
 
-    forAll(cellRegion_(), cellI)
+    forAll(cellRegion_(), celli)
     {
-        regionField[cellRegion_()[cellI]] += cellField[cellI];
+        regionField[cellRegion_()[celli]] += cellField[celli];
     }
 
     // Global sum

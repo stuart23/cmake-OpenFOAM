@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,10 +28,16 @@ License
 #include "faceCoupleInfo.H"
 #include "fvMesh.H"
 
+/* * * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * * */
+
+namespace Foam
+{
+defineTypeNameAndDebug(fvMeshAdder, 0);
+}
+
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-//- Calculate map from new patch faces to old patch faces. -1 where
-//  could not map.
 Foam::labelList Foam::fvMeshAdder::calcPatchMap
 (
     const label oldStart,
@@ -48,11 +54,11 @@ Foam::labelList Foam::fvMeshAdder::calcPatchMap
 
     for (label i = 0; i < oldSize; i++)
     {
-        label newFaceI = oldToNew[oldStart+i];
+        label newFacei = oldToNew[oldStart+i];
 
-        if (newFaceI >= newStart && newFaceI < newStart+newSize)
+        if (newFacei >= newStart && newFacei < newStart+newSize)
         {
-            newToOld[newFaceI-newStart] = i;
+            newToOld[newFacei-newStart] = i;
         }
     }
     return newToOld;
@@ -61,7 +67,6 @@ Foam::labelList Foam::fvMeshAdder::calcPatchMap
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Inplace add mesh1 to mesh0
 Foam::autoPtr<Foam::mapAddedPolyMesh> Foam::fvMeshAdder::add
 (
     fvMesh& mesh0,
@@ -89,9 +94,9 @@ Foam::autoPtr<Foam::mapAddedPolyMesh> Foam::fvMeshAdder::add
 
     fvBoundaryMesh& fvPatches = const_cast<fvBoundaryMesh&>(mesh0.boundary());
     fvPatches.setSize(patches.size());
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        fvPatches.set(patchI, fvPatch::New(patches[patchI], fvPatches));
+        fvPatches.set(patchi, fvPatch::New(patches[patchi], fvPatches));
     }
 
     // Do the mapping of the stored fields
@@ -107,6 +112,12 @@ Foam::autoPtr<Foam::mapAddedPolyMesh> Foam::fvMeshAdder::add
     fvMeshAdder::MapSurfaceFields<sphericalTensor>(mapPtr, mesh0, mesh1);
     fvMeshAdder::MapSurfaceFields<symmTensor>(mapPtr, mesh0, mesh1);
     fvMeshAdder::MapSurfaceFields<tensor>(mapPtr, mesh0, mesh1);
+
+    fvMeshAdder::MapDimFields<scalar>(mapPtr, mesh0, mesh1);
+    fvMeshAdder::MapDimFields<vector>(mapPtr, mesh0, mesh1);
+    fvMeshAdder::MapDimFields<sphericalTensor>(mapPtr, mesh0, mesh1);
+    fvMeshAdder::MapDimFields<symmTensor>(mapPtr, mesh0, mesh1);
+    fvMeshAdder::MapDimFields<tensor>(mapPtr, mesh0, mesh1);
 
     return mapPtr;
 }

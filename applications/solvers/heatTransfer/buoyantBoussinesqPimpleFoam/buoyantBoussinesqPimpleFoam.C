@@ -25,7 +25,7 @@ Application
     buoyantBoussinesqPimpleFoam
 
 Description
-    Transient solver for buoyant, turbulent flow of incompressible fluids
+    Transient solver for buoyant, turbulent flow of incompressible fluids.
 
     Uses the Boussinesq approximation:
     \f[
@@ -49,28 +49,27 @@ Description
 #include "singlePhaseTransportModel.H"
 #include "turbulentTransportModel.H"
 #include "radiationModel.H"
-#include "fvIOoptionList.H"
+#include "fvOptions.H"
 #include "pimpleControl.H"
-#include "fixedFluxPressureFvPatchScalarField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
+    #include "postProcess.H"
+
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
-
-    pimpleControl pimple(mesh);
-
+    #include "createControl.H"
     #include "createFields.H"
-    #include "createIncompressibleRadiationModel.H"
-    #include "createMRF.H"
     #include "createFvOptions.H"
-    #include "initContinuityErrs.H"
     #include "createTimeControls.H"
     #include "CourantNo.H"
     #include "setInitialDeltaT.H"
+    #include "initContinuityErrs.H"
+
+    turbulence->validate();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

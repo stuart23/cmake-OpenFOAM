@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -147,10 +147,10 @@ bool Foam::fileFormats::STLsurfaceFormat<Face>::read
     if (reader.sorted())
     {
         // already sorted - generate directly
-        forAll(faceLst, faceI)
+        forAll(faceLst, facei)
         {
-            const label startPt = 3*faceI;
-            faceLst[faceI] = triFace(startPt, startPt+1, startPt+2);
+            const label startPt = 3*facei;
+            faceLst[facei] = triFace(startPt, startPt+1, startPt+2);
         }
     }
     else
@@ -161,10 +161,10 @@ bool Foam::fileFormats::STLsurfaceFormat<Face>::read
         sortedOrder(zoneIds, faceMap);
 
         // generate sorted faces
-        forAll(faceMap, faceI)
+        forAll(faceMap, facei)
         {
-            const label startPt = 3*faceMap[faceI];
-            faceLst[faceI] = triFace(startPt, startPt+1, startPt+2);
+            const label startPt = 3*faceMap[facei];
+            faceLst[facei] = triFace(startPt, startPt+1, startPt+2);
         }
     }
     zoneIds.clear();
@@ -197,11 +197,7 @@ void Foam::fileFormats::STLsurfaceFormat<Face>::writeAscii
     OFstream os(filename);
     if (!os.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::STLsurfaceFormat::writeAscii"
-            "(const fileName&, const MeshedSurfaceProxy<Face>&)"
-        )
+        FatalErrorInFunction
             << "Cannot open file for writing " << filename
             << exit(FatalError);
     }
@@ -229,15 +225,15 @@ void Foam::fileFormats::STLsurfaceFormat<Face>::writeAscii
 
         if (useFaceMap)
         {
-            forAll(zone, localFaceI)
+            forAll(zone, localFacei)
             {
-                const label faceI = faceMap[faceIndex++];
-                writeShell(os, pointLst, faceLst[faceI]);
+                const label facei = faceMap[faceIndex++];
+                writeShell(os, pointLst, faceLst[facei]);
             }
         }
         else
         {
-            forAll(zone, localFaceI)
+            forAll(zone, localFacei)
             {
                 writeShell(os, pointLst, faceLst[faceIndex++]);
             }
@@ -257,11 +253,7 @@ void Foam::fileFormats::STLsurfaceFormat<Face>::writeBinary
     std::ofstream os(filename.c_str(), std::ios::binary);
     if (!os.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::STLsurfaceFormat::writeBinary"
-            "(const fileName&, const MeshedSurfaceProxy<Face>&)"
-        )
+        FatalErrorInFunction
             << "Cannot open file for writing " << filename
             << exit(FatalError);
     }
@@ -289,9 +281,9 @@ void Foam::fileFormats::STLsurfaceFormat<Face>::writeBinary
     else
     {
         // count triangles for on-the-fly triangulation
-        forAll(faceLst, faceI)
+        forAll(faceLst, facei)
         {
-            nTris += faceLst[faceI].size() - 2;
+            nTris += faceLst[facei].size() - 2;
         }
     }
 
@@ -305,7 +297,7 @@ void Foam::fileFormats::STLsurfaceFormat<Face>::writeBinary
 
         if (useFaceMap)
         {
-            forAll(zone, localFaceI)
+            forAll(zone, localFacei)
             {
                 writeShell
                 (
@@ -318,7 +310,7 @@ void Foam::fileFormats::STLsurfaceFormat<Face>::writeBinary
         }
         else
         {
-            forAll(zone, localFaceI)
+            forAll(zone, localFacei)
             {
                 writeShell
                 (
@@ -343,11 +335,7 @@ void Foam::fileFormats::STLsurfaceFormat<Face>::writeAscii
     OFstream os(filename);
     if (!os.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::STLsurfaceFormat::writeAscii"
-            "(const fileName&, const UnsortedMeshedSurface<Face>&)"
-        )
+        FatalErrorInFunction
             << "Cannot open file for writing " << filename
             << exit(FatalError);
     }
@@ -359,9 +347,9 @@ void Foam::fileFormats::STLsurfaceFormat<Face>::writeAscii
         const List<Face>& faceLst  = surf.faces();
 
         os << "solid " << surf.zoneToc()[0].name() << endl;
-        forAll(faceLst, faceI)
+        forAll(faceLst, facei)
         {
-            writeShell(os, pointLst, faceLst[faceI]);
+            writeShell(os, pointLst, faceLst[facei]);
         }
         os << "endsolid " << surf.zoneToc()[0].name() << endl;
     }
@@ -395,11 +383,7 @@ void Foam::fileFormats::STLsurfaceFormat<Face>::writeBinary
     std::ofstream os(filename.c_str(), std::ios::binary);
     if (!os.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::STLsurfaceFormat::writeBinary"
-            "(const fileName&, const UnsortedMeshedSurface<Face>&)"
-        )
+        FatalErrorInFunction
             << "Cannot open file for writing " << filename
             << exit(FatalError);
     }
@@ -416,9 +400,9 @@ void Foam::fileFormats::STLsurfaceFormat<Face>::writeBinary
     else
     {
         // count triangles for on-the-fly triangulation
-        forAll(faceLst, faceI)
+        forAll(faceLst, facei)
         {
-            nTris += faceLst[faceI].size() - 2;
+            nTris += faceLst[facei].size() - 2;
         }
     }
 
@@ -426,14 +410,14 @@ void Foam::fileFormats::STLsurfaceFormat<Face>::writeBinary
     STLsurfaceFormatCore::writeHeaderBINARY(os, nTris);
 
     // always write unsorted
-    forAll(faceLst, faceI)
+    forAll(faceLst, facei)
     {
         writeShell
         (
             os,
             pointLst,
-            faceLst[faceI],
-            zoneIds[faceI]
+            faceLst[facei],
+            zoneIds[facei]
         );
     }
 }

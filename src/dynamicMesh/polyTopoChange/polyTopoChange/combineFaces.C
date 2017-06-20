@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -128,7 +128,7 @@ bool Foam::combineFaces::validFace
 void Foam::combineFaces::regioniseFaces
 (
     const scalar minCos,
-    const label cellI,
+    const label celli,
     const labelList& cEdges,
     Map<label>& faceRegion
 ) const
@@ -140,7 +140,7 @@ void Foam::combineFaces::regioniseFaces
         label edgeI = cEdges[i];
 
         label f0, f1;
-        meshTools::getEdgeFaces(mesh_, cellI, edgeI, f0, f1);
+        meshTools::getEdgeFaces(mesh_, celli, edgeI, f0, f1);
 
         label p0 = patches.whichPatch(f0);
         label p1 = patches.whichPatch(f1);
@@ -215,7 +215,7 @@ void Foam::combineFaces::regioniseFaces
 
 bool Foam::combineFaces::faceNeighboursValid
 (
-    const label cellI,
+    const label celli,
     const Map<label>& faceRegion
 ) const
 {
@@ -224,20 +224,20 @@ bool Foam::combineFaces::faceNeighboursValid
         return true;
     }
 
-    const cell& cFaces = mesh_.cells()[cellI];
+    const cell& cFaces = mesh_.cells()[celli];
 
     DynamicList<label> storage;
 
     // Test for face collapsing to edge since too many neighbours merged.
-    forAll(cFaces, cFaceI)
+    forAll(cFaces, cFacei)
     {
-        label faceI = cFaces[cFaceI];
+        label facei = cFaces[cFacei];
 
-        if (!faceRegion.found(faceI))
+        if (!faceRegion.found(facei))
         {
-            const labelList& fEdges = mesh_.faceEdges(faceI, storage);
+            const labelList& fEdges = mesh_.faceEdges(facei, storage);
 
-            // Count number of remaining faces neighbouring faceI. This has
+            // Count number of remaining faces neighbouring facei. This has
             // to be 3 or more.
 
             // Unregioned neighbouring faces
@@ -248,7 +248,7 @@ bool Foam::combineFaces::faceNeighboursValid
             forAll(fEdges, i)
             {
                 label edgeI = fEdges[i];
-                label nbrI = meshTools::otherFace(mesh_, cellI, faceI, edgeI);
+                label nbrI = meshTools::otherFace(mesh_, celli, facei, edgeI);
 
                 Map<label>::const_iterator iter = faceRegion.find(nbrI);
 
@@ -310,15 +310,15 @@ Foam::labelListList Foam::combineFaces::getMergeSets
     // On all cells regionise the faces
     forAllConstIter(labelHashSet, boundaryCells, iter)
     {
-        label cellI = iter.key();
+        label celli = iter.key();
 
-        const cell& cFaces = mesh_.cells()[cellI];
+        const cell& cFaces = mesh_.cells()[celli];
 
-        const labelList& cEdges = mesh_.cellEdges(cellI, storage);
+        const labelList& cEdges = mesh_.cellEdges(celli, storage);
 
         // Region per face
         Map<label> faceRegion(cFaces.size());
-        regioniseFaces(featureCos, cellI, cEdges, faceRegion);
+        regioniseFaces(featureCos, celli, cEdges, faceRegion);
 
         // Now we have in faceRegion for every face the region with planar
         // face sharing the same region. We now check whether the resulting
@@ -326,14 +326,14 @@ Foam::labelListList Foam::combineFaces::getMergeSets
         // - to become a set of edges since too many faces are merged.
         // - to become convex
 
-        if (faceNeighboursValid(cellI, faceRegion))
+        if (faceNeighboursValid(celli, faceRegion))
         {
             // Create region-to-faces addressing
             Map<labelList> regionToFaces(faceRegion.size());
 
             forAllConstIter(Map<label>, faceRegion, iter)
             {
-                label faceI = iter.key();
+                label facei = iter.key();
                 label region = iter();
 
                 Map<labelList>::iterator regionFnd = regionToFaces.find(region);
@@ -343,11 +343,11 @@ Foam::labelListList Foam::combineFaces::getMergeSets
                     labelList& setFaces = regionFnd();
                     label sz = setFaces.size();
                     setFaces.setSize(sz+1);
-                    setFaces[sz] = faceI;
+                    setFaces[sz] = facei;
                 }
                 else
                 {
-                    regionToFaces.insert(region, labelList(1, faceI));
+                    regionToFaces.insert(region, labelList(1, facei));
                 }
             }
 
@@ -390,9 +390,9 @@ Foam::labelListList Foam::combineFaces::getMergeSets
     // Pick up all cells on boundary
     labelHashSet boundaryCells(mesh_.nFaces()-mesh_.nInternalFaces());
 
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        const polyPatch& patch = patches[patchI];
+        const polyPatch& patch = patches[patchi];
 
         if (!patch.coupled())
         {
@@ -417,10 +417,8 @@ Foam::face Foam::combineFaces::getOutsideFace
 {
     if (fp.edgeLoops().size() != 1)
     {
-        FatalErrorIn
-        (
-            "combineFaces::getOutsideFace(const indirectPrimitivePatch&)"
-        )   << "Multiple outside loops:" << fp.edgeLoops()
+        FatalErrorInFunction
+            << "Multiple outside loops:" << fp.edgeLoops()
             << abort(FatalError);
     }
 
@@ -434,10 +432,8 @@ Foam::face Foam::combineFaces::getOutsideFace
 
     if (eFaces.size() != 1)
     {
-        FatalErrorIn
-        (
-            "combineFaces::getOutsideFace(const indirectPrimitivePatch&)"
-        )   << "boundary edge:" << bEdgeI
+        FatalErrorInFunction
+            << "boundary edge:" << bEdgeI
             << " points:" << fp.meshPoints()[e[0]]
             << ' ' << fp.meshPoints()[e[1]]
             << " on indirectPrimitivePatch has " << eFaces.size()
@@ -462,11 +458,8 @@ Foam::face Foam::combineFaces::getOutsideFace
 
         if (index0 == -1 || index1 == -1)
         {
-            FatalErrorIn
-            (
-                "combineFaces::getOutsideFace"
-                "(const indirectPrimitivePatch&)"
-            )   << "Cannot find boundary edge:" << e
+            FatalErrorInFunction
+                << "Cannot find boundary edge:" << e
                 << " points:" << fp.meshPoints()[e[0]]
                 << ' ' << fp.meshPoints()[e[1]]
                 << " in edgeLoop:" << outsideLoop << abort(FatalError);
@@ -481,11 +474,8 @@ Foam::face Foam::combineFaces::getOutsideFace
         }
         else
         {
-            FatalErrorIn
-            (
-                "combineFaces::getOutsideFace"
-                "(const indirectPrimitivePatch&)"
-            )   << "Cannot find boundary edge:" << e
+            FatalErrorInFunction
+                << "Cannot find boundary edge:" << e
                 << " points:" << fp.meshPoints()[e[0]]
                 << ' ' << fp.meshPoints()[e[1]]
                 << " on consecutive points in edgeLoop:"
@@ -510,11 +500,8 @@ Foam::face Foam::combineFaces::getOutsideFace
 
         if (index == -1)
         {
-            FatalErrorIn
-            (
-                "combineFaces::getOutsideFace"
-                "(const indirectPrimitivePatch&)"
-            )   << "Cannot find boundary edge:" << e
+            FatalErrorInFunction
+                << "Cannot find boundary edge:" << e
                 << " points:" << fp.meshPoints()[e[0]]
                 << ' ' << fp.meshPoints()[e[1]]
                 << " in face:" << eFaces[0]
@@ -531,11 +518,8 @@ Foam::face Foam::combineFaces::getOutsideFace
         }
         else
         {
-            FatalErrorIn
-            (
-                "combineFaces::getOutsideFace"
-                "(const indirectPrimitivePatch&)"
-            )   << "Cannot find boundary edge:" << e
+            FatalErrorInFunction
+                << "Cannot find boundary edge:" << e
                 << " points:" << fp.meshPoints()[e[0]]
                 << ' ' << fp.meshPoints()[e[1]]
                 << " in face:" << eFaces[0] << " verts:" << localF
@@ -582,9 +566,9 @@ void Foam::combineFaces::setRefinement
 
     const labelListList& pointFaces = mesh_.pointFaces();
 
-    forAll(pointFaces, pointI)
+    forAll(pointFaces, pointi)
     {
-        nPointFaces[pointI] = pointFaces[pointI].size();
+        nPointFaces[pointi] = pointFaces[pointi].size();
     }
 
     const polyBoundaryMesh& patches = mesh_.boundaryMesh();
@@ -598,16 +582,12 @@ void Foam::combineFaces::setRefinement
         {
             forAll(setFaces, i)
             {
-                label patchI = patches.whichPatch(setFaces[i]);
+                label patchi = patches.whichPatch(setFaces[i]);
 
-                if (patchI == -1 || patches[patchI].coupled())
+                if (patchi == -1 || patches[patchi].coupled())
                 {
-                    FatalErrorIn
-                    (
-                        "combineFaces::setRefinement"
-                        "(const bool, const labelListList&"
-                        ", polyTopoChange&)"
-                    )   << "Can only merge non-coupled boundary faces"
+                    FatalErrorInFunction
+                        << "Can only merge non-coupled boundary faces"
                         << " but found internal or coupled face:"
                         << setFaces[i] << " in set " << setI
                         << abort(FatalError);
@@ -631,11 +611,8 @@ void Foam::combineFaces::setRefinement
 
         if (edgeLoops.size() != 1)
         {
-            FatalErrorIn
-            (
-                "combineFaces::setRefinement"
-                "(const bool, const labelListList&, polyTopoChange&)"
-            )   << "Faces to-be-merged " << setFaces
+            FatalErrorInFunction
+                << "Faces to-be-merged " << setFaces
                 << " do not form a single big face." << nl
                 << abort(FatalError);
         }
@@ -646,12 +623,12 @@ void Foam::combineFaces::setRefinement
         // Modify master face
         // ~~~~~~~~~~~~~~~~~~
 
-        label masterFaceI = setFaces[0];
+        label masterFacei = setFaces[0];
 
         // Get outside face in mesh vertex labels
         face outsideFace(getOutsideFace(bigFace));
 
-        label zoneID = mesh_.faceZones().whichZone(masterFaceI);
+        label zoneID = mesh_.faceZones().whichZone(masterFacei);
 
         bool zoneFlip = false;
 
@@ -659,21 +636,21 @@ void Foam::combineFaces::setRefinement
         {
             const faceZone& fZone = mesh_.faceZones()[zoneID];
 
-            zoneFlip = fZone.flipMap()[fZone.whichFace(masterFaceI)];
+            zoneFlip = fZone.flipMap()[fZone.whichFace(masterFacei)];
         }
 
-        label patchI = mesh_.boundaryMesh().whichPatch(masterFaceI);
+        label patchi = mesh_.boundaryMesh().whichPatch(masterFacei);
 
         meshMod.setAction
         (
             polyModifyFace
             (
                 outsideFace,                    // modified face
-                masterFaceI,                    // label of face being modified
-                mesh_.faceOwner()[masterFaceI], // owner
+                masterFacei,                    // label of face being modified
+                mesh_.faceOwner()[masterFacei], // owner
                 -1,                             // neighbour
                 false,                          // face flip
-                patchI,                         // patch for face
+                patchi,                         // patch for face
                 false,                          // remove from zone
                 zoneID,                         // zone for face
                 zoneFlip                        // face flip in zone
@@ -723,11 +700,11 @@ void Foam::combineFaces::setRefinement
     // Remove all unused points. Store position if undoable.
     if (!undoable_)
     {
-        forAll(nPointFaces, pointI)
+        forAll(nPointFaces, pointi)
         {
-            if (nPointFaces[pointI] == 0)
+            if (nPointFaces[pointi] == 0)
             {
-                meshMod.setAction(polyRemovePoint(pointI));
+                meshMod.setAction(polyRemovePoint(pointi));
             }
         }
     }
@@ -735,9 +712,9 @@ void Foam::combineFaces::setRefinement
     {
         // Count removed points
         label n = 0;
-        forAll(nPointFaces, pointI)
+        forAll(nPointFaces, pointi)
         {
-            if (nPointFaces[pointI] == 0)
+            if (nPointFaces[pointi] == 0)
             {
                 n++;
             }
@@ -749,16 +726,16 @@ void Foam::combineFaces::setRefinement
 
         // Remove points and store position
         n = 0;
-        forAll(nPointFaces, pointI)
+        forAll(nPointFaces, pointi)
         {
-            if (nPointFaces[pointI] == 0)
+            if (nPointFaces[pointi] == 0)
             {
-                meshMod.setAction(polyRemovePoint(pointI));
+                meshMod.setAction(polyRemovePoint(pointi));
 
-                savedPointLabels_[n] = pointI;
-                savedPoints_[n] = mesh_.points()[pointI];
+                savedPointLabels_[n] = pointi;
+                savedPoints_[n] = mesh_.points()[pointi];
 
-                meshToSaved.insert(pointI, n);
+                meshToSaved.insert(pointi, n);
                 n++;
             }
         }
@@ -774,11 +751,11 @@ void Foam::combineFaces::setRefinement
 
                 forAll(f, fp)
                 {
-                    label pointI = f[fp];
+                    label pointi = f[fp];
 
-                    if (nPointFaces[pointI] == 0)
+                    if (nPointFaces[pointi] == 0)
                     {
-                        f[fp] = -meshToSaved[pointI]-1;
+                        f[fp] = -meshToSaved[pointi]-1;
                     }
                 }
             }
@@ -807,19 +784,16 @@ void Foam::combineFaces::updateMesh(const mapPolyMesh& map)
 
                 forAll(f, fp)
                 {
-                    label pointI = f[fp];
+                    label pointi = f[fp];
 
-                    if (pointI >= 0)
+                    if (pointi >= 0)
                     {
-                        f[fp] = map.reversePointMap()[pointI];
+                        f[fp] = map.reversePointMap()[pointi];
 
                         if (f[fp] < 0)
                         {
-                            FatalErrorIn
-                            (
-                                "combineFaces::updateMesh"
-                                "(const mapPolyMesh&)"
-                            )   << "In set " << setI << " at position " << i
+                            FatalErrorInFunction
+                                << "In set " << setI << " at position " << i
                                 << " with master face "
                                 << masterFace_[setI] << nl
                                 << "the points of the slave face " << faces[i]
@@ -849,12 +823,8 @@ void Foam::combineFaces::setUnrefinement
 {
     if (!undoable_)
     {
-        FatalErrorIn
-        (
-            "combineFaces::setUnrefinement"
-            "(const labelList&, polyTopoChange&"
-            ", Map<label>&, Map<label>&, Map<label>&)"
-        )   << "Can only call setUnrefinement if constructed with"
+        FatalErrorInFunction
+            << "Can only call setUnrefinement if constructed with"
             << " unrefinement capability." << exit(FatalError);
     }
 
@@ -875,18 +845,14 @@ void Foam::combineFaces::setUnrefinement
 
     forAll(masterFaces, i)
     {
-        label masterFaceI = masterFaces[i];
+        label masterFacei = masterFaces[i];
 
-        Map<label>::const_iterator iter = masterToSet.find(masterFaceI);
+        Map<label>::const_iterator iter = masterToSet.find(masterFacei);
 
         if (iter == masterToSet.end())
         {
-            FatalErrorIn
-            (
-                "combineFaces::setUnrefinement"
-                "(const labelList&, polyTopoChange&"
-                ", Map<label>&, Map<label>&, Map<label>&)"
-            )   << "Master face " << masterFaceI
+            FatalErrorInFunction
+                << "Master face " << masterFacei
                 << " is not the master of one of the merge sets"
                 << " or has already been merged"
                 << abort(FatalError);
@@ -902,12 +868,8 @@ void Foam::combineFaces::setUnrefinement
 
         if (faces.empty())
         {
-            FatalErrorIn
-            (
-                "combineFaces::setUnrefinement"
-                "(const labelList&, polyTopoChange&"
-                ", Map<label>&, Map<label>&, Map<label>&)"
-            )   << "Set " << setI << " with master face " << masterFaceI
+            FatalErrorInFunction
+                << "Set " << setI << " with master face " << masterFacei
                 << " has already been merged." << abort(FatalError);
         }
 
@@ -917,11 +879,11 @@ void Foam::combineFaces::setUnrefinement
 
             forAll(f, fp)
             {
-                label pointI = f[fp];
+                label pointi = f[fp];
 
-                if (pointI < 0)
+                if (pointi < 0)
                 {
-                    label localI = -pointI-1;
+                    label localI = -pointi-1;
 
                     if (addedPoints[localI] == -1)
                     {
@@ -952,29 +914,25 @@ void Foam::combineFaces::setUnrefinement
         // Restore
         // ~~~~~~~
 
-        label own = mesh_.faceOwner()[masterFaceI];
-        label zoneID = mesh_.faceZones().whichZone(masterFaceI);
+        label own = mesh_.faceOwner()[masterFacei];
+        label zoneID = mesh_.faceZones().whichZone(masterFacei);
         bool zoneFlip = false;
         if (zoneID >= 0)
         {
             const faceZone& fZone = mesh_.faceZones()[zoneID];
-            zoneFlip = fZone.flipMap()[fZone.whichFace(masterFaceI)];
+            zoneFlip = fZone.flipMap()[fZone.whichFace(masterFacei)];
         }
-        label patchI = mesh_.boundaryMesh().whichPatch(masterFaceI);
+        label patchi = mesh_.boundaryMesh().whichPatch(masterFacei);
 
-        if (mesh_.boundaryMesh()[patchI].coupled())
+        if (mesh_.boundaryMesh()[patchi].coupled())
         {
-            FatalErrorIn
-            (
-                "combineFaces::setUnrefinement"
-                "(const labelList&, polyTopoChange&"
-                ", Map<label>&, Map<label>&, Map<label>&)"
-            )   << "Master face " << masterFaceI << " is on coupled patch "
-                << mesh_.boundaryMesh()[patchI].name()
+            FatalErrorInFunction
+                << "Master face " << masterFacei << " is on coupled patch "
+                << mesh_.boundaryMesh()[patchi].name()
                 << abort(FatalError);
         }
 
-        //Pout<< "Restoring new master face " << masterFaceI
+        //Pout<< "Restoring new master face " << masterFacei
         //    << " to vertices " << faces[0] << endl;
 
         // Modify the master face.
@@ -983,17 +941,17 @@ void Foam::combineFaces::setUnrefinement
             polyModifyFace
             (
                 faces[0],                       // original face
-                masterFaceI,                    // label of face
+                masterFacei,                    // label of face
                 own,                            // owner
                 -1,                             // neighbour
                 false,                          // face flip
-                patchI,                         // patch for face
+                patchi,                         // patch for face
                 false,                          // remove from zone
                 zoneID,                         // zone for face
                 zoneFlip                        // face flip in zone
             )
         );
-        restoredFaces.insert(masterFaceI, masterFaceI);
+        restoredFaces.insert(masterFacei, masterFacei);
 
         // Add the previously removed faces
         for (label i = 1; i < faces.size(); i++)
@@ -1001,7 +959,7 @@ void Foam::combineFaces::setUnrefinement
             //Pout<< "Restoring removed face with vertices " << faces[i]
             //    << endl;
 
-            label faceI = meshMod.setAction
+            label facei = meshMod.setAction
             (
                 polyAddFace
                 (
@@ -1010,14 +968,14 @@ void Foam::combineFaces::setUnrefinement
                     -1,                     // neighbour,
                     -1,                     // masterPointID,
                     -1,                     // masterEdgeID,
-                    masterFaceI,             // masterFaceID,
+                    masterFacei,             // masterFaceID,
                     false,                  // flipFaceFlux,
-                    patchI,                 // patchID,
+                    patchi,                 // patchID,
                     zoneID,                 // zoneID,
                     zoneFlip                // zoneFlip
                 )
             );
-            restoredFaces.insert(faceI, masterFaceI);
+            restoredFaces.insert(facei, masterFacei);
         }
 
         // Clear out restored set

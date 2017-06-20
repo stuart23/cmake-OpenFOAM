@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -265,8 +265,8 @@ public:
             //- External hook to add mass to the primary region
             virtual scalar addMassSources
             (
-                const label patchI,            // patchI on primary region
-                const label faceI              // faceI of patchI
+                const label patchi,            // patchi on primary region
+                const label facei              // facei of patchi
             );
 
             //- Mean diffusion number of the solid region

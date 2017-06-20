@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -296,7 +296,7 @@ ListType Foam::subset
     // select must at least cover the list range
     if (select.size() < lst.size())
     {
-        FatalErrorIn("subset(const UList<T>&, const T&, const ListType&)")
+        FatalErrorInFunction
             << "select is of size " << select.size()
             << "; but it must index a list of size " << lst.size()
             << abort(FatalError);
@@ -332,7 +332,7 @@ void Foam::inplaceSubset
     // select must at least cover the list range
     if (select.size() < lst.size())
     {
-        FatalErrorIn("inplaceSubset(const UList<T>&, const T&, ListType&)")
+        FatalErrorInFunction
             << "select is of size " << select.size()
             << "; but it must index a list of size " << lst.size()
             << abort(FatalError);
@@ -411,8 +411,6 @@ void Foam::inplaceSubset
 }
 
 
-// As clarification:
-// coded as inversion from pointEdges to edges but completely general.
 template<class InList, class OutList>
 void Foam::invertManyToMany
 (
@@ -424,9 +422,9 @@ void Foam::invertManyToMany
     // Number of points per edge
     labelList nPointsPerEdge(nEdges, 0);
 
-    forAll(pointEdges, pointI)
+    forAll(pointEdges, pointi)
     {
-        const InList& pEdges = pointEdges[pointI];
+        const InList& pEdges = pointEdges[pointi];
 
         forAll(pEdges, j)
         {
@@ -444,15 +442,15 @@ void Foam::invertManyToMany
     nPointsPerEdge = 0;
 
     // Fill edges
-    forAll(pointEdges, pointI)
+    forAll(pointEdges, pointi)
     {
-        const InList& pEdges = pointEdges[pointI];
+        const InList& pEdges = pointEdges[pointi];
 
         forAll(pEdges, j)
         {
             label edgeI = pEdges[j];
 
-            edges[edgeI][nPointsPerEdge[edgeI]++] = pointI;
+            edges[edgeI][nPointsPerEdge[edgeI]++] = pointi;
         }
     }
 }
@@ -689,10 +687,10 @@ Foam::label Foam::findLower
 }
 
 
-template<class Container, class T, int nRows>
-Foam::List<Container> Foam::initList(const T elems[nRows])
+template<class Container, class T, int mRows>
+Foam::List<Container> Foam::initList(const T elems[mRows])
 {
-    List<Container> lst(nRows);
+    List<Container> lst(mRows);
 
     forAll(lst, rowI)
     {
@@ -702,10 +700,10 @@ Foam::List<Container> Foam::initList(const T elems[nRows])
 }
 
 
-template<class Container, class T, int nRows, int nColumns>
-Foam::List<Container> Foam::initListList(const T elems[nRows][nColumns])
+template<class Container, class T, int mRows, int nColumns>
+Foam::List<Container> Foam::initListList(const T elems[mRows][nColumns])
 {
-    List<Container> lst(nRows);
+    List<Container> lst(mRows);
 
     Container cols(nColumns);
     forAll(lst, rowI)

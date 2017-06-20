@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -34,8 +34,7 @@ Description
     The jump is specified as a fixed value field, applied as an offset to the
     'owner' patch.
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         patchType    | underlying patch type should be \c cyclic| yes |
@@ -44,7 +43,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            fixedJump;
         patchType       cyclic;
@@ -57,7 +56,7 @@ Description
 Note
      The underlying \c patchType should be set to \c cyclic
 
-SeeAlso
+See also
     Foam::jumpCyclicFvPatchField
 
 SourceFiles
@@ -132,9 +131,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchField<Type>> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new fixedJumpFvPatchField<Type>(*this)
             );
@@ -148,12 +147,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchField<Type>> clone
         (
             const DimensionedField<Type, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new fixedJumpFvPatchField<Type>(*this, iF)
             );
@@ -165,7 +164,7 @@ public:
         // Access
 
             //- Return the "jump" across the patch
-            virtual tmp<Field<Type> > jump() const;
+            virtual tmp<Field<Type>> jump() const;
 
 
         // Mapping functions
@@ -196,7 +195,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "fixedJumpFvPatchField.C"
+    #include "fixedJumpFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

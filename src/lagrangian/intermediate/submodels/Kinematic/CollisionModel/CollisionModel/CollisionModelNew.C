@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::autoPtr<Foam::CollisionModel<CloudType> >
+Foam::autoPtr<Foam::CollisionModel<CloudType>>
 Foam::CollisionModel<CloudType>::New
 (
     const dictionary& dict,
@@ -44,20 +44,14 @@ Foam::CollisionModel<CloudType>::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "CollisionModel<CloudType>::New"
-            "("
-                "const dictionary&, "
-                "CloudType&"
-            ")"
-        )   << "Unknown collision model type " << modelType
+        FatalErrorInFunction
+            << "Unknown collision model type " << modelType
             << ", constructor not in hash table" << nl << nl
             << "    Valid collision model types are:" << nl
             << dictionaryConstructorTablePtr_->sortedToc() << exit(FatalError);
     }
 
-    return autoPtr<CollisionModel<CloudType> >(cstrIter()(dict, owner));
+    return autoPtr<CollisionModel<CloudType>>(cstrIter()(dict, owner));
 }
 
 

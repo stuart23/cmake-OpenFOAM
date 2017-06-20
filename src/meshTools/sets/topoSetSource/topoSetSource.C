@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -82,11 +82,8 @@ Foam::autoPtr<Foam::topoSetSource> Foam::topoSetSource::New
 
     if (cstrIter == wordConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "topoSetSource::New(const word&, "
-            "const polyMesh&, const dictionary&)"
-        )   << "Unknown topoSetSource type " << topoSetSourceType
+        FatalErrorInFunction
+            << "Unknown topoSetSource type " << topoSetSourceType
             << endl << endl
             << "Valid topoSetSource types : " << endl
             << wordConstructorTablePtr_->sortedToc()
@@ -109,11 +106,8 @@ Foam::autoPtr<Foam::topoSetSource> Foam::topoSetSource::New
 
     if (cstrIter == istreamConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "topoSetSource::New(const word&, "
-            "const polyMesh&, Istream&)"
-        )   << "Unknown topoSetSource type " << topoSetSourceType
+        FatalErrorInFunction
+            << "Unknown topoSetSource type " << topoSetSourceType
             << endl << endl
             << "Valid topoSetSource types : " << endl
             << istreamConstructorTablePtr_->sortedToc()
@@ -132,7 +126,7 @@ Foam::Istream& Foam::topoSetSource::checkIs(Istream& is)
     }
     else
     {
-        FatalErrorIn("cellToFace::cellToFace") << "Istream not good"
+        FatalErrorInFunction
             << exit(FatalError);
 
         return is;
@@ -145,17 +139,17 @@ Foam::Istream& Foam::topoSetSource::checkIs(Istream& is)
 void Foam::topoSetSource::addOrDelete
 (
     topoSet& set,
-    const label cellI,
+    const label celli,
     const bool add
 ) const
 {
     if (add)
     {
-        set.insert(cellI);
+        set.insert(celli);
     }
     else
     {
-        set.erase(cellI);
+        set.erase(celli);
     }
 }
 

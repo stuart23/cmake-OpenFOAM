@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -196,6 +196,7 @@ private:
             labelHashSet& warningGiven
         ) const;
 
+        //- Split cellTypes into cells, faces and lines
         void extractCells
         (
             Istream& inFile,
@@ -203,6 +204,7 @@ private:
             const labelList& cellVertData
         );
 
+        //- Read single field and stores it on the objectRegistry.
         void readField
         (
             ISstream& inFile,
@@ -212,6 +214,8 @@ private:
             const label size
         ) const;
 
+        //- Reads fields, stores them on the objectRegistry. Returns a list of
+        //  read fields
         wordList readFieldArray
         (
             ISstream& inFile,
@@ -365,7 +369,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "vtkUnstructuredReaderTemplates.C"
+    #include "vtkUnstructuredReaderTemplates.C"
 #endif
 
 

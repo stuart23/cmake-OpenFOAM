@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -49,18 +49,18 @@ namespace Foam
 void Foam::radiation::viewFactor::initialise()
 {
     const polyBoundaryMesh& coarsePatches = coarseMesh_.boundaryMesh();
-    const volScalarField::GeometricBoundaryField& Qrp = Qr_.boundaryField();
+    const volScalarField::Boundary& Qrp = Qr_.boundaryField();
 
     label count = 0;
-    forAll(Qrp, patchI)
+    forAll(Qrp, patchi)
     {
-        //const polyPatch& pp = mesh_.boundaryMesh()[patchI];
-        const fvPatchScalarField& QrPatchI = Qrp[patchI];
+        //const polyPatch& pp = mesh_.boundaryMesh()[patchi];
+        const fvPatchScalarField& QrPatchi = Qrp[patchi];
 
-        if ((isA<fixedValueFvPatchScalarField>(QrPatchI)))
+        if ((isA<fixedValueFvPatchScalarField>(QrPatchi)))
         {
-            selectedPatches_[count] = QrPatchI.patch().index();
-            nLocalCoarseFaces_ += coarsePatches[patchI].size();
+            selectedPatches_[count] = QrPatchi.patch().index();
+            nLocalCoarseFaces_ += coarsePatches[patchi].size();
             count++;
         }
     }
@@ -80,7 +80,7 @@ void Foam::radiation::viewFactor::initialise()
 
     if (debug && Pstream::master())
     {
-        InfoIn("radiation::viewFactor::initialise()")
+        InfoInFunction
             << "Total number of clusters : " << totalNCoarseFaces_ << endl;
     }
 
@@ -173,23 +173,23 @@ void Foam::radiation::viewFactor::initialise()
     {
         Fmatrix_.reset
         (
-            new scalarSquareMatrix(totalNCoarseFaces_, totalNCoarseFaces_, 0.0)
+            new scalarSquareMatrix(totalNCoarseFaces_, 0.0)
         );
 
         if (debug)
         {
-            InfoIn("radiation::viewFactor::initialise()")
+            InfoInFunction
                 << "Insert elements in the matrix..." << endl;
         }
 
-        for (label procI = 0; procI < Pstream::nProcs(); procI++)
+        for (label proci = 0; proci < Pstream::nProcs(); proci++)
         {
             insertMatrixElements
             (
                 globalNumbering,
-                procI,
-                globalFaceFacesProc[procI],
-                F[procI],
+                proci,
+                globalFaceFacesProc[proci],
+                F[proci],
                 Fmatrix_()
             );
         }
@@ -200,7 +200,7 @@ void Foam::radiation::viewFactor::initialise()
         {
             if (debug)
             {
-                InfoIn("radiation::viewFactor::initialise()")
+                InfoInFunction
                     << "Smoothing the matrix..." << endl;
             }
 
@@ -209,12 +209,12 @@ void Foam::radiation::viewFactor::initialise()
                 scalar sumF = 0.0;
                 for (label j=0; j<totalNCoarseFaces_; j++)
                 {
-                    sumF += Fmatrix_()[i][j];
+                    sumF += Fmatrix_()(i, j);
                 }
                 scalar delta = sumF - 1.0;
                 for (label j=0; j<totalNCoarseFaces_; j++)
                 {
-                    Fmatrix_()[i][j] *= (1.0 - delta/(sumF + 0.001));
+                    Fmatrix_()(i, j) *= (1.0 - delta/(sumF + 0.001));
                 }
             }
         }
@@ -224,15 +224,10 @@ void Foam::radiation::viewFactor::initialise()
         {
             CLU_.reset
             (
-                new scalarSquareMatrix
-                (
-                    totalNCoarseFaces_,
-                    totalNCoarseFaces_,
-                    0.0
-                )
+                new scalarSquareMatrix(totalNCoarseFaces_, 0.0)
             );
 
-            pivotIndices_.setSize(CLU_().n());
+            pivotIndices_.setSize(CLU_().m());
         }
     }
 }
@@ -376,18 +371,18 @@ bool Foam::radiation::viewFactor::read()
 void Foam::radiation::viewFactor::insertMatrixElements
 (
     const globalIndex& globalNumbering,
-    const label procI,
+    const label proci,
     const labelListList& globalFaceFaces,
     const scalarListList& viewFactors,
     scalarSquareMatrix& Fmatrix
 )
 {
-    forAll(viewFactors, faceI)
+    forAll(viewFactors, facei)
     {
-        const scalarList& vf = viewFactors[faceI];
-        const labelList& globalFaces = globalFaceFaces[faceI];
+        const scalarList& vf = viewFactors[facei];
+        const labelList& globalFaces = globalFaceFaces[facei];
 
-        label globalI = globalNumbering.toGlobal(procI, faceI);
+        label globalI = globalNumbering.toGlobal(proci, facei);
         forAll(globalFaces, i)
         {
             Fmatrix[globalI][globalFaces[i]] = vf[i];
@@ -412,6 +407,8 @@ void Foam::radiation::viewFactor::calculate()
     DynamicList<scalar> localCoarseEave(nLocalCoarseFaces_);
     DynamicList<scalar> localCoarseHoave(nLocalCoarseFaces_);
 
+    volScalarField::Boundary& QrBf = Qr_.boundaryFieldRef();
+
     forAll(selectedPatches_, i)
     {
         label patchID = selectedPatches_[i];
@@ -419,7 +416,7 @@ void Foam::radiation::viewFactor::calculate()
         const scalarField& Tp = T_.boundaryField()[patchID];
         const scalarField& sf = mesh_.magSf().boundaryField()[patchID];
 
-        fvPatchScalarField& QrPatch = Qr_.boundaryField()[patchID];
+        fvPatchScalarField& QrPatch = QrBf[patchID];
 
         greyDiffusiveViewFactorFixedValueFvPatchScalarField& Qrp =
             refCast
@@ -458,10 +455,10 @@ void Foam::radiation::viewFactor::calculate()
                 // Temperature, emissivity and external flux area weighting
                 forAll(fineFaces, j)
                 {
-                    label faceI = fineFaces[j];
-                    Tave[coarseI] += (Tp[faceI]*sf[faceI])/area;
-                    Eave[coarseI] += (eb[faceI]*sf[faceI])/area;
-                    Hoiave[coarseI] += (Hoi[faceI]*sf[faceI])/area;
+                    label facei = fineFaces[j];
+                    Tave[coarseI] += (Tp[facei]*sf[facei])/area;
+                    Eave[coarseI] += (eb[facei]*sf[facei])/area;
+                    Hoiave[coarseI] += (Hoi[facei]*sf[facei])/area;
                 }
             }
         }
@@ -472,10 +469,9 @@ void Foam::radiation::viewFactor::calculate()
     }
 
     // Fill the local values to distribute
-    SubList<scalar>(compactCoarseT,nLocalCoarseFaces_).assign(localCoarseTave);
-    SubList<scalar>(compactCoarseE,nLocalCoarseFaces_).assign(localCoarseEave);
-    SubList<scalar>
-        (compactCoarseHo,nLocalCoarseFaces_).assign(localCoarseHoave);
+    SubList<scalar>(compactCoarseT,nLocalCoarseFaces_) = localCoarseTave;
+    SubList<scalar>(compactCoarseE,nLocalCoarseFaces_) = localCoarseEave;
+    SubList<scalar>(compactCoarseHo,nLocalCoarseFaces_) = localCoarseHoave;
 
     // Distribute data
     map_->distribute(compactCoarseT);
@@ -496,7 +492,7 @@ void Foam::radiation::viewFactor::calculate()
     (
         compactGlobalIds,
         nLocalCoarseFaces_
-    ).assign(localGlobalIds);
+    ) = localGlobalIds;
 
     map_->distribute(compactGlobalIds);
 
@@ -529,7 +525,7 @@ void Foam::radiation::viewFactor::calculate()
         // Variable emissivity
         if (!constEmissivity_)
         {
-            scalarSquareMatrix C(totalNCoarseFaces_, totalNCoarseFaces_, 0.0);
+            scalarSquareMatrix C(totalNCoarseFaces_, 0.0);
 
             for (label i=0; i<totalNCoarseFaces_; i++)
             {
@@ -541,13 +537,13 @@ void Foam::radiation::viewFactor::calculate()
 
                     if (i==j)
                     {
-                        C[i][j] = invEj - (invEj - 1.0)*Fmatrix_()[i][j];
-                        q[i] += (Fmatrix_()[i][j] - 1.0)*sigmaT4 - QrExt[j];
+                        C(i, j) = invEj - (invEj - 1.0)*Fmatrix_()(i, j);
+                        q[i] += (Fmatrix_()(i, j) - 1.0)*sigmaT4 - QrExt[j];
                     }
                     else
                     {
-                        C[i][j] = (1.0 - invEj)*Fmatrix_()[i][j];
-                        q[i] += Fmatrix_()[i][j]*sigmaT4;
+                        C(i, j) = (1.0 - invEj)*Fmatrix_()(i, j);
+                        q[i] += Fmatrix_()(i, j)*sigmaT4;
                     }
 
                 }
@@ -570,18 +566,18 @@ void Foam::radiation::viewFactor::calculate()
                         scalar invEj = 1.0/E[j];
                         if (i==j)
                         {
-                            CLU_()[i][j] = invEj-(invEj-1.0)*Fmatrix_()[i][j];
+                            CLU_()(i, j) = invEj-(invEj-1.0)*Fmatrix_()(i, j);
                         }
                         else
                         {
-                            CLU_()[i][j] = (1.0 - invEj)*Fmatrix_()[i][j];
+                            CLU_()(i, j) = (1.0 - invEj)*Fmatrix_()(i, j);
                         }
                     }
                 }
 
                 if (debug)
                 {
-                    InfoIn("radiation::viewFactor::initialise()")
+                    InfoInFunction
                         << "\nDecomposing C matrix..." << endl;
                 }
 
@@ -598,18 +594,18 @@ void Foam::radiation::viewFactor::calculate()
 
                     if (i==j)
                     {
-                        q[i] += (Fmatrix_()[i][j] - 1.0)*sigmaT4  - QrExt[j];
+                        q[i] += (Fmatrix_()(i, j) - 1.0)*sigmaT4  - QrExt[j];
                     }
                     else
                     {
-                        q[i] += Fmatrix_()[i][j]*sigmaT4;
+                        q[i] += Fmatrix_()(i, j)*sigmaT4;
                     }
                 }
             }
 
             if (debug)
             {
-                InfoIn("radiation::viewFactor::initialise()")
+                InfoInFunction
                     << "\nLU Back substitute C matrix.." << endl;
             }
 
@@ -622,7 +618,6 @@ void Foam::radiation::viewFactor::calculate()
     Pstream::listCombineScatter(q);
     Pstream::listCombineGather(q, maxEqOp<scalar>());
 
-
     label globCoarseId = 0;
     forAll(selectedPatches_, i)
     {
@@ -630,7 +625,7 @@ void Foam::radiation::viewFactor::calculate()
         const polyPatch& pp = mesh_.boundaryMesh()[patchID];
         if (pp.size() > 0)
         {
-            scalarField& Qrp = Qr_.boundaryField()[patchID];
+            scalarField& Qrp = QrBf[patchID];
             const scalarField& sf = mesh_.magSf().boundaryField()[patchID];
             const labelList& agglom = finalAgglom_[patchID];
             label nAgglom = max(agglom)+1;
@@ -649,10 +644,10 @@ void Foam::radiation::viewFactor::calculate()
                 const labelList& fineFaces = coarseToFine[coarseFaceID];
                 forAll(fineFaces, k)
                 {
-                    label faceI = fineFaces[k];
+                    label facei = fineFaces[k];
 
-                    Qrp[faceI] = q[globalCoarse];
-                    heatFlux += Qrp[faceI]*sf[faceI];
+                    Qrp[facei] = q[globalCoarse];
+                    heatFlux += Qrp[facei]*sf[facei];
                 }
                 globCoarseId ++;
             }
@@ -661,13 +656,13 @@ void Foam::radiation::viewFactor::calculate()
 
     if (debug)
     {
-        forAll(Qr_.boundaryField(), patchID)
+        forAll(QrBf, patchID)
         {
-            const scalarField& Qrp = Qr_.boundaryField()[patchID];
+            const scalarField& Qrp = QrBf[patchID];
             const scalarField& magSf = mesh_.magSf().boundaryField()[patchID];
             scalar heatFlux = gSum(Qrp*magSf);
 
-            InfoIn("radiation::viewFactor::initialise()")
+            InfoInFunction
                 << "Total heat transfer rate at patch: "
                 << patchID << " "
                 << heatFlux << endl;
@@ -706,10 +701,10 @@ Foam::tmp<Foam::volScalarField> Foam::radiation::viewFactor::Rp() const
 }
 
 
-Foam::tmp<Foam::DimensionedField<Foam::scalar, Foam::volMesh> >
+Foam::tmp<Foam::DimensionedField<Foam::scalar, Foam::volMesh>>
 Foam::radiation::viewFactor::Ru() const
 {
-    return tmp<DimensionedField<scalar, volMesh> >
+    return tmp<DimensionedField<scalar, volMesh>>
     (
         new DimensionedField<scalar, volMesh>
         (

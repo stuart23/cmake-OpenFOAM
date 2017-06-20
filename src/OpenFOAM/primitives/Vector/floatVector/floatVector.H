@@ -48,7 +48,7 @@ namespace Foam
 typedef Vector<float> floatVector;
 
 //- Data associated with floatVector type are contiguous
-#if !defined(SINGLE_PRECISION)
+#if !defined(WM_SP)
 template<>
 inline bool contiguous<floatVector>() {return true;}
 #endif

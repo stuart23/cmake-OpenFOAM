@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,7 +26,7 @@ License
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class SourcePatch, class TargetPatch>
-Foam::autoPtr<Foam::AMIMethod<SourcePatch, TargetPatch> >
+Foam::autoPtr<Foam::AMIMethod<SourcePatch, TargetPatch>>
 Foam::AMIMethod<SourcePatch, TargetPatch>::New
 (
     const word& methodName,
@@ -49,26 +49,14 @@ Foam::AMIMethod<SourcePatch, TargetPatch>::New
 
     if (cstrIter == componentsConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "AMIMethod<SourcePatch, TargetPatch>::New"
-            "("
-                "const word&, "
-                "const SourcePatch&, "
-                "const TargetPatch&, "
-                "const scalarField&, "
-                "const scalarField&, "
-                "const faceAreaIntersect::triangulationMode&, "
-                "const bool, "
-                "const bool"
-            ")"
-        )   << "Unknown AMIMethod type "
+        FatalErrorInFunction
+            << "Unknown AMIMethod type "
             << methodName << nl << nl
             << "Valid AMIMethod types are:" << nl
             << componentsConstructorTablePtr_->sortedToc() << exit(FatalError);
     }
 
-    return autoPtr<AMIMethod<SourcePatch, TargetPatch> >
+    return autoPtr<AMIMethod<SourcePatch, TargetPatch>>
     (
         cstrIter()
         (

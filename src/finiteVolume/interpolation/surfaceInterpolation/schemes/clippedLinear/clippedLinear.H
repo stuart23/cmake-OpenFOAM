@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -65,7 +65,7 @@ class clippedLinear
         {
             if (cellSizeRatio_ <= 0 || cellSizeRatio_ > 1)
             {
-                FatalErrorIn("clippedLinear::calcWfLimit()")
+                FatalErrorInFunction
                     << "Given cellSizeRatio of " << cellSizeRatio_
                     << " is not between 0 and 1"
                     << exit(FatalError);
@@ -150,16 +150,20 @@ public:
                     dimless
                 )
             );
-            surfaceScalarField& clippedLinearWeights = tclippedLinearWeights();
+            surfaceScalarField& clippedLinearWeights =
+                tclippedLinearWeights.ref();
 
-            clippedLinearWeights.internalField() =
-                max(min(cdWeights.internalField(), 1 - wfLimit_), wfLimit_);
+            clippedLinearWeights.primitiveFieldRef() =
+                max(min(cdWeights.primitiveField(), 1 - wfLimit_), wfLimit_);
+
+            surfaceScalarField::Boundary& clwbf =
+                clippedLinearWeights.boundaryFieldRef();
 
             forAll(mesh.boundary(), patchi)
             {
-                if (clippedLinearWeights.boundaryField()[patchi].coupled())
+                if (clwbf[patchi].coupled())
                 {
-                    clippedLinearWeights.boundaryField()[patchi] =
+                    clwbf[patchi] =
                         max
                         (
                             min
@@ -172,8 +176,7 @@ public:
                 }
                 else
                 {
-                    clippedLinearWeights.boundaryField()[patchi] =
-                        cdWeights.boundaryField()[patchi];
+                    clwbf[patchi] = cdWeights.boundaryField()[patchi];
                 }
             }
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -91,10 +91,7 @@ void Foam::edgeMesh::write
 {
     if (debug)
     {
-        Info<< "edgeMesh::write"
-            "(const fileName&, const edgeMesh&) : "
-            "writing to " << name
-            << endl;
+        InfoInFunction << "Writing to " << name << endl;
     }
 
     const word ext = name.ext();
@@ -104,11 +101,8 @@ void Foam::edgeMesh::write
 
     if (mfIter == writefileExtensionMemberFunctionTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "MeshedSurface::write"
-            "(const fileName&, const MeshedSurface&)"
-        )   << "Unknown file extension " << ext << nl << nl
+        FatalErrorInFunction
+            << "Unknown file extension " << ext << nl << nl
             << "Valid types are :" << endl
             << writefileExtensionMemberFunctionTablePtr_->sortedToc()
             << exit(FatalError);

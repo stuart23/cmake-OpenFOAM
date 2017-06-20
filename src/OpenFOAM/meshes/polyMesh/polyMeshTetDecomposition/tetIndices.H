@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -67,6 +67,14 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of friend functions and operators
+
+class tetIndices;
+
+Istream& operator>>(Istream&, tetIndices&);
+Ostream& operator<<(Ostream&, const tetIndices&);
+
+
 /*---------------------------------------------------------------------------*\
                          Class tetIndices Declaration
 \*---------------------------------------------------------------------------*/
@@ -76,10 +84,10 @@ class tetIndices
     // Private data
 
     //- Cell that this is a decomposed tet of
-    label cellI_;
+    label celli_;
 
     //- Face that holds this decomposed tet
-    label faceI_;
+    label facei_;
 
     //- Base point on the face
     label faceBasePtI_;
@@ -109,8 +117,8 @@ public:
         //- Construct from components
         tetIndices
         (
-            label cellI,
-            label faceI,
+            label celli,
+            label facei,
             label faceBasePtI,
             label facePtAI,
             label facePtBI,
@@ -120,8 +128,8 @@ public:
         //- Construct from cell, face, pt description of tet
         tetIndices
         (
-            label cellI,
-            label faceI,
+            label celli,
+            label facei,
             label tetPtI,
             const polyMesh& mesh
         );

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -90,12 +90,11 @@ bool Foam::patchDistMethods::Poisson::correct
                 ),
                 mesh_,
                 dimensionedScalar("yPsi", sqr(dimLength), 0.0),
-                y.boundaryField().types()
+                y.boundaryFieldRef().types()
             )
         );
     }
-
-    volScalarField& yPsi = tyPsi_();
+    volScalarField& yPsi = tyPsi_.ref();
 
     solve(fvm::laplacian(yPsi) == dimensionedScalar("1", dimless, -1.0));
 

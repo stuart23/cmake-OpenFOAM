@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -70,7 +70,7 @@ void Foam::meshToMesh0::interpolateField
         const labelList& overlapCells = adr[celli];
         const scalarList& w = weights[celli];
 
-        Type f = pTraits<Type>::zero;
+        Type f = Zero;
         forAll(overlapCells, i)
         {
             label fromCelli = overlapCells[i];
@@ -158,12 +158,8 @@ void Foam::meshToMesh0::interpolateInternalField
 {
     if (fromVf.mesh() != fromMesh_)
     {
-        FatalErrorIn
-        (
-            "meshToMesh0::interpolateInternalField(Field<Type>&, "
-            "const GeometricField<Type, fvPatchField, volMesh>&, "
-            "meshToMesh0::order, const CombineOp&) const"
-        )   << "the argument field does not correspond to the right mesh. "
+        FatalErrorInFunction
+            << "the argument field does not correspond to the right mesh. "
             << "Field size: " << fromVf.size()
             << " mesh size: " << fromMesh_.nCells()
             << exit(FatalError);
@@ -171,12 +167,8 @@ void Foam::meshToMesh0::interpolateInternalField
 
     if (toF.size() != toMesh_.nCells())
     {
-        FatalErrorIn
-        (
-            "meshToMesh0::interpolateInternalField(Field<Type>&, "
-            "const GeometricField<Type, fvPatchField, volMesh>&, "
-            "meshToMesh0::order, const CombineOp&) const"
-        )   << "the argument field does not correspond to the right mesh. "
+        FatalErrorInFunction
+            << "the argument field does not correspond to the right mesh. "
             << "Field size: " << toF.size()
             << " mesh size: " << toMesh_.nCells()
             << exit(FatalError);
@@ -229,12 +221,8 @@ void Foam::meshToMesh0::interpolateInternalField
             break;
         }
         default:
-            FatalErrorIn
-            (
-                "meshToMesh0::interpolateInternalField(Field<Type>&, "
-                "const GeometricField<Type, fvPatchField, volMesh>&, "
-                "meshToMesh0::order, const CombineOp&) const"
-            )   << "unknown interpolation scheme " << ord
+            FatalErrorInFunction
+                << "unknown interpolation scheme " << ord
                 << exit(FatalError);
     }
 }
@@ -244,7 +232,7 @@ template<class Type, class CombineOp>
 void Foam::meshToMesh0::interpolateInternalField
 (
     Field<Type>& toF,
-    const tmp<GeometricField<Type, fvPatchField, volMesh> >& tfromVf,
+    const tmp<GeometricField<Type, fvPatchField, volMesh>>& tfromVf,
     meshToMesh0::order ord,
     const CombineOp& cop
 ) const
@@ -265,6 +253,9 @@ void Foam::meshToMesh0::interpolate
 {
     interpolateInternalField(toVf, fromVf, ord, cop);
 
+    typename GeometricField<Type, fvPatchField, volMesh>::
+        Boundary& toVfBf = toVf.boundaryFieldRef();
+
     forAll(toMesh_.boundaryMesh(), patchi)
     {
         const fvPatch& toPatch = toMesh_.boundary()[patchi];
@@ -277,7 +268,7 @@ void Foam::meshToMesh0::interpolate
                 {
                     mapField
                     (
-                        toVf.boundaryField()[patchi],
+                        toVfBf[patchi],
                         fromVf,
                         boundaryAddressing_[patchi],
                         cop
@@ -289,7 +280,7 @@ void Foam::meshToMesh0::interpolate
                 {
                     interpolateField
                     (
-                        toVf.boundaryField()[patchi],
+                        toVfBf[patchi],
                         fromVf,
                         boundaryAddressing_[patchi],
                         toPatch.Cf(),
@@ -302,7 +293,7 @@ void Foam::meshToMesh0::interpolate
                 {
                     interpolateField
                     (
-                        toVf.boundaryField()[patchi],
+                        toVfBf[patchi],
                         fromVf,
                         boundaryAddressing_[patchi],
                         toPatch.Cf(),
@@ -312,27 +303,21 @@ void Foam::meshToMesh0::interpolate
                 }
                 case CELL_VOLUME_WEIGHT:
                 {
-                    // Do nothing
                     break;
                 }
 
                 default:
-                    FatalErrorIn
-                    (
-                        "meshToMesh0::interpolate("
-                        "GeometricField<Type, fvPatchField, volMesh>&, "
-                        "const GeometricField<Type, fvPatchField, volMesh>&, "
-                        "meshToMesh0::order, const CombineOp&) const"
-                    )   << "unknown interpolation scheme " << ord
+                    FatalErrorInFunction
+                        << "unknown interpolation scheme " << ord
                         << exit(FatalError);
             }
 
-            if (isA<mixedFvPatchField<Type> >(toVf.boundaryField()[patchi]))
+            if (isA<mixedFvPatchField<Type>>(toVfBf[patchi]))
             {
-                refCast<mixedFvPatchField<Type> >
+                refCast<mixedFvPatchField<Type>>
                 (
-                    toVf.boundaryField()[patchi]
-                ).refValue() = toVf.boundaryField()[patchi];
+                    toVfBf[patchi]
+                ).refValue() = toVfBf[patchi];
             }
         }
         else if
@@ -341,20 +326,9 @@ void Foam::meshToMesh0::interpolate
          && fromMeshPatches_.found(patchMap_.find(toPatch.name())())
         )
         {
-            /*
-            toVf.boundaryField()[patchi].map
-            (
-                fromVf.boundaryField()
-                [
-                    fromMeshPatches_.find(patchMap_.find(toPatch.name())())()
-                ],
-                boundaryAddressing_[patchi]
-            );
-            */
-
             mapField
             (
-                toVf.boundaryField()[patchi],
+                toVfBf[patchi],
                 fromVf.boundaryField()
                 [
                     fromMeshPatches_.find(patchMap_.find(toPatch.name())())()
@@ -371,7 +345,7 @@ template<class Type, class CombineOp>
 void Foam::meshToMesh0::interpolate
 (
     GeometricField<Type, fvPatchField, volMesh>& toVf,
-    const tmp<GeometricField<Type, fvPatchField, volMesh> >& tfromVf,
+    const tmp<GeometricField<Type, fvPatchField, volMesh>>& tfromVf,
     meshToMesh0::order ord,
     const CombineOp& cop
 ) const
@@ -382,7 +356,7 @@ void Foam::meshToMesh0::interpolate
 
 
 template<class Type, class CombineOp>
-Foam::tmp< Foam::GeometricField<Type, Foam::fvPatchField, Foam::volMesh> >
+Foam::tmp<Foam::GeometricField<Type, Foam::fvPatchField, Foam::volMesh>>
 Foam::meshToMesh0::interpolate
 (
     const GeometricField<Type, fvPatchField, volMesh>& fromVf,
@@ -398,35 +372,31 @@ Foam::meshToMesh0::interpolate
     // of boundary patches
     if (fromMesh_.boundary().size() != toMesh_.boundary().size())
     {
-        FatalErrorIn
-        (
-            "meshToMesh0::interpolate"
-            "(const GeometricField<Type, fvPatchField, volMesh>&,"
-            "meshToMesh0::order, const CombineOp&) const"
-        )   << "Incompatible meshes: different number of boundaries, "
+        FatalErrorInFunction
+            << "Incompatible meshes: different number of boundaries, "
                "only internal field may be interpolated"
             << exit(FatalError);
     }
 
     // Create and map the patch field values
-    PtrList<fvPatchField<Type> > patchFields
+    PtrList<fvPatchField<Type>> patchFields
     (
         boundaryAddressing_.size()
     );
 
-    forAll(boundaryAddressing_, patchI)
+    forAll(boundaryAddressing_, patchi)
     {
         patchFields.set
         (
-            patchI,
+            patchi,
             fvPatchField<Type>::New
             (
-                fromVf.boundaryField()[patchI],
-                toMesh_.boundary()[patchI],
+                fromVf.boundaryField()[patchi],
+                toMesh_.boundary()[patchi],
                 DimensionedField<Type, volMesh>::null(),
                 patchFieldInterpolator
                 (
-                    boundaryAddressing_[patchI]
+                    boundaryAddressing_[patchi]
                 )
             )
         );
@@ -434,7 +404,7 @@ Foam::meshToMesh0::interpolate
 
 
     // Create the complete field from the pieces
-    tmp<GeometricField<Type, fvPatchField, volMesh> > ttoF
+    tmp<GeometricField<Type, fvPatchField, volMesh>> ttoF
     (
         new GeometricField<Type, fvPatchField, volMesh>
         (
@@ -458,15 +428,15 @@ Foam::meshToMesh0::interpolate
 
 
 template<class Type, class CombineOp>
-Foam::tmp< Foam::GeometricField<Type, Foam::fvPatchField, Foam::volMesh> >
+Foam::tmp<Foam::GeometricField<Type, Foam::fvPatchField, Foam::volMesh>>
 Foam::meshToMesh0::interpolate
 (
-    const tmp<GeometricField<Type, fvPatchField, volMesh> >& tfromVf,
+    const tmp<GeometricField<Type, fvPatchField, volMesh>>& tfromVf,
     meshToMesh0::order ord,
     const CombineOp& cop
 ) const
 {
-    tmp<GeometricField<Type, fvPatchField, volMesh> > tint =
+    tmp<GeometricField<Type, fvPatchField, volMesh>> tint =
         interpolate(tfromVf(), ord, cop);
     tfromVf.clear();
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,7 +30,7 @@ Description
 Note
     Uses the extension \a .inp (input) to denote the format.
 
-See Also
+See also
     Foam::meshReaders::STARCD
 
 SourceFiles
@@ -100,9 +100,9 @@ public:
     // Selectors
 
         //- Read file and return surface
-        static autoPtr<MeshedSurface<Face> > New(const fileName& name)
+        static autoPtr<MeshedSurface<Face>> New(const fileName& name)
         {
-            return autoPtr<MeshedSurface<Face> >
+            return autoPtr<MeshedSurface<Face>>
             (
                 new STARCDsurfaceFormat<Face>(name)
             );
@@ -138,7 +138,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "STARCDsurfaceFormat.C"
+    #include "STARCDsurfaceFormat.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -66,7 +66,7 @@ private:
         fileName codeRoot_;
 
         //- Subdirectory name for loading libraries
-        fileName libSubDir_;
+        const fileName libSubDir_;
 
         //- Name for code
         word codeName_;
@@ -131,9 +131,6 @@ protected:
 
         //- Write SHA1 value as C-comment
         bool writeCommentSHA1(Ostream&) const;
-
-        //- Create CMakeLists
-        bool createCMakeLists() const;
 
         //- Copy/create Make/files prior to compilation
         bool createMakeFiles() const;
@@ -282,7 +279,7 @@ public:
         bool copyOrCreateFiles(const bool verbose = false) const;
 
         //- Compile a libso
-        bool makeLibso() const;
+        bool wmakeLibso() const;
 
 };
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -32,47 +32,58 @@ Description
     Values are transferred as plain text files, where OpenFOAM data is written
     as:
 
+    \verbatim
         # Patch: <patch name>
         <magSf1> <value1> <surfaceNormalGradient1>
         <magSf2> <value2> <surfaceNormalGradient2>
         <magSf3> <value3> <surfaceNormalGradient3>
         ...
         <magSfN> <valueN> <surfaceNormalGradientN>
+    \endverbatim
 
     and received as the constituent pieces of the `mixed' condition, i.e.
 
+    \verbatim
         # Patch: <patch name>
         <value1> <gradient1> <valueFracion1>
         <value2> <gradient2> <valueFracion2>
         <value3> <gradient3> <valueFracion3>
         ...
         <valueN> <gradientN> <valueFracionN>
+    \endverbatim
 
     Data is sent/received as a single file for all patches from the directory
 
+    \verbatim
         $FOAM_CASE/<commsDir>
+    \endverbatim
 
     At start-up, the boundary creates a lock file, i.e..
 
+    \verbatim
         OpenFOAM.lock
+    \endverbatim
 
     ... to signal the external source to wait.  During the boundary condition
     update, boundary values are written to file, e.g.
 
+    \verbatim
         <fileName>.out
+    \endverbatim
 
     The lock file is then removed, instructing the external source to take
     control of the program execution.  When ready, the external program
     should create the return values, e.g. to file
 
+    \verbatim
         <fileName>.in
+    \endverbatim
 
     ... and then re-instate the lock file.  The boundary condition will then
     read the return values, and pass program execution back to OpenFOAM.
 
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         commsDir     | communications directory   | yes         |
@@ -86,7 +97,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            externalCoupled;
         commsDir        "$FOAM_CASE/comms";
@@ -96,7 +107,7 @@ Description
     }
     \endverbatim
 
-SeeAlso
+See also
     mixedFvPatchField
 
 SourceFiles
@@ -161,7 +172,7 @@ private:
         bool master_;
 
         //- Offsets in data file to start reading at correct position
-        List<List<label> > offsets_;
+        List<List<label>> offsets_;
 
         //- Initialised flag
         bool initialised_;
@@ -263,9 +274,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchField<Type>> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new externalCoupledMixedFvPatchField<Type>(*this)
             );
@@ -279,12 +290,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchField<Type>> clone
         (
             const DimensionedField<Type, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new externalCoupledMixedFvPatchField<Type>(*this, iF)
             );
@@ -345,7 +356,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "externalCoupledMixedFvPatchField.C"
+    #include "externalCoupledMixedFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

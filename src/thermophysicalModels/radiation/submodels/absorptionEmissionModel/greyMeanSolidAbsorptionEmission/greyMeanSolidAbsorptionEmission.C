@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,7 +26,7 @@ License
 #include "greyMeanSolidAbsorptionEmission.H"
 #include "addToRunTimeSelectionTable.H"
 #include "unitConversion.H"
-#include "zeroGradientFvPatchFields.H"
+#include "extrapolatedCalculatedFvPatchFields.H"
 
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -54,17 +54,17 @@ greyMeanSolidAbsorptionEmission::X(const word specie) const
     const volScalarField& T = thermo_.T();
     const volScalarField& p = thermo_.p();
 
-    tmp<scalarField> tXj(new scalarField(T.internalField().size(), 0.0));
-    scalarField& Xj = tXj();
+    tmp<scalarField> tXj(new scalarField(T.primitiveField().size(), 0.0));
+    scalarField& Xj = tXj.ref();
 
-    tmp<scalarField> tRhoInv(new scalarField(T.internalField().size(), 0.0));
-    scalarField& rhoInv = tRhoInv();
+    tmp<scalarField> tRhoInv(new scalarField(T.primitiveField().size(), 0.0));
+    scalarField& rhoInv = tRhoInv.ref();
 
     forAll(mixture_.Y(), specieI)
     {
         const scalarField& Yi = mixture_.Y()[specieI];
 
-        forAll (rhoInv, iCell)
+        forAll(rhoInv, iCell)
         {
             rhoInv[iCell] +=
                 Yi[iCell]/mixture_.rho(specieI, p[iCell], T[iCell]);
@@ -98,15 +98,8 @@ greyMeanSolidAbsorptionEmission
 {
     if (!isA<basicSpecieMixture>(thermo_))
     {
-        FatalErrorIn
-        (
-            "radiation::greyMeanSolidAbsorptionEmission::"
-            "greyMeanSolidAbsorptionEmission"
-            "("
-                "const dictionary&, "
-                "const fvMesh&"
-            ")"
-        )   << "Model requires a multi-component thermo package"
+        FatalErrorInFunction
+            << "Model requires a multi-component thermo package"
             << abort(FatalError);
     }
 
@@ -123,15 +116,8 @@ greyMeanSolidAbsorptionEmission
         const word& key = iter().keyword();
         if (!mixture_.contains(key))
         {
-            WarningIn
-            (
-                "greyMeanSolidAbsorptionEmission::"
-                "greyMeanSolidAbsorptionEmission "
-                "("
-                "   const dictionary& dict,"
-                "   const fvMesh& mesh"
-                ")"
-            )   << " specie: " << key << " is not found in the solid mixture"
+            WarningInFunction
+                << " specie: " << key << " is not found in the solid mixture"
                 << nl
                 << " specie is the mixture are:" << mixture_.species() << nl
                 << nl << endl;
@@ -172,11 +158,11 @@ calc(const label propertyId) const
             ),
             mesh(),
             dimensionedScalar("a", dimless/dimLength, 0.0),
-            zeroGradientFvPatchVectorField::typeName
+            extrapolatedCalculatedFvPatchVectorField::typeName
         )
     );
 
-    scalarField& a = ta().internalField();
+    scalarField& a = ta.ref().primitiveFieldRef();
 
     forAllConstIter(HashTable<label>, speciesNames_, iter)
     {
@@ -186,7 +172,7 @@ calc(const label propertyId) const
         }
     }
 
-    ta().correctBoundaryConditions();
+    ta.ref().correctBoundaryConditions();
     return ta;
 }
 

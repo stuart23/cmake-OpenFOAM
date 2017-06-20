@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -108,17 +108,13 @@ public:
             const GeometricField<scalar, fvPatchField, volMesh>&
         ) const
         {
-            notImplemented
-            (
-                "harmonic::weights"
-                "(const GeometricField<scalar, fvPatchField, volMesh>&)"
-            );
+            NotImplemented;
 
             return tmp<surfaceScalarField>(NULL);
         }
 
         //- Return the face-interpolate of the given cell field
-        virtual tmp<GeometricField<scalar, fvsPatchField, surfaceMesh> >
+        virtual tmp<GeometricField<scalar, fvsPatchField, surfaceMesh>>
         interpolate
         (
             const GeometricField<scalar, fvPatchField, volMesh>& vf

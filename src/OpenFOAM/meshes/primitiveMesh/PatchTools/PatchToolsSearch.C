@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -32,8 +32,6 @@ Description
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Finds area, starting at faceI, delimited by borderEdge.
-// Marks all visited faces (from face-edge-face walk) with currentZone.
 template
 <
     class BoolListType,
@@ -42,13 +40,11 @@ template
     class PointField,
     class PointType
 >
-
-void
-Foam::PatchTools::markZone
+void Foam::PatchTools::markZone
 (
     const PrimitivePatch<Face, FaceList, PointField, PointType>& p,
     const BoolListType& borderEdge,
-    const label faceI,
+    const label facei,
     const label currentZone,
     labelList&  faceZone
 )
@@ -57,7 +53,7 @@ Foam::PatchTools::markZone
     const labelListList& edgeFaces = p.edgeFaces();
 
     // List of faces whose faceZone has been set.
-    labelList changedFaces(1, faceI);
+    labelList changedFaces(1, facei);
 
     while (true)
     {
@@ -66,9 +62,9 @@ Foam::PatchTools::markZone
 
         forAll(changedFaces, i)
         {
-            label faceI = changedFaces[i];
+            label facei = changedFaces[i];
 
-            const labelList& fEdges = faceEdges[faceI];
+            const labelList& fEdges = faceEdges[facei];
 
             forAll(fEdges, fEdgeI)
             {
@@ -80,31 +76,20 @@ Foam::PatchTools::markZone
 
                     forAll(eFaceLst, j)
                     {
-                        label nbrFaceI = eFaceLst[j];
+                        label nbrFacei = eFaceLst[j];
 
-                        if (faceZone[nbrFaceI] == -1)
+                        if (faceZone[nbrFacei] == -1)
                         {
-                            faceZone[nbrFaceI] = currentZone;
-                            newChangedFaces.append(nbrFaceI);
+                            faceZone[nbrFacei] = currentZone;
+                            newChangedFaces.append(nbrFacei);
                         }
-                        else if (faceZone[nbrFaceI] != currentZone)
+                        else if (faceZone[nbrFacei] != currentZone)
                         {
-                            FatalErrorIn
-                            (
-                                "PatchTools::markZone"
-                                "("
-                                    "const PrimitivePatch<Face, FaceList, "
-                                        "PointField, PointType>& p,"
-                                    "const BoolListType& borderEdge,"
-                                    "const label faceI,"
-                                    "const label currentZone,"
-                                    "labelList&  faceZone"
-                                ")"
-                            )
-                                << "Zones " << faceZone[nbrFaceI]
-                                << " at face " << nbrFaceI
+                            FatalErrorInFunction
+                                << "Zones " << faceZone[nbrFacei]
+                                << " at face " << nbrFacei
                                 << " connects to zone " << currentZone
-                                << " at face " << faceI
+                                << " at face " << facei
                                 << abort(FatalError);
                         }
                     }
@@ -123,8 +108,6 @@ Foam::PatchTools::markZone
 }
 
 
-// Finds areas delimited by borderEdge (or 'real' edges).
-// Fills faceZone accordingly
 template
 <
     class BoolListType,
@@ -146,15 +129,15 @@ Foam::PatchTools::markZones
     faceZone = -1;
 
     label zoneI = 0;
-    for (label startFaceI = 0; startFaceI < faceZone.size();)
+    for (label startFacei = 0; startFacei < faceZone.size();)
     {
         // Find next non-visited face
-        for (; startFaceI < faceZone.size(); ++startFaceI)
+        for (; startFacei < faceZone.size(); ++startFacei)
         {
-            if (faceZone[startFaceI] == -1)
+            if (faceZone[startFacei] == -1)
             {
-                faceZone[startFaceI] = zoneI;
-                markZone(p, borderEdge, startFaceI, zoneI, faceZone);
+                faceZone[startFacei] = zoneI;
+                markZone(p, borderEdge, startFacei, zoneI, faceZone);
                 zoneI++;
                 break;
             }
@@ -165,9 +148,6 @@ Foam::PatchTools::markZones
 }
 
 
-
-// Finds areas delimited by borderEdge (or 'real' edges).
-// Fills faceZone accordingly
 template
 <
     class BoolListType,
@@ -186,8 +166,8 @@ Foam::PatchTools::subsetMap
     labelList& faceMap
 )
 {
-    label faceI  = 0;
-    label pointI = 0;
+    label facei  = 0;
+    label pointi = 0;
 
     const List<Face>& localFaces = p.localFaces();
 
@@ -196,15 +176,15 @@ Foam::PatchTools::subsetMap
 
     boolList pointHad(pointMap.size(), false);
 
-    forAll(p, oldFaceI)
+    forAll(p, oldFacei)
     {
-        if (includeFaces[oldFaceI])
+        if (includeFaces[oldFacei])
         {
             // Store new faces compact
-            faceMap[faceI++] = oldFaceI;
+            faceMap[facei++] = oldFacei;
 
             // Renumber labels for face
-            const Face& f = localFaces[oldFaceI];
+            const Face& f = localFaces[oldFacei];
 
             forAll(f, fp)
             {
@@ -212,15 +192,15 @@ Foam::PatchTools::subsetMap
                 if (!pointHad[ptLabel])
                 {
                     pointHad[ptLabel]  = true;
-                    pointMap[pointI++] = ptLabel;
+                    pointMap[pointi++] = ptLabel;
                 }
             }
         }
     }
 
     // Trim
-    faceMap.setSize(faceI);
-    pointMap.setSize(pointI);
+    faceMap.setSize(facei);
+    pointMap.setSize(pointi);
 }
 
 
@@ -247,17 +227,17 @@ void Foam::PatchTools::calcBounds
     nPoints = 0;
     bb = boundBox::invertedBox;
 
-    forAll(p, faceI)
+    forAll(p, facei)
     {
-        const Face& f = p[faceI];
+        const Face& f = p[facei];
 
         forAll(f, fp)
         {
-            label pointI = f[fp];
-            if (pointIsUsed.set(pointI, 1u))
+            label pointi = f[fp];
+            if (pointIsUsed.set(pointi, 1u))
             {
-                bb.min() = ::Foam::min(bb.min(), points[pointI]);
-                bb.max() = ::Foam::max(bb.max(), points[pointI]);
+                bb.min() = ::Foam::min(bb.min(), points[pointi]);
+                bb.max() = ::Foam::max(bb.max(), points[pointi]);
                 nPoints++;
             }
         }

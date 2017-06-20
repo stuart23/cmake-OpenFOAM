@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,16 +28,17 @@ Description
     Miscellaneous information about surface meshes.
 
 Usage
-    - surfaceMeshInfo surfaceFile [OPTION]
+    \b surfaceMeshInfo surfaceFile [OPTION]
 
-    \param -areas \n
-    Report area for each face.
+    Options:
+      - \par -areas
+        Report area for each face.
 
-    \param -scale \<scale\> \n
-    Specify a scaling factor when reading files.
+      - \par -scale \<scale\>
+        Specify a scaling factor when reading files.
 
-    \param -xml \n
-    Write output in XML format.
+      - \par -xml
+        Write output in XML format.
 
 Note
     The filename extensions are used to determine the file format type.
@@ -143,9 +144,9 @@ int main(int argc, char *argv[])
         }
     }
 
-    forAll(surf, faceI)
+    forAll(surf, facei)
     {
-        const scalar fArea(surf[faceI].mag(surf.points()));
+        const scalar fArea(surf[facei].mag(surf.points()));
         areaTotal += fArea;
 
         if (writeAreas)

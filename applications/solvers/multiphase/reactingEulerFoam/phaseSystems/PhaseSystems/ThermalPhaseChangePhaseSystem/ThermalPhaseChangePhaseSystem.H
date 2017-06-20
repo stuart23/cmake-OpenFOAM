@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -77,10 +77,6 @@ protected:
         HashPtrTable<volScalarField, phasePairKey, phasePairKey::hash>
             iDmdt_;
 
-        //- Wall Mass transfer rate
-        HashPtrTable<volScalarField, phasePairKey, phasePairKey::hash>
-            wDmdt_;
-
 
 public:
 
@@ -98,6 +94,9 @@ public:
 
         //- Return the saturationModel
         const saturationModel& saturation() const;
+
+        //- Return the heat transfer matrices
+        virtual autoPtr<phaseSystem::heatTransferTable> heatTransfer() const;
 
         //- Return the mass transfer matrices
         virtual autoPtr<phaseSystem::massTransferTable> massTransfer() const;
@@ -117,7 +116,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "ThermalPhaseChangePhaseSystem.C"
+    #include "ThermalPhaseChangePhaseSystem.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

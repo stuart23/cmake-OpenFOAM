@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -27,15 +27,10 @@ License
 #include "pointMesh.H"
 #include "dictionary.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-pointPatchField<Type>::pointPatchField
+Foam::pointPatchField<Type>::pointPatchField
 (
     const pointPatch& p,
     const DimensionedField<Type, pointMesh>& iF
@@ -49,7 +44,7 @@ pointPatchField<Type>::pointPatchField
 
 
 template<class Type>
-pointPatchField<Type>::pointPatchField
+Foam::pointPatchField<Type>::pointPatchField
 (
     const pointPatch& p,
     const DimensionedField<Type, pointMesh>& iF,
@@ -80,7 +75,7 @@ Foam::pointPatchField<Type>::pointPatchField
 
 
 template<class Type>
-pointPatchField<Type>::pointPatchField
+Foam::pointPatchField<Type>::pointPatchField
 (
     const pointPatchField<Type>& ptf
 )
@@ -93,7 +88,7 @@ pointPatchField<Type>::pointPatchField
 
 
 template<class Type>
-pointPatchField<Type>::pointPatchField
+Foam::pointPatchField<Type>::pointPatchField
 (
     const pointPatchField<Type>& ptf,
     const DimensionedField<Type, pointMesh>& iF
@@ -109,14 +104,14 @@ pointPatchField<Type>::pointPatchField
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-const objectRegistry& pointPatchField<Type>::db() const
+const Foam::objectRegistry& Foam::pointPatchField<Type>::db() const
 {
     return patch_.boundaryMesh().mesh()();
 }
 
 
 template<class Type>
-void pointPatchField<Type>::write(Ostream& os) const
+void Foam::pointPatchField<Type>::write(Ostream& os) const
 {
     os.writeKeyword("type") << type() << token::END_STATEMENT << nl;
 
@@ -129,41 +124,40 @@ void pointPatchField<Type>::write(Ostream& os) const
 
 
 template<class Type>
-tmp<Field<Type> > pointPatchField<Type>::patchInternalField() const
+Foam::tmp<Foam::Field<Type>>
+Foam::pointPatchField<Type>::patchInternalField() const
 {
-    return patchInternalField(internalField());
+    return patchInternalField(primitiveField());
 }
 
 
 template<class Type>
 template<class Type1>
-tmp<Field<Type1> > pointPatchField<Type>::patchInternalField
+Foam::tmp<Foam::Field<Type1>>
+Foam::pointPatchField<Type>::patchInternalField
 (
     const Field<Type1>& iF,
     const labelList& meshPoints
 ) const
 {
     // Check size
-    if (iF.size() != internalField().size())
+    if (iF.size() != primitiveField().size())
     {
-        FatalErrorIn
-        (
-            "tmp<Field<Type1> > pointPatchField<"
-            "Type>::"
-            "patchInternalField(const Field<Type1>& iF) const"
-        )   << "given internal field does not correspond to the mesh. "
+        FatalErrorInFunction
+            << "given internal field does not correspond to the mesh. "
             << "Field size: " << iF.size()
-            << " mesh size: " << internalField().size()
+            << " mesh size: " << primitiveField().size()
             << abort(FatalError);
     }
 
-    return tmp<Field<Type1> >(new Field<Type1>(iF, meshPoints));
+    return tmp<Field<Type1>>(new Field<Type1>(iF, meshPoints));
 }
 
 
 template<class Type>
 template<class Type1>
-tmp<Field<Type1> > pointPatchField<Type>::patchInternalField
+Foam::tmp<Foam::Field<Type1>>
+Foam::pointPatchField<Type>::patchInternalField
 (
     const Field<Type1>& iF
 ) const
@@ -174,34 +168,26 @@ tmp<Field<Type1> > pointPatchField<Type>::patchInternalField
 
 template<class Type>
 template<class Type1>
-void pointPatchField<Type>::addToInternalField
+void Foam::pointPatchField<Type>::addToInternalField
 (
     Field<Type1>& iF,
     const Field<Type1>& pF
 ) const
 {
     // Check size
-    if (iF.size() != internalField().size())
+    if (iF.size() != primitiveField().size())
     {
-        FatalErrorIn
-        (
-            "void pointPatchField<Type>::"
-            "addToInternalField("
-            "Field<Type1>& iF, const Field<Type1>& iF) const"
-        )   << "given internal field does not correspond to the mesh. "
+        FatalErrorInFunction
+            << "given internal field does not correspond to the mesh. "
             << "Field size: " << iF.size()
-            << " mesh size: " << internalField().size()
+            << " mesh size: " << primitiveField().size()
             << abort(FatalError);
     }
 
     if (pF.size() != size())
     {
-        FatalErrorIn
-        (
-            "void pointPatchField<Type>::"
-            "addToInternalField("
-            "Field<Type1>& iF, const Field<Type1>& iF) const"
-        )   << "given patch field does not correspond to the mesh. "
+        FatalErrorInFunction
+            << "given patch field does not correspond to the mesh. "
             << "Field size: " << pF.size()
             << " mesh size: " << size()
             << abort(FatalError);
@@ -210,16 +196,16 @@ void pointPatchField<Type>::addToInternalField
     // Get the addressing
     const labelList& mp = patch().meshPoints();
 
-    forAll(mp, pointI)
+    forAll(mp, pointi)
     {
-        iF[mp[pointI]] += pF[pointI];
+        iF[mp[pointi]] += pF[pointi];
     }
 }
 
 
 template<class Type>
 template<class Type1>
-void pointPatchField<Type>::addToInternalField
+void Foam::pointPatchField<Type>::addToInternalField
 (
     Field<Type1>& iF,
     const Field<Type1>& pF,
@@ -227,27 +213,19 @@ void pointPatchField<Type>::addToInternalField
 ) const
 {
     // Check size
-    if (iF.size() != internalField().size())
+    if (iF.size() != primitiveField().size())
     {
-        FatalErrorIn
-        (
-            "void pointPatchField<Type>::"
-            "addToInternalField("
-            "Field<Type1>& iF, const Field<Type1>& iF, const labelList&) const"
-        )   << "given internal field does not correspond to the mesh. "
+        FatalErrorInFunction
+            << "given internal field does not correspond to the mesh. "
             << "Field size: " << iF.size()
-            << " mesh size: " << internalField().size()
+            << " mesh size: " << primitiveField().size()
             << abort(FatalError);
     }
 
     if (pF.size() != size())
     {
-        FatalErrorIn
-        (
-            "void pointPatchField<Type>::"
-            "addToInternalField("
-            "Field<Type1>& iF, const Field<Type1>& iF, const labelList&) const"
-        )   << "given patch field does not correspond to the mesh. "
+        FatalErrorInFunction
+            << "given patch field does not correspond to the mesh. "
             << "Field size: " << pF.size()
             << " mesh size: " << size()
             << abort(FatalError);
@@ -258,15 +236,15 @@ void pointPatchField<Type>::addToInternalField
 
     forAll(points, i)
     {
-        label pointI = points[i];
-        iF[mp[pointI]] += pF[pointI];
+        label pointi = points[i];
+        iF[mp[pointi]] += pF[pointi];
     }
 }
 
 
 template<class Type>
 template<class Type1>
-void pointPatchField<Type>::setInInternalField
+void Foam::pointPatchField<Type>::setInInternalField
 (
     Field<Type1>& iF,
     const Field<Type1>& pF,
@@ -274,42 +252,34 @@ void pointPatchField<Type>::setInInternalField
 ) const
 {
     // Check size
-    if (iF.size() != internalField().size())
+    if (iF.size() != primitiveField().size())
     {
-        FatalErrorIn
-        (
-            "void pointPatchField<Type>::"
-            "setInInternalField("
-            "Field<Type1>& iF, const Field<Type1>& iF) const"
-        )   << "given internal field does not correspond to the mesh. "
+        FatalErrorInFunction
+            << "given internal field does not correspond to the mesh. "
             << "Field size: " << iF.size()
-            << " mesh size: " << internalField().size()
+            << " mesh size: " << primitiveField().size()
             << abort(FatalError);
     }
 
     if (pF.size() != meshPoints.size())
     {
-        FatalErrorIn
-        (
-            "void pointPatchField<Type>::"
-            "setInInternalField("
-            "Field<Type1>& iF, const Field<Type1>& iF) const"
-        )   << "given patch field does not correspond to the meshPoints. "
+        FatalErrorInFunction
+            << "given patch field does not correspond to the meshPoints. "
             << "Field size: " << pF.size()
             << " meshPoints size: " << size()
             << abort(FatalError);
     }
 
-    forAll(meshPoints, pointI)
+    forAll(meshPoints, pointi)
     {
-        iF[meshPoints[pointI]] = pF[pointI];
+        iF[meshPoints[pointi]] = pF[pointi];
     }
 }
 
 
 template<class Type>
 template<class Type1>
-void pointPatchField<Type>::setInInternalField
+void Foam::pointPatchField<Type>::setInInternalField
 (
     Field<Type1>& iF,
     const Field<Type1>& pF
@@ -320,7 +290,7 @@ void pointPatchField<Type>::setInInternalField
 
 
 template<class Type>
-void pointPatchField<Type>::evaluate(const Pstream::commsTypes)
+void Foam::pointPatchField<Type>::evaluate(const Pstream::commsTypes)
 {
     if (!updated_)
     {
@@ -334,7 +304,7 @@ void pointPatchField<Type>::evaluate(const Pstream::commsTypes)
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
 template<class Type>
-Ostream& operator<<
+Foam::Ostream& Foam::operator<<
 (
     Ostream& os,
     const pointPatchField<Type>& ptf
@@ -347,10 +317,6 @@ Ostream& operator<<
     return os;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

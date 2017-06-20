@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "kEpsilon.H"
+#include "fvOptions.H"
 #include "bound.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -40,6 +41,7 @@ void kEpsilon<BasicTurbulenceModel>::correctNut()
 {
     this->nut_ = Cmu_*sqr(k_)/epsilon_;
     this->nut_.correctBoundaryConditions();
+    fv::options::New(this->mesh_).correct(this->nut_);
 
     BasicTurbulenceModel::correctNut();
 }
@@ -90,7 +92,7 @@ kEpsilon<BasicTurbulenceModel>::kEpsilon
     const word& type
 )
 :
-    eddyViscosity<RASModel<BasicTurbulenceModel> >
+    eddyViscosity<RASModel<BasicTurbulenceModel>>
     (
         type,
         alpha,
@@ -135,7 +137,7 @@ kEpsilon<BasicTurbulenceModel>::kEpsilon
         (
             "C3",
             this->coeffDict_,
-            -0.33
+            0
         )
     ),
     sigmak_
@@ -188,7 +190,6 @@ kEpsilon<BasicTurbulenceModel>::kEpsilon
     if (type == typeName)
     {
         this->printCoeffs(type);
-        correctNut();
     }
 }
 
@@ -198,7 +199,7 @@ kEpsilon<BasicTurbulenceModel>::kEpsilon
 template<class BasicTurbulenceModel>
 bool kEpsilon<BasicTurbulenceModel>::read()
 {
-    if (eddyViscosity<RASModel<BasicTurbulenceModel> >::read())
+    if (eddyViscosity<RASModel<BasicTurbulenceModel>>::read())
     {
         Cmu_.readIfPresent(this->coeffDict());
         C1_.readIfPresent(this->coeffDict());
@@ -230,17 +231,25 @@ void kEpsilon<BasicTurbulenceModel>::correct()
     const surfaceScalarField& alphaRhoPhi = this->alphaRhoPhi_;
     const volVectorField& U = this->U_;
     volScalarField& nut = this->nut_;
+    fv::options& fvOptions(fv::options::New(this->mesh_));
 
-    eddyViscosity<RASModel<BasicTurbulenceModel> >::correct();
+    eddyViscosity<RASModel<BasicTurbulenceModel>>::correct();
 
-    volScalarField divU(fvc::div(fvc::absolute(this->phi(), U)));
+    volScalarField::Internal divU
+    (
+        fvc::div(fvc::absolute(this->phi(), U))().v()
+    );
 
     tmp<volTensorField> tgradU = fvc::grad(U);
-    volScalarField G(this->GName(), nut*(dev(twoSymm(tgradU())) && tgradU()));
+    volScalarField::Internal G
+    (
+        this->GName(),
+        nut.v()*(dev(twoSymm(tgradU().v())) && tgradU().v())
+    );
     tgradU.clear();
 
     // Update epsilon and G at the wall
-    epsilon_.boundaryField().updateCoeffs();
+    epsilon_.boundaryFieldRef().updateCoeffs();
 
     // Dissipation equation
     tmp<fvScalarMatrix> epsEqn
@@ -249,15 +258,18 @@ void kEpsilon<BasicTurbulenceModel>::correct()
       + fvm::div(alphaRhoPhi, epsilon_)
       - fvm::laplacian(alpha*rho*DepsilonEff(), epsilon_)
      ==
-        C1_*alpha*rho*G*epsilon_/k_
-      - fvm::SuSp(((2.0/3.0)*C1_ + C3_)*alpha*rho*divU, epsilon_)
-      - fvm::Sp(C2_*alpha*rho*epsilon_/k_, epsilon_)
+        C1_*alpha()*rho()*G*epsilon_()/k_()
+      - fvm::SuSp(((2.0/3.0)*C1_ - C3_)*alpha()*rho()*divU, epsilon_)
+      - fvm::Sp(C2_*alpha()*rho()*epsilon_()/k_(), epsilon_)
       + epsilonSource()
+      + fvOptions(alpha, rho, epsilon_)
     );
 
-    epsEqn().relax();
-    epsEqn().boundaryManipulate(epsilon_.boundaryField());
+    epsEqn.ref().relax();
+    fvOptions.constrain(epsEqn.ref());
+    epsEqn.ref().boundaryManipulate(epsilon_.boundaryFieldRef());
     solve(epsEqn);
+    fvOptions.correct(epsilon_);
     bound(epsilon_, this->epsilonMin_);
 
     // Turbulent kinetic energy equation
@@ -267,14 +279,17 @@ void kEpsilon<BasicTurbulenceModel>::correct()
       + fvm::div(alphaRhoPhi, k_)
       - fvm::laplacian(alpha*rho*DkEff(), k_)
      ==
-        alpha*rho*G
-      - fvm::SuSp((2.0/3.0)*alpha*rho*divU, k_)
-      - fvm::Sp(alpha*rho*epsilon_/k_, k_)
+        alpha()*rho()*G
+      - fvm::SuSp((2.0/3.0)*alpha()*rho()*divU, k_)
+      - fvm::Sp(alpha()*rho()*epsilon_()/k_(), k_)
       + kSource()
+      + fvOptions(alpha, rho, k_)
     );
 
-    kEqn().relax();
+    kEqn.ref().relax();
+    fvOptions.constrain(kEqn.ref());
     solve(kEqn);
+    fvOptions.correct(k_);
     bound(k_, this->kMin_);
 
     correctNut();

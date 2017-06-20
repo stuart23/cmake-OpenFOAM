@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -173,18 +173,20 @@ class isoSurface
             const bool neiLower
         ) const;
 
+        //- Get neighbour value and position.
         void getNeighbour
         (
             const labelList& boundaryRegion,
             const volVectorField& meshC,
             const volScalarField& cVals,
-            const label cellI,
-            const label faceI,
+            const label celli,
+            const label facei,
             scalar& nbrValue,
             point& nbrPoint
         ) const;
 
-        //- Set faceCutType,cellCutType.
+        //- Determine for every face/cell whether it (possibly) generates
+        //  triangles.
         void calcCutTypes
         (
             const labelList& boundaryRegion,
@@ -193,19 +195,7 @@ class isoSurface
             const scalarField& pVals
         );
 
-        static labelPair findCommonPoints
-        (
-            const labelledTri&,
-            const labelledTri&
-        );
-
         static point calcCentre(const triSurface&);
-
-        static pointIndexHit collapseSurface
-        (
-            pointField& localPoints,
-            DynamicList<labelledTri, 64>& localTris
-        );
 
         //- Determine per cc whether all near cuts can be snapped to single
         //  point.
@@ -236,7 +226,7 @@ class isoSurface
         //- Return input field with coupled (and empty) patch values rewritten
         template<class Type>
         tmp<SlicedGeometricField
-        <Type, fvPatchField, slicedFvPatchField, volMesh> >
+        <Type, fvPatchField, slicedFvPatchField, volMesh>>
         adaptPatchFields
         (
             const GeometricField<Type, fvPatchField, volMesh>& fld
@@ -257,6 +247,9 @@ class isoSurface
             const Type& snapP1
         ) const;
 
+
+        //- Note: cannot use simpler isoSurfaceCell::generateTriPoints since
+        //  the need here to sometimes pass in remote 'snappedPoints'
         template<class Type>
         void generateTriPoints
         (
@@ -295,7 +288,7 @@ class isoSurface
             const DynamicList<Type>& snappedPoints,
             const labelList& snappedCc,
             const labelList& snappedPoint,
-            const label faceI,
+            const label facei,
 
             const scalar neiVal,
             const Type& neiPt,
@@ -323,6 +316,14 @@ class isoSurface
             DynamicList<label>& triMeshCells
         ) const;
 
+        template<class Type>
+        static tmp<Field<Type>> interpolate
+        (
+            const label nPoints,
+            const labelList& triPointMergeMap,
+            const DynamicList<Type>& unmergedValues
+        );
+
         triSurface stitchTriPoints
         (
             const bool checkDuplicates,
@@ -334,54 +335,6 @@ class isoSurface
         //- Check single triangle for (topological) validity
         static bool validTri(const triSurface&, const label);
 
-        //- Determine edge-face addressing
-        void calcAddressing
-        (
-            const triSurface& surf,
-            List<FixedList<label, 3> >& faceEdges,
-            labelList& edgeFace0,
-            labelList& edgeFace1,
-            Map<labelList>& edgeFacesRest
-        ) const;
-
-        //- Determine orientation
-        static void walkOrientation
-        (
-            const triSurface& surf,
-            const List<FixedList<label, 3> >& faceEdges,
-            const labelList& edgeFace0,
-            const labelList& edgeFace1,
-            const label seedTriI,
-            labelList& flipState
-        );
-
-        //- Orient surface
-        static void orientSurface
-        (
-            triSurface&,
-            const List<FixedList<label, 3> >& faceEdges,
-            const labelList& edgeFace0,
-            const labelList& edgeFace1,
-            const Map<labelList>& edgeFacesRest
-        );
-
-        //- Is triangle (given by 3 edges) not fully connected?
-        static bool danglingTriangle
-        (
-            const FixedList<label, 3>& fEdges,
-            const labelList& edgeFace1
-        );
-
-        //- Mark all non-fully connected triangles
-        static label markDanglingTriangles
-        (
-            const List<FixedList<label, 3> >& faceEdges,
-            const labelList& edgeFace0,
-            const labelList& edgeFace1,
-            const Map<labelList>& edgeFacesRest,
-            boolList& keepTriangles
-        );
-
         static triSurface subsetMesh
         (
             const triSurface& s,
@@ -391,6 +344,10 @@ class isoSurface
         );
 
 public:
+
+    //- Declare friendship with isoSurfaceCell to share some functionality
+    friend class isoSurfaceCell;
+
 
     //- Runtime type information
     TypeName("isoSurface");
@@ -413,22 +370,16 @@ public:
 
     // Member Functions
 
-        //- For every face original cell in mesh
+        //- For every triangle the original cell in mesh
         const labelList& meshCells() const
         {
             return meshCells_;
         }
 
-        //- For every unmerged triangle point the point in the triSurface
-        const labelList& triPointMergeMap() const
-        {
-            return triPointMergeMap_;
-        }
-
         //- Interpolates cCoords,pCoords. Uses the references to the original
         //  fields used to create the iso surface.
         template<class Type>
-        tmp<Field<Type> > interpolate
+        tmp<Field<Type>> interpolate
         (
             const GeometricField<Type, fvPatchField, volMesh>& cCoords,
             const Field<Type>& pCoords
@@ -444,7 +395,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "isoSurfaceTemplates.C"
+    #include "isoSurfaceTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

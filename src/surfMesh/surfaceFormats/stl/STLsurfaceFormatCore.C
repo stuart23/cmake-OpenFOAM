@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -101,10 +101,7 @@ bool Foam::fileFormats::STLsurfaceFormatCore::readBINARY
     // Check that stream is OK, if not this may be an ASCII file
     if (!is.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::STLsurfaceFormatCore::readBINARY(IFstream&)"
-        )
+        FatalErrorInFunction
             << "problem reading header, perhaps file is not binary "
             << exit(FatalError);
     }
@@ -127,10 +124,7 @@ bool Foam::fileFormats::STLsurfaceFormatCore::readBINARY
      || nTris > int(dataFileSize - headerSize)/25
     )
     {
-        FatalErrorIn
-        (
-            "fileFormats::STLsurfaceFormatCore::readBINARY(istream&)"
-        )
+        FatalErrorInFunction
             << "problem reading number of triangles, perhaps file is not binary"
             << exit(FatalError);
     }
@@ -148,7 +142,7 @@ bool Foam::fileFormats::STLsurfaceFormatCore::readBINARY
 
     label ptI = 0;
     label zoneI = -1;
-    forAll(zoneIds_, faceI)
+    forAll(zoneIds_, facei)
     {
         // Read an STL triangle
         STLtriangle stlTri(is);
@@ -178,7 +172,7 @@ bool Foam::fileFormats::STLsurfaceFormatCore::readBINARY
             dynSizes.append(0);
         }
 
-        zoneIds_[faceI] = zoneI;
+        zoneIds_[facei] = zoneI;
         dynSizes[zoneI]++;
 
 #ifdef DEBUG_STLBINARY

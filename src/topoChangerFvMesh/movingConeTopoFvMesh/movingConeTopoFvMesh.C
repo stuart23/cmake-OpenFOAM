@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -59,7 +59,7 @@ Foam::tmp<Foam::scalarField> Foam::movingConeTopoFvMesh::vertexMarkup
         << curLeft << " curRight: " << curRight << endl;
 
     tmp<scalarField> tvertexMarkup(new scalarField(p.size()));
-    scalarField& vertexMarkup = tvertexMarkup();
+    scalarField& vertexMarkup = tvertexMarkup.ref();
 
     forAll(p, pI)
     {
@@ -93,7 +93,7 @@ void Foam::movingConeTopoFvMesh::addZonesAndModifiers()
      || topoChanger_.size()
     )
     {
-        Info<< "void movingConeTopoFvMesh::addZonesAndModifiers() : "
+        InfoInFunction
             << "Zones and modifiers already present.  Skipping."
             << endl;
 
@@ -114,38 +114,38 @@ void Foam::movingConeTopoFvMesh::addZonesAndModifiers()
     boolList flipZone2(fc.size(), false);
     label nZoneFaces2 = 0;
 
-    forAll(fc, faceI)
+    forAll(fc, facei)
     {
         if
         (
-            fc[faceI].x() > -0.003501
-         && fc[faceI].x() < -0.003499
+            fc[facei].x() > -0.003501
+         && fc[facei].x() < -0.003499
         )
         {
-            if ((fa[faceI] & vector(1, 0, 0)) < 0)
+            if ((fa[facei] & vector(1, 0, 0)) < 0)
             {
                 flipZone1[nZoneFaces1] = true;
             }
 
-            zone1[nZoneFaces1] = faceI;
-            Info<< "face " << faceI << " for zone 1.  Flip: "
+            zone1[nZoneFaces1] = facei;
+            Info<< "face " << facei << " for zone 1.  Flip: "
                 << flipZone1[nZoneFaces1] << endl;
             nZoneFaces1++;
         }
         else if
         (
-            fc[faceI].x() > -0.00701
-         && fc[faceI].x() < -0.00699
+            fc[facei].x() > -0.00701
+         && fc[facei].x() < -0.00699
         )
         {
-            zone2[nZoneFaces2] = faceI;
+            zone2[nZoneFaces2] = facei;
 
-            if ((fa[faceI] & vector(1, 0, 0)) > 0)
+            if ((fa[facei] & vector(1, 0, 0)) > 0)
             {
                 flipZone2[nZoneFaces2] = true;
             }
 
-            Info<< "face " << faceI << " for zone 2.  Flip: "
+            Info<< "face " << facei << " for zone 2.  Flip: "
                 << flipZone2[nZoneFaces2] << endl;
             nZoneFaces2++;
         }
@@ -337,48 +337,6 @@ bool Foam::movingConeTopoFvMesh::update()
         if (topoChangeMap().hasMotionPoints())
         {
             Info<< "Topology change. Has premotion points" << endl;
-            //Info<< "preMotionPoints:" << topoChangeMap().preMotionPoints()
-            //    << endl;
-
-            //mkDir(time().timePath());
-            //{
-            //    OFstream str(time().timePath()/"meshPoints.obj");
-            //    Pout<< "Writing mesh with meshPoints to " << str.name()
-            //        << endl;
-            //
-            //    const pointField& currentPoints = points();
-            //    label vertI = 0;
-            //    forAll(currentPoints, pointI)
-            //    {
-            //        meshTools::writeOBJ(str, currentPoints[pointI]);
-            //        vertI++;
-            //    }
-            //    forAll(edges(), edgeI)
-            //    {
-            //        const edge& e = edges()[edgeI];
-            //        str << "l " << e[0]+1 << ' ' << e[1]+1 << nl;
-            //    }
-            //}
-            //{
-            //    OFstream str(time().timePath()/"preMotionPoints.obj");
-            //    Pout<< "Writing mesh with preMotionPoints to " << str.name()
-            //        << endl;
-            //
-            //    const pointField& newPoints =
-            //        topoChangeMap().preMotionPoints();
-            //    label vertI = 0;
-            //    forAll(newPoints, pointI)
-            //    {
-            //        meshTools::writeOBJ(str, newPoints[pointI]);
-            //        vertI++;
-            //    }
-            //    forAll(edges(), edgeI)
-            //    {
-            //        const edge& e = edges()[edgeI];
-            //        str << "l " << e[0]+1 << ' ' << e[1]+1 << nl;
-            //    }
-            //}
-
 
             motionMask_ =
                 vertexMarkup

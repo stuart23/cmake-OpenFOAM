@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -39,8 +39,7 @@ Description
     The first of these is not instantiated by default as the standard
     leastSquaresGrad is equivalent and more efficient.
 
-    \heading Usage
-
+Usage
     Example of the gradient specification:
     \verbatim
     gradSchemes
@@ -49,7 +48,7 @@ Description
     }
     \endverbatim
 
-See Also
+See also
     Foam::fv::LeastSquaresVectors
     Foam::fv::leastSquaresGrad
 
@@ -157,7 +156,7 @@ public:
                 LeastSquaresGrad##TYPE##STENCIL##_;                            \
                                                                                \
             gradScheme<Foam::TYPE>::addIstreamConstructorToTable               \
-                <LeastSquaresGrad<Foam::TYPE, Foam::STENCIL> >                 \
+                <LeastSquaresGrad<Foam::TYPE, Foam::STENCIL>>                  \
                 add##SS##STENCIL##TYPE##IstreamConstructorToTable_;            \
         }                                                                      \
     }
@@ -175,7 +174,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "LeastSquaresGrad.C"
+    #include "LeastSquaresGrad.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,7 +25,6 @@ License
 
 #include "solidChemistryModel.H"
 #include "reactingMixture.H"
-#include "zeroGradientFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -60,16 +59,16 @@ solidChemistryModel
     reactingCells_(mesh.nCells(), true)
 {
     // create the fields for the chemistry sources
-    forAll(RRs_, fieldI)
+    forAll(RRs_, fieldi)
     {
         RRs_.set
         (
-            fieldI,
+            fieldi,
             new DimensionedField<scalar, volMesh>
             (
                 IOobject
                 (
-                    "RRs." + Ys_[fieldI].name(),
+                    "RRs." + Ys_[fieldi].name(),
                     mesh.time().timeName(),
                     mesh,
                     IOobject::NO_READ,
@@ -99,10 +98,7 @@ Foam::scalar Foam::solidChemistryModel<CompType, SolidThermo>::solve
     const scalarField& deltaT
 )
 {
-    notImplemented
-    (
-        "solidChemistryModel::solve(const scalarField& deltaT)"
-    );
+    NotImplemented;
     return 0;
 }
 
@@ -111,10 +107,7 @@ template<class CompType, class SolidThermo>
 Foam::tmp<Foam::volScalarField>
 Foam::solidChemistryModel<CompType, SolidThermo>::tc() const
 {
-    notImplemented
-    (
-        "solidChemistryModel::tc()"
-    );
+    NotImplemented;
     return volScalarField::null();
 }
 
@@ -137,21 +130,20 @@ Foam::solidChemistryModel<CompType, SolidThermo>::Sh() const
                 false
             ),
             this->mesh_,
-            dimensionedScalar("zero", dimEnergy/dimTime/dimVolume, 0.0),
-            zeroGradientFvPatchScalarField::typeName
+            dimensionedScalar("zero", dimEnergy/dimTime/dimVolume, 0.0)
         )
     );
 
     if (this->chemistry_)
     {
-        scalarField& Sh = tSh();
+        scalarField& Sh = tSh.ref();
 
         forAll(Ys_, i)
         {
-            forAll(Sh, cellI)
+            forAll(Sh, celli)
             {
                 scalar hf = solidThermo_[i].Hc();
-                Sh[cellI] -= hf*RRs_[i][cellI];
+                Sh[celli] -= hf*RRs_[i][celli];
             }
         }
     }
@@ -178,15 +170,14 @@ Foam::solidChemistryModel<CompType, SolidThermo>::dQ() const
                 false
             ),
             this->mesh_,
-            dimensionedScalar("dQ", dimEnergy/dimTime, 0.0),
-            zeroGradientFvPatchScalarField::typeName
+            dimensionedScalar("dQ", dimEnergy/dimTime, 0.0)
         )
     );
 
     if (this->chemistry_)
     {
-        volScalarField& dQ = tdQ();
-        dQ.dimensionedInternalField() = this->mesh_.V()*Sh()();
+        volScalarField& dQ = tdQ.ref();
+        dQ.ref() = this->mesh_.V()*Sh()();
     }
 
     return tdQ;
@@ -196,11 +187,11 @@ Foam::solidChemistryModel<CompType, SolidThermo>::dQ() const
 template<class CompType, class SolidThermo>
 void Foam::solidChemistryModel<CompType, SolidThermo>::setCellReacting
 (
-    const label cellI,
+    const label celli,
     const bool active
 )
 {
-    reactingCells_[cellI] = active;
+    reactingCells_[celli] = active;
 }
 
 // ************************************************************************* //

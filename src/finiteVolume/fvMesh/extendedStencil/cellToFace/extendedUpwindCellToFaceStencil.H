@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -83,8 +83,8 @@ class extendedUpwindCellToFaceStencil
         (
             const boolList& nonEmptyFace,
             const scalar minOpposedness,
-            const label faceI,
-            const label cellI,
+            const label facei,
+            const label celli,
             DynamicList<label>& oppositeFaces
         ) const;
 
@@ -94,8 +94,8 @@ class extendedUpwindCellToFaceStencil
             const boolList& nonEmptyFace,
             const labelListList& faceStencil,
             const scalar minOpposedness,
-            const label faceI,
-            const label cellI,
+            const label facei,
+            const label celli,
             const bool stencilHasNeighbour,
 
             DynamicList<label>& oppositeFaces,
@@ -175,12 +175,12 @@ public:
 
         //- Sum vol field contributions to create face values
         template<class Type>
-        tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > weightedSum
+        tmp<GeometricField<Type, fvsPatchField, surfaceMesh>> weightedSum
         (
             const surfaceScalarField& phi,
             const GeometricField<Type, fvPatchField, volMesh>& fld,
-            const List<List<scalar> >& ownWeights,
-            const List<List<scalar> >& neiWeights
+            const List<List<scalar>>& ownWeights,
+            const List<List<scalar>>& neiWeights
         ) const;
 
 };
@@ -193,7 +193,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "extendedUpwindCellToFaceStencilTemplates.C"
+    #include "extendedUpwindCellToFaceStencilTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,7 +30,7 @@ License
 // * * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::fv::gradScheme<Type> > Foam::fv::gradScheme<Type>::New
+Foam::tmp<Foam::fv::gradScheme<Type>> Foam::fv::gradScheme<Type>::New
 (
     const fvMesh& mesh,
     Istream& schemeData
@@ -38,18 +38,13 @@ Foam::tmp<Foam::fv::gradScheme<Type> > Foam::fv::gradScheme<Type>::New
 {
     if (fv::debug)
     {
-        Info<< "gradScheme<Type>::New"
-               "(const fvMesh& mesh, Istream& schemeData) : "
-               "constructing gradScheme<Type>"
-            << endl;
+        InfoInFunction << "Constructing gradScheme<Type>" << endl;
     }
 
     if (schemeData.eof())
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "gradScheme<Type>::New"
-            "(const fvMesh& mesh, Istream& schemeData)",
             schemeData
         )   << "Grad scheme not specified" << endl << endl
             << "Valid grad schemes are :" << endl
@@ -64,10 +59,8 @@ Foam::tmp<Foam::fv::gradScheme<Type> > Foam::fv::gradScheme<Type>::New
 
     if (cstrIter == IstreamConstructorTablePtr_->end())
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "gradScheme<Type>::New"
-            "(const fvMesh& mesh, Istream& schemeData)",
             schemeData
         )   << "Unknown grad scheme " << schemeName << nl << nl
             << "Valid grad schemes are :" << endl
@@ -204,7 +197,7 @@ Foam::tmp
 >
 Foam::fv::gradScheme<Type>::grad
 (
-    const tmp<GeometricField<Type, fvPatchField, volMesh> >& tvsf
+    const tmp<GeometricField<Type, fvPatchField, volMesh>>& tvsf
 ) const
 {
     typedef typename outerProduct<vector, Type>::type GradType;

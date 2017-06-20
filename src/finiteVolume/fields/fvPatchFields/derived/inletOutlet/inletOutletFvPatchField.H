@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -31,8 +31,7 @@ Description
     This boundary condition provides a generic outflow condition, with
     specified inflow for the case of return flow.
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         phi          | Flux field name         | no          | phi
@@ -41,7 +40,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            inletOutlet;
         phi             phi;
@@ -58,7 +57,7 @@ Note
     - Positive flux (out of domain): apply zero-gradient condition
     - Negative flux (into of domain): apply the "inletValue" fixed-value
 
-SeeAlso
+See also
     Foam::mixedFvPatchField
     Foam::zeroGradientFvPatchField
     Foam::outletInletFvPatchField
@@ -135,9 +134,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchField<Type>> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new inletOutletFvPatchField<Type>(*this)
             );
@@ -151,12 +150,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchField<Type>> clone
         (
             const DimensionedField<Type, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new inletOutletFvPatchField<Type>(*this, iF)
             );
@@ -164,6 +163,15 @@ public:
 
 
     // Member functions
+
+        // Attributes
+
+            //- Return true: this patch field is altered by assignment
+            virtual bool assignable() const
+            {
+                return true;
+            }
+
 
         //- Update the coefficients associated with the patch field
         virtual void updateCoeffs();
@@ -185,7 +193,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "inletOutletFvPatchField.C"
+    #include "inletOutletFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

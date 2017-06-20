@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -50,8 +50,7 @@ Description
         Nov. 2001
     \endverbatim
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         Cmu          | model coefficient       | no          | 0.09
@@ -62,7 +61,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            omegaWallFunction;
     }
@@ -128,7 +127,7 @@ protected:
         label master_;
 
         //- List of averaging corner weights
-        List<List<scalar> > cornerWeights_;
+        List<List<scalar>> cornerWeights_;
 
 
     // Protected Member Functions
@@ -264,7 +263,7 @@ public:
             virtual void updateCoeffs();
 
             //- Update the coefficients associated with the patch field
-            virtual void updateCoeffs(const scalarField& weights);
+            virtual void updateWeightedCoeffs(const scalarField& weights);
 
             //- Manipulate matrix
             virtual void manipulateMatrix(fvMatrix<scalar>& matrix);

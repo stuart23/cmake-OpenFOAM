@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -35,7 +35,7 @@ License
 
 namespace Foam
 {
-defineTypeNameAndDebug(commSchedule, 0);
+    defineTypeNameAndDebug(commSchedule, 0);
 }
 
 
@@ -62,7 +62,6 @@ Foam::label Foam::commSchedule::outstandingComms
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from separate addressing
 Foam::commSchedule::commSchedule
 (
     const label nProcs,
@@ -73,7 +72,7 @@ Foam::commSchedule::commSchedule
     procSchedule_(nProcs)
 {
     // Determine comms per processor.
-    List<DynamicList<label> > procToComms(nProcs);
+    List<DynamicList<label>> procToComms(nProcs);
 
     forAll(comms, commI)
     {
@@ -82,11 +81,8 @@ Foam::commSchedule::commSchedule
 
         if (proc0 < 0 || proc0 >= nProcs || proc1 < 0 || proc1 >= nProcs)
         {
-            FatalErrorIn
-            (
-                "commSchedule::commSchedule"
-                "(const label, const List<labelPair>&)"
-            )   << "Illegal processor " << comms[commI] << abort(FatalError);
+            FatalErrorInFunction
+                << "Illegal processor " << comms[commI] << abort(FatalError);
         }
 
         procToComms[proc0].append(commI);
@@ -217,15 +213,15 @@ Foam::commSchedule::commSchedule
                 // Print it
                 OStringStream os;
                 os  << setw(3) << iter << " |";
-                forAll(procToComm, procI)
+                forAll(procToComm, proci)
                 {
-                    if (procToComm[procI] == -1)
+                    if (procToComm[proci] == -1)
                     {
                         os  << "   ";
                     }
                     else
                     {
-                        os  << setw(3) << procToComm[procI];
+                        os  << setw(3) << procToComm[proci];
                     }
                 }
                 Pout<< os.str().c_str() << endl;
@@ -258,9 +254,9 @@ Foam::commSchedule::commSchedule
         nProcScheduled[twoProcs[1]]++;
     }
     // Allocate
-    forAll(procSchedule_, procI)
+    forAll(procSchedule_, proci)
     {
-        procSchedule_[procI].setSize(nProcScheduled[procI]);
+        procSchedule_[proci].setSize(nProcScheduled[proci]);
     }
     nProcScheduled = 0;
     // Fill
@@ -280,17 +276,17 @@ Foam::commSchedule::commSchedule
     {
         Pout<< "commSchedule::commSchedule : Per processor:" << endl;
 
-        forAll(procSchedule_, procI)
+        forAll(procSchedule_, proci)
         {
-            const labelList& procComms = procSchedule_[procI];
+            const labelList& procComms = procSchedule_[proci];
 
-            Pout<< "Processor " << procI << " talks to processors:" << endl;
+            Pout<< "Processor " << proci << " talks to processors:" << endl;
 
             forAll(procComms, i)
             {
                 const labelPair& twoProcs = comms[procComms[i]];
 
-                label nbr = (twoProcs[1] == procI ? twoProcs[0] : twoProcs[1]);
+                label nbr = (twoProcs[1] == proci ? twoProcs[0] : twoProcs[1]);
 
                 Pout<< "    " << nbr << endl;
             }

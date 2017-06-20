@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -38,7 +38,7 @@ bool Foam::triSurface::readOFF(const fileName& OFFfileName)
 
     if (!OFFfile.good())
     {
-        FatalErrorIn("triSurface::readOFF(const fileName&)")
+        FatalErrorInFunction
             << "Cannot read file " << OFFfileName
             << exit(FatalError);
     }
@@ -47,7 +47,7 @@ bool Foam::triSurface::readOFF(const fileName& OFFfileName)
     string hdr = getLineNoComment(OFFfile);
     if (hdr != "OFF")
     {
-        FatalErrorIn("triSurface::readOFF(const fileName&)")
+        FatalErrorInFunction
             << "OFF file " << OFFfileName
             << " does not start with 'OFF'"
             << exit(FatalError);
@@ -79,7 +79,7 @@ bool Foam::triSurface::readOFF(const fileName& OFFfileName)
     // Read faces & triangulate them,
     DynamicList<labelledTri> tris(nElems);
 
-    for (label faceI = 0; faceI < nElems; faceI++)
+    for (label facei = 0; facei < nElems; facei++)
     {
         line = getLineNoComment(OFFfile);
         {
@@ -113,9 +113,9 @@ bool Foam::triSurface::readOFF(const fileName& OFFfileName)
 
                 f.triangles(points, nTri, triFaces);
 
-                forAll(triFaces, triFaceI)
+                forAll(triFaces, triFacei)
                 {
-                    const face& f = triFaces[triFaceI];
+                    const face& f = triFaces[triFacei];
 
                     tris.append(labelledTri(f[0], f[1], f[2], 0));
                 }

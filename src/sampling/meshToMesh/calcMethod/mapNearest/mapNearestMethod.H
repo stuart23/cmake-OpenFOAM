@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -98,17 +98,17 @@ protected:
         virtual void setNextNearestCells
         (
             label& startSeedI,
-            label& srcCellI,
-            label& tgtCellI,
+            label& srcCelli,
+            label& tgtCelli,
             boolList& mapFlag,
             const labelList& srcCellIDs
         ) const;
 
-        //- Find a source cell mapped to target cell tgtCellI
+        //- Find a source cell mapped to target cell tgtCelli
         virtual label findMappedSrcCell
         (
-            const label tgtCellI,
-            const List<DynamicList<label> >& tgtToSrc
+            const label tgtCelli,
+            const List<DynamicList<label>>& tgtToSrc
         ) const;
 
         //- Disallow default bitwise copy construct

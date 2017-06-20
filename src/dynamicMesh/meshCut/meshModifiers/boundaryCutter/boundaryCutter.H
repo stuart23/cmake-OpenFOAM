@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -71,7 +71,7 @@ class boundaryCutter
         const polyMesh& mesh_;
 
         //- Per edge sorted (start to end) list of points added.
-        HashTable<labelList, edge, Hash<edge> > edgeAddedPoints_;
+        HashTable<labelList, edge, Hash<edge>> edgeAddedPoints_;
 
         //- Per face the mid point added.
         Map<label> faceAddedPoint_;
@@ -82,31 +82,31 @@ class boundaryCutter
         //- Get patch and zone info for face
         void getFaceInfo
         (
-            const label faceI,
+            const label facei,
             label& patchID,
             label& zoneID,
             label& zoneFlip
         ) const;
 
         //- Add cuts of edges to face
-        face addEdgeCutsToFace(const label faceI, const Map<labelList>&) const;
+        face addEdgeCutsToFace(const label facei, const Map<labelList>&) const;
 
         //- Splits faces with multiple cut edges. Return true if anything split.
         bool splitFace
         (
-            const label faceI,
+            const label facei,
             const Map<point>& pointToPos,
             const Map<labelList>& edgeToAddedPoints,
             polyTopoChange& meshMod
         ) const;
 
-        //- Add/modify faceI for new vertices.
+        //- Add/modify facei for new vertices.
         void addFace
         (
-            const label faceI,
+            const label facei,
             const face& newFace,
 
-            bool& modifiedFace,     // have we already 'used' faceI?
+            bool& modifiedFace,     // have we already 'used' facei?
             polyTopoChange& meshMod
         ) const;
 
@@ -146,7 +146,7 @@ public:
             void setRefinement
             (
                 const Map<point>& pointToPos,
-                const Map<List<point> >& edgeToCuts,
+                const Map<List<point>>& edgeToCuts,
                 const Map<labelPair>& faceToSplit,
                 const Map<point>& faceToFeaturePoint,
                 polyTopoChange& meshMod
@@ -159,7 +159,7 @@ public:
         // Access
 
             //- Per edge a sorted list (start to end) of added points.
-            const HashTable<labelList, edge, Hash<edge> >& edgeAddedPoints()
+            const HashTable<labelList, edge, Hash<edge>>& edgeAddedPoints()
              const
             {
                 return edgeAddedPoints_;

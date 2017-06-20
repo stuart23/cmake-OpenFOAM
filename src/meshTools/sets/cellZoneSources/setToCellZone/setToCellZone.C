@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -105,11 +105,8 @@ void Foam::setToCellZone::applyToSet
 {
     if (!isA<cellZoneSet>(set))
     {
-        WarningIn
-        (
-            "setToCellZone::applyToSet(const topoSetSource::setAction"
-            ", topoSet"
-        )   << "Operation only allowed on a cellZoneSet." << endl;
+        WarningInFunction
+            << "Operation only allowed on a cellZoneSet." << endl;
     }
     else
     {
@@ -128,11 +125,11 @@ void Foam::setToCellZone::applyToSet
 
             forAllConstIter(cellSet, fSet, iter)
             {
-                label cellI = iter.key();
+                label celli = iter.key();
 
-                if (!fzSet.found(cellI))
+                if (!fzSet.found(celli))
                 {
-                    newAddressing.append(cellI);
+                    newAddressing.append(celli);
                 }
             }
 

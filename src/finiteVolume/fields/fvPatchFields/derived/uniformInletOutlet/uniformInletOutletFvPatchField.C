@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -37,8 +37,8 @@ Foam::uniformInletOutletFvPatchField<Type>::uniformInletOutletFvPatchField
     mixedFvPatchField<Type>(p, iF),
     phiName_("phi")
 {
-    this->refValue() = pTraits<Type>::zero;
-    this->refGrad() = pTraits<Type>::zero;
+    this->refValue() = Zero;
+    this->refGrad() = Zero;
     this->valueFraction() = 0.0;
 }
 
@@ -53,7 +53,7 @@ Foam::uniformInletOutletFvPatchField<Type>::uniformInletOutletFvPatchField
 :
     mixedFvPatchField<Type>(p, iF),
     phiName_(dict.lookupOrDefault<word>("phi", "phi")),
-    uniformInletValue_(DataEntry<Type>::New("uniformInletValue", dict))
+    uniformInletValue_(Function1<Type>::New("uniformInletValue", dict))
 {
     this->refValue() =
         uniformInletValue_->value(this->db().time().timeOutputValue());
@@ -70,7 +70,7 @@ Foam::uniformInletOutletFvPatchField<Type>::uniformInletOutletFvPatchField
         fvPatchField<Type>::operator=(this->refValue());
     }
 
-    this->refGrad() = pTraits<Type>::zero;
+    this->refGrad() = Zero;
     this->valueFraction() = 0.0;
 }
 
@@ -94,7 +94,7 @@ Foam::uniformInletOutletFvPatchField<Type>::uniformInletOutletFvPatchField
     this->refValue() =
         uniformInletValue_->value(this->db().time().timeOutputValue());
 
-    this->refGrad() = pTraits<Type>::zero;
+    this->refGrad() = Zero;
     this->valueFraction() = 0.0;
 
     // Initialize the patch value to the refValue

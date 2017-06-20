@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -32,8 +32,7 @@ void Foam::surfMesh::setInstance(const fileName& inst)
 {
     if (debug)
     {
-        Info<< "void surfMesh::setInstance(const fileName& inst) : "
-            << "Resetting file instance to " << inst << endl;
+        InfoInFunction << "Resetting file instance to " << inst << endl;
     }
 
     instance() = inst;
@@ -53,8 +52,7 @@ Foam::surfMesh::readUpdateState Foam::surfMesh::readUpdate()
 {
     if (debug)
     {
-        Info<< "surfMesh::readUpdateState surfMesh::readUpdate() : "
-            << "Updating mesh based on saved data." << endl;
+        InfoInFunction << "Updating mesh based on saved data." << endl;
     }
 
     // Find point and face instances
@@ -151,8 +149,7 @@ Foam::surfMesh::readUpdateState Foam::surfMesh::readUpdate()
 
         if (zonesChanged)
         {
-            WarningIn("surfMesh::readUpdateState surfMesh::readUpdate()")
-                << "Number of zones has changed.  This may have "
+            WarningInFunction
                 << "unexpected consequences.  Proceed with care." << endl;
 
             return surfMesh::TOPO_PATCH_CHANGE;

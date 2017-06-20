@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -50,7 +50,7 @@ inline Foam::UList<T>::UList(T* __restrict__ v, label size)
 template<class T>
 inline const Foam::UList<T>& Foam::UList<T>::null()
 {
-    return NullObjectRef<UList<T> >();
+    return NullObjectRef<UList<T>>();
 }
 
 
@@ -68,45 +68,42 @@ inline Foam::label Foam::UList<T>::rcIndex(const label i) const
 }
 
 
-// Check start is within valid range (0 ... size-1).
 template<class T>
 inline void Foam::UList<T>::checkStart(const label start) const
 {
     if (start<0 || (start && start>=size_))
     {
-        FatalErrorIn("UList<T>::checkStart(const label)")
+        FatalErrorInFunction
             << "start " << start << " out of range 0 ... " << max(size_-1, 0)
             << abort(FatalError);
     }
 }
 
 
-// Check size is within valid range (0 ... size).
 template<class T>
 inline void Foam::UList<T>::checkSize(const label size) const
 {
     if (size<0 || size>size_)
     {
-        FatalErrorIn("UList<T>::checkSize(const label)")
+        FatalErrorInFunction
             << "size " << size << " out of range 0 ... " << size_
             << abort(FatalError);
     }
 }
 
 
-// Check index i is within valid range (0 ... size-1).
 template<class T>
 inline void Foam::UList<T>::checkIndex(const label i) const
 {
     if (!size_)
     {
-        FatalErrorIn("UList<T>::checkIndex(const label)")
+        FatalErrorInFunction
             << "attempt to access element from zero sized list"
             << abort(FatalError);
     }
     else if (i<0 || i>=size_)
     {
-        FatalErrorIn("UList<T>::checkIndex(const label)")
+        FatalErrorInFunction
             << "index " << i << " out of range 0 ... " << size_-1
             << abort(FatalError);
     }
@@ -155,23 +152,29 @@ inline T* Foam::UList<T>::data()
 }
 
 
+template<class T>
+inline void Foam::UList<T>::shallowCopy(const UList<T>& a)
+{
+    size_ = a.size_;
+    v_ = a.v_;
+}
+
+
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 
-// element access
 template<class T>
 inline T& Foam::UList<T>::operator[](const label i)
 {
-#   ifdef FULLDEBUG
+    #ifdef FULLDEBUG
     checkIndex(i);
-#   endif
+    #endif
     return v_[i];
 }
 
 
 namespace Foam
 {
-
     // Template specialization for bool
     template<>
     inline const bool& Foam::UList<bool>::operator[](const label i) const
@@ -186,22 +189,19 @@ namespace Foam
             return Foam::pTraits<bool>::zero;
         }
     }
+}
 
-} // end of namespace Foam
 
-
-// const element access
 template<class T>
 inline const T& Foam::UList<T>::operator[](const label i) const
 {
-#   ifdef FULLDEBUG
+    #ifdef FULLDEBUG
     checkIndex(i);
-#   endif
+    #endif
     return v_[i];
 }
 
 
-// Allow cast to a const List<T>&
 template<class T>
 inline Foam::UList<T>::operator const Foam::List<T>&() const
 {

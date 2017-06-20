@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -116,14 +116,14 @@ public:
                 )
             );
 
-            surfaceScalarField::GeometricBoundaryField& awbf =
-                taw().boundaryField();
+            surfaceScalarField::Boundary& awBf =
+                taw.ref().boundaryFieldRef();
 
-            forAll(awbf, patchi)
+            forAll(awBf, patchi)
             {
-                if (!awbf[patchi].coupled())
+                if (!awBf[patchi].coupled())
                 {
-                    awbf[patchi] = 1.0;
+                    awBf[patchi] = 1.0;
                 }
             }
 

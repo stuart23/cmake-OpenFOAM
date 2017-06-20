@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -100,15 +100,13 @@ bool Foam::featurePointConformer::createSpecialisedFeaturePoint
             }
             else if (eS == extendedFeatureEdgeMesh::FLAT)
             {
-                WarningIn("Foam::conformalVoronoiMesh::"
-                    "createSpecialisedFeaturePoint")
+                WarningInFunction
                     << "Edge " << eS << " is flat"
                     << endl;
             }
             else
             {
-                FatalErrorIn("Foam::conformalVoronoiMesh::"
-                    "createSpecialisedFeaturePoint")
+                FatalErrorInFunction
                     << "Edge " << eS << " not concave/convex"
                     << exit(FatalError);
             }
@@ -202,8 +200,8 @@ bool Foam::featurePointConformer::createSpecialisedFeaturePoint
         Foam::point externalPtD;
         Foam::point externalPtE;
 
-        vector convexEdgePlaneCNormal(vector::zero);
-        vector convexEdgePlaneDNormal(vector::zero);
+        vector convexEdgePlaneCNormal(Zero);
+        vector convexEdgePlaneDNormal(Zero);
 
         const labelList& concaveEdgeNormals = edgeNormals[concaveEdgeI];
         const labelList& convexEdgeANormals = edgeNormals[convexEdgesI[0]];
@@ -258,11 +256,7 @@ bool Foam::featurePointConformer::createSpecialisedFeaturePoint
 
             if ((convexEdgeA && convexEdgeB) || (!convexEdgeA && !convexEdgeB))
             {
-                WarningIn
-                    (
-                     "Foam::conformalVoronoiMesh"
-                     "::createSpecialisedFeaturePoint"
-                    )
+                WarningInFunction
                     << "Both or neither of the convex edges share the concave "
                     << "edge's normal."
                     << " convexEdgeA = " << convexEdgeA
@@ -538,15 +532,13 @@ bool Foam::featurePointConformer::createSpecialisedFeaturePoint
             }
             else if (eS == extendedFeatureEdgeMesh::FLAT)
             {
-                WarningIn("Foam::conformalVoronoiMesh::"
-                    "createSpecialisedFeaturePoint")
+                WarningInFunction
                     << "Edge " << eS << " is flat"
                     << endl;
             }
             else
             {
-                FatalErrorIn("Foam::conformalVoronoiMesh::"
-                    "createSpecialisedFeaturePoint")
+                FatalErrorInFunction
                     << "Edge " << eS << " not concave/convex"
                     << exit(FatalError);
             }
@@ -640,8 +632,8 @@ bool Foam::featurePointConformer::createSpecialisedFeaturePoint
         Foam::point externalPtD;
         Foam::point externalPtE;
 
-        vector concaveEdgePlaneCNormal(vector::zero);
-        vector concaveEdgePlaneDNormal(vector::zero);
+        vector concaveEdgePlaneCNormal(Zero);
+        vector concaveEdgePlaneDNormal(Zero);
 
         const labelList& convexEdgeNormals = edgeNormals[convexEdgeI];
         const labelList& concaveEdgeANormals = edgeNormals[concaveEdgesI[0]];
@@ -700,11 +692,8 @@ bool Foam::featurePointConformer::createSpecialisedFeaturePoint
              || (!concaveEdgeA && !concaveEdgeB)
             )
             {
-                WarningIn
-                (
-                 "Foam::conformalVoronoiMesh"
-                 "::createSpecialisedFeaturePoint"
-                )   << "Both or neither of the concave edges share the convex "
+                WarningInFunction
+                    << "Both or neither of the concave edges share the convex "
                     << "edge's normal."
                     << " concaveEdgeA = " << concaveEdgeA
                     << " concaveEdgeB = " << concaveEdgeB

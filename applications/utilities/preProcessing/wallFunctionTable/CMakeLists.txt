@@ -2,7 +2,7 @@ set( EXE_NAME wallFunctionTable )
 
 set( SOURCES
 
-wallFunctionTableApp.C
+wallFunctionTable.C
 
 )
 

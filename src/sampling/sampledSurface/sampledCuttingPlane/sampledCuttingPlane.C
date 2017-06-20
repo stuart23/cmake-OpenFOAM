@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -69,14 +69,14 @@ void Foam::sampledCuttingPlane::createGeometry()
         const polyBoundaryMesh& patches = mesh().boundaryMesh();
 
         // Patch to put exposed internal faces into
-        const label exposedPatchI = patches.findPatchID(exposedPatchName_);
+        const label exposedPatchi = patches.findPatchID(exposedPatchName_);
 
         if (debug)
         {
             Info<< "Allocating subset of size "
                 << mesh().cellZones()[zoneID_.index()].size()
                 << " with exposed faces into patch "
-                << patches[exposedPatchI].name() << endl;
+                << patches[exposedPatchi].name() << endl;
         }
 
         subMeshPtr_.reset
@@ -86,7 +86,7 @@ void Foam::sampledCuttingPlane::createGeometry()
         subMeshPtr_().setLargeCellSubset
         (
             labelHashSet(mesh().cellZones()[zoneID_.index()]),
-            exposedPatchI
+            exposedPatchi
         );
     }
 
@@ -125,7 +125,7 @@ void Foam::sampledCuttingPlane::createGeometry()
     // Internal field
     {
         const pointField& cc = fvm.cellCentres();
-        scalarField& fld = cellDistance.internalField();
+        scalarField& fld = cellDistance.primitiveFieldRef();
 
         forAll(cc, i)
         {
@@ -134,32 +134,35 @@ void Foam::sampledCuttingPlane::createGeometry()
         }
     }
 
+    volScalarField::Boundary& cellDistanceBf =
+        cellDistance.boundaryFieldRef();
+
     // Patch fields
     {
-        forAll(cellDistance.boundaryField(), patchI)
+        forAll(cellDistanceBf, patchi)
         {
             if
             (
                 isA<emptyFvPatchScalarField>
                 (
-                    cellDistance.boundaryField()[patchI]
+                    cellDistanceBf[patchi]
                 )
             )
             {
-                cellDistance.boundaryField().set
+                cellDistanceBf.set
                 (
-                    patchI,
+                    patchi,
                     new calculatedFvPatchScalarField
                     (
-                        fvm.boundary()[patchI],
+                        fvm.boundary()[patchi],
                         cellDistance
                     )
                 );
 
-                const polyPatch& pp = fvm.boundary()[patchI].patch();
+                const polyPatch& pp = fvm.boundary()[patchi].patch();
                 pointField::subField cc = pp.patchSlice(fvm.faceCentres());
 
-                fvPatchScalarField& fld = cellDistance.boundaryField()[patchI];
+                fvPatchScalarField& fld = cellDistanceBf[patchi];
                 fld.setSize(pp.size());
                 forAll(fld, i)
                 {
@@ -168,8 +171,8 @@ void Foam::sampledCuttingPlane::createGeometry()
             }
             else
             {
-                const pointField& cc = fvm.C().boundaryField()[patchI];
-                fvPatchScalarField& fld = cellDistance.boundaryField()[patchI];
+                const pointField& cc = fvm.C().boundaryField()[patchi];
+                fvPatchScalarField& fld = cellDistanceBf[patchi];
 
                 forAll(fld, i)
                 {
@@ -214,7 +217,7 @@ void Foam::sampledCuttingPlane::createGeometry()
             pointMesh::New(fvm),
             dimensionedScalar("zero", dimLength, 0)
         );
-        pDist.internalField() = pointDistance_;
+        pDist.primitiveFieldRef() = pointDistance_;
 
         Pout<< "Writing point distance:" << pDist.objectPath() << endl;
         pDist.write();
@@ -279,11 +282,8 @@ Foam::sampledCuttingPlane::sampledCuttingPlane
 
         if (mesh.boundaryMesh().findPatchID(exposedPatchName_) == -1)
         {
-            FatalErrorIn
-            (
-                "sampledCuttingPlane::sampledCuttingPlane"
-                "(const word&, const polyMesh&, const dictionary&)"
-            )   << "Cannot find patch " << exposedPatchName_
+            FatalErrorInFunction
+                << "Cannot find patch " << exposedPatchName_
                 << " in which to put exposed faces." << endl
                 << "Valid patches are " << mesh.boundaryMesh().names()
                 << exit(FatalError);

@@ -23,7 +23,7 @@ volVectorField U
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedVector("U", dimVelocity, vector::zero)
+    dimensionedVector("U", dimVelocity, Zero)
 );
 
 surfaceScalarField phi
@@ -50,18 +50,6 @@ forAllIter(PtrDictionary<phaseModel>, fluid.phases(), iter)
     U += alpha*phase.U();
     phi += fvc::interpolate(alpha)*phase.phi();
 }
-
-scalar slamDampCoeff
-(
-    fluid.lookupOrDefault<scalar>("slamDampCoeff", 1)
-);
-
-dimensionedScalar maxSlamVelocity
-(
-    "maxSlamVelocity",
-    dimVelocity,
-    fluid.lookupOrDefault<scalar>("maxSlamVelocity", GREAT)
-);
 
 
 volScalarField rho
@@ -114,3 +102,6 @@ setRefCell
     pRefValue
 );
 mesh.setFluxRequired(p_rgh.name());
+
+
+#include "createMRFZones.H"

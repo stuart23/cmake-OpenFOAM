@@ -12,7 +12,7 @@ volVectorField U
     mesh
 );
 
-U = dimensionedVector("0", U.dimensions(), vector::zero);
+U = dimensionedVector("0", U.dimensions(), Zero);
 
 surfaceScalarField phi
 (
@@ -24,13 +24,13 @@ surfaceScalarField phi
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    fvc::interpolate(U) & mesh.Sf()
+    fvc::flux(U)
 );
 
 if (args.optionFound("initialiseUBCs"))
 {
     U.correctBoundaryConditions();
-    phi = fvc::interpolate(U) & mesh.Sf();
+    phi = fvc::flux(U);
 }
 
 
@@ -40,7 +40,7 @@ word pName("p");
 // Update name of the pressure field from the command-line option
 args.optionReadIfPresent("pName", pName);
 
-// Infer the pressure BCs from the velocity BCs
+// Infer the pressure BCs from the velocity
 wordList pBCTypes
 (
     U.boundaryField().size(),
@@ -71,6 +71,21 @@ volScalarField p
     pBCTypes
 );
 
+// Infer the velocity potential BCs from the pressure
+wordList PhiBCTypes
+(
+    p.boundaryField().size(),
+    zeroGradientFvPatchScalarField::typeName
+);
+
+forAll(p.boundaryField(), patchi)
+{
+    if (p.boundaryField()[patchi].fixesValue())
+    {
+        PhiBCTypes[patchi] = fixedValueFvPatchScalarField::typeName;
+    }
+}
+
 Info<< "Constructing velocity potential field Phi\n" << endl;
 volScalarField Phi
 (
@@ -84,7 +99,7 @@ volScalarField Phi
     ),
     mesh,
     dimensionedScalar("Phi", dimLength*dimVelocity, 0),
-    p.boundaryField().types()
+    PhiBCTypes
 );
 
 label PhiRefCell = 0;
@@ -97,3 +112,5 @@ setRefCell
     PhiRefValue
 );
 mesh.setFluxRequired(Phi.name());
+
+#include "createMRF.H"

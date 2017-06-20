@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 {
-    volScalarField& rDeltaT = trDeltaT();
+    volScalarField& rDeltaT = trDeltaT.ref();
 
     const dictionary& pimpleDict = pimple.dict();
 
@@ -58,24 +58,24 @@ License
 
     // Flow time scale
     {
-        rDeltaT.dimensionedInternalField() =
+        rDeltaT.ref() =
         (
-            fvc::surfaceSum(mag(phi))().dimensionedInternalField()
-           /((2*maxCo)*mesh.V()*rho.dimensionedInternalField())
+            fvc::surfaceSum(mag(phi))()()
+           /((2*maxCo)*mesh.V()*rho())
         );
 
         // Limit the largest time scale
         rDeltaT.max(1/maxDeltaT);
 
         Info<< "    Flow        = "
-            << gMin(1/rDeltaT.internalField()) << ", "
-            << gMax(1/rDeltaT.internalField()) << endl;
+            << gMin(1/rDeltaT.primitiveField()) << ", "
+            << gMax(1/rDeltaT.primitiveField()) << endl;
     }
 
     // Reaction source time scale
     if (alphaTemp < 1.0)
     {
-        volScalarField::DimensionedInternalField rDeltaTT
+        volScalarField::Internal rDeltaTT
         (
             mag(reaction->Sh())/(alphaTemp*rho*thermo.Cp()*T)
         );
@@ -84,9 +84,9 @@ License
             << gMin(1/(rDeltaTT.field() + VSMALL)) << ", "
             << gMax(1/(rDeltaTT.field() + VSMALL)) << endl;
 
-        rDeltaT.dimensionedInternalField() = max
+        rDeltaT.ref() = max
         (
-            rDeltaT.dimensionedInternalField(),
+            rDeltaT(),
             rDeltaTT
         );
     }
@@ -116,9 +116,12 @@ License
         );
     }
 
+    // Update tho boundary values of the reciprocal time-step
+    rDeltaT.correctBoundaryConditions();
+
     Info<< "    Overall     = "
-        << gMin(1/rDeltaT.internalField())
-        << ", " << gMax(1/rDeltaT.internalField()) << endl;
+        << gMin(1/rDeltaT.primitiveField())
+        << ", " << gMax(1/rDeltaT.primitiveField()) << endl;
 }
 
 

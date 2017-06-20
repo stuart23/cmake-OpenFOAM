@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -67,7 +67,6 @@ Foam::processorFvPatchField<Type>::processorFvPatchField
 {}
 
 
-// Construct by mapping given processorFvPatchField<Type>
 template<class Type>
 Foam::processorFvPatchField<Type>::processorFvPatchField
 (
@@ -88,25 +87,16 @@ Foam::processorFvPatchField<Type>::processorFvPatchField
 {
     if (!isA<processorFvPatch>(this->patch()))
     {
-        FatalErrorIn
-        (
-            "processorFvPatchField<Type>::processorFvPatchField\n"
-            "(\n"
-            "    const processorFvPatchField<Type>& ptf,\n"
-            "    const fvPatch& p,\n"
-            "    const DimensionedField<Type, volMesh>& iF,\n"
-            "    const fvPatchFieldMapper& mapper\n"
-            ")\n"
-        )   << "\n    patch type '" << p.type()
+        FatalErrorInFunction
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
             << exit(FatalIOError);
     }
     if (debug && !ptf.ready())
     {
-        FatalErrorIn("processorFvPatchField<Type>::processorFvPatchField(..)")
+        FatalErrorInFunction
             << "On patch " << procPatch_.name() << " outstanding request."
             << abort(FatalError);
     }
@@ -132,20 +122,14 @@ Foam::processorFvPatchField<Type>::processorFvPatchField
 {
     if (!isA<processorFvPatch>(p))
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "processorFvPatchField<Type>::processorFvPatchField\n"
-            "(\n"
-            "    const fvPatch& p,\n"
-            "    const Field<Type>& field,\n"
-            "    const dictionary& dict\n"
-            ")\n",
             dict
         )   << "\n    patch type '" << p.type()
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
             << exit(FatalIOError);
     }
 }
@@ -169,7 +153,7 @@ Foam::processorFvPatchField<Type>::processorFvPatchField
 {
     if (debug && !ptf.ready())
     {
-        FatalErrorIn("processorFvPatchField<Type>::processorFvPatchField(..)")
+        FatalErrorInFunction
             << "On patch " << procPatch_.name() << " outstanding request."
             << abort(FatalError);
     }
@@ -194,7 +178,7 @@ Foam::processorFvPatchField<Type>::processorFvPatchField
 {
     if (debug && !ptf.ready())
     {
-        FatalErrorIn("processorFvPatchField<Type>::processorFvPatchField(..)")
+        FatalErrorInFunction
             << "On patch " << procPatch_.name() << " outstanding request."
             << abort(FatalError);
     }
@@ -211,12 +195,12 @@ Foam::processorFvPatchField<Type>::~processorFvPatchField()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::processorFvPatchField<Type>::patchNeighbourField() const
 {
     if (debug && !this->ready())
     {
-        FatalErrorIn("processorFvPatchField<Type>::patchNeighbourField()")
+        FatalErrorInFunction
             << "On patch " << procPatch_.name()
             << " outstanding request."
             << abort(FatalError);
@@ -306,7 +290,7 @@ void Foam::processorFvPatchField<Type>::evaluate
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::processorFvPatchField<Type>::snGrad
 (
     const scalarField& deltaCoeffs
@@ -333,10 +317,8 @@ void Foam::processorFvPatchField<Type>::initInterfaceMatrixUpdate
         // Fast path.
         if (debug && !this->ready())
         {
-            FatalErrorIn
-            (
-                "processorFvPatchField<Type>::initInterfaceMatrixUpdate(..)"
-            )   << "On patch " << procPatch_.name()
+            FatalErrorInFunction
+                << "On patch " << procPatch_.name()
                 << " outstanding request."
                 << abort(FatalError);
         }
@@ -454,10 +436,8 @@ void Foam::processorFvPatchField<Type>::initInterfaceMatrixUpdate
         // Fast path.
         if (debug && !this->ready())
         {
-            FatalErrorIn
-            (
-                "processorFvPatchField<Type>::initInterfaceMatrixUpdate(..)"
-            )   << "On patch " << procPatch_.name()
+            FatalErrorInFunction
+                << "On patch " << procPatch_.name()
                 << " outstanding request."
                 << abort(FatalError);
         }

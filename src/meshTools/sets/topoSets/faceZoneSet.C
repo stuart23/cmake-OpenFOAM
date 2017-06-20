@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -144,9 +144,9 @@ void faceZoneSet::invert(const label maxLen)
     // Count
     label n = 0;
 
-    for (label faceI = 0; faceI < maxLen; faceI++)
+    for (label facei = 0; facei < maxLen; facei++)
     {
-        if (!found(faceI))
+        if (!found(facei))
         {
             n++;
         }
@@ -157,11 +157,11 @@ void faceZoneSet::invert(const label maxLen)
     flipMap_.setSize(n);
     n = 0;
 
-    for (label faceI = 0; faceI < maxLen; faceI++)
+    for (label facei = 0; facei < maxLen; facei++)
     {
-        if (!found(faceI))
+        if (!found(facei))
         {
-            addressing_[n] = faceI;
+            addressing_[n] = facei;
             flipMap_[n] = false;         //? or true?
             n++;
         }
@@ -187,9 +187,9 @@ void faceZoneSet::subset(const topoSet& set)
 
     forAll(fSet.addressing(), i)
     {
-        label faceI = fSet.addressing()[i];
+        label facei = fSet.addressing()[i];
 
-        Map<label>::const_iterator iter = faceToIndex.find(faceI);
+        Map<label>::const_iterator iter = faceToIndex.find(facei);
 
         if (iter != faceToIndex.end())
         {
@@ -199,14 +199,14 @@ void faceZoneSet::subset(const topoSet& set)
             {
                 nConflict++;
             }
-            newAddressing.append(faceI);
+            newAddressing.append(facei);
             newFlipMap.append(flipMap_[index]);
         }
     }
 
     if (nConflict > 0)
     {
-        WarningIn(" faceZoneSet::subset(const topoSet&)")
+        WarningInFunction
             << "subset : there are " << nConflict
             << " faces with different orientation in faceZonesSets "
             << name() << " and " << set.name() << endl;
@@ -235,9 +235,9 @@ void faceZoneSet::addSet(const topoSet& set)
 
     forAll(fSet.addressing(), i)
     {
-        label faceI = fSet.addressing()[i];
+        label facei = fSet.addressing()[i];
 
-        Map<label>::const_iterator iter = faceToIndex.find(faceI);
+        Map<label>::const_iterator iter = faceToIndex.find(facei);
 
         if (iter != faceToIndex.end())
         {
@@ -250,14 +250,14 @@ void faceZoneSet::addSet(const topoSet& set)
         }
         else
         {
-            newAddressing.append(faceI);
+            newAddressing.append(facei);
             newFlipMap.append(fSet.flipMap()[i]);
         }
     }
 
     if (nConflict > 0)
     {
-        WarningIn("faceZoneSet::addSet(const topoSet&)")
+        WarningInFunction
             << "addSet : there are " << nConflict
             << " faces with different orientation in faceZonesSets "
             << name() << " and " << set.name() << endl;
@@ -286,9 +286,9 @@ void faceZoneSet::deleteSet(const topoSet& set)
 
     forAll(addressing_, i)
     {
-        label faceI = addressing_[i];
+        label facei = addressing_[i];
 
-        Map<label>::const_iterator iter = faceToIndex.find(faceI);
+        Map<label>::const_iterator iter = faceToIndex.find(facei);
 
         if (iter != faceToIndex.end())
         {
@@ -302,14 +302,14 @@ void faceZoneSet::deleteSet(const topoSet& set)
         else
         {
             // Not found in fSet so add
-            newAddressing.append(faceI);
+            newAddressing.append(facei);
             newFlipMap.append(fSet.flipMap()[i]);
         }
     }
 
     if (nConflict > 0)
     {
-        WarningIn("faceZoneSet::deleteSet(const topoSet&)")
+        WarningInFunction
             << "deleteSet : there are " << nConflict
             << " faces with different orientation in faceZonesSets "
             << name() << " and " << set.name() << endl;
@@ -331,7 +331,6 @@ label faceZoneSet::maxSize(const polyMesh& mesh) const
 }
 
 
-//- Write using given format, version and compression
 bool faceZoneSet::writeObject
 (
     IOstream::streamFormat s,
@@ -386,11 +385,11 @@ void faceZoneSet::updateMesh(const mapPolyMesh& morphMap)
     label n = 0;
     forAll(addressing_, i)
     {
-        label faceI = addressing_[i];
-        label newFaceI = morphMap.reverseFaceMap()[faceI];
-        if (newFaceI >= 0)
+        label facei = addressing_[i];
+        label newFacei = morphMap.reverseFaceMap()[facei];
+        if (newFacei >= 0)
         {
-            newAddressing[n] = newFaceI;
+            newAddressing[n] = newFacei;
             newFlipMap[n] = flipMap_[i];
             n++;
         }

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -40,7 +40,7 @@ Foam::csvTableReader<Type>::csvTableReader(const dictionary& dict)
 {
     if (componentColumns_.size() != pTraits<Type>::nComponents)
     {
-        FatalErrorIn("csvTableReader<Type>::csvTableReader(const dictionary&)")
+        FatalErrorInFunction
             << componentColumns_ << " does not have the expected length "
             << pTraits<Type>::nComponents << endl
             << exit(FatalError);
@@ -65,10 +65,8 @@ namespace Foam
     {
         if (componentColumns_[0] >= splitted.size())
         {
-            FatalErrorIn
-            (
-                "csvTableReader<scalar>::readValue(const List<string>&)"
-            )   << "No column " << componentColumns_[0] << " in "
+            FatalErrorInFunction
+                << "No column " << componentColumns_[0] << " in "
                 << splitted << endl
                 << exit(FatalError);
         }
@@ -86,10 +84,8 @@ namespace Foam
         {
             if (componentColumns_[i] >= splitted.size())
             {
-                FatalErrorIn
-                (
-                    "csvTableReader<Type>::readValue(const List<string>&)"
-                )   << "No column " << componentColumns_[i] << " in "
+                FatalErrorInFunction
+                    << "No column " << componentColumns_[i] << " in "
                     << splitted << endl
                     << exit(FatalError);
             }
@@ -109,12 +105,12 @@ template<class Type>
 void Foam::csvTableReader<Type>::operator()
 (
     const fileName& fName,
-    List<Tuple2<scalar, Type> >& data
+    List<Tuple2<scalar, Type>>& data
 )
 {
     IFstream in(fName);
 
-    DynamicList<Tuple2<scalar, Type> > values;
+    DynamicList<Tuple2<scalar, Type>> values;
 
     // Skip header
     if (headerLine_)
@@ -166,10 +162,10 @@ template<class Type>
 void Foam::csvTableReader<Type>::operator()
 (
     const fileName& fName,
-    List<Tuple2<scalar, List<Tuple2<scalar, Type> > > >& data
+    List<Tuple2<scalar, List<Tuple2<scalar, Type>>>>& data
 )
 {
-    notImplemented("csvTableReader<Type>::operator()");
+    NotImplemented;
 }
 
 

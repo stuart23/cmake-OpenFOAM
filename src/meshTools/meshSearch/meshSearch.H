@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -69,8 +69,8 @@ class meshSearch
         mutable autoPtr<treeBoundBox> overallBbPtr_;
 
         //- Demand driven octrees
-        mutable autoPtr<indexedOctree<treeDataFace> > boundaryTreePtr_;
-        mutable autoPtr<indexedOctree<treeDataCell> > cellTreePtr_;
+        mutable autoPtr<indexedOctree<treeDataFace>> boundaryTreePtr_;
+        mutable autoPtr<indexedOctree<treeDataCell>> cellTreePtr_;
 
 
     // Private Member Functions
@@ -132,7 +132,7 @@ class meshSearch
             label findNearestBoundaryFaceWalk
             (
                 const point& location,
-                const label seedFaceI
+                const label seedFacei
             ) const;
 
             //- Calculate offset vector in direction dir with as length a
@@ -140,7 +140,7 @@ class meshSearch
             vector offset
             (
                 const point& bPoint,
-                const label bFaceI,
+                const label bFacei,
                 const vector& dir
             ) const;
 
@@ -221,14 +221,14 @@ public:
             label findNearestCell
             (
                 const point& location,
-                const label seedCellI = -1,
+                const label seedCelli = -1,
                 const bool useTreeSearch = true
             ) const;
 
             label findNearestFace
             (
                 const point& location,
-                const label seedFaceI = -1,
+                const label seedFacei = -1,
                 const bool useTreeSearch = true
             ) const;
 
@@ -239,7 +239,7 @@ public:
             label findCell
             (
                 const point& location,
-                const label seedCellI = -1,
+                const label seedCelli = -1,
                 const bool useTreeSearch = true
             ) const;
 
@@ -250,7 +250,7 @@ public:
             label findNearestBoundaryFace
             (
                 const point& location,
-                const label seedFaceI = -1,
+                const label seedFacei = -1,
                 const bool useTreeSearch = true
             ) const;
 

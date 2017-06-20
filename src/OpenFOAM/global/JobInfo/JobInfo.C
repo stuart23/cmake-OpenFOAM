@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -37,7 +37,6 @@ Foam::JobInfo Foam::jobInfo;
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Null constructor
 Foam::JobInfo::JobInfo()
 :
     runningJobPath_(),
@@ -59,21 +58,21 @@ Foam::JobInfo::JobInfo()
 
         if (baseDir.empty())
         {
-            FatalErrorIn("JobInfo::JobInfo()")
+            FatalErrorInFunction
                 << "Cannot get JobInfo directory $FOAM_JOB_DIR"
                 << Foam::exit(FatalError);
         }
 
         if (!isDir(runningDir) && !mkDir(runningDir))
         {
-            FatalErrorIn("JobInfo::JobInfo()")
+            FatalErrorInFunction
                 << "Cannot make JobInfo directory " << runningDir
                 << Foam::exit(FatalError);
         }
 
         if (!isDir(finishedDir) && !mkDir(finishedDir))
         {
-            FatalErrorIn("JobInfo::JobInfo()")
+            FatalErrorInFunction
                 << "Cannot make JobInfo directory " << finishedDir
                 << Foam::exit(FatalError);
         }
@@ -125,7 +124,7 @@ void Foam::JobInfo::write() const
     {
         if (!write(OFstream(runningJobPath_)()))
         {
-            FatalErrorIn("JobInfo::write() const")
+            FatalErrorInFunction
                 << "Failed to write to JobInfo file "
                 << runningJobPath_
                 << Foam::exit(FatalError);

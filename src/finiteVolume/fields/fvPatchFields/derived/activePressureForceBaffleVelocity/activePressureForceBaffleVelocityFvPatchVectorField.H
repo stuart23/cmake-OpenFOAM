@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -57,8 +57,7 @@ Description
 
     The open fraction is then applied to scale the patch areas.
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         p            | pressure field name     | no          | p
@@ -74,7 +73,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            activePressureForceBaffleVelocity;
         p               p;

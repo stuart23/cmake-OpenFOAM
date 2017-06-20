@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -73,7 +73,7 @@ class kineticTheoryModel
 :
     public eddyViscosity
     <
-        RASModel<EddyDiffusivity<phaseCompressibleTurbulenceModel> >
+        RASModel<EddyDiffusivity<phaseCompressibleTurbulenceModel>>
     >
 {
     // Private data
@@ -120,6 +120,9 @@ class kineticTheoryModel
             //- Residual phase fraction
             dimensionedScalar residualAlpha_;
 
+            //- Maximum turbulent viscosity
+            dimensionedScalar maxNut_;
+
 
         // Kinetic Theory Model Fields
 
@@ -134,6 +137,9 @@ class kineticTheoryModel
 
             //- The granular "thermal" conductivity
             volScalarField kappa_;
+
+            //- The frictional viscosity
+            volScalarField nuFric_;
 
 
     // Private Member Functions

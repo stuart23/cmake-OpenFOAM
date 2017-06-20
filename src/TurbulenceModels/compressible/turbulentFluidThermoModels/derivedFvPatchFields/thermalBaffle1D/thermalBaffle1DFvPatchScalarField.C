@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -231,11 +231,8 @@ baffleThickness() const
     {
         if (thickness_.size() != patch().size())
         {
-            FatalIOErrorIn
+            FatalIOErrorInFunction
             (
-                " template<class solidType>"
-                " tmp<scalarField> thermalBaffle1DFvPatchScalarField<solidType>"
-                " baffleThickness() const",
                 solidDict_
             )<< " Field thickness has not been specified "
             << " for patch " << this->patch().name()
@@ -260,7 +257,7 @@ baffleThickness() const
         (
             new scalarField(nbrField.baffleThickness())
         );
-        scalarField& thickness = tthickness();
+        scalarField& thickness = tthickness.ref();
         mapDist.distribute(thickness);
         return tthickness;
     }
@@ -288,7 +285,7 @@ tmp<scalarField> thermalBaffle1DFvPatchScalarField<solidType>::Qs() const
         );
 
         tmp<scalarField> tQs(new scalarField(nbrField.Qs()));
-        scalarField& Qs = tQs();
+        scalarField& Qs = tQs.ref();
         mapDist.distribute(Qs);
         return tQs;
     }
@@ -406,9 +403,9 @@ void thermalBaffle1DFvPatchScalarField<solidType>::updateCoeffs()
             scalar Q = gAverage(kappaw*snGrad());
             Info<< patch().boundaryMesh().mesh().name() << ':'
                 << patch().name() << ':'
-                << this->dimensionedInternalField().name() << " <- "
+                << this->internalField().name() << " <- "
                 << nbrPatch.name() << ':'
-                << this->dimensionedInternalField().name() << " :"
+                << this->internalField().name() << " :"
                 << " heat[W]:" << Q
                 << " walltemperature "
                 << " min:" << gMin(*this)

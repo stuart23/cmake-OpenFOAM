@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -90,7 +90,7 @@ void Foam::radiation::fvDOM::initialise()
         // Currently 2D solution is limited to the x-y plane
         if (mesh_.solutionD()[vector::Z] != -1)
         {
-            FatalErrorIn("fvDOM::initialise()")
+            FatalErrorInFunction
                 << "Currently 2D solution is limited to the x-y plane"
                 << exit(FatalError);
         }
@@ -130,7 +130,7 @@ void Foam::radiation::fvDOM::initialise()
         // Currently 1D solution is limited to the x-direction
         if (mesh_.solutionD()[vector::X] != 1)
         {
-            FatalErrorIn("fvDOM::initialise()")
+            FatalErrorInFunction
                 << "Currently 1D solution is limited to the x-direction"
                 << exit(FatalError);
         }
@@ -489,19 +489,19 @@ Foam::tmp<Foam::volScalarField> Foam::radiation::fvDOM::Rp() const
 }
 
 
-Foam::tmp<Foam::DimensionedField<Foam::scalar, Foam::volMesh> >
+Foam::tmp<Foam::DimensionedField<Foam::scalar, Foam::volMesh>>
 Foam::radiation::fvDOM::Ru() const
 {
 
     const DimensionedField<scalar, volMesh>& G =
-        G_.dimensionedInternalField();
+        G_();
 
     const DimensionedField<scalar, volMesh> E =
-        absorptionEmission_->ECont()().dimensionedInternalField();
+        absorptionEmission_->ECont()()();
 
     // Only include continuous phase absorption
     const DimensionedField<scalar, volMesh> a =
-        absorptionEmission_->aCont()().dimensionedInternalField();
+        absorptionEmission_->aCont()()();
 
     return a*G - E;
 }
@@ -527,9 +527,9 @@ void Foam::radiation::fvDOM::updateG()
     {
         IRay_[rayI].addIntensity();
         G_ += IRay_[rayI].I()*IRay_[rayI].omega();
-        Qr_.boundaryField() += IRay_[rayI].Qr().boundaryField();
-        Qem_.boundaryField() += IRay_[rayI].Qem().boundaryField();
-        Qin_.boundaryField() += IRay_[rayI].Qin().boundaryField();
+        Qr_.boundaryFieldRef() += IRay_[rayI].Qr().boundaryField();
+        Qem_.boundaryFieldRef() += IRay_[rayI].Qem().boundaryField();
+        Qin_.boundaryFieldRef() += IRay_[rayI].Qin().boundaryField();
     }
 }
 

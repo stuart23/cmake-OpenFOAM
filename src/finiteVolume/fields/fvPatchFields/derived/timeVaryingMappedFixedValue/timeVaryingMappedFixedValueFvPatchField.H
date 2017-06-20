@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -43,8 +43,7 @@ Description
 
     Values are interpolated linearly between times.
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         setAverage   | flag to activate setting of average value | yes |
@@ -55,7 +54,7 @@ Description
     \endtable
 
     \verbatim
-    myPatch
+    <patchName>
     {
         type            timeVaryingMappedFixedValue;
         setAverage      false;
@@ -65,8 +64,9 @@ Description
     }
     \endverbatim
 
-SeeAlso
+See also
     Foam::fixedValueFvPatchField
+    Foam::Function1Types
 
 SourceFiles
     timeVaryingMappedFixedValueFvPatchField.C
@@ -80,7 +80,7 @@ SourceFiles
 #include "FixedList.H"
 #include "instantList.H"
 #include "pointToPointPlanarInterpolation.H"
-#include "DataEntry.H"
+#include "Function1.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -135,7 +135,7 @@ class timeVaryingMappedFixedValueFvPatchField
         Type endAverage_;
 
         //- Time varying offset values to interpolated data
-        autoPtr<DataEntry<Type> > offset_;
+        autoPtr<Function1<Type>> offset_;
 
 
 public:
@@ -178,9 +178,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchField<Type>> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new timeVaryingMappedFixedValueFvPatchField<Type>(*this)
             );
@@ -194,12 +194,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchField<Type>> clone
         (
             const DimensionedField<Type, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new timeVaryingMappedFixedValueFvPatchField<Type>(*this, iF)
             );
@@ -257,7 +257,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "timeVaryingMappedFixedValueFvPatchField.C"
+    #include "timeVaryingMappedFixedValueFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -87,7 +87,7 @@ void Foam::CLASSNAME::operator=(const CLASSNAME& rhs)
     // Check for assignment to self
     if (this == &rhs)
     {
-        FatalErrorIn("Foam::CLASSNAME::operator=(const Foam::CLASSNAME&)")
+        FatalErrorInFunction
             << "Attempted assignment to self"
             << abort(FatalError);
     }

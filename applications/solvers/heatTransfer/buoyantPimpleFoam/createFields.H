@@ -18,8 +18,6 @@ volScalarField rho
 );
 
 volScalarField& p = thermo.p();
-const volScalarField& psi = thermo.psi();
-
 
 Info<< "Reading field U\n" << endl;
 volVectorField U
@@ -90,3 +88,6 @@ volScalarField dpdt
 
 Info<< "Creating field kinetic energy K\n" << endl;
 volScalarField K("K", 0.5*magSqr(U));
+
+#include "createMRF.H"
+#include "createRadiationModel.H"

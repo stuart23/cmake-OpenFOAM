@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -42,7 +42,7 @@ Description
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// turbulence constants - file-scope
+// Turbulence constants - file-scope
 static const scalar Cmu(0.09);
 static const scalar kappa(0.41);
 
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 
     if (!args.optionFound("ybl") && !args.optionFound("Cbl"))
     {
-        FatalErrorIn(args.executable())
+        FatalErrorInFunction
             << "Neither option 'ybl' or 'Cbl' have been provided to calculate "
             << "the boundary-layer thickness.\n"
             << "Please choose either 'ybl' OR 'Cbl'."
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     }
     else if (args.optionFound("ybl") && args.optionFound("Cbl"))
     {
-        FatalErrorIn(args.executable())
+        FatalErrorInFunction
             << "Both 'ybl' and 'Cbl' have been provided to calculate "
             << "the boundary-layer thickness.\n"
             << "Please choose either 'ybl' OR 'Cbl'."
@@ -104,12 +104,12 @@ int main(int argc, char *argv[])
 
     Info<< "Setting boundary layer velocity" << nl << endl;
     scalar yblv = ybl.value();
-    forAll(U, cellI)
+    forAll(U, celli)
     {
-        if (y[cellI] <= yblv)
+        if (y[celli] <= yblv)
         {
-            mask[cellI] = 1;
-            U[cellI] *= ::pow(y[cellI]/yblv, (1.0/7.0));
+            mask[celli] = 1;
+            U[celli] *= ::pow(y[celli]/yblv, (1.0/7.0));
         }
     }
     mask.correctBoundaryConditions();
@@ -130,14 +130,14 @@ int main(int argc, char *argv[])
 
     if (isA<incompressible::RASModel>(turbulence()))
     {
-        // Calculate nut - reference nut is calculated by the turbulence model
-        // on its construction
+        // Calculate nut
+        turbulence->validate();
         tmp<volScalarField> tnut = turbulence->nut();
-        volScalarField& nut = tnut();
+        volScalarField& nut = const_cast<volScalarField&>(tnut());
         volScalarField S(mag(dev(symm(fvc::grad(U)))));
         nut = (1 - mask)*nut + mask*sqr(kappa*min(y, ybl))*::sqrt(2)*S;
 
-        // do not correct BC - wall functions will 'undo' manipulation above
+        // Do not correct BC - wall functions will 'undo' manipulation above
         // by using nut from turbulence model
 
         if (args.optionFound("writenut"))
@@ -151,11 +151,11 @@ int main(int argc, char *argv[])
 
         // Turbulence k
         tmp<volScalarField> tk = turbulence->k();
-        volScalarField& k = tk();
+        volScalarField& k = const_cast<volScalarField&>(tk());
         scalar ck0 = pow025(Cmu)*kappa;
         k = (1 - mask)*k + mask*sqr(nut/(ck0*min(y, ybl)));
 
-        // do not correct BC - operation may use inconsistent fields wrt these
+        // Do not correct BC - operation may use inconsistent fields wrt these
         // local manipulations
         // k.correctBoundaryConditions();
 
@@ -165,11 +165,11 @@ int main(int argc, char *argv[])
 
         // Turbulence epsilon
         tmp<volScalarField> tepsilon = turbulence->epsilon();
-        volScalarField& epsilon = tepsilon();
+        volScalarField& epsilon = const_cast<volScalarField&>(tepsilon());
         scalar ce0 = ::pow(Cmu, 0.75)/kappa;
         epsilon = (1 - mask)*epsilon + mask*ce0*k*sqrt(k)/min(y, ybl);
 
-        // do not correct BC - wall functions will use non-updated k from
+        // Do not correct BC - wall functions will use non-updated k from
         // turbulence model
         // epsilon.correctBoundaryConditions();
 
@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
             dimensionedScalar k0("VSMALL", k.dimensions(), VSMALL);
             omega = (1 - mask)*omega + mask*epsilon/(Cmu*k + k0);
 
-            // do not correct BC - wall functions will use non-updated k from
+            // Do not correct BC - wall functions will use non-updated k from
             // turbulence model
             // omega.correctBoundaryConditions();
 
@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
             volScalarField nuTilda(nuTildaHeader, mesh);
             nuTilda = nut;
 
-            // do not correct BC
+            // Do not correct BC
             // nuTilda.correctBoundaryConditions();
 
             Info<< "Writing nuTilda\n" << endl;

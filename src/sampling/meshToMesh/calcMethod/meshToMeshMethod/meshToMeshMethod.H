@@ -1,8 +1,8 @@
-/*---------------------------------------------------------------------------*\
+/*---------------------------------------------------------------------------* \
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -74,21 +74,21 @@ protected:
         //- Return the true if cells intersect
         virtual bool intersect
         (
-            const label srcCellI,
-            const label tgtCellI
+            const label srcCelli,
+            const label tgtCelli
         ) const;
 
         //- Return the intersection volume between two cells
         virtual scalar interVol
         (
-            const label srcCellI,
-            const label tgtCellI
+            const label srcCelli,
+            const label tgtCelli
         ) const;
 
         //- Append target cell neihgbour cells to cellIDs list
         virtual void appendNbrCells
         (
-            const label tgtCellI,
+            const label tgtCelli,
             const polyMesh& mesh,
             const DynamicList<label>& visitedTgtCells,
             DynamicList<label>& nbrTgtCellIDs
@@ -101,6 +101,11 @@ protected:
             labelListList& tgtToTgtAddr,
             scalarListList& tgtToTgtWght
         ) const;
+
+
+private:
+
+    // Private member functions
 
         //- Disallow default bitwise copy construct
         meshToMeshMethod(const meshToMeshMethod&);

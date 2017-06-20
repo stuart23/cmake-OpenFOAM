@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -39,7 +39,7 @@ Description
       - Coarse matrix scaling: performed by correction scaling, using steepest
         descent optimisation.
       - Type of cycle: V-cycle with optional pre-smoothing.
-      - Coarsest-level matrix solved using ICCG or BICCG.
+      - Coarsest-level matrix solved using PCG or PBiCG.
 
 SourceFiles
     GAMGSolver.C
@@ -116,16 +116,16 @@ class GAMGSolver
         PtrList<lduMatrix> matrixLevels_;
 
         //- Hierarchy of interfaces.
-        PtrList<PtrList<lduInterfaceField> > primitiveInterfaceLevels_;
+        PtrList<PtrList<lduInterfaceField>> primitiveInterfaceLevels_;
 
         //- Hierarchy of interfaces in lduInterfaceFieldPtrs form
         PtrList<lduInterfaceFieldPtrsList> interfaceLevels_;
 
         //- Hierarchy of interface boundary coefficients
-        PtrList<FieldField<Field, scalar> > interfaceLevelsBouCoeffs_;
+        PtrList<FieldField<Field, scalar>> interfaceLevelsBouCoeffs_;
 
         //- Hierarchy of interface internal coefficients
-        PtrList<FieldField<Field, scalar> > interfaceLevelsIntCoeffs_;
+        PtrList<FieldField<Field, scalar>> interfaceLevelsIntCoeffs_;
 
         //- LU decompsed coarsest matrix
         autoPtr<LUscalarMatrix> coarsestLUMatrixPtr_;
@@ -191,10 +191,10 @@ class GAMGSolver
             const lduInterfaceFieldPtrsList& interfaces,
 
             PtrList<lduMatrix>& otherMats,
-            PtrList<FieldField<Field, scalar> >& otherBouCoeffs,
-            PtrList<FieldField<Field, scalar> >& otherIntCoeffs,
+            PtrList<FieldField<Field, scalar>>& otherBouCoeffs,
+            PtrList<FieldField<Field, scalar>>& otherIntCoeffs,
             List<boolList>& otherTransforms,
-            List<List<label> >& otherRanks
+            List<List<label>>& otherRanks
         ) const;
 
         //- Agglomerate processor matrices
@@ -234,7 +234,7 @@ class GAMGSolver
         ) const;
 
         //- Interpolate the correction after injected prolongation and
-        /// re-normalise
+        //  re-normalise
         void interpolate
         (
             scalarField& psi,
@@ -292,6 +292,21 @@ class GAMGSolver
             const direction cmpt=0
         ) const;
 
+        //- Create and return the dictionary to specify the PCG solver
+        //  to solve the coarsest level
+        dictionary PCGsolverDict
+        (
+            const scalar tol,
+            const scalar relTol
+        ) const;
+
+        //- Create and return the dictionary to specify the PBiCG solver
+        //  to solve the coarsest level
+        dictionary PBiCGsolverDict
+        (
+            const scalar tol,
+            const scalar relTol
+        ) const;
 
         //- Solve the coarsest level with either an iterative or direct solver
         void solveCoarsestLevel

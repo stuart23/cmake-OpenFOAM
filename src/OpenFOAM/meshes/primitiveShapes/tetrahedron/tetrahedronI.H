@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -100,32 +100,32 @@ inline const Point& Foam::tetrahedron<Point, PointRef>::d() const
 template<class Point, class PointRef>
 inline Foam::triPointRef Foam::tetrahedron<Point, PointRef>::tri
 (
-    const label faceI
+    const label facei
 ) const
 {
     // Warning. Ordering of faces needs to be the same for a tetrahedron
     // class, a tetrahedron cell shape model and a tetCell
 
-    if (faceI == 0)
+    if (facei == 0)
     {
         return triPointRef(b_, c_, d_);
     }
-    else if (faceI == 1)
+    else if (facei == 1)
     {
         return triPointRef(a_, d_, c_);
     }
-    else if (faceI == 2)
+    else if (facei == 2)
     {
         return triPointRef(a_, b_, d_);
     }
-    else if (faceI == 3)
+    else if (facei == 3)
     {
         return triPointRef(a_, c_, b_);
     }
     else
     {
-        FatalErrorIn("tetrahedron::tri(const label faceI) const")
-            << "index out of range 0 -> 3. faceI = " << faceI
+        FatalErrorInFunction
+            << "index out of range 0 -> 3. facei = " << facei
             << abort(FatalError);
         return triPointRef(b_, c_, d_);
     }
@@ -319,7 +319,7 @@ Foam::scalar Foam::tetrahedron<Point, PointRef>::barycentric
     List<scalar>& bary
 ) const
 {
-    // From:
+    // Reference:
     // http://en.wikipedia.org/wiki/Barycentric_coordinate_system_(mathematics)
 
     vector e0(a_ - d_);
@@ -470,7 +470,7 @@ bool Foam::tetrahedron<Point, PointRef>::inside(const point& pt) const
     // planeBase[2] = tetBasePt = b_
     // planeBase[3] = tetBasePt = b_
 
-    vector n = vector::zero;
+    vector n = Zero;
 
     {
         // 0, a
@@ -907,7 +907,7 @@ tetSliceWithPlane
         }
         else
         {
-            FatalErrorIn("tetSliceWithPlane(..)")
+            FatalErrorInFunction
                 << "Missed edge:" << posEdge
                 << abort(FatalError);
         }

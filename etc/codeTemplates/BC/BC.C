@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -50,15 +50,15 @@ CONSTRUCT
 :
     PARENT(p, iF),
     scalarData_(0.0),
-    data_(pTraits<TYPE>::zero),
-    fieldData_(p.size(), pTraits<TYPE>::zero),
+    data_(Zero),
+    fieldData_(p.size(), Zero),
     timeVsData_(),
     wordData_("wordDefault"),
     labelData_(-1),
     boolData_(false)
 {
-    this->refValue() = pTraits<TYPE>::zero;
-    this->refGrad() = pTraits<TYPE>::zero;
+    this->refValue() = Zero;
+    this->refGrad() = Zero;
     this->valueFraction() = 0.0;
 }
 
@@ -76,12 +76,12 @@ CONSTRUCT
     scalarData_(readScalar(dict.lookup("scalarData"))),
     data_(pTraits<TYPE>(dict.lookup("data"))),
     fieldData_("fieldData", dict, p.size()),
-    timeVsData_(DataEntry<TYPE>::New("timeVsData", dict)),
+    timeVsData_(Function1<TYPE>::New("timeVsData", dict)),
     wordData_(dict.lookupOrDefault<word>("wordName", "wordDefault")),
     labelData_(-1),
     boolData_(false)
 {
-    this->refGrad() = pTraits<TYPE>::zero;
+    this->refGrad() = Zero;
     this->valueFraction() = 0.0;
 
     this->refValue() = FIELD("fieldData", dict, p.size());
@@ -203,7 +203,10 @@ void Foam::CLASS::updateCoeffs()
     );
 
     const scalarField& phip =
-        this->patch().template lookupPatchField<surfaceScalarField, scalar>("phi");
+        this->patch().template lookupPatchField<surfaceScalarField, scalar>
+        (
+            "phi"
+        );
     this->valueFraction() = 1.0 - pos(phip);
 
     PARENT::updateCoeffs();

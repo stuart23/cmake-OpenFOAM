@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -36,6 +36,8 @@ namespace Foam
 {
     defineTypeNameAndDebug(polyLineSet, 0);
     addToRunTimeSelectionTable(sampledSet, polyLineSet, word);
+
+    const scalar polyLineSet::tol = 1e-6;
 }
 
 
@@ -137,7 +139,7 @@ void Foam::polyLineSet::calcSamples
     // Check sampling points
     if (sampleCoords_.size() < 2)
     {
-        FatalErrorIn("polyLineSet::calcSamples()")
+        FatalErrorInFunction
             << "Incorrect sample specification. Too few points:"
             << sampleCoords_ << exit(FatalError);
     }
@@ -146,7 +148,7 @@ void Foam::polyLineSet::calcSamples
     {
         if (mag(sampleCoords_[sampleI] - oldPoint) < SMALL)
         {
-            FatalErrorIn("polyLineSet::calcSamples()")
+            FatalErrorInFunction
                 << "Incorrect sample specification."
                 << " Point " << sampleCoords_[sampleI-1]
                 << " at position " << sampleI-1
@@ -174,8 +176,8 @@ void Foam::polyLineSet::calcSamples
     {
         // Get boundary intersection
         point trackPt;
-        label trackCellI = -1;
-        label trackFaceI = -1;
+        label trackCelli = -1;
+        label trackFacei = -1;
 
         do
         {
@@ -192,12 +194,12 @@ void Foam::polyLineSet::calcSamples
             );
 
             point bPoint(GREAT, GREAT, GREAT);
-            label bFaceI = -1;
+            label bFacei = -1;
 
             if (bHits.size())
             {
                 bPoint = bHits[0].hitPoint();
-                bFaceI = bHits[0].index();
+                bFacei = bHits[0].index();
             }
 
             // Get tracking point
@@ -205,29 +207,29 @@ void Foam::polyLineSet::calcSamples
             bool isSample =
                 getTrackingPoint
                 (
-                    sampleCoords_[sampleI+1] - sampleCoords_[sampleI],
                     sampleCoords_[sampleI],
                     bPoint,
-                    bFaceI,
+                    bFacei,
+                    smallDist,
 
                     trackPt,
-                    trackCellI,
-                    trackFaceI
+                    trackCelli,
+                    trackFacei
                 );
 
             if (isSample && (mag(lastSample - trackPt) > smallDist))
             {
                 //Info<< "calcSamples : getTrackingPoint returned valid sample "
                 //    << "  trackPt:" << trackPt
-                //    << "  trackFaceI:" << trackFaceI
-                //    << "  trackCellI:" << trackCellI
+                //    << "  trackFacei:" << trackFacei
+                //    << "  trackCelli:" << trackCelli
                 //    << "  sampleI:" << sampleI
                 //    << "  dist:" << dist
                 //    << endl;
 
                 samplingPts.append(trackPt);
-                samplingCells.append(trackCellI);
-                samplingFaces.append(trackFaceI);
+                samplingCells.append(trackCelli);
+                samplingFaces.append(trackFacei);
 
                 // Convert sampling position to unique curve parameter. Get
                 // fraction of distance between sampleI and sampleI+1.
@@ -239,12 +241,12 @@ void Foam::polyLineSet::calcSamples
                 lastSample = trackPt;
             }
 
-            if (trackCellI == -1)
+            if (trackCelli == -1)
             {
                 // No intersection found. Go to next point
                 sampleI++;
             }
-        } while ((trackCellI == -1) && (sampleI < sampleCoords_.size() - 1));
+        } while ((trackCelli == -1) && (sampleI < sampleCoords_.size() - 1));
 
         if (sampleI == sampleCoords_.size() - 1)
         {
@@ -263,7 +265,7 @@ void Foam::polyLineSet::calcSamples
         (
             mesh(),
             trackPt,
-            trackCellI
+            trackCelli
         );
 
         bool bReached = trackToBoundary

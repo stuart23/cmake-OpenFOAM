@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -115,9 +115,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual autoPtr<SurfaceReactionModel<CloudType> > clone() const
+        virtual autoPtr<SurfaceReactionModel<CloudType>> clone() const
         {
-            return autoPtr<SurfaceReactionModel<CloudType> >
+            return autoPtr<SurfaceReactionModel<CloudType>>
             (
                 new COxidationDiffusionLimitedRate<CloudType>(*this)
             );
@@ -134,7 +134,7 @@ public:
         virtual scalar calculate
         (
             const scalar dt,
-            const label cellI,
+            const label celli,
             const scalar d,
             const scalar T,
             const scalar Tc,

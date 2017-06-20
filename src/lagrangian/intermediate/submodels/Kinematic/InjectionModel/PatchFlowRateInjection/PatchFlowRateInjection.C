@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "PatchFlowRateInjection.H"
-#include "TimeDataEntry.H"
+#include "TimeFunction1.H"
 #include "distributionModel.H"
 #include "mathematicalConstants.H"
 #include "surfaceFields.H"
@@ -46,7 +46,7 @@ Foam::PatchFlowRateInjection<CloudType>::PatchFlowRateInjection
     duration_(readScalar(this->coeffDict().lookup("duration"))),
     concentration_
     (
-        TimeDataEntry<scalar>
+        TimeFunction1<scalar>
         (
             owner.db().time(),
             "concentration",
@@ -161,6 +161,9 @@ Foam::label Foam::PatchFlowRateInjection<CloudType>::parcelsToInject
         scalar c = concentration_.value(0.5*(time0 + time1));
 
         scalar nParcels = parcelConcentration_*c*flowRate()*dt;
+
+        cachedRandom& rnd = this->owner().rndGen();
+
         label nParcelsToInject = floor(nParcels);
 
         // Inject an additional parcel with a probability based on the
@@ -170,7 +173,7 @@ Foam::label Foam::PatchFlowRateInjection<CloudType>::parcelsToInject
             nParcelsToInject > 0
          && (
                nParcels - scalar(nParcelsToInject)
-             > this->owner().rndGen().position(scalar(0), scalar(1))
+             > rnd.globalPosition(scalar(0), scalar(1))
             )
         )
         {
@@ -217,7 +220,7 @@ void Foam::PatchFlowRateInjection<CloudType>::setPositionAndCell
     const scalar,
     vector& position,
     label& cellOwner,
-    label& tetFaceI,
+    label& tetFacei,
     label& tetPtI
 )
 {
@@ -227,7 +230,7 @@ void Foam::PatchFlowRateInjection<CloudType>::setPositionAndCell
         this->owner().rndGen(),
         position,
         cellOwner,
-        tetFaceI,
+        tetFacei,
         tetPtI
     );
 }
@@ -242,10 +245,10 @@ void Foam::PatchFlowRateInjection<CloudType>::setProperties
     typename CloudType::parcelType& parcel
 )
 {
-    // set particle velocity to carrier velocity
+    // Set particle velocity to carrier velocity
     parcel.U() = this->owner().U()[parcel.cell()];
 
-    // set particle diameter
+    // Set particle diameter
     parcel.d() = sizeDistribution_->sample();
 }
 

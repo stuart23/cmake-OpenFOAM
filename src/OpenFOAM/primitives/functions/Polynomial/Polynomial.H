@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -27,17 +27,19 @@ Class
 Description
     Polynomial templated on size (order):
 
-        poly = sum(coeff_[i]*x^i) logCoeff*log(x)
+    \verbatim
+        poly = sum(coeffs[i]*x^i) + logCoeff*log(x)
+    \endverbatim
 
-    where 0 \<= i \<= N
+    where <tt> 0 <= i <= N </tt>
 
     - integer powers, starting at zero
-    - value(x) to evaluate the poly for a given value
-    - derivative(x) returns derivative at value
-    - integral(x1, x2) returns integral between two scalar values
-    - integral() to return a new, integral coeff polynomial
+    - \c value(x) to evaluate the poly for a given value
+    - \c derivative(x) returns derivative at value
+    - \c integral(x1, x2) returns integral between two scalar values
+    - \c integral() to return a new, integral coeff polynomial
       - increases the size (order)
-    - integralMinus1() to return a new, integral coeff polynomial where
+    - \c integralMinus1() to return a new, integral coeff polynomial where
       the base poly starts at order -1
 
 SourceFiles
@@ -52,7 +54,7 @@ SourceFiles
 #include "scalar.H"
 #include "Ostream.H"
 #include "VectorSpace.H"
-#include "StaticAssert.H"
+#include <type_traits>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -81,8 +83,7 @@ class Polynomial
 :
     public VectorSpace<Polynomial<PolySize>, scalar, PolySize>
 {
-    //- Size must be positive (non-zero)
-    StaticAssert(PolySize > 0);
+    static_assert(PolySize > 0, "Size must be positive (non-zero)");
 
     // Private data
 
@@ -168,8 +169,8 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "Polynomial.C"
-#   include "PolynomialIO.C"
+    #include "Polynomial.C"
+    #include "PolynomialIO.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

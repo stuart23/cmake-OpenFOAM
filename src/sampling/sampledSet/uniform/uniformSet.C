@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -36,6 +36,8 @@ namespace Foam
 {
     defineTypeNameAndDebug(uniformSet, 0);
     addToRunTimeSelectionTable(sampledSet, uniformSet, word);
+
+    const scalar uniformSet::tol = 1e-3;
 }
 
 
@@ -147,7 +149,7 @@ bool Foam::uniformSet::trackToBoundary
         {
             Pout<< "Searching along trajectory from "
                 << "  trackPt:" << trackPt
-                << "  trackCellI:" << singleParticle.cell()
+                << "  trackCelli:" << singleParticle.cell()
                 << "  to:" << samplePt << endl;
         }
 
@@ -162,8 +164,8 @@ bool Foam::uniformSet::trackToBoundary
             {
                 Pout<< "Result of tracking "
                     << "  trackPt:" << trackPt
-                    << "  trackCellI:" << singleParticle.cell()
-                    << "  trackFaceI:" << singleParticle.face()
+                    << "  trackCelli:" << singleParticle.cell()
+                    << "  trackFacei:" << singleParticle.face()
                     << "  onBoundary:" << singleParticle.onBoundary()
                     << "  samplePt:" << samplePt
                     << "  smallDist:" << smallDist
@@ -217,7 +219,7 @@ void Foam::uniformSet::calcSamples
     // distance vector between sampling points
     if ((nPoints_ < 2) || (mag(end_ - start_) < SMALL))
     {
-        FatalErrorIn("uniformSet::calcSamples()")
+        FatalErrorInFunction
             << "Incorrect sample specification. Either too few points or"
             << " start equals end point." << endl
             << "nPoints:" << nPoints_
@@ -243,47 +245,48 @@ void Foam::uniformSet::calcSamples
     );
 
     point bPoint(GREAT, GREAT, GREAT);
-    label bFaceI = -1;
+    label bFacei = -1;
 
     if (bHits.size())
     {
         bPoint = bHits[0].hitPoint();
-        bFaceI = bHits[0].index();
+        bFacei = bHits[0].index();
     }
 
-    // Get first tracking point. Use bPoint, bFaceI if provided.
+    // Get first tracking point. Use bPoint, bFacei if provided.
 
     point trackPt;
-    label trackCellI = -1;
-    label trackFaceI = -1;
+    label trackCelli = -1;
+    label trackFacei = -1;
 
     bool isSample =
         getTrackingPoint
         (
-            offset,
             start_,
             bPoint,
-            bFaceI,
+            bFacei,
+            smallDist,
 
             trackPt,
-            trackCellI,
-            trackFaceI
+            trackCelli,
+            trackFacei
         );
 
-    if (trackCellI == -1)
+    if (trackCelli == -1)
     {
         // Line start_ - end_ does not intersect domain at all.
         // (or is along edge)
         // Set points and cell/face labels to empty lists
 
+        const_cast<polyMesh&>(mesh()).moving(oldMoving);
         return;
     }
 
     if (isSample)
     {
         samplingPts.append(start_);
-        samplingCells.append(trackCellI);
-        samplingFaces.append(trackFaceI);
+        samplingCells.append(trackCelli);
+        samplingFaces.append(trackFacei);
         samplingCurveDist.append(0.0);
     }
 
@@ -306,7 +309,7 @@ void Foam::uniformSet::calcSamples
     while(true)
     {
         // Initialize tracking starting from trackPt
-        passiveParticle singleParticle(mesh(), trackPt, trackCellI);
+        passiveParticle singleParticle(mesh(), trackPt, trackCelli);
 
         bool reachedBoundary = trackToBoundary
         (
@@ -376,9 +379,9 @@ void Foam::uniformSet::calcSamples
         }
 
         // Update starting point for tracking
-        trackFaceI = bFaceI;
-        trackPt = pushIn(bPoint, trackFaceI);
-        trackCellI = getBoundaryCell(trackFaceI);
+        trackFacei = bFacei;
+        trackPt = pushIn(bPoint, trackFacei);
+        trackCelli = getBoundaryCell(trackFacei);
 
         segmentI++;
 

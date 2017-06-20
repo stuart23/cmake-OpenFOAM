@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -56,7 +56,7 @@ void Foam::regionModels::singleLayerRegion::constructMeshObjects()
                 NO_WRITE
             ),
             regionMesh(),
-            dimensionedVector("zero", dimless, vector::zero),
+            dimensionedVector("zero", dimless, Zero),
             zeroGradientFvPatchField<vector>::typeName
         )
     );
@@ -95,8 +95,8 @@ void Foam::regionModels::singleLayerRegion::initialise()
     volScalarField& magSf = magSfPtr_();
     forAll(intCoupledPatchIDs_, i)
     {
-        const label patchI = intCoupledPatchIDs_[i];
-        const polyPatch& pp = rbm[patchI];
+        const label patchi = intCoupledPatchIDs_[i];
+        const polyPatch& pp = rbm[patchi];
         const labelList& fCells = pp.faceCells();
 
         nBoundaryFaces += fCells.size();
@@ -109,7 +109,7 @@ void Foam::regionModels::singleLayerRegion::initialise()
 
     if (nBoundaryFaces != regionMesh().nCells())
     {
-        FatalErrorIn("singleLayerRegion::initialise()")
+        FatalErrorInFunction
             << "Number of primary region coupled boundary faces not equal to "
             << "the number of cells in the local region" << nl << nl
             << "Number of cells = " << regionMesh().nCells() << nl
@@ -121,19 +121,19 @@ void Foam::regionModels::singleLayerRegion::initialise()
     passivePatchIDs_.setSize(intCoupledPatchIDs_.size(), -1);
     forAll(intCoupledPatchIDs_, i)
     {
-        const label patchI = intCoupledPatchIDs_[i];
-        const polyPatch& ppIntCoupled = rbm[patchI];
+        const label patchi = intCoupledPatchIDs_[i];
+        const polyPatch& ppIntCoupled = rbm[patchi];
         if (ppIntCoupled.size() > 0)
         {
-            label cellId = rbm[patchI].faceCells()[0];
+            label cellId = rbm[patchi].faceCells()[0];
             const cell& cFaces = regionMesh().cells()[cellId];
 
-            label faceI = ppIntCoupled.start();
-            label faceO = cFaces.opposingFaceLabel(faceI, regionMesh().faces());
+            label facei = ppIntCoupled.start();
+            label faceO = cFaces.opposingFaceLabel(facei, regionMesh().faces());
 
-            label passivePatchI = rbm.whichPatch(faceO);
-            passivePatchIDs_[i] = passivePatchI;
-            const polyPatch& ppPassive = rbm[passivePatchI];
+            label passivePatchi = rbm.whichPatch(faceO);
+            passivePatchIDs_[i] = passivePatchi;
+            const polyPatch& ppPassive = rbm[passivePatchi];
             UIndirectList<scalar>(passiveMagSf, ppPassive.faceCells()) =
                 mag(ppPassive.faceAreas());
         }
@@ -208,7 +208,7 @@ const Foam::volVectorField& Foam::regionModels::singleLayerRegion::nHat() const
 {
     if (!nHatPtr_.valid())
     {
-        FatalErrorIn("const fvMesh& singleLayerRegion::nHat() const")
+        FatalErrorInFunction
             << "Region patch normal vectors not available"
             << abort(FatalError);
     }
@@ -221,7 +221,7 @@ const Foam::volScalarField& Foam::regionModels::singleLayerRegion::magSf() const
 {
     if (!magSfPtr_.valid())
     {
-        FatalErrorIn("const fvMesh& singleLayerRegion::magSf() const")
+        FatalErrorInFunction
             << "Region patch areas not available"
             << abort(FatalError);
     }

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -101,14 +101,14 @@ Foam::velocityComponentLaplacianFvMotionSolver::curPoints() const
 
     tmp<pointField> tcurPoints(new pointField(fvMesh_.points()));
 
-    tcurPoints().replace
+    tcurPoints.ref().replace
     (
         cmpt_,
         tcurPoints().component(cmpt_)
-      + fvMesh_.time().deltaTValue()*pointMotionU_.internalField()
+      + fvMesh_.time().deltaTValue()*pointMotionU_.primitiveField()
     );
 
-    twoDCorrectPoints(tcurPoints());
+    twoDCorrectPoints(tcurPoints.ref());
 
     return tcurPoints;
 }
@@ -121,7 +121,7 @@ void Foam::velocityComponentLaplacianFvMotionSolver::solve()
     movePoints(fvMesh_.points());
 
     diffusivityPtr_->correct();
-    pointMotionU_.boundaryField().updateCoeffs();
+    pointMotionU_.boundaryFieldRef().updateCoeffs();
 
     Foam::solve
     (

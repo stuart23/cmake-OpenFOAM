@@ -14,7 +14,7 @@ if (!thermo.isotropic())
     tmp<volVectorField> tkappaByCp = thermo.Kappa()/cp;
     const coordinateSystem& coodSys = coordinates[i];
 
-    aniAlpha.internalField() =
+    aniAlpha.primitiveFieldRef() =
         coodSys.R().transformVector(tkappaByCp());
     aniAlpha.correctBoundaryConditions();
 
@@ -29,4 +29,4 @@ volScalarField& h = thermo.he();
 
 const volScalarField& betav = betavSolid[i];
 
-fv::IOoptionList& fvOptions = solidHeatSources[i];
+fv::options& fvOptions = solidHeatSources[i];

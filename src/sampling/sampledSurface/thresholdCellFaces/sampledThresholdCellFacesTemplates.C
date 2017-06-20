@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,7 +33,7 @@ License
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::sampledThresholdCellFaces::sampleField
 (
     const GeometricField<Type, fvPatchField, volMesh>& vField
@@ -42,12 +42,12 @@ Foam::sampledThresholdCellFaces::sampleField
     // Recreate geometry if time has changed
     updateGeometry();
 
-    return tmp<Field<Type> >(new Field<Type>(vField, meshCells_));
+    return tmp<Field<Type>>(new Field<Type>(vField, meshCells_));
 }
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::sampledThresholdCellFaces::interpolateField
 (
     const interpolation<Type>& interpolator
@@ -57,27 +57,27 @@ Foam::sampledThresholdCellFaces::interpolateField
     updateGeometry();
 
     // One value per point
-    tmp<Field<Type> > tvalues(new Field<Type>(points().size()));
-    Field<Type>& values = tvalues();
+    tmp<Field<Type>> tvalues(new Field<Type>(points().size()));
+    Field<Type>& values = tvalues.ref();
 
     boolList pointDone(points().size(), false);
 
-    forAll(faces(), cutFaceI)
+    forAll(faces(), cutFacei)
     {
-        const face& f = faces()[cutFaceI];
+        const face& f = faces()[cutFacei];
 
         forAll(f, faceVertI)
         {
-            label pointI = f[faceVertI];
+            label pointi = f[faceVertI];
 
-            if (!pointDone[pointI])
+            if (!pointDone[pointi])
             {
-                values[pointI] = interpolator.interpolate
+                values[pointi] = interpolator.interpolate
                 (
-                    points()[pointI],
-                    meshCells_[cutFaceI]
+                    points()[pointi],
+                    meshCells_[cutFacei]
                 );
-                pointDone[pointI] = true;
+                pointDone[pointi] = true;
             }
         }
     }

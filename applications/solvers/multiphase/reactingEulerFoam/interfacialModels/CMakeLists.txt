@@ -12,6 +12,7 @@ dragModels/SchillerNaumann/SchillerNaumann.C
 dragModels/SyamlalOBrien/SyamlalOBrien.C
 dragModels/TomiyamaCorrelated/TomiyamaCorrelated.C
 dragModels/TomiyamaAnalytic/TomiyamaAnalytic.C
+dragModels/TomiyamaKataokaZunSakaguchi/TomiyamaKataokaZunSakaguchi.C
 dragModels/WenYu/WenYu.C
 dragModels/IshiiZuber/IshiiZuber.C
 
@@ -27,6 +28,7 @@ liftModels/constantLiftCoefficient/constantLiftCoefficient.C
 liftModels/Moraga/Moraga.C
 liftModels/LegendreMagnaudet/LegendreMagnaudet.C
 liftModels/TomiyamaLift/TomiyamaLift.C
+liftModels/wallDampedLift/wallDampedLift.C
 
 heatTransferModels/heatTransferModel/heatTransferModel.C
 heatTransferModels/heatTransferModel/newHeatTransferModel.C
@@ -87,6 +89,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactin
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/dragModels/SyamlalOBrien )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/dragModels/TomiyamaAnalytic )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/dragModels/TomiyamaCorrelated )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/dragModels/TomiyamaKataokaZunSakaguchi )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/dragModels/WenYu )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/dragModels/dragModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/dragModels/segregated )
@@ -96,6 +99,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactin
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/liftModels/LegendreMagnaudet )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/liftModels/Moraga )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/liftModels/TomiyamaLift )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/liftModels/wallDampedLift )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/liftModels/constantLiftCoefficient )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/liftModels/liftModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/liftModels/noLift )

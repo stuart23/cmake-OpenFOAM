@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,15 +25,10 @@ License
 
 #include "symmetryPlaneFvsPatchField.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField
+Foam::symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, surfaceMesh>& iF
@@ -44,7 +39,29 @@ symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField
 
 
 template<class Type>
-symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField
+Foam::symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField
+(
+    const fvPatch& p,
+    const DimensionedField<Type, surfaceMesh>& iF,
+    const dictionary& dict
+)
+:
+    fvsPatchField<Type>(p, iF, dict)
+{
+    if (!isType<symmetryPlaneFvPatch>(p))
+    {
+        FatalIOErrorInFunction
+        (
+            dict
+        )   << "patch " << this->patch().index() << " not symmetryPlane type. "
+            << "Patch type = " << p.type()
+            << exit(FatalIOError);
+    }
+}
+
+
+template<class Type>
+Foam::symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField
 (
     const symmetryPlaneFvsPatchField<Type>& ptf,
     const fvPatch& p,
@@ -56,16 +73,8 @@ symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField
 {
     if (!isType<symmetryPlaneFvPatch>(this->patch()))
     {
-        FatalErrorIn
-        (
-            "symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField\n"
-            "(\n"
-            "    const symmetryPlaneFvsPatchField<Type>& ptf,\n"
-            "    const fvPatch& p,\n"
-            "    const DimensionedField<Type, surfaceMesh>& iF,\n"
-            "    const fvPatchFieldMapper& mapper\n"
-            ")\n"
-        )   << "Field type does not correspond to patch type for patch "
+        FatalErrorInFunction
+            << "Field type does not correspond to patch type for patch "
             << this->patch().index() << "." << endl
             << "Field type: " << typeName << endl
             << "Patch type: " << this->patch().type()
@@ -75,35 +84,7 @@ symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField
 
 
 template<class Type>
-symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField
-(
-    const fvPatch& p,
-    const DimensionedField<Type, surfaceMesh>& iF,
-    const dictionary& dict
-)
-:
-    fvsPatchField<Type>(p, iF, dict)
-{
-    if (!isType<symmetryPlaneFvPatch>(p))
-    {
-        FatalIOErrorIn
-        (
-            "symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField\n"
-            "(\n"
-            "    const fvPatch& p,\n"
-            "    const Field<Type>& field,\n"
-            "    const dictionary& dict\n"
-            ")\n",
-            dict
-        )   << "patch " << this->patch().index() << " not symmetryPlane type. "
-            << "Patch type = " << p.type()
-            << exit(FatalIOError);
-    }
-}
-
-
-template<class Type>
-symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField
+Foam::symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField
 (
     const symmetryPlaneFvsPatchField<Type>& ptf
 )
@@ -113,7 +94,7 @@ symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField
 
 
 template<class Type>
-symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField
+Foam::symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField
 (
     const symmetryPlaneFvsPatchField<Type>& ptf,
     const DimensionedField<Type, surfaceMesh>& iF
@@ -122,9 +103,5 @@ symmetryPlaneFvsPatchField<Type>::symmetryPlaneFvsPatchField
     fvsPatchField<Type>(ptf, iF)
 {}
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

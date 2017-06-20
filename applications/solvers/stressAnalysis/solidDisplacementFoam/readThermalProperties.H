@@ -75,8 +75,7 @@ if (thermalStress)
                     "C",
                     dimensionSet(0, 2, -2 , -1, 0),
                     CValue
-                ),
-                zeroGradientFvPatchField<scalar>::typeName
+                )
             )
         );
 
@@ -96,10 +95,8 @@ if (thermalStress)
     }
     else
     {
-        FatalErrorIn
-        (
-             "readThermalProperties.H"
-        )   << "Valid type entries are uniform or field for C"
+        FatalErrorInFunction
+            << "Valid type entries are uniform or field for C"
             << abort(FatalError);
     }
 
@@ -133,8 +130,7 @@ if (thermalStress)
                     "rhoK",
                     dimensionSet(1, 1, -3 , -1, 0),
                     rhoKValue
-                ),
-                zeroGradientFvPatchField<scalar>::typeName
+                )
             )
         );
 
@@ -154,10 +150,8 @@ if (thermalStress)
     }
     else
     {
-        FatalErrorIn
-        (
-             "readThermalProperties.H"
-        )   << "Valid type entries are uniform or field for K"
+        FatalErrorInFunction
+            << "Valid type entries are uniform or field for K"
             << abort(FatalError);
     }
 
@@ -192,8 +186,7 @@ if (thermalStress)
                     "alpha",
                     inv(dimTemperature),
                     alphaValue
-                ),
-                zeroGradientFvPatchField<scalar>::typeName
+                )
             )
         );
     }
@@ -212,10 +205,8 @@ if (thermalStress)
     }
     else
     {
-        FatalErrorIn
-        (
-            "readThermalProperties.H"
-        )   << "Valid type entries are uniform or field for alpha"
+        FatalErrorInFunction
+            << "Valid type entries are uniform or field for alpha"
             << abort(FatalError);
     }
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -57,13 +57,12 @@ const Foam::NamedEnum<Foam::directions::directionType, 3>
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-// For debugging
 void Foam::directions::writeOBJ(Ostream& os, const point& pt)
 {
     os << "v " << pt.x() << ' ' << pt.y() << ' ' << pt.z() << endl;
 }
 
-// For debugging
+
 void Foam::directions::writeOBJ
 (
     Ostream& os,
@@ -81,7 +80,6 @@ void Foam::directions::writeOBJ
 }
 
 
-// Dump to file.
 void Foam::directions::writeOBJ
 (
     const fileName& fName,
@@ -96,14 +94,14 @@ void Foam::directions::writeOBJ
 
     label vertI = 0;
 
-    forAll(dirs, cellI)
+    forAll(dirs, celli)
     {
-        const point& ctr = mesh.cellCentres()[cellI];
+        const point& ctr = mesh.cellCentres()[celli];
 
         // Calculate local length scale
         scalar minDist = GREAT;
 
-        const labelList& nbrs = mesh.cellCells()[cellI];
+        const labelList& nbrs = mesh.cellCells()[celli];
 
         forAll(nbrs, nbrI)
         {
@@ -112,7 +110,7 @@ void Foam::directions::writeOBJ
 
         scalar scale = 0.5*minDist;
 
-        writeOBJ(xDirStream, ctr, ctr + scale*dirs[cellI], vertI);
+        writeOBJ(xDirStream, ctr, ctr + scale*dirs[celli], vertI);
     }
 }
 
@@ -127,7 +125,7 @@ void Foam::directions::check2D
     {
         if (mag(correct2DPtr->planeNormal() & vec) > 1e-6)
         {
-            FatalErrorIn("check2D") << "Specified vector " << vec
+            FatalErrorInFunction
                 << "is not normal to plane defined in dynamicMeshDict."
                 << endl
                 << "Either make case 3D or adjust vector."
@@ -137,7 +135,6 @@ void Foam::directions::check2D
 }
 
 
-// Get direction on all cells
 Foam::vectorField Foam::directions::propagateDirection
 (
     const polyMesh& mesh,
@@ -153,38 +150,38 @@ Foam::vectorField Foam::directions::propagateDirection
 
     if (useTopo)
     {
-        forAll(pp, patchFaceI)
+        forAll(pp, patchFacei)
         {
-            label meshFaceI = pp.start() + patchFaceI;
+            label meshFacei = pp.start() + patchFacei;
 
-            label cellI = mesh.faceOwner()[meshFaceI];
+            label celli = mesh.faceOwner()[meshFacei];
 
-            if (!hexMatcher().isA(mesh, cellI))
+            if (!hexMatcher().isA(mesh, celli))
             {
-                FatalErrorIn("propagateDirection")
-                    << "useHexTopology specified but cell " << cellI
-                    << " on face " << patchFaceI << " of patch " << pp.name()
+                FatalErrorInFunction
+                    << "useHexTopology specified but cell " << celli
+                    << " on face " << patchFacei << " of patch " << pp.name()
                     << " is not a hex" << exit(FatalError);
             }
 
-            const vector& cutDir = ppField[patchFaceI];
+            const vector& cutDir = ppField[patchFacei];
 
             // Get edge(bundle) on cell most in direction of cutdir
-            label edgeI = meshTools::cutDirToEdge(mesh, cellI, cutDir);
+            label edgeI = meshTools::cutDirToEdge(mesh, celli, cutDir);
 
             // Convert edge into index on face
             label faceIndex =
                 directionInfo::edgeToFaceIndex
                 (
                     mesh,
-                    cellI,
-                    meshFaceI,
+                    celli,
+                    meshFacei,
                     edgeI
                 );
 
             // Set initial face and direction
-            changedFaces[patchFaceI] = meshFaceI;
-            changedFacesInfo[patchFaceI] =
+            changedFaces[patchFacei] = meshFacei;
+            changedFacesInfo[patchFacei] =
                 directionInfo
                 (
                     faceIndex,
@@ -194,14 +191,14 @@ Foam::vectorField Foam::directions::propagateDirection
     }
     else
     {
-        forAll(pp, patchFaceI)
+        forAll(pp, patchFacei)
         {
-            changedFaces[patchFaceI] = pp.start() + patchFaceI;
-            changedFacesInfo[patchFaceI] =
+            changedFaces[patchFacei] = pp.start() + patchFacei;
+            changedFacesInfo[patchFacei] =
                 directionInfo
                 (
                     -2,         // Geometric information only
-                    ppField[patchFaceI]
+                    ppField[patchFacei]
                 );
         }
     }
@@ -222,39 +219,39 @@ Foam::vectorField Foam::directions::propagateDirection
     label nGeom = 0;
     label nTopo = 0;
 
-    forAll(cellInfo, cellI)
+    forAll(cellInfo, celli)
     {
-        label index = cellInfo[cellI].index();
+        label index = cellInfo[celli].index();
 
         if (index == -3)
         {
             // Never visited
-            WarningIn("propagateDirection")
-                << "Cell " << cellI << " never visited to determine "
+            WarningInFunction
+                << "Cell " << celli << " never visited to determine "
                 << "local coordinate system" << endl
                 << "Using direction " << defaultDir << " instead" << endl;
 
-            dirField[cellI] = defaultDir;
+            dirField[celli] = defaultDir;
 
             nUnset++;
         }
         else if (index == -2)
         {
             // Geometric direction
-            dirField[cellI] = cellInfo[cellI].n();
+            dirField[celli] = cellInfo[celli].n();
 
             nGeom++;
         }
         else if (index == -1)
         {
-            FatalErrorIn("propagateDirection")
+            FatalErrorInFunction
                 << "Illegal index " << index << endl
                 << "Value is only allowed on faces" << abort(FatalError);
         }
         else
         {
             // Topological edge cut. Convert into average cut direction.
-            dirField[cellI] = meshTools::edgeToCutDir(mesh, cellI, index);
+            dirField[celli] = meshTools::edgeToCutDir(mesh, celli, index);
 
             nTopo++;
         }
@@ -283,33 +280,34 @@ Foam::directions::directions
     List<vectorField>(wordList(dict.lookup("directions")).size())
 {
     const wordList wantedDirs(dict.lookup("directions"));
+    const word coordSystem(dict.lookup("coordinateSystem"));
 
     bool wantNormal = false;
     bool wantTan1 = false;
     bool wantTan2 = false;
+    label nDirs = 0;
 
-    forAll(wantedDirs, i)
+    if (coordSystem != "fieldBased")
     {
-        directionType wantedDir = directionTypeNames_[wantedDirs[i]];
+        forAll(wantedDirs, i)
+        {
+            directionType wantedDir = directionTypeNames_[wantedDirs[i]];
 
-        if (wantedDir == NORMAL)
-        {
-            wantNormal = true;
-        }
-        else if (wantedDir == TAN1)
-        {
-            wantTan1 = true;
-        }
-        else if (wantedDir == TAN2)
-        {
-            wantTan2 = true;
+            if (wantedDir == NORMAL)
+            {
+                wantNormal = true;
+            }
+            else if (wantedDir == TAN1)
+            {
+                wantTan1 = true;
+            }
+            else if (wantedDir == TAN2)
+            {
+                wantTan2 = true;
+            }
         }
     }
 
-
-    label nDirs = 0;
-
-    const word coordSystem(dict.lookup("coordinateSystem"));
 
     if (coordSystem == "global")
     {
@@ -349,21 +347,18 @@ Foam::directions::directions
 
         const word patchName(patchDict.lookup("patch"));
 
-        const label patchI = mesh.boundaryMesh().findPatchID(patchName);
+        const label patchi = mesh.boundaryMesh().findPatchID(patchName);
 
-        if (patchI == -1)
+        if (patchi == -1)
         {
-            FatalErrorIn
-            (
-                "directions::directions(const polyMesh&, const dictionary&,"
-                "const twoDPointCorrector*)"
-            )   << "Cannot find patch "
+            FatalErrorInFunction
+                << "Cannot find patch "
                 << patchName
                 << exit(FatalError);
         }
 
         // Take zeroth face on patch
-        const polyPatch& pp = mesh.boundaryMesh()[patchI];
+        const polyPatch& pp = mesh.boundaryMesh()[patchi];
 
         vector tan1(patchDict.lookup("tan1"));
 
@@ -373,11 +368,8 @@ Foam::directions::directions
         {
             tan1 = correct2DPtr->planeNormal() ^ n0;
 
-            WarningIn
-            (
-                "directions::directions(const polyMesh&, const dictionary&,"
-                "const twoDPointCorrector*)"
-            )   << "Discarding user specified tan1 since 2D case." << endl
+            WarningInFunction
+                << "Discarding user specified tan1 since 2D case." << endl
                 << "Recalculated tan1 from face normal and planeNormal as "
                 << tan1 << endl << endl;
         }
@@ -430,15 +422,29 @@ Foam::directions::directions
             this->operator[](nDirs++) = tan2Dirs;
         }
     }
+    else if (coordSystem == "fieldBased")
+    {
+        forAll(wantedDirs, i)
+        {
+            operator[](nDirs++) =
+                vectorIOField
+                (
+                    IOobject
+                    (
+                        mesh.instance()/wantedDirs[i],
+                        mesh,
+                        IOobject::MUST_READ,
+                        IOobject::NO_WRITE
+                    )
+                );
+        }
+    }
     else
     {
-        FatalErrorIn
-        (
-            "directions::directions(const polyMesh&, const dictionary&,"
-            "const twoDPointCorrector*)"
-        )   << "Unknown coordinate system "
+        FatalErrorInFunction
+            << "Unknown coordinate system "
             << coordSystem << endl
-            << "Known types are global and patchLocal"
+            << "Known types are global, patchLocal and fieldBased"
             << exit(FatalError);
     }
 }

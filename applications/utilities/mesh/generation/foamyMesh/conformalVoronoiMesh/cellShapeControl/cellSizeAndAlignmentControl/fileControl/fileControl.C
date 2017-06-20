@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -119,7 +119,7 @@ Foam::fileControl::~fileControl()
 //
 //    label nearest = 0;
 //
-//    tensor alignment = Foam::tensor::zero;
+//    tensor alignment = Zero;
 //    forAll(bary, pI)
 //    {
 //        //alignment += bary[pI]*ch->vertex(pI)->alignment();
@@ -155,7 +155,7 @@ Foam::fileControl::~fileControl()
 //        size += bary[pI]*ch->vertex(pI)->size();
 //    }
 //
-////    alignment = Foam::tensor::zero;
+////    alignment = Zero;
 ////    forAll(bary, pI)
 ////    {
 ////        alignment += bary[pI]*ch->vertex(pI)->alignment();
@@ -235,15 +235,8 @@ void Foam::fileControl::initialVertices
 
     if ((pts.size() != sizes.size()) || (pts.size() != alignments.size()))
     {
-        FatalErrorIn
-        (
-            "Foam::fileControl::initialVertices"
-            "("
-            "   pointField&,"
-            "   scalarField&,"
-            "   Field<triad>&"
-            ")"
-        )   << "Size of list of points, sizes and alignments do not match:"
+        FatalErrorInFunction
+            << "Size of list of points, sizes and alignments do not match:"
             << nl
             << "Points size     = " << pts.size() << nl
             << "Sizes size      = " << sizes.size() << nl

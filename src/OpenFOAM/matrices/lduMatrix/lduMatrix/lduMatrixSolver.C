@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -71,10 +71,8 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
 
         if (constructorIter == symMatrixConstructorTablePtr_->end())
         {
-            FatalIOErrorIn
-            (
-                "lduMatrix::solver::New", solverControls
-            )   << "Unknown symmetric matrix solver " << name << nl << nl
+            FatalIOErrorInFunction(solverControls)
+                << "Unknown symmetric matrix solver " << name << nl << nl
                 << "Valid symmetric matrix solvers are :" << endl
                 << symMatrixConstructorTablePtr_->sortedToc()
                 << exit(FatalIOError);
@@ -100,10 +98,8 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
 
         if (constructorIter == asymMatrixConstructorTablePtr_->end())
         {
-            FatalIOErrorIn
-            (
-                "lduMatrix::solver::New", solverControls
-            )   << "Unknown asymmetric matrix solver " << name << nl << nl
+            FatalIOErrorInFunction(solverControls)
+                << "Unknown asymmetric matrix solver " << name << nl << nl
                 << "Valid asymmetric matrix solvers are :" << endl
                 << asymMatrixConstructorTablePtr_->sortedToc()
                 << exit(FatalIOError);
@@ -124,10 +120,8 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
     }
     else
     {
-        FatalIOErrorIn
-        (
-            "lduMatrix::solver::New", solverControls
-        )   << "cannot solve incomplete matrix, "
+        FatalIOErrorInFunction(solverControls)
+            << "cannot solve incomplete matrix, "
                "no diagonal or off-diagonal coefficient"
             << exit(FatalIOError);
 
@@ -163,10 +157,10 @@ Foam::lduMatrix::solver::solver
 
 void Foam::lduMatrix::solver::readControls()
 {
-    maxIter_   = controlDict_.lookupOrDefault<label>("maxIter", 1000);
-    minIter_   = controlDict_.lookupOrDefault<label>("minIter", 0);
+    maxIter_ = controlDict_.lookupOrDefault<label>("maxIter", defaultMaxIter_);
+    minIter_ = controlDict_.lookupOrDefault<label>("minIter", 0);
     tolerance_ = controlDict_.lookupOrDefault<scalar>("tolerance", 1e-6);
-    relTol_    = controlDict_.lookupOrDefault<scalar>("relTol", 0);
+    relTol_ = controlDict_.lookupOrDefault<scalar>("relTol", 0);
 }
 
 

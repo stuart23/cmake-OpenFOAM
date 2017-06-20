@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -91,21 +91,7 @@ void Foam::Time::adjustDeltaT()
         timeToNextWrite = max
         (
             0.0,
-            (outputTimeIndex_ + 1)*writeInterval_ - (value() - startTime_)
-        );
-    }
-    if (secondaryWriteControl_ == wcAdjustableRunTime)
-    {
-        adjustTime = true;
-        timeToNextWrite = max
-        (
-            0.0,
-            min
-            (
-                timeToNextWrite,
-                (secondaryOutputTimeIndex_ + 1)*secondaryWriteInterval_
-              - (value() - startTime_)
-            )
+            (writeTimeIndex_ + 1)*writeInterval_ - (value() - startTime_)
         );
     }
 
@@ -178,7 +164,7 @@ void Foam::Time::setControls()
         }
         else
         {
-            FatalIOErrorIn("Time::setControls()", controlDict_)
+            FatalIOErrorInFunction(controlDict_)
                 << "expected startTime, firstTime or latestTime"
                 << " found '" << startFrom << "'"
                 << exit(FatalIOError);
@@ -225,7 +211,7 @@ void Foam::Time::setControls()
             // Update the time formatting
             setTime(startTime_, 0);
 
-            WarningIn("Time::setControls()")
+            WarningInFunction
                 << "Increasing the timePrecision from " << oldPrecision
                 << " to " << precision_
                 << " to support the formatting of the current time directory "
@@ -251,7 +237,7 @@ void Foam::Time::setControls()
           > Pstream::nProcs()*deltaT_/10.0
         )
         {
-            FatalIOErrorIn("Time::setControls()", controlDict_)
+            FatalIOErrorInFunction(controlDict_)
                 << "Start time is not the same for all processors" << nl
                 << "processor " << Pstream::myProcNo() << " has startTime "
                 << startTime_ << exit(FatalIOError);
@@ -318,7 +304,7 @@ void Foam::Time::setControls()
 
             if (storedTimeName != timeName())
             {
-                IOWarningIn("Time::setControls()", timeDict)
+                IOWarningInFunction(timeDict)
                     << "Time read from time dictionary " << storedTimeName
                     << " differs from actual time " << timeName() << '.' << nl
                     << "    This may cause unexpected database behaviour."
@@ -376,10 +362,7 @@ Foam::Time::Time
     stopAt_(saEndTime),
     writeControl_(wcTimeStep),
     writeInterval_(GREAT),
-    secondaryWriteControl_(wcTimeStep),
-    secondaryWriteInterval_(labelMax/10.0), // bit less to allow calculations
     purgeWrite_(0),
-    secondaryPurgeWrite_(0),
     writeOnce_(false),
     subCycling_(false),
     sigWriteNow_(true, *this),
@@ -471,10 +454,7 @@ Foam::Time::Time
     stopAt_(saEndTime),
     writeControl_(wcTimeStep),
     writeInterval_(GREAT),
-    secondaryWriteControl_(wcTimeStep),
-    secondaryWriteInterval_(labelMax/10.0),
     purgeWrite_(0),
-    secondaryPurgeWrite_(0),
     writeOnce_(false),
     subCycling_(false),
     sigWriteNow_(true, *this),
@@ -573,10 +553,7 @@ Foam::Time::Time
     stopAt_(saEndTime),
     writeControl_(wcTimeStep),
     writeInterval_(GREAT),
-    secondaryWriteControl_(wcTimeStep),
-    secondaryWriteInterval_(labelMax/10.0),
     purgeWrite_(0),
-    secondaryPurgeWrite_(0),
     writeOnce_(false),
     subCycling_(false),
     sigWriteNow_(true, *this),
@@ -671,10 +648,7 @@ Foam::Time::Time
     stopAt_(saEndTime),
     writeControl_(wcTimeStep),
     writeInterval_(GREAT),
-    secondaryWriteControl_(wcTimeStep),
-    secondaryWriteInterval_(labelMax/10.0),
     purgeWrite_(0),
-    secondaryPurgeWrite_(0),
     writeOnce_(false),
     subCycling_(false),
 
@@ -699,7 +673,7 @@ Foam::Time::~Time()
         removeWatch(controlDict_.watchIndex());
     }
 
-    // destroy function objects first
+    // Destroy function objects first
     functionObjects_.clear();
 }
 
@@ -754,7 +728,6 @@ Foam::word Foam::Time::timeName() const
 }
 
 
-// Search the construction path for times
 Foam::instantList Foam::Time::times() const
 {
     return findTimes(path(), constant());
@@ -795,7 +768,7 @@ Foam::instant Foam::Time::findClosestTime(const scalar t) const
 {
     instantList timeDirs = findTimes(path(), constant());
 
-    // there is only one time (likely "constant") so return it
+    // There is only one time (likely "constant") so return it
     if (timeDirs.size() == 1)
     {
         return timeDirs[0];
@@ -826,16 +799,6 @@ Foam::instant Foam::Time::findClosestTime(const scalar t) const
     return timeDirs[nearestIndex];
 }
 
-
-// This should work too,
-// if we don't worry about checking "constant" explicitly
-//
-// Foam::instant Foam::Time::findClosestTime(const scalar t) const
-// {
-//     instantList timeDirs = findTimes(path(), constant());
-//     label timeIndex = min(findClosestTimeIndex(timeDirs, t), 0, constant());
-//     return timeDirs[timeIndex];
-// }
 
 Foam::label Foam::Time::findClosestTimeIndex
 (
@@ -1126,124 +1089,61 @@ Foam::Time& Foam::Time::operator++()
             }
         }
 
-
-        outputTime_ = false;
-        primaryOutputTime_ = false;
-        secondaryOutputTime_ = false;
+        writeTime_ = false;
 
         switch (writeControl_)
         {
             case wcTimeStep:
-                primaryOutputTime_ = !(timeIndex_ % label(writeInterval_));
+                writeTime_ = !(timeIndex_ % label(writeInterval_));
             break;
 
             case wcRunTime:
             case wcAdjustableRunTime:
             {
-                label outputIndex = label
+                label writeIndex = label
                 (
                     ((value() - startTime_) + 0.5*deltaT_)
                   / writeInterval_
                 );
 
-                if (outputIndex > outputTimeIndex_)
+                if (writeIndex > writeTimeIndex_)
                 {
-                    primaryOutputTime_ = true;
-                    outputTimeIndex_ = outputIndex;
+                    writeTime_ = true;
+                    writeTimeIndex_ = writeIndex;
                 }
             }
             break;
 
             case wcCpuTime:
             {
-                label outputIndex = label
+                label writeIndex = label
                 (
                     returnReduce(elapsedCpuTime(), maxOp<double>())
                   / writeInterval_
                 );
-                if (outputIndex > outputTimeIndex_)
+                if (writeIndex > writeTimeIndex_)
                 {
-                    primaryOutputTime_ = true;
-                    outputTimeIndex_ = outputIndex;
+                    writeTime_ = true;
+                    writeTimeIndex_ = writeIndex;
                 }
             }
             break;
 
             case wcClockTime:
             {
-                label outputIndex = label
+                label writeIndex = label
                 (
                     returnReduce(label(elapsedClockTime()), maxOp<label>())
                   / writeInterval_
                 );
-                if (outputIndex > outputTimeIndex_)
+                if (writeIndex > writeTimeIndex_)
                 {
-                    primaryOutputTime_ = true;
-                    outputTimeIndex_ = outputIndex;
+                    writeTime_ = true;
+                    writeTimeIndex_ = writeIndex;
                 }
             }
             break;
         }
-
-
-        // Adapt for secondaryWrite controls
-        switch (secondaryWriteControl_)
-        {
-            case wcTimeStep:
-                secondaryOutputTime_ =
-                    !(timeIndex_ % label(secondaryWriteInterval_));
-            break;
-
-            case wcRunTime:
-            case wcAdjustableRunTime:
-            {
-                label outputIndex = label
-                (
-                    ((value() - startTime_) + 0.5*deltaT_)
-                  / secondaryWriteInterval_
-                );
-
-                if (outputIndex > secondaryOutputTimeIndex_)
-                {
-                    secondaryOutputTime_ = true;
-                    secondaryOutputTimeIndex_ = outputIndex;
-                }
-            }
-            break;
-
-            case wcCpuTime:
-            {
-                label outputIndex = label
-                (
-                    returnReduce(elapsedCpuTime(), maxOp<double>())
-                  / secondaryWriteInterval_
-                );
-                if (outputIndex > secondaryOutputTimeIndex_)
-                {
-                    secondaryOutputTime_ = true;
-                    secondaryOutputTimeIndex_ = outputIndex;
-                }
-            }
-            break;
-
-            case wcClockTime:
-            {
-                label outputIndex = label
-                (
-                    returnReduce(label(elapsedClockTime()), maxOp<label>())
-                  / secondaryWriteInterval_
-                );
-                if (outputIndex > secondaryOutputTimeIndex_)
-                {
-                    secondaryOutputTime_ = true;
-                    secondaryOutputTimeIndex_ = outputIndex;
-                }
-            }
-            break;
-        }
-
-
-        outputTime_ = primaryOutputTime_ || secondaryOutputTime_;
 
 
         // Check if endTime needs adjustment to stop at the next run()/end()
@@ -1256,25 +1156,23 @@ Foam::Time& Foam::Time::operator++()
             else if (stopAt_ == saWriteNow)
             {
                 endTime_ = value();
-                outputTime_ = true;
-                primaryOutputTime_ = true;
+                writeTime_ = true;
             }
-            else if (stopAt_ == saNextWrite && outputTime_ == true)
+            else if (stopAt_ == saNextWrite && writeTime_ == true)
             {
                 endTime_ = value();
             }
         }
 
-        // Override outputTime if one-shot writing
+        // Override writeTime if one-shot writing
         if (writeOnce_)
         {
-            primaryOutputTime_ = true;
-            outputTime_ = true;
+            writeTime_ = true;
             writeOnce_ = false;
         }
 
         // Adjust the precision of the time directory name if necessary
-        if (outputTime_)
+        if (writeTime_)
         {
             // Tolerance used when testing time equivalence
             const scalar timeTol =
@@ -1308,7 +1206,7 @@ Foam::Time& Foam::Time::operator++()
 
                 if (precision_ != oldPrecision)
                 {
-                    WarningIn("Time::operator++()")
+                    WarningInFunction
                         << "Increased the timePrecision from " << oldPrecision
                         << " to " << precision_
                         << " to distinguish between timeNames at time "
@@ -1318,7 +1216,7 @@ Foam::Time& Foam::Time::operator++()
                     if (precision_ == maxPrecision_)
                     {
                         // Reached maxPrecision limit
-                        WarningIn("Time::operator++()")
+                        WarningInFunction
                             << "Current time name " << dimensionedScalar::name()
                             << nl
                             << "    The maximum time precision has been reached"
@@ -1338,7 +1236,7 @@ Foam::Time& Foam::Time::operator++()
                         )
                     )
                     {
-                        WarningIn("Time::operator++()")
+                        WarningInFunction
                             << "Current time name " << dimensionedScalar::name()
                             << " is set to an instance prior to the "
                                "previous one "
@@ -1350,8 +1248,6 @@ Foam::Time& Foam::Time::operator++()
                 }
             }
         }
-
-        functionObjects_.timeSet();
     }
 
     return *this;

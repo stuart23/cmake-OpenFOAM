@@ -1,3 +1,4 @@
+for (int Ecorr=0; Ecorr<nEnergyCorrectors; Ecorr++)
 {
     fluid.correctEnergyTransport();
 
@@ -28,13 +29,14 @@
             );
 
             EEqn->relax();
-            fvOptions.constrain(EEqn());
+            fvOptions.constrain(EEqn.ref());
             EEqn->solve();
         }
     }
+
+    fluid.correctThermo();
 }
 
-fluid.correctThermo();
 
 forAll(phases, phasei)
 {

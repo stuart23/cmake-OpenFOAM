@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -43,25 +43,26 @@ void Foam::fvMeshDistribute::printFieldInfo(const fvMesh& mesh)
             //<< " value:" << fld
             << endl;
 
-        forAll(fld.boundaryField(), patchI)
+        forAll(fld.boundaryField(), patchi)
         {
-            Pout<< "    " << patchI
-                << ' ' << fld.boundaryField()[patchI].patch().name()
-                << ' ' << fld.boundaryField()[patchI].type()
-                << ' ' << fld.boundaryField()[patchI].size()
+            Pout<< "    " << patchi
+                << ' ' << fld.boundaryField()[patchi].patch().name()
+                << ' ' << fld.boundaryField()[patchi].type()
+                << ' ' << fld.boundaryField()[patchi].size()
                 << endl;
         }
     }
 }
 
 
-// Save whole boundary field
 template<class T, class Mesh>
 void Foam::fvMeshDistribute::saveBoundaryFields
 (
-    PtrList<FieldField<fvsPatchField, T> >& bflds
+    PtrList<FieldField<fvsPatchField, T>>& bflds
 ) const
 {
+    // Save whole boundary field
+
     typedef GeometricField<T, fvsPatchField, Mesh> fldType;
 
     HashTable<const fldType*> flds
@@ -84,14 +85,15 @@ void Foam::fvMeshDistribute::saveBoundaryFields
 }
 
 
-// Map boundary field
 template<class T, class Mesh>
 void Foam::fvMeshDistribute::mapBoundaryFields
 (
     const mapPolyMesh& map,
-    const PtrList<FieldField<fvsPatchField, T> >& oldBflds
+    const PtrList<FieldField<fvsPatchField, T>>& oldBflds
 )
 {
+    // Map boundary field
+
     const labelList& oldPatchStarts = map.oldPatchStarts();
     const labelList& faceMap = map.faceMap();
 
@@ -104,39 +106,39 @@ void Foam::fvMeshDistribute::mapBoundaryFields
 
     if (flds.size() != oldBflds.size())
     {
-        FatalErrorIn("fvMeshDistribute::mapBoundaryFields(..)") << "problem"
+        FatalErrorInFunction
             << abort(FatalError);
     }
 
-    label fieldI = 0;
+    label fieldi = 0;
 
     forAllIter(typename HashTable<fldType*>, flds, iter)
     {
         fldType& fld = *iter();
-        typename fldType::GeometricBoundaryField& bfld =
-            fld.boundaryField();
+        typename fldType::Boundary& bfld =
+            fld.boundaryFieldRef();
 
-        const FieldField<fvsPatchField, T>& oldBfld = oldBflds[fieldI++];
+        const FieldField<fvsPatchField, T>& oldBfld = oldBflds[fieldi++];
 
         // Pull from old boundary field into bfld.
 
-        forAll(bfld, patchI)
+        forAll(bfld, patchi)
         {
-            fvsPatchField<T>& patchFld = bfld[patchI];
-            label faceI = patchFld.patch().start();
+            fvsPatchField<T>& patchFld = bfld[patchi];
+            label facei = patchFld.patch().start();
 
             forAll(patchFld, i)
             {
-                label oldFaceI = faceMap[faceI++];
+                label oldFacei = faceMap[facei++];
 
-                // Find patch and local patch face oldFaceI was in.
-                forAll(oldPatchStarts, oldPatchI)
+                // Find patch and local patch face oldFacei was in.
+                forAll(oldPatchStarts, oldPatchi)
                 {
-                    label oldLocalI = oldFaceI - oldPatchStarts[oldPatchI];
+                    label oldLocalI = oldFacei - oldPatchStarts[oldPatchi];
 
-                    if (oldLocalI >= 0 && oldLocalI < oldBfld[oldPatchI].size())
+                    if (oldLocalI >= 0 && oldLocalI < oldBfld[oldPatchi].size())
                     {
-                        patchFld[i] = oldBfld[oldPatchI][oldLocalI];
+                        patchFld[i] = oldBfld[oldPatchi][oldLocalI];
                     }
                 }
             }
@@ -145,13 +147,103 @@ void Foam::fvMeshDistribute::mapBoundaryFields
 }
 
 
-// Init patch fields of certain type
+template<class T>
+void Foam::fvMeshDistribute::saveInternalFields
+(
+    PtrList<Field<T> >& iflds
+) const
+{
+    typedef GeometricField<T, fvsPatchField, surfaceMesh> fldType;
+
+    HashTable<const fldType*> flds
+    (
+        static_cast<const fvMesh&>(mesh_).objectRegistry::lookupClass<fldType>()
+    );
+
+    iflds.setSize(flds.size());
+
+    label i = 0;
+
+    forAllConstIter(typename HashTable<const fldType*>, flds, iter)
+    {
+        const fldType& fld = *iter();
+
+        iflds.set(i, fld.primitiveField().clone());
+
+        i++;
+    }
+}
+
+
+template<class T>
+void Foam::fvMeshDistribute::mapExposedFaces
+(
+    const mapPolyMesh& map,
+    const PtrList<Field<T> >& oldFlds
+)
+{
+    // Set boundary values of exposed internal faces
+
+    const labelList& faceMap = map.faceMap();
+
+    typedef GeometricField<T, fvsPatchField, surfaceMesh> fldType;
+
+    HashTable<fldType*> flds
+    (
+        mesh_.objectRegistry::lookupClass<fldType>()
+    );
+
+    if (flds.size() != oldFlds.size())
+    {
+        FatalErrorIn("fvMeshDistribute::mapExposedFaces(..)") << "problem"
+            << abort(FatalError);
+    }
+
+
+    label fieldI = 0;
+
+    forAllIter(typename HashTable<fldType*>, flds, iter)
+    {
+        fldType& fld = *iter();
+        typename fldType::Boundary& bfld = fld.boundaryFieldRef();
+
+        const Field<T>& oldInternal = oldFlds[fieldI++];
+
+        // Pull from old internal field into bfld.
+
+        forAll(bfld, patchi)
+        {
+            fvsPatchField<T>& patchFld = bfld[patchi];
+
+            forAll(patchFld, i)
+            {
+                const label faceI = patchFld.patch().start()+i;
+
+                label oldFaceI = faceMap[faceI];
+
+                if (oldFaceI < oldInternal.size())
+                {
+                    patchFld[i] = oldInternal[oldFaceI];
+
+                    if (map.flipFaceFlux().found(faceI))
+                    {
+                        patchFld[i] = flipOp()(patchFld[i]);
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 template<class GeoField, class PatchFieldType>
 void Foam::fvMeshDistribute::initPatchFields
 (
     const typename GeoField::value_type& initVal
 )
 {
+    // Init patch fields of certain type
+
     HashTable<GeoField*> flds
     (
         mesh_.objectRegistry::lookupClass<GeoField>()
@@ -161,24 +253,24 @@ void Foam::fvMeshDistribute::initPatchFields
     {
         GeoField& fld = *iter();
 
-        typename GeoField::GeometricBoundaryField& bfld =
-            fld.boundaryField();
+        typename GeoField::Boundary& bfld = fld.boundaryFieldRef();
 
-        forAll(bfld, patchI)
+        forAll(bfld, patchi)
         {
-            if (isA<PatchFieldType>(bfld[patchI]))
+            if (isA<PatchFieldType>(bfld[patchi]))
             {
-                bfld[patchI] == initVal;
+                bfld[patchi] == initVal;
             }
         }
     }
 }
 
 
-// correctBoundaryConditions patch fields of certain type
 template<class GeoField>
 void Foam::fvMeshDistribute::correctBoundaryConditions()
 {
+    // correctBoundaryConditions patch fields of certain type
+
     HashTable<GeoField*> flds
     (
         mesh_.objectRegistry::lookupClass<GeoField>()
@@ -192,24 +284,6 @@ void Foam::fvMeshDistribute::correctBoundaryConditions()
 }
 
 
-// Send fields. Note order supplied so we can receive in exactly the same order.
-// Note that field gets written as entry in dictionary so we
-// can construct from subdictionary.
-// (since otherwise the reading as-a-dictionary mixes up entries from
-// consecutive fields)
-// The dictionary constructed is:
-//  volScalarField
-//  {
-//      p {internalField ..; boundaryField ..;}
-//      k {internalField ..; boundaryField ..;}
-//  }
-//  volVectorField
-//  {
-//      U {internalField ...  }
-//  }
-
-// volVectorField {U {internalField ..; boundaryField ..;}}
-//
 template<class GeoField>
 void Foam::fvMeshDistribute::sendFields
 (
@@ -219,6 +293,25 @@ void Foam::fvMeshDistribute::sendFields
     Ostream& toNbr
 )
 {
+    // Send fields. Note order supplied so we can receive in exactly the same
+    // order.
+    // Note that field gets written as entry in dictionary so we
+    // can construct from subdictionary.
+    // (since otherwise the reading as-a-dictionary mixes up entries from
+    // consecutive fields)
+    // The dictionary constructed is:
+    //  volScalarField
+    //  {
+    //      p {internalField ..; boundaryField ..;}
+    //      k {internalField ..; boundaryField ..;}
+    //  }
+    //  volVectorField
+    //  {
+    //      U {internalField ...  }
+    //  }
+
+    // volVectorField {U {internalField ..; boundaryField ..;}}
+
     toNbr << GeoField::typeName << token::NL << token::BEGIN_BLOCK << token::NL;
     forAll(fieldNames, i)
     {
@@ -244,7 +337,6 @@ void Foam::fvMeshDistribute::sendFields
 }
 
 
-// Opposite of sendFields
 template<class GeoField>
 void Foam::fvMeshDistribute::receiveFields
 (

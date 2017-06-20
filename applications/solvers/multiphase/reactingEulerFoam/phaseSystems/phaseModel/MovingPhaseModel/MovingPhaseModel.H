@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -80,6 +80,9 @@ class MovingPhaseModel
         //- Lagrangian acceleration field (needed for virtual-mass)
         volVectorField DUDt_;
 
+        //- Dilatation rate
+        tmp<volScalarField> divU_;
+
         //- Turbulence model
         autoPtr<phaseCompressibleTurbulenceModel> turbulence_;
 
@@ -151,6 +154,12 @@ public:
             //- Return the substantive acceleration
             virtual tmp<volVectorField> DUDt() const;
 
+            //- Return the phase dilatation rate (d(alpha)/dt + div(alpha*phi))
+            virtual const tmp<volScalarField>& divU() const;
+
+            //- Set the phase dilatation rate (d(alpha)/dt + div(alpha*phi))
+            virtual void divU(const tmp<volScalarField>& divU);
+
             //- Constant access the continuity error
             virtual tmp<volScalarField> continuityError() const;
 
@@ -187,7 +196,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "MovingPhaseModel.C"
+    #include "MovingPhaseModel.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

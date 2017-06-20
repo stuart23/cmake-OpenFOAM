@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -34,8 +34,7 @@ Description
     The sample mode is set by the underlying mapping engine, provided by the
     mappedPatchBase class.
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         fieldName    | name of field to be mapped | no       | this field name
@@ -46,7 +45,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            mapped;
         fieldName       T;
@@ -69,7 +68,7 @@ Note
     It is not possible to sample internal faces since volume fields are not
     defined on faces.
 
-SeeAlso
+See also
     Foam::mappedPatchBase
     Foam::interpolation
     Foam::fixedValueFvPatchField
@@ -153,9 +152,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchField<Type>> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new mappedFixedValueFvPatchField<Type>(*this)
             );
@@ -169,12 +168,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchField<Type>> clone
         (
             const DimensionedField<Type, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new mappedFixedValueFvPatchField<Type>(*this, iF)
             );
@@ -200,7 +199,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "mappedFixedValueFvPatchField.C"
+    #include "mappedFixedValueFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

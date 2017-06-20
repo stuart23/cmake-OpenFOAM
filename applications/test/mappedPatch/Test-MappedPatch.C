@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -60,11 +60,11 @@ int main(int argc, char *argv[])
         calculatedFvPatchVectorField::typeName
     );
 
-    forAll(mesh.boundaryMesh(), patchI)
+    forAll(mesh.boundaryMesh(), patchi)
     {
-        if (isA<mappedPolyPatch>(mesh.boundaryMesh()[patchI]))
+        if (isA<mappedPolyPatch>(mesh.boundaryMesh()[patchi]))
         {
-            patchFieldTypes[patchI] =
+            patchFieldTypes[patchi] =
                 mappedFixedValueFvPatchVectorField::typeName;
         }
     }
@@ -82,30 +82,30 @@ int main(int argc, char *argv[])
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedVector("zero", dimLength, vector::zero),
+        dimensionedVector("zero", dimLength, Zero),
         patchFieldTypes
     );
 
-    cc.internalField() = mesh.C().internalField();
-    cc.boundaryField().updateCoeffs();
+    cc.primitiveFieldRef() = mesh.C().primitiveField();
+    cc.boundaryFieldRef().updateCoeffs();
 
-    forAll(cc.boundaryField(), patchI)
+    forAll(cc.boundaryField(), patchi)
     {
         if
         (
             isA<mappedFixedValueFvPatchVectorField>
             (
-                cc.boundaryField()[patchI]
+                cc.boundaryField()[patchi]
             )
         )
         {
-            Pout<< "Detected a mapped patch:" << patchI << endl;
+            Pout<< "Detected a mapped patch:" << patchi << endl;
 
-            OFstream str(mesh.boundaryMesh()[patchI].name() + ".obj");
+            OFstream str(mesh.boundaryMesh()[patchi].name() + ".obj");
             Pout<< "Writing mapped values to " << str.name() << endl;
 
             label vertI = 0;
-            const fvPatchVectorField& fvp = cc.boundaryField()[patchI];
+            const fvPatchVectorField& fvp = cc.boundaryField()[patchi];
 
             forAll(fvp, i)
             {

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -62,7 +62,7 @@ inline Foam::tetCell::tetCell(Istream& is)
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline Foam::triFace Foam::tetCell::face(const label faceI) const
+inline Foam::triFace Foam::tetCell::face(const label facei) const
 {
     // Warning. Ordering of faces needs to be the same for a tetrahedron
     // class, a tetrahedron cell shape model and a tetCell
@@ -70,20 +70,20 @@ inline Foam::triFace Foam::tetCell::face(const label faceI) const
     static const label b[] = {2, 3, 1, 2};
     static const label c[] = {3, 2, 3, 1};
 
-#   ifdef FULLDEBUG
-    if (faceI >= 4)
+    #ifdef FULLDEBUG
+    if (facei >= 4)
     {
-        FatalErrorIn("tetCell::face(const label faceI) const")
-            << "index out of range 0 -> 3. faceI = " << faceI
+        FatalErrorInFunction
+            << "index out of range 0 -> 3. facei = " << facei
             << abort(FatalError);
     }
-#   endif
+    #endif
 
     return triFace
     (
-        operator[](a[faceI]),
-        operator[](b[faceI]),
-        operator[](c[faceI])
+        operator[](a[facei]),
+        operator[](b[facei]),
+        operator[](c[facei])
     );
 }
 
@@ -95,17 +95,14 @@ inline Foam::label Foam::tetCell::edgeFace(const label edgeI) const
     //static const label edgeFaces[6] = {2, 1, 1, 0, 0, 0};
     static const label edgeFaces[6] = {2, 3, 1, 0, 0, 1};
 
-#   ifdef FULLDEBUG
+    #ifdef FULLDEBUG
     if (edgeI >= 6)
     {
-        FatalErrorIn
-        (
-            "tetCell::edgeFace(const label edgeI)"
-            "const"
-        )   << "edge index out of range 0 -> 5. edgeI = " << edgeI
+        FatalErrorInFunction
+            << "edge index out of range 0 -> 5. edgeI = " << edgeI
             << abort(FatalError);
     }
-#   endif
+    #endif
 
     return edgeFaces[edgeI];
 }
@@ -114,7 +111,7 @@ inline Foam::label Foam::tetCell::edgeFace(const label edgeI) const
 inline Foam::label Foam::tetCell::edgeAdjacentFace
 (
     const label edgeI,
-    const label faceI
+    const label facei
 ) const
 {
     // Warning. Ordering of faces needs to be the same for a tetrahedron
@@ -129,29 +126,23 @@ inline Foam::label Foam::tetCell::edgeAdjacentFace
         {1, 0, -1, -1}
     };
 
-#   ifdef FULLDEBUG
-    if (faceI >= 4)
+    #ifdef FULLDEBUG
+    if (facei >= 4)
     {
-        FatalErrorIn
-        (
-            "tetCell::edgeAdjacentFace(const label edgeI, const label faceI)"
-            "const"
-        )   << "face index out of range 0 -> 3. faceI = " << faceI
+        FatalErrorInFunction
+            << "face index out of range 0 -> 3. facei = " << facei
             << abort(FatalError);
     }
 
     if (edgeI >= 6)
     {
-        FatalErrorIn
-        (
-            "tetCell::edgeAdjacentFace(const label edgeI, const label faceI)"
-            "const"
-        )   << "edge index out of range 0 -> 5. edgeI = " << edgeI
+        FatalErrorInFunction
+            << "edge index out of range 0 -> 5. edgeI = " << edgeI
             << abort(FatalError);
     }
-#   endif
+    #endif
 
-    return adjacentFace[edgeI][faceI];
+    return adjacentFace[edgeI][facei];
 }
 
 
@@ -163,14 +154,14 @@ inline Foam::edge Foam::tetCell::tetEdge(const label edgeI) const
     static const label start[] = {0, 0, 0, 3, 1, 3};
     static const label end[] = {1, 2, 3, 1, 2, 2};
 
-#   ifdef FULLDEBUG
+    #ifdef FULLDEBUG
     if (edgeI >= 6)
     {
-        FatalErrorIn("tetCell::tetEdge(const label edgeI) const")
+        FatalErrorInFunction
             << "index out of range 0 -> 5. edgeI = " << edgeI
             << abort(FatalError);
     }
-#   endif
+    #endif
 
     return edge(operator[](start[edgeI]), operator[](end[edgeI]));
 }

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -53,39 +53,39 @@ int main(int argc, char *argv[])
 
     if (globalNumbering.localSize() != mesh.nCells())
     {
-        FatalErrorIn(args.executable())
+        FatalErrorInFunction
             << "Problem." << abort(FatalError);
     }
 
 
     if (!Pstream::parRun())
     {
-        WarningIn(args.executable())
+        WarningInFunction
             << "globalIndex class is only useful in parallel code."
             << endl;
     }
 
     // convert from local to global and back.
-    for (label cellI = 0; cellI < mesh.nCells(); cellI++)
+    for (label celli = 0; celli < mesh.nCells(); celli++)
     {
         // to global index
-        label globalCellI = globalNumbering.toGlobal(cellI);
+        label globalCelli = globalNumbering.toGlobal(celli);
 
         // and back
-        label procI = globalNumbering.whichProcID(globalCellI);
-        label localCellI = globalNumbering.toLocal(globalCellI);
+        label proci = globalNumbering.whichProcID(globalCelli);
+        label localCelli = globalNumbering.toLocal(globalCelli);
 
-        if (procI != Pstream::myProcNo() || localCellI != cellI)
+        if (proci != Pstream::myProcNo() || localCelli != celli)
         {
-            FatalErrorIn(args.executable())
-                << "Problem. cellI:" << cellI << " localCellI:" << localCellI
-                << " procI:" << procI << abort(FatalError);
+            FatalErrorInFunction
+                << "Problem. celli:" << celli << " localCelli:" << localCelli
+                << " proci:" << proci << abort(FatalError);
         }
 
-        if (!globalNumbering.isLocal(globalCellI))
+        if (!globalNumbering.isLocal(globalCelli))
         {
-            FatalErrorIn(args.executable())
-                << "Problem. cellI:" << cellI << " globalCellI:" << globalCellI
+            FatalErrorInFunction
+                << "Problem. celli:" << celli << " globalCelli:" << globalCelli
                 << " not local" << abort(FatalError);
         }
     }
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 
     if (mesh.nCells() < 1)
     {
-        FatalErrorIn(args.executable())
+        FatalErrorInFunction
             << "Test needs to be run on a case with at least one"
             << " cell per processor." << abort(FatalError);
     }
@@ -104,30 +104,30 @@ int main(int argc, char *argv[])
     {
         // We already checked that toGlobal(0) maps back correctly to myProcNo
         // so now check that the index one before maps to the previous processor
-        label prevProcCellI = globalNumbering.toGlobal(0)-1;
-        label procI = globalNumbering.whichProcID(prevProcCellI);
+        label prevProcCelli = globalNumbering.toGlobal(0)-1;
+        label proci = globalNumbering.whichProcID(prevProcCelli);
 
-        if (procI != Pstream::myProcNo()-1)
+        if (proci != Pstream::myProcNo()-1)
         {
-            FatalErrorIn(args.executable())
-                << "Problem. global:" << prevProcCellI
+            FatalErrorInFunction
+                << "Problem. global:" << prevProcCelli
                 << " expected on processor:" << Pstream::myProcNo()-1
-                << " but is calculated to be on procI:" << procI
+                << " but is calculated to be on proci:" << proci
                 << abort(FatalError);
         }
 
-        if (globalNumbering.isLocal(prevProcCellI))
+        if (globalNumbering.isLocal(prevProcCelli))
         {
-            FatalErrorIn(args.executable())
-                << "Problem. globalCellI:" << prevProcCellI
+            FatalErrorInFunction
+                << "Problem. globalCelli:" << prevProcCelli
                 << " calculated as local" << abort(FatalError);
         }
 
-        if (!globalNumbering.isLocal(procI, prevProcCellI))
+        if (!globalNumbering.isLocal(proci, prevProcCelli))
         {
-            FatalErrorIn(args.executable())
-                << "Problem. globalCellI:" << prevProcCellI
-                << " not calculated as local on processor:" << procI
+            FatalErrorInFunction
+                << "Problem. globalCelli:" << prevProcCelli
+                << " not calculated as local on processor:" << proci
                 << abort(FatalError);
         }
     }
@@ -135,30 +135,30 @@ int main(int argc, char *argv[])
 
     if (Pstream::myProcNo() < Pstream::nProcs()-1)
     {
-        label nextProcCellI = globalNumbering.toGlobal(mesh.nCells()-1)+1;
-        label procI = globalNumbering.whichProcID(nextProcCellI);
+        label nextProcCelli = globalNumbering.toGlobal(mesh.nCells()-1)+1;
+        label proci = globalNumbering.whichProcID(nextProcCelli);
 
-        if (procI != Pstream::myProcNo()+1)
+        if (proci != Pstream::myProcNo()+1)
         {
-            FatalErrorIn(args.executable())
-                << "Problem. global:" << nextProcCellI
+            FatalErrorInFunction
+                << "Problem. global:" << nextProcCelli
                 << " expected on processor:" << Pstream::myProcNo()+1
-                << " but is calculated to be on procI:" << procI
+                << " but is calculated to be on proci:" << proci
                 << abort(FatalError);
         }
 
-        if (globalNumbering.isLocal(nextProcCellI))
+        if (globalNumbering.isLocal(nextProcCelli))
         {
-            FatalErrorIn(args.executable())
-                << "Problem. globalCellI:" << nextProcCellI
+            FatalErrorInFunction
+                << "Problem. globalCelli:" << nextProcCelli
                 << " calculated as local" << abort(FatalError);
         }
 
-        if (!globalNumbering.isLocal(procI, nextProcCellI))
+        if (!globalNumbering.isLocal(proci, nextProcCelli))
         {
-            FatalErrorIn(args.executable())
-                << "Problem. globalCellI:" << nextProcCellI
-                << " not calculated as local on processor:" << procI
+            FatalErrorInFunction
+                << "Problem. globalCelli:" << nextProcCelli
+                << " not calculated as local on processor:" << proci
                 << abort(FatalError);
         }
     }

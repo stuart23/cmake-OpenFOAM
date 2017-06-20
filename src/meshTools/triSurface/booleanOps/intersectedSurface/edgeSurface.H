@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -170,10 +170,8 @@ public:
                 }
                 else
                 {
-                    FatalErrorIn
-                    (
-                        "edgeSurface::parentEdge(const label edgeI) const"
-                    )   << "Trying to get parent (i.e. surface) edge for"
+                    FatalErrorInFunction
+                        << "Trying to get parent (i.e. surface) edge for"
                         << " intersection edge " << edgeI
                         << abort(FatalError);
                     return -1;
@@ -197,7 +195,7 @@ public:
 
             //- Add intersection edges to a face. Used for connecting
             //  floating intersection on face to rest of face.
-            void addIntersectionEdges(const label faceI, const edgeList&);
+            void addIntersectionEdges(const label facei, const edgeList&);
 };
 
 

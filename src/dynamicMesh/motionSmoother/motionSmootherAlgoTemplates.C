@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -57,7 +57,7 @@ void Foam::motionSmootherAlgo::checkConstraints
     }
 
 
-    typename FldType::GeometricBoundaryField& bFld = pf.boundaryField();
+    typename FldType::Boundary& bFld = pf.boundaryField();
 
 
     // Evaluate in reverse order
@@ -118,11 +118,8 @@ void Foam::motionSmootherAlgo::checkConstraints
 
                 if (savedVal != pf[ppp])
                 {
-                    FatalErrorIn
-                    (
-                        "motionSmootherAlgo::checkConstraints"
-                        "(GeometricField<Type, pointPatchField, pointMesh>&)"
-                    )   << "Patch fields are not consistent on mesh point "
+                    FatalErrorInFunction
+                        << "Patch fields are not consistent on mesh point "
                         << ppp << " coordinate " << mesh.points()[ppp]
                         << " at patch " << bm[patchi].name() << '.'
                         << endl
@@ -136,16 +133,15 @@ void Foam::motionSmootherAlgo::checkConstraints
 }
 
 
-// Average of connected points.
 template<class Type>
-Foam::tmp<Foam::GeometricField<Type, Foam::pointPatchField, Foam::pointMesh> >
+Foam::tmp<Foam::GeometricField<Type, Foam::pointPatchField, Foam::pointMesh>>
 Foam::motionSmootherAlgo::avg
 (
     const GeometricField<Type, pointPatchField, pointMesh>& fld,
     const scalarField& edgeWeight
 ) const
 {
-    tmp<GeometricField<Type, pointPatchField, pointMesh> > tres
+    tmp<GeometricField<Type, pointPatchField, pointMesh>> tres
     (
         new GeometricField<Type, pointPatchField, pointMesh>
         (
@@ -159,10 +155,10 @@ Foam::motionSmootherAlgo::avg
                 false
             ),
             fld.mesh(),
-            dimensioned<Type>("zero", fld.dimensions(), pTraits<Type>::zero)
+            dimensioned<Type>("zero", fld.dimensions(), Zero)
         )
     );
-    GeometricField<Type, pointPatchField, pointMesh>& res = tres();
+    GeometricField<Type, pointPatchField, pointMesh>& res = tres.ref();
 
     const polyMesh& mesh = fld.mesh()();
 
@@ -201,7 +197,7 @@ Foam::motionSmootherAlgo::avg
         mesh,
         res,
         plusEqOp<Type>(),
-        pTraits<Type>::zero     // null value
+        Type(Zero)     // null value
     );
     syncTools::syncPointList
     (
@@ -215,16 +211,16 @@ Foam::motionSmootherAlgo::avg
     // Average
     // ~~~~~~~
 
-    forAll(res, pointI)
+    forAll(res, pointi)
     {
-        if (mag(sumWeight[pointI]) < VSMALL)
+        if (mag(sumWeight[pointi]) < VSMALL)
         {
             // Unconnected point. Take over original value
-            res[pointI] = fld[pointI];
+            res[pointi] = fld[pointi];
         }
         else
         {
-            res[pointI] /= sumWeight[pointI];
+            res[pointi] /= sumWeight[pointi];
         }
     }
 
@@ -235,7 +231,6 @@ Foam::motionSmootherAlgo::avg
 }
 
 
-// smooth field (point-jacobi)
 template<class Type>
 void Foam::motionSmootherAlgo::smooth
 (
@@ -247,11 +242,11 @@ void Foam::motionSmootherAlgo::smooth
     tmp<pointVectorField> tavgFld = avg(fld, edgeWeight);
     const pointVectorField& avgFld = tavgFld();
 
-    forAll(fld, pointI)
+    forAll(fld, pointi)
     {
-        if (isInternalPoint(pointI))
+        if (isInternalPoint(pointi))
         {
-            newFld[pointI] = 0.5*fld[pointI] + 0.5*avgFld[pointI];
+            newFld[pointi] = 0.5*fld[pointi] + 0.5*avgFld[pointi];
         }
     }
 
@@ -260,7 +255,6 @@ void Foam::motionSmootherAlgo::smooth
 }
 
 
-//- Test synchronisation of generic field (not positions!) on points
 template<class Type, class CombineOp>
 void Foam::motionSmootherAlgo::testSyncField
 (
@@ -290,12 +284,8 @@ void Foam::motionSmootherAlgo::testSyncField
     {
         if (mag(syncedFld[i] - fld[i]) > maxMag)
         {
-            FatalErrorIn
-            (
-                "motionSmootherAlgo::testSyncField"
-                "(const Field<Type>&, const CombineOp&"
-                ", const Type&, const bool)"
-            )   << "On element " << i << " value:" << fld[i]
+            FatalErrorInFunction
+                << "On element " << i << " value:" << fld[i]
                 << " synchronised value:" << syncedFld[i]
                 << abort(FatalError);
         }

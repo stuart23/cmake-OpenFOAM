@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::autoPtr<Foam::PatchInteractionModel<CloudType> >
+Foam::autoPtr<Foam::PatchInteractionModel<CloudType>>
 Foam::PatchInteractionModel<CloudType>::New
 (
     const dictionary& dict,
@@ -44,21 +44,15 @@ Foam::PatchInteractionModel<CloudType>::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "PatchInteractionModel<CloudType>::New"
-            "("
-                "const dictionary&, "
-                "CloudType&"
-            ")"
-        )   << "Unknown patch interaction model type "
+        FatalErrorInFunction
+            << "Unknown patch interaction model type "
             << modelType << nl << nl
             << "Valid patch interaction model types are:" << nl
             << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 
-    return autoPtr<PatchInteractionModel<CloudType> >(cstrIter()(dict, owner));
+    return autoPtr<PatchInteractionModel<CloudType>>(cstrIter()(dict, owner));
 }
 
 

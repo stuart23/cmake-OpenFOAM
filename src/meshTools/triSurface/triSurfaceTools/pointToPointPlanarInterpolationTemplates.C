@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,24 +28,21 @@ License
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> > Foam::pointToPointPlanarInterpolation::interpolate
+Foam::tmp<Foam::Field<Type>> Foam::pointToPointPlanarInterpolation::interpolate
 (
     const Field<Type>& sourceFld
 ) const
 {
     if (nPoints_ != sourceFld.size())
     {
-        FatalErrorIn
-        (
-            "pointToPointPlanarInterpolation::interpolate"
-            "(const Field<Type>&) const"
-        )   << "Number of source points = " << nPoints_
+        FatalErrorInFunction
+            << "Number of source points = " << nPoints_
             << " number of values = " << sourceFld.size()
             << exit(FatalError);
     }
 
-    tmp<Field<Type> > tfld(new Field<Type>(nearestVertex_.size()));
-    Field<Type>& fld = tfld();
+    tmp<Field<Type>> tfld(new Field<Type>(nearestVertex_.size()));
+    Field<Type>& fld = tfld.ref();
 
     forAll(fld, i)
     {

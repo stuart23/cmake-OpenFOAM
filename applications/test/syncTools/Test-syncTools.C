@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,6 @@ Description
     Test some functionality in syncTools.
 
 \*---------------------------------------------------------------------------*/
-
 
 #include "syncTools.H"
 #include "argList.H"
@@ -81,7 +80,7 @@ void testPackedList(const polyMesh& mesh, Random& rndGen)
              || maxEdgeValues[i] != label(maxBits.get(i))
             )
             {
-                FatalErrorIn("testPackedList()")
+                FatalErrorInFunction
                     << "edge:" << i
                     << " minlabel:" << edgeValues[i]
                     << " minbits:" << bits.get(i)
@@ -128,7 +127,7 @@ void testPackedList(const polyMesh& mesh, Random& rndGen)
              || maxPointValues[i] != label(maxBits.get(i))
             )
             {
-                FatalErrorIn("testPackedList()")
+                FatalErrorInFunction
                     << "point:" << i
                     << " at:" << mesh.points()[i]
                     << " minlabel:" << pointValues[i]
@@ -142,15 +141,15 @@ void testPackedList(const polyMesh& mesh, Random& rndGen)
 
     {
         PackedList<3> bits(mesh.nFaces());
-        forAll(bits, faceI)
+        forAll(bits, facei)
         {
-            bits.set(faceI, rndGen.integer(0,3));
+            bits.set(facei, rndGen.integer(0,3));
         }
 
         labelList faceValues(mesh.nFaces());
-        forAll(bits, faceI)
+        forAll(bits, facei)
         {
-            faceValues[faceI] = bits.get(faceI);
+            faceValues[facei] = bits.get(facei);
         }
 
         PackedList<3> maxBits(bits);
@@ -162,20 +161,20 @@ void testPackedList(const polyMesh& mesh, Random& rndGen)
         syncTools::syncFaceList(mesh, maxBits, maxEqOp<unsigned int>());
         syncTools::syncFaceList(mesh, maxFaceValues, maxEqOp<label>());
 
-        forAll(bits, faceI)
+        forAll(bits, facei)
         {
             if
             (
-                faceValues[faceI] != label(bits.get(faceI))
-             || maxFaceValues[faceI] != label(maxBits.get(faceI))
+                faceValues[facei] != label(bits.get(facei))
+             || maxFaceValues[facei] != label(maxBits.get(facei))
             )
             {
-                FatalErrorIn("testPackedList()")
-                    << "face:" << faceI
-                    << " minlabel:" << faceValues[faceI]
-                    << " minbits:" << bits.get(faceI)
-                    << " maxLabel:" << maxFaceValues[faceI]
-                    << " maxBits:" << maxBits.get(faceI)
+                FatalErrorInFunction
+                    << "face:" << facei
+                    << " minlabel:" << faceValues[facei]
+                    << " minbits:" << bits.get(facei)
+                    << " maxLabel:" << maxFaceValues[facei]
+                    << " maxBits:" << maxBits.get(facei)
                     << exit(FatalError);
             }
         }
@@ -187,7 +186,7 @@ void testSparseData(const polyMesh& mesh, Random& rndGen)
 {
     Info<< nl << "Testing Map synchronisation." << endl;
 
-    WarningIn("testSparseData()")
+    WarningInFunction
         << "Position test of sparse data only correct for cases without cyclics"
         << " with shared points." << endl;
 
@@ -216,10 +215,10 @@ void testSparseData(const polyMesh& mesh, Random& rndGen)
         {
             const point pt = localPoints[i] + 1e-4*rndGen.vector01();
 
-            label meshPointI = allBoundary.meshPoints()[i];
+            label meshPointi = allBoundary.meshPoints()[i];
 
-            sparseData.insert(meshPointI, pt);
-            fullData[meshPointI] = pt;
+            sparseData.insert(meshPointi, pt);
+            fullData[meshPointi] = pt;
         }
 
         //Pout<< "sparseData:" << sparseData << endl;
@@ -242,18 +241,18 @@ void testSparseData(const polyMesh& mesh, Random& rndGen)
 
         // Compare.
         // 1. Is all fullData also present in sparseData and same value
-        forAll(fullData, meshPointI)
+        forAll(fullData, meshPointi)
         {
-            const point& fullPt = fullData[meshPointI];
+            const point& fullPt = fullData[meshPointi];
 
             if (fullPt != point(GREAT, GREAT, GREAT))
             {
-                const point& sparsePt = sparseData[meshPointI];
+                const point& sparsePt = sparseData[meshPointi];
 
                 if (fullPt != sparsePt)
                 {
-                    FatalErrorIn("testSparseData()")
-                        << "point:" << meshPointI
+                    FatalErrorInFunction
+                        << "point:" << meshPointi
                         << " full:" << fullPt
                         << " sparse:" << sparsePt
                         << exit(FatalError);
@@ -265,13 +264,13 @@ void testSparseData(const polyMesh& mesh, Random& rndGen)
         forAllConstIter(Map<point>, sparseData, iter)
         {
             const point& sparsePt = iter();
-            label meshPointI = iter.key();
-            const point& fullPt = fullData[meshPointI];
+            label meshPointi = iter.key();
+            const point& fullPt = fullData[meshPointi];
 
             if (fullPt != sparsePt)
             {
-                FatalErrorIn("testSparseData()")
-                    << "point:" << meshPointI
+                FatalErrorInFunction
+                    << "point:" << meshPointi
                     << " full:" << fullPt
                     << " sparse:" << sparsePt
                     << exit(FatalError);
@@ -335,7 +334,7 @@ void testSparseData(const polyMesh& mesh, Random& rndGen)
 
                 if (fullPt != sparsePt)
                 {
-                    FatalErrorIn("testSparseData()")
+                    FatalErrorInFunction
                         << "edge:" << meshEdgeI
                         << " points:" << mesh.edges()[meshEdgeI]
                         << " full:" << fullPt
@@ -359,7 +358,7 @@ void testSparseData(const polyMesh& mesh, Random& rndGen)
 
                 if (fullPt != sparsePt)
                 {
-                    FatalErrorIn("testSparseData()")
+                    FatalErrorInFunction
                         << "Extra edge:" << meshEdgeI
                         << " points:" << mesh.edges()[meshEdgeI]
                         << " full:" << fullPt
@@ -388,14 +387,14 @@ void testPointSync(const polyMesh& mesh, Random& rndGen)
             point(GREAT, GREAT, GREAT)
         );
 
-        forAll(syncedPoints, pointI)
+        forAll(syncedPoints, pointi)
         {
-            if (mag(syncedPoints[pointI] - mesh.points()[pointI]) > SMALL)
+            if (mag(syncedPoints[pointi] - mesh.points()[pointi]) > SMALL)
             {
-                FatalErrorIn("testPointSync()")
-                    << "Point " << pointI
-                    << " original location " << mesh.points()[pointI]
-                    << " synced location " << syncedPoints[pointI]
+                FatalErrorInFunction
+                    << "Point " << pointi
+                    << " original location " << mesh.points()[pointi]
+                    << " synced location " << syncedPoints[pointi]
                     << exit(FatalError);
             }
         }
@@ -408,11 +407,11 @@ void testPointSync(const polyMesh& mesh, Random& rndGen)
 
         PackedBoolList isMasterPoint(syncTools::getMasterPoints(mesh));
 
-        forAll(isMasterPoint, pointI)
+        forAll(isMasterPoint, pointi)
         {
-            if (isMasterPoint[pointI])
+            if (isMasterPoint[pointi])
             {
-                nMasters[pointI] = 1;
+                nMasters[pointi] = 1;
             }
         }
 
@@ -424,17 +423,15 @@ void testPointSync(const polyMesh& mesh, Random& rndGen)
             0
         );
 
-        forAll(nMasters, pointI)
+        forAll(nMasters, pointi)
         {
-            if (nMasters[pointI] != 1)
+            if (nMasters[pointi] != 1)
             {
-                //FatalErrorIn("testPointSync()")
-                WarningIn("testPointSync()")
-                    << "Point " << pointI
-                    << " original location " << mesh.points()[pointI]
-                    << " has " << nMasters[pointI]
+                WarningInFunction
+                    << "Point " << pointi
+                    << " original location " << mesh.points()[pointi]
+                    << " has " << nMasters[pointi]
                     << " masters."
-                    //<< exit(FatalError);
                     << endl;
             }
         }
@@ -470,7 +467,7 @@ void testEdgeSync(const polyMesh& mesh, Random& rndGen)
 
             if (mag(syncedMids[edgeI] - eMid) > SMALL)
             {
-                FatalErrorIn("testEdgeSync()")
+                FatalErrorInFunction
                     << "Edge " << edgeI
                     << " original midpoint " << eMid
                     << " synced location " << syncedMids[edgeI]
@@ -507,13 +504,11 @@ void testEdgeSync(const polyMesh& mesh, Random& rndGen)
             if (nMasters[edgeI] != 1)
             {
                 const edge& e = edges[edgeI];
-                //FatalErrorIn("testEdgeSync()")
-                WarningIn("testEdgeSync()")
+                WarningInFunction
                     << "Edge " << edgeI
                     << " at:" << mesh.points()[e[0]] << mesh.points()[e[1]]
                     << " has " << nMasters[edgeI]
                     << " masters."
-                    //<< exit(FatalError);
                     << endl;
             }
         }
@@ -537,14 +532,14 @@ void testFaceSync(const polyMesh& mesh, Random& rndGen)
             maxMagSqrEqOp<point>()
         );
 
-        forAll(syncedFc, faceI)
+        forAll(syncedFc, facei)
         {
-            if (mag(syncedFc[faceI] - mesh.faceCentres()[faceI]) > SMALL)
+            if (mag(syncedFc[facei] - mesh.faceCentres()[facei]) > SMALL)
             {
-                FatalErrorIn("testFaceSync()")
-                    << "Face " << faceI
-                    << " original centre " << mesh.faceCentres()[faceI]
-                    << " synced centre " << syncedFc[faceI]
+                FatalErrorInFunction
+                    << "Face " << facei
+                    << " original centre " << mesh.faceCentres()[facei]
+                    << " synced centre " << syncedFc[facei]
                     << exit(FatalError);
             }
         }
@@ -557,11 +552,11 @@ void testFaceSync(const polyMesh& mesh, Random& rndGen)
 
         PackedBoolList isMasterFace(syncTools::getMasterFaces(mesh));
 
-        forAll(isMasterFace, faceI)
+        forAll(isMasterFace, facei)
         {
-            if (isMasterFace[faceI])
+            if (isMasterFace[facei])
             {
-                nMasters[faceI] = 1;
+                nMasters[facei] = 1;
             }
         }
 
@@ -572,14 +567,14 @@ void testFaceSync(const polyMesh& mesh, Random& rndGen)
             plusEqOp<label>()
         );
 
-        forAll(nMasters, faceI)
+        forAll(nMasters, facei)
         {
-            if (nMasters[faceI] != 1)
+            if (nMasters[facei] != 1)
             {
-                FatalErrorIn("testFaceSync()")
-                    << "Face " << faceI
-                    << " centre " << mesh.faceCentres()[faceI]
-                    << " has " << nMasters[faceI]
+                FatalErrorInFunction
+                    << "Face " << facei
+                    << " centre " << mesh.faceCentres()[facei]
+                    << " has " << nMasters[facei]
                     << " masters."
                     << exit(FatalError);
             }

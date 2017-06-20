@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -103,11 +103,8 @@ Pair<int> faceMap
         }
     }
 
-    FatalErrorIn
-    (
-        "faceMap(const label facePi, const face& faceP, "
-        "const label faceNi, const face& faceN)"
-    )   << "Cannot find point correspondance for faces "
+    FatalErrorInFunction
+        << "Cannot find point correspondance for faces "
         << faceP << " and " << faceN
         << exit(FatalError);
 
@@ -120,7 +117,7 @@ void setBlockFaceCorrespondence
     const cellList& topoCells,
     const faceList::subList& topoInternalFaces,
     const labelList& topoFaceCell,
-    List<Pair<label> >& mergeBlock
+    List<Pair<label>>& mergeBlock
 )
 {
     forAll(topoInternalFaces, topoFacei)
@@ -146,7 +143,7 @@ void setBlockFaceCorrespondence
 
         if (!foundFace)
         {
-            FatalErrorIn("setBlockFaceCorrespondence()")
+            FatalErrorInFunction
                 << "Cannot find merge face for block " << topoPi
                 << exit(FatalError);
         }
@@ -341,7 +338,7 @@ void Foam::blockMesh::calcMergeInfoFast()
         topology().nInternalFaces()
     );
 
-    List<Pair<label> > mergeBlockP(topoInternalFaces.size());
+    List<Pair<label>> mergeBlockP(topoInternalFaces.size());
     setBlockFaceCorrespondence
     (
         topoCells,
@@ -350,7 +347,7 @@ void Foam::blockMesh::calcMergeInfoFast()
         mergeBlockP
     );
 
-    List<Pair<label> > mergeBlockN(topoInternalFaces.size());
+    List<Pair<label>> mergeBlockN(topoInternalFaces.size());
     setBlockFaceCorrespondence
     (
         topoCells,
@@ -410,7 +407,7 @@ void Foam::blockMesh::calcMergeInfoFast()
 
             if (Pnij != NPnij)
             {
-                FatalErrorIn("blockMesh::calcMergeInfoFast()")
+                FatalErrorInFunction
                     << "Sub-division mismatch between face "
                     << blockPfacei << " of block " << blockPi << Pnij
                     << " and face "
@@ -449,7 +446,7 @@ void Foam::blockMesh::calcMergeInfoFast()
 
                 if (sqrDist > testSqrDist)
                 {
-                    FatalErrorIn("blockMesh::calcMergeInfoFast()")
+                    FatalErrorInFunction
                         << "Point merge failure between face "
                         << blockPfacei << " of block " << blockPi
                         << " and face "
@@ -555,7 +552,7 @@ void Foam::blockMesh::calcMergeInfoFast()
 
         if (nPasses > 100)
         {
-            FatalErrorIn("blockMesh::calcMergeInfoFast()")
+            FatalErrorInFunction
                 << "Point merging failed after 100 passes."
                 << exit(FatalError);
         }
@@ -570,7 +567,7 @@ void Foam::blockMesh::calcMergeInfoFast()
     {
         if (mergeList_[pointi] > pointi)
         {
-            FatalErrorIn("blockMesh::calcMergeInfoFast()")
+            FatalErrorInFunction
                 << "Merge list contains point index out of range"
                 << exit(FatalError);
         }

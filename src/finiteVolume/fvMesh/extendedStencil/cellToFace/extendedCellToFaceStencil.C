@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -77,15 +77,15 @@ void Foam::extendedCellToFaceStencil::writeStencilStats
     // Sum all sent data
     label nSent = 0;
     label nLocal = 0;
-    forAll(map.subMap(), procI)
+    forAll(map.subMap(), proci)
     {
-        if (procI != Pstream::myProcNo())
+        if (proci != Pstream::myProcNo())
         {
-            nSent += map.subMap()[procI].size();
+            nSent += map.subMap()[proci].size();
         }
         else
         {
-            nLocal += map.subMap()[procI].size();
+            nLocal += map.subMap()[proci].size();
         }
     }
 
@@ -104,20 +104,17 @@ Foam::extendedCellToFaceStencil::extendedCellToFaceStencil(const polyMesh& mesh)
     // Check for transformation - not supported.
     const polyBoundaryMesh& patches = mesh.boundaryMesh();
 
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        if (patches[patchI].coupled())
+        if (patches[patchi].coupled())
         {
             const coupledPolyPatch& cpp =
-                refCast<const coupledPolyPatch>(patches[patchI]);
+                refCast<const coupledPolyPatch>(patches[patchi]);
 
             if (!cpp.parallel() || cpp.separated())
             {
-                FatalErrorIn
-                (
-                    "extendedCellToFaceStencil::extendedCellToFaceStencil"
-                    "(const polyMesh&)"
-                )   << "Coupled patches with transformations not supported."
+                FatalErrorInFunction
+                    << "Coupled patches with transformations not supported."
                     << endl
                     << "Problematic patch " << cpp.name() << exit(FatalError);
             }

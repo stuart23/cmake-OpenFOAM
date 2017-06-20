@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -46,13 +46,13 @@ void Foam::sixDoFRigidBodyMotion::applyRestraints()
             }
 
             // Restraint position
-            point rP = vector::zero;
+            point rP = Zero;
 
             // Restraint force
-            vector rF = vector::zero;
+            vector rF = Zero;
 
             // Restraint moment
-            vector rM = vector::zero;
+            vector rM = Zero;
 
             // Accumulate the restraints
             restraints_[rI].restrain(*this, rP, rF, rM);
@@ -78,8 +78,8 @@ Foam::sixDoFRigidBodyMotion::sixDoFRigidBodyMotion()
     constraints_(),
     tConstraints_(tensor::I),
     rConstraints_(tensor::I),
-    initialCentreOfMass_(vector::zero),
-    initialCentreOfRotation_(vector::zero),
+    initialCentreOfMass_(Zero),
+    initialCentreOfRotation_(Zero),
     initialQ_(I),
     mass_(VSMALL),
     momentOfInertia_(diagTensor::one*VSMALL),
@@ -272,7 +272,7 @@ void Foam::sixDoFRigidBodyMotion::updateAcceleration
     const vector& tauGlobal
 )
 {
-    static bool first = false;
+    static bool first = true;
 
     // Save the previous iteration accelerations for relaxation
     vector aPrevIter = a();
@@ -289,8 +289,10 @@ void Foam::sixDoFRigidBodyMotion::updateAcceleration
         a() = aRelax_*a() + (1 - aRelax_)*aPrevIter;
         tau() = aRelax_*tau() + (1 - aRelax_)*tauPrevIter;
     }
-
-    first = false;
+    else
+    {
+        first = false;
+    }
 }
 
 
@@ -352,11 +354,11 @@ Foam::tmp<Foam::pointField> Foam::sixDoFRigidBodyMotion::transform
     septernion s
     (
         centreOfRotation() - initialCentreOfRotation(),
-        quaternion(Q() & initialQ().T())
+        quaternion(Q().T() & initialQ())
     );
 
     tmp<pointField> tpoints(new pointField(initialPoints));
-    pointField& points = tpoints();
+    pointField& points = tpoints.ref();
 
     forAll(points, pointi)
     {
@@ -375,7 +377,7 @@ Foam::tmp<Foam::pointField> Foam::sixDoFRigidBodyMotion::transform
 
                 points[pointi] =
                     initialCentreOfRotation()
-                  + ss.transform
+                  + ss.invTransformPoint
                     (
                         initialPoints[pointi]
                       - initialCentreOfRotation()

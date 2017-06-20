@@ -4,7 +4,6 @@ fvMesh/fvMeshGeometry.C
 fvMesh/fvMesh.C
 
 fvMesh/singleCellFvMesh/singleCellFvMesh.C
-fvMesh/fvMeshSubset/fvMeshSubset.C
 
 fvMesh/fvBoundaryMesh/fvBoundaryMesh.C
 
@@ -79,10 +78,13 @@ fvMesh/extendedStencil/faceToCell/extendedFaceToCellStencil.C
 fvMesh/extendedStencil/faceToCell/extendedCentredFaceToCellStencil.C
 fvMesh/extendedStencil/faceToCell/MeshObjects/centredCFCFaceToCellStencilObject.C
 
+fvMesh/fvMeshFunctionObject/fvMeshFunctionObject.C
+
 fields/fvPatchFields/fvPatchField/fvPatchFields.C
 
 fields/fvPatchFields/basic/basicSymmetry/basicSymmetryFvPatchScalarField.C
 fields/fvPatchFields/basic/calculated/calculatedFvPatchFields.C
+fields/fvPatchFields/basic/extrapolatedCalculated/extrapolatedCalculatedFvPatchFields.C
 fields/fvPatchFields/basic/coupled/coupledFvPatchFields.C
 fields/fvPatchFields/basic/directionMixed/directionMixedFvPatchFields.C
 fields/fvPatchFields/basic/fixedGradient/fixedGradientFvPatchFields.C
@@ -120,6 +122,7 @@ fields/fvPatchFields/derived/externalCoupledMixed/externalCoupledMixedFvPatchFie
 fields/fvPatchFields/derived/fan/fanFvPatchFields.C
 fields/fvPatchFields/derived/fanPressure/fanPressureFvPatchScalarField.C
 fields/fvPatchFields/derived/fixedFluxPressure/fixedFluxPressureFvPatchScalarField.C
+fields/fvPatchFields/derived/fixedFluxExtrapolatedPressure/fixedFluxExtrapolatedPressureFvPatchScalarField.C
 fields/fvPatchFields/derived/fixedInternalValueFvPatchField/fixedInternalValueFvPatchFields.C
 fields/fvPatchFields/derived/fixedJump/fixedJumpFvPatchFields.C
 fields/fvPatchFields/derived/fixedJumpAMI/fixedJumpAMIFvPatchFields.C
@@ -138,8 +141,8 @@ fields/fvPatchFields/derived/mappedFixedPushedInternalValue/mappedFixedPushedInt
 fields/fvPatchFields/derived/mappedFixedValue/mappedFixedValueFvPatchFields.C
 fields/fvPatchFields/derived/mappedFlowRate/mappedFlowRateFvPatchVectorField.C
 fields/fvPatchFields/derived/mappedVelocityFluxFixedValue/mappedVelocityFluxFixedValueFvPatchField.C
+fields/fvPatchFields/derived/noSlip/noSlipFvPatchVectorField.C
 fields/fvPatchFields/derived/movingWallVelocity/movingWallVelocityFvPatchVectorField.C
-fields/fvPatchFields/derived/oscillatingFixedValue/oscillatingFixedValueFvPatchFields.C
 fields/fvPatchFields/derived/outletInlet/outletInletFvPatchFields.C
 fields/fvPatchFields/derived/outletMappedUniformInlet/outletMappedUniformInletFvPatchFields.C
 fields/fvPatchFields/derived/partialSlip/partialSlipFvPatchFields.C
@@ -182,6 +185,9 @@ fields/fvPatchFields/derived/waveSurfacePressure/waveSurfacePressureFvPatchScala
 fields/fvPatchFields/derived/interstitialInletVelocity/interstitialInletVelocityFvPatchVectorField.C
 fields/fvPatchFields/derived/prghPressure/prghPressureFvPatchScalarField.C
 fields/fvPatchFields/derived/prghTotalPressure/prghTotalPressureFvPatchScalarField.C
+fields/fvPatchFields/derived/prghTotalHydrostaticPressure/prghTotalHydrostaticPressureFvPatchScalarField.C
+fields/fvPatchFields/derived/fixedProfile/fixedProfileFvPatchScalarField.C
+fields/fvPatchFields/derived/plenumPressure/plenumPressureFvPatchScalarField.C
 
 fields/fvsPatchFields/fvsPatchField/fvsPatchFields.C
 
@@ -354,6 +360,7 @@ finiteVolume/fvc/fvcSmooth/fvcSmooth.C
 finiteVolume/fvc/fvcReconstructMag.C
 
 cfdTools/general/findRefCell/findRefCell.C
+cfdTools/general/constrainHbyA/constrainHbyA.C
 cfdTools/general/adjustPhi/adjustPhi.C
 cfdTools/general/bound/bound.C
 cfdTools/general/CorrectPhi/correctUphiBCs.C
@@ -382,6 +389,10 @@ cfdTools/general/SRF/derivedFvPatchFields/SRFVelocityFvPatchVectorField/SRFVeloc
 cfdTools/general/SRF/derivedFvPatchFields/SRFWallVelocityFvPatchVectorField/SRFWallVelocityFvPatchVectorField.C
 cfdTools/general/SRF/derivedFvPatchFields/SRFFreestreamVelocityFvPatchVectorField/SRFFreestreamVelocityFvPatchVectorField.C
 
+cfdTools/general/fvOptions/fvOption.C
+cfdTools/general/fvOptions/fvOptionIO.C
+cfdTools/general/fvOptions/fvOptionList.C
+cfdTools/general/fvOptions/fvOptions.C
 )
 
 ## Define the output

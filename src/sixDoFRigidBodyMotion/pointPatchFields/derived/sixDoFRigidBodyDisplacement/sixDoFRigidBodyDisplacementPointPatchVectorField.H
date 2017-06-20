@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -60,7 +60,7 @@ class sixDoFRigidBodyDisplacementPointPatchVectorField
         pointField initialPoints_;
 
         //- Reference density required by the forces object for
-        //  incompressible calculations, required if rhoName == rhoInf
+        //  incompressible calculations, required if rho == rhoInf
         scalar rhoInf_;
 
         //- Name of density field, optional unless used for an
@@ -121,9 +121,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual autoPtr<pointPatchField<vector> > clone() const
+        virtual autoPtr<pointPatchField<vector>> clone() const
         {
-            return autoPtr<pointPatchField<vector> >
+            return autoPtr<pointPatchField<vector>>
             (
                 new sixDoFRigidBodyDisplacementPointPatchVectorField
                 (
@@ -140,12 +140,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual autoPtr<pointPatchField<vector> > clone
+        virtual autoPtr<pointPatchField<vector>> clone
         (
             const DimensionedField<vector, pointMesh>& iF
         ) const
         {
-            return autoPtr<pointPatchField<vector> >
+            return autoPtr<pointPatchField<vector>>
             (
                 new sixDoFRigidBodyDisplacementPointPatchVectorField
                 (

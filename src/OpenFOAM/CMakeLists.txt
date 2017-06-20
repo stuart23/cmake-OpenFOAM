@@ -2,6 +2,7 @@ set( SOURCES
 global/global.C
 global/argList/argList.C
 global/clock/clock.C
+global/etcFiles/etcFiles.C
 
 primitives/bools/bool/bool.C
 primitives/bools/bool/boolIO.C
@@ -11,6 +12,8 @@ primitives/bools/lists/boolList.C
 
 primitives/chars/char/charIO.C
 primitives/chars/wchar/wcharIO.C
+
+primitives/direction/directionIO.C
 
 primitives/ints/uint32/uint32.C
 primitives/ints/uint32/uint32IO.C
@@ -64,7 +67,7 @@ primitives/quaternion/quaternion.C
 primitives/septernion/septernion.C
 primitives/triad/triad.C
 
-primitives/functions/DataEntry/makeDataEntries.C
+primitives/functions/Function1/makeDataEntries.C
 primitives/functions/Polynomial/polynomialFunction.C
 
 primitives/subModelBase/subModelBase.C
@@ -82,6 +85,8 @@ primitives/strings/wordRe/wordRe.C
 primitives/strings/lists/hashedWordList.C
 primitives/strings/stringOps/stringOps.C
 
+primitives/ops/flipOp.C
+
 primitives/hashes/Hasher/Hasher.C
 
 primitives/hashes/SHA1/SHA1.C
@@ -94,6 +99,10 @@ primitives/ranges/labelRange/labelRange.C
 primitives/ranges/labelRange/labelRanges.C
 primitives/ranges/scalarRange/scalarRange.C
 primitives/ranges/scalarRange/scalarRanges.C
+
+primitives/spatialVectorAlgebra/SpatialVector/spatialVector/spatialVector.C
+primitives/spatialVectorAlgebra/SpatialTensor/spatialTensor/spatialTensor.C
+primitives/spatialVectorAlgebra/CompactSpatialTensor/compactSpatialTensor/compactSpatialTensor.C
 
 containers/HashTables/HashTable/HashTableCore.C
 containers/HashTables/StaticHashTable/StaticHashTableCore.C
@@ -150,6 +159,7 @@ db/dictionary/functionEntries/codeStream/codeStream.C
 db/dictionary/functionEntries/functionEntry/functionEntry.C
 db/dictionary/functionEntries/includeEntry/includeEntry.C
 db/dictionary/functionEntries/includeEtcEntry/includeEtcEntry.C
+db/dictionary/functionEntries/includeFuncEntry/includeFuncEntry.C
 db/dictionary/functionEntries/includeIfPresentEntry/includeIfPresentEntry.C
 db/dictionary/functionEntries/inputModeEntry/inputModeEntry.C
 db/dictionary/functionEntries/removeEntry/removeEntry.C
@@ -178,8 +188,11 @@ db/dynamicLibrary/codedBase/codedBase.C
 
 db/functionObjects/functionObject/functionObject.C
 db/functionObjects/functionObjectList/functionObjectList.C
-db/functionObjects/functionObjectFile/functionObjectFile.C
-db/functionObjects/outputFilterOutputControl/outputFilterOutputControl.C
+db/functionObjects/writeFile/writeFile.C
+db/functionObjects/writeFiles/writeFiles.C
+db/functionObjects/timeControl/timeControl.C
+db/functionObjects/timeControl/timeControlFunctionObject.C
+db/functionObjects/regionFunctionObject/regionFunctionObject.C
 
 db/Time/TimePaths.C
 db/Time/TimeState.C
@@ -221,8 +234,7 @@ matrices/lduMatrix/solvers/diagonalSolver/diagonalSolver.C
 matrices/lduMatrix/solvers/smoothSolver/smoothSolver.C
 matrices/lduMatrix/solvers/PCG/PCG.C
 matrices/lduMatrix/solvers/PBiCG/PBiCG.C
-matrices/lduMatrix/solvers/ICCG/ICCG.C
-matrices/lduMatrix/solvers/BICCG/BICCG.C
+matrices/lduMatrix/solvers/PBiCGStab/PBiCGStab.C
 
 matrices/lduMatrix/smoothers/GaussSeidel/GaussSeidelSmoother.C
 matrices/lduMatrix/smoothers/symGaussSeidel/symGaussSeidelSmoother.C
@@ -419,6 +431,7 @@ meshes/polyMesh/mapPolyMesh/mapPolyMesh.C
 meshes/polyMesh/mapPolyMesh/faceMapper/faceMapper.C
 meshes/polyMesh/mapPolyMesh/cellMapper/cellMapper.C
 meshes/polyMesh/mapPolyMesh/mapDistribute/mapDistribute.C
+meshes/polyMesh/mapPolyMesh/mapDistribute/mapDistributeBase.C
 meshes/polyMesh/mapPolyMesh/mapDistribute/mapDistributePolyMesh.C
 meshes/polyMesh/mapPolyMesh/mapDistribute/IOmapDistribute.C
 meshes/polyMesh/mapPolyMesh/mapAddedPolyMesh.C
@@ -552,6 +565,7 @@ meshes/data/data.C
 
 if( DOUBLE_PRECISION )
   set( SOURCES "${SOURCES};primitives/Vector/floatVector/floatVector.C" )
+  set( SOURCES "${SOURCES};primitives/Tensor/floatTensor/floatTensor.C" )
 endif()
 
 ## Define the output
@@ -934,13 +948,6 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/chars/wchar )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/complex )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/contiguous )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/direction )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/functions/DataEntry/CSV )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/functions/DataEntry/CompatibilityConstant )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/functions/DataEntry/Constant )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/functions/DataEntry/DataEntry )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/functions/DataEntry/PolynomialEntry )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/functions/DataEntry/Table )
-include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/functions/DataEntry/TableFile )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/functions/Polynomial )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/globalIndexAndTransform )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/globalIndexAndTransform/vectorTensorTransform )

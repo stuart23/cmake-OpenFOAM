@@ -2,7 +2,7 @@
  =========                   |
  \\      /   F ield          | OpenFOAM: The Open Source CFD Toolbox
   \\    /    O peration      |
-   \\  /     A nd            | Copyright (C) 2011-2013 OpenFOAM Foundation
+   \\  /     A nd            | Copyright (C) 2011-2016 OpenFOAM Foundation
     \\/      M anipulation   |
 -------------------------------------------------------------------------------
 License
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 
         point Cf = f.centre(pts);
 
-        tensor J = tensor::zero;
+        tensor J = Zero;
 
         J = f.inertia(pts, Cf, density);
 
@@ -141,8 +141,8 @@ int main(int argc, char *argv[])
         tetFaces[3] = triFace(0, 1, 3);
 
         scalar m = 0.0;
-        vector cM = vector::zero;
-        tensor J = tensor::zero;
+        vector cM = Zero;
+        tensor J = Zero;
 
         momentOfInertia::massPropertiesSolid(pts, tetFaces, density, m, cM, J);
 
@@ -196,16 +196,16 @@ int main(int argc, char *argv[])
     }
 
     {
-        const label cellI = args.optionLookupOrDefault("cell", 0);
+        const label celli = args.optionLookupOrDefault("cell", 0);
 
         tensorField mI(momentOfInertia::meshInertia(mesh));
 
-        tensor& J = mI[cellI];
+        tensor& J = mI[celli];
 
         vector eVal = eigenValues(J);
 
         Info<< nl
-            << "Inertia tensor of cell " << cellI << " " << J << nl
+            << "Inertia tensor of cell " << celli << " " << J << nl
             << "eigenValues (principal moments) " << eVal << endl;
 
         J /= cmptMax(eVal);
@@ -215,16 +215,16 @@ int main(int argc, char *argv[])
         Info<< "eigenVectors (principal axes, from normalised inertia) " << eVec
             << endl;
 
-        OFstream str("cell_" + name(cellI) + "_inertia.obj");
+        OFstream str("cell_" + name(celli) + "_inertia.obj");
 
-        Info<< nl << "Writing scaled principal axes of cell " << cellI << " to "
+        Info<< nl << "Writing scaled principal axes of cell " << celli << " to "
             << str.name() << endl;
 
-        const point& cC = mesh.cellCentres()[cellI];
+        const point& cC = mesh.cellCentres()[celli];
 
         scalar scale = mag
         (
-            (cC - mesh.faceCentres()[mesh.cells()[cellI][0]])
+            (cC - mesh.faceCentres()[mesh.cells()[celli][0]])
            /eVal.component(findMin(eVal))
         );
 

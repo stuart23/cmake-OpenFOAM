@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -43,14 +43,13 @@ Description
         p      | pressure [Pa]
         \rho   | density [kg/m3]
         \mu    | laminar viscosity [Pa s]
-        I      | inertial coefficient
         D      | Darcy coefficient
+        I      | inertial coefficient
         L      | porous media length in the flow direction
     \endvartable
 
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         patchType    | underlying patch type should be \c cyclic| yes |
@@ -58,19 +57,19 @@ Description
         rho          | density field name      | no          | rho
         D            | Darcy coefficient       | yes         |
         I            | inertial coefficient    | yes         |
-        L            | porous media length in the flow direction | yes |
+        length       | porous media length in the flow direction | yes |
     \endtable
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            porousBafflePressure;
         patchType       cyclic;
         jump            uniform 0;
         D               0.001;
         I               1000000;
-        L               0.1;
+        length          0.1;
         value           uniform 0;
     }
     \endverbatim
@@ -159,9 +158,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<scalar> > clone() const
+        virtual tmp<fvPatchField<scalar>> clone() const
         {
-            return tmp<fvPatchField<scalar> >
+            return tmp<fvPatchField<scalar>>
             (
                 new porousBafflePressureFvPatchField(*this)
             );
@@ -175,12 +174,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<scalar> > clone
+        virtual tmp<fvPatchField<scalar>> clone
         (
             const DimensionedField<scalar, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<scalar> >
+            return tmp<fvPatchField<scalar>>
             (
                 new porousBafflePressureFvPatchField(*this, iF)
             );

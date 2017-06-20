@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -34,20 +34,17 @@ Foam::extendedCellToCellStencil::extendedCellToCellStencil(const polyMesh& mesh)
     // Check for transformation - not supported.
     const polyBoundaryMesh& patches = mesh.boundaryMesh();
 
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        if (patches[patchI].coupled())
+        if (patches[patchi].coupled())
         {
             const coupledPolyPatch& cpp =
-                refCast<const coupledPolyPatch>(patches[patchI]);
+                refCast<const coupledPolyPatch>(patches[patchi]);
 
             if (!cpp.parallel() || cpp.separated())
             {
-                FatalErrorIn
-                (
-                    "extendedCellToCellStencil::extendedCellToCellStencil"
-                    "(const polyMesh&)"
-                )   << "Coupled patches with transformations not supported."
+                FatalErrorInFunction
+                    << "Coupled patches with transformations not supported."
                     << endl
                     << "Problematic patch " << cpp.name() << exit(FatalError);
             }

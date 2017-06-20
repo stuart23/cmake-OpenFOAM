@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,8 +25,8 @@ Application
     fireFoam
 
 Description
-    Transient PIMPLE solver for Fires and turbulent diffusion flames with
-    reacting Lagrangian parcels, surface film and pyrolysis modelling.
+    Transient solver for fires and turbulent diffusion flames with reacting
+    particle clouds, surface film and pyrolysis modelling.
 
 \*---------------------------------------------------------------------------*/
 
@@ -40,32 +40,28 @@ Description
 #include "solidChemistryModel.H"
 #include "psiCombustionModel.H"
 #include "pimpleControl.H"
-#include "fvIOoptionList.H"
-#include "fixedFluxPressureFvPatchScalarField.H"
+#include "fvOptions.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCase.H"
+    #include "postProcess.H"
 
+    #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
-
-    pimpleControl pimple(mesh);
-
+    #include "createControl.H"
     #include "createFields.H"
-    #include "createMRF.H"
+    #include "createFieldRefs.H"
     #include "createFvOptions.H"
-    #include "createClouds.H"
-    #include "createSurfaceFilmModel.H"
-    #include "createPyrolysisModel.H"
-    #include "createRadiationModel.H"
     #include "initContinuityErrs.H"
     #include "createTimeControls.H"
     #include "compressibleCourantNo.H"
     #include "setInitialDeltaT.H"
     #include "readPyrolysisTimeControls.H"
+
+    turbulence->validate();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -73,7 +69,7 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-        #include "createTimeControls.H"
+        #include "readTimeControls.H"
         #include "compressibleCourantNo.H"
         #include "solidRegionDiffusionNo.H"
         #include "setMultiRegionDeltaT.H"
@@ -87,7 +83,10 @@ int main(int argc, char *argv[])
 
         surfaceFilm.evolve();
 
-        pyrolysis.evolve();
+        if(solvePyrolysisRegion)
+        {
+            pyrolysis.evolve();
+        }
 
         if (solvePrimaryRegion)
         {

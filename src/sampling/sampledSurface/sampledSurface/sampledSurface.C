@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -53,7 +53,7 @@ void Foam::sampledSurface::makeSf() const
     // It is an error to recalculate if the pointer is already set
     if (SfPtr_)
     {
-        FatalErrorIn("Foam::sampledSurface::makeSf()")
+        FatalErrorInFunction
             << "face area vectors already exist"
             << abort(FatalError);
     }
@@ -62,9 +62,9 @@ void Foam::sampledSurface::makeSf() const
     SfPtr_ = new vectorField(theFaces.size());
 
     vectorField& values = *SfPtr_;
-    forAll(theFaces, faceI)
+    forAll(theFaces, facei)
     {
-        values[faceI] = theFaces[faceI].normal(points());
+        values[facei] = theFaces[facei].normal(points());
     }
 }
 
@@ -74,7 +74,7 @@ void Foam::sampledSurface::makeMagSf() const
     // It is an error to recalculate if the pointer is already set
     if (magSfPtr_)
     {
-        FatalErrorIn("Foam::sampledSurface::makeMagSf()")
+        FatalErrorInFunction
             << "mag face areas already exist"
             << abort(FatalError);
     }
@@ -83,9 +83,9 @@ void Foam::sampledSurface::makeMagSf() const
     magSfPtr_ = new scalarField(theFaces.size());
 
     scalarField& values = *magSfPtr_;
-    forAll(theFaces, faceI)
+    forAll(theFaces, facei)
     {
-        values[faceI] = theFaces[faceI].mag(points());
+        values[facei] = theFaces[facei].mag(points());
     }
 }
 
@@ -95,7 +95,7 @@ void Foam::sampledSurface::makeCf() const
     // It is an error to recalculate if the pointer is already set
     if (CfPtr_)
     {
-        FatalErrorIn("Foam::sampledSurface::makeCf()")
+        FatalErrorInFunction
             << "face centres already exist"
             << abort(FatalError);
     }
@@ -104,9 +104,9 @@ void Foam::sampledSurface::makeCf() const
     CfPtr_ = new vectorField(theFaces.size());
 
     vectorField& values = *CfPtr_;
-    forAll(theFaces, faceI)
+    forAll(theFaces, facei)
     {
-        values[faceI] = theFaces[faceI].centre(points());
+        values[facei] = theFaces[facei].centre(points());
     }
 }
 
@@ -132,11 +132,8 @@ Foam::autoPtr<Foam::sampledSurface> Foam::sampledSurface::New
 
     if (cstrIter == wordConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "sampledSurface::New"
-            "(const word&, const polyMesh&, const dictionary&)"
-        )   << "Unknown sample type "
+        FatalErrorInFunction
+            << "Unknown sample type "
             << sampleType << nl << nl
             << "Valid sample types : " << endl
             << wordConstructorTablePtr_->sortedToc()
@@ -245,7 +242,7 @@ Foam::tmp<Foam::scalarField> Foam::sampledSurface::sample
     const surfaceScalarField& sField
 ) const
 {
-    notImplemented("tmp<Foam::scalarField> sampledSurface::sample");
+    NotImplemented;
     return tmp<scalarField>(NULL);
 }
 
@@ -255,7 +252,7 @@ Foam::tmp<Foam::vectorField> Foam::sampledSurface::sample
     const surfaceVectorField& sField
 ) const
 {
-    notImplemented("tmp<Foam::vectorField> sampledSurface::sample");
+    NotImplemented;
     return tmp<vectorField>(NULL);
 }
 
@@ -265,7 +262,7 @@ Foam::tmp<Foam::sphericalTensorField> Foam::sampledSurface::sample
     const surfaceSphericalTensorField& sField
 ) const
 {
-    notImplemented("tmp<Foam::sphericalTensorField> sampledSurface::sample");
+    NotImplemented;
     return tmp<sphericalTensorField>(NULL);
 }
 
@@ -275,7 +272,7 @@ Foam::tmp<Foam::symmTensorField> Foam::sampledSurface::sample
     const surfaceSymmTensorField& sField
 ) const
 {
-    notImplemented("tmp<Foam::symmTensorField> sampledSurface::sample");
+    NotImplemented;
     return tmp<symmTensorField>(NULL);
 }
 
@@ -285,58 +282,58 @@ Foam::tmp<Foam::tensorField> Foam::sampledSurface::sample
     const surfaceTensorField& sField
 ) const
 {
-    notImplemented("tmp<Foam::tensorField> sampledSurface::sample");
+    NotImplemented;
     return tmp<tensorField>(NULL);
 }
 
 
-Foam::tmp<Foam::Field<Foam::scalar> >
+Foam::tmp<Foam::Field<Foam::scalar>>
 Foam::sampledSurface::project(const Field<scalar>& field) const
 {
-    tmp<Field<scalar> > tRes(new Field<scalar>(faces().size()));
-    Field<scalar>& res = tRes();
+    tmp<Field<scalar>> tRes(new Field<scalar>(faces().size()));
+    Field<scalar>& res = tRes.ref();
 
-    forAll(faces(), faceI)
+    forAll(faces(), facei)
     {
-        res[faceI] = field[faceI];
+        res[facei] = field[facei];
     }
 
     return tRes;
 }
 
 
-Foam::tmp<Foam::Field<Foam::scalar> >
+Foam::tmp<Foam::Field<Foam::scalar>>
 Foam::sampledSurface::project(const Field<vector>& field) const
 {
-    tmp<Field<scalar> > tRes(new Field<scalar>(faces().size()));
-    project(tRes(), field);
+    tmp<Field<scalar>> tRes(new Field<scalar>(faces().size()));
+    project(tRes.ref(), field);
     return tRes;
 }
 
 
-Foam::tmp<Foam::Field<Foam::vector> >
+Foam::tmp<Foam::Field<Foam::vector>>
 Foam::sampledSurface::project(const Field<sphericalTensor>& field) const
 {
-    tmp<Field<vector> > tRes(new Field<vector>(faces().size()));
-    project(tRes(), field);
+    tmp<Field<vector>> tRes(new Field<vector>(faces().size()));
+    project(tRes.ref(), field);
     return tRes;
 }
 
 
-Foam::tmp<Foam::Field<Foam::vector> >
+Foam::tmp<Foam::Field<Foam::vector>>
 Foam::sampledSurface::project(const Field<symmTensor>& field) const
 {
-    tmp<Field<vector> > tRes(new Field<vector>(faces().size()));
-    project(tRes(), field);
+    tmp<Field<vector>> tRes(new Field<vector>(faces().size()));
+    project(tRes.ref(), field);
     return tRes;
 }
 
 
-Foam::tmp<Foam::Field<Foam::vector> >
+Foam::tmp<Foam::Field<Foam::vector>>
 Foam::sampledSurface::project(const Field<tensor>& field) const
 {
-    tmp<Field<vector> > tRes(new Field<vector>(faces().size()));
-    project(tRes(), field);
+    tmp<Field<vector>> tRes(new Field<vector>(faces().size()));
+    project(tRes.ref(), field);
     return tRes;
 }
 

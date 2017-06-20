@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -31,7 +31,7 @@ License
 template<>
 Foam::volumeType Foam::treeDataPrimitivePatch<Foam::triSurface>::getVolumeType
 (
-    const indexedOctree<treeDataPrimitivePatch<triSurface> >& oc,
+    const indexedOctree<treeDataPrimitivePatch<triSurface>>& oc,
     const point& sample
 ) const
 {
@@ -40,22 +40,19 @@ Foam::volumeType Foam::treeDataPrimitivePatch<Foam::triSurface>::getVolumeType
 
     if (info.index() == -1)
     {
-        FatalErrorIn
-        (
-            "treeDataPrimitivePatch::getSampleType"
-            "(indexedOctree<treeDataPrimitivePatch>&, const point&)"
-        )   << "Could not find " << sample << " in octree."
+        FatalErrorInFunction
+            << "Could not find " << sample << " in octree."
             << abort(FatalError);
     }
 
     // Get actual intersection point on face
-    label faceI = info.index();
+    label facei = info.index();
 
     triSurfaceTools::sideType t = triSurfaceTools::surfaceSide
     (
         patch_,
         sample,
-        faceI
+        facei
     );
 
     if (t == triSurfaceTools::UNKNOWN)
@@ -72,7 +69,7 @@ Foam::volumeType Foam::treeDataPrimitivePatch<Foam::triSurface>::getVolumeType
     }
     else
     {
-        FatalErrorIn("treeDataPrimitivePatch<PatchType>::getVolumeType(..)")
+        FatalErrorInFunction
             << "problem" << abort(FatalError);
         return volumeType::UNKNOWN;
     }

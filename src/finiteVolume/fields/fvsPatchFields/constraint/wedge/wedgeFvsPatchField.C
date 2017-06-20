@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,15 +25,10 @@ License
 
 #include "wedgeFvsPatchField.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-wedgeFvsPatchField<Type>::wedgeFvsPatchField
+Foam::wedgeFvsPatchField<Type>::wedgeFvsPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, surfaceMesh>& iF
@@ -44,7 +39,29 @@ wedgeFvsPatchField<Type>::wedgeFvsPatchField
 
 
 template<class Type>
-wedgeFvsPatchField<Type>::wedgeFvsPatchField
+Foam::wedgeFvsPatchField<Type>::wedgeFvsPatchField
+(
+    const fvPatch& p,
+    const DimensionedField<Type, surfaceMesh>& iF,
+    const dictionary& dict
+)
+:
+    fvsPatchField<Type>(p, iF, dict)
+{
+    if (!isType<wedgeFvPatch>(p))
+    {
+        FatalIOErrorInFunction
+        (
+            dict
+        )   << "patch " << this->patch().index() << " not wedge type. "
+            << "Patch type = " << p.type()
+            << exit(FatalIOError);
+    }
+}
+
+
+template<class Type>
+Foam::wedgeFvsPatchField<Type>::wedgeFvsPatchField
 (
     const wedgeFvsPatchField<Type>& ptf,
     const fvPatch& p,
@@ -56,16 +73,8 @@ wedgeFvsPatchField<Type>::wedgeFvsPatchField
 {
     if (!isType<wedgeFvPatch>(this->patch()))
     {
-        FatalErrorIn
-        (
-            "wedgeFvsPatchField<Type>::wedgeFvsPatchField\n"
-            "(\n"
-            "    const wedgeFvsPatchField<Type>& ptf,\n"
-            "    const fvPatch& p,\n"
-            "    const DimensionedField<Type, surfaceMesh>& iF,\n"
-            "    const fvPatchFieldMapper& mapper\n"
-            ")\n"
-        )   << "Field type does not correspond to patch type for patch "
+        FatalErrorInFunction
+            << "Field type does not correspond to patch type for patch "
             << this->patch().index() << "." << endl
             << "Field type: " << typeName << endl
             << "Patch type: " << this->patch().type()
@@ -75,35 +84,7 @@ wedgeFvsPatchField<Type>::wedgeFvsPatchField
 
 
 template<class Type>
-wedgeFvsPatchField<Type>::wedgeFvsPatchField
-(
-    const fvPatch& p,
-    const DimensionedField<Type, surfaceMesh>& iF,
-    const dictionary& dict
-)
-:
-    fvsPatchField<Type>(p, iF, dict)
-{
-    if (!isType<wedgeFvPatch>(p))
-    {
-        FatalIOErrorIn
-        (
-            "wedgeFvsPatchField<Type>::wedgeFvsPatchField\n"
-            "(\n"
-            "    const fvPatch& p,\n"
-            "    const Field<Type>& field,\n"
-            "    dictionary& dict\n"
-            ")\n",
-            dict
-        )   << "patch " << this->patch().index() << " not wedge type. "
-            << "Patch type = " << p.type()
-            << exit(FatalIOError);
-    }
-}
-
-
-template<class Type>
-wedgeFvsPatchField<Type>::wedgeFvsPatchField
+Foam::wedgeFvsPatchField<Type>::wedgeFvsPatchField
 (
     const wedgeFvsPatchField<Type>& ptf
 )
@@ -113,7 +94,7 @@ wedgeFvsPatchField<Type>::wedgeFvsPatchField
 
 
 template<class Type>
-wedgeFvsPatchField<Type>::wedgeFvsPatchField
+Foam::wedgeFvsPatchField<Type>::wedgeFvsPatchField
 (
     const wedgeFvsPatchField<Type>& ptf,
     const DimensionedField<Type, surfaceMesh>& iF
@@ -122,9 +103,5 @@ wedgeFvsPatchField<Type>::wedgeFvsPatchField
     fvsPatchField<Type>(ptf, iF)
 {}
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

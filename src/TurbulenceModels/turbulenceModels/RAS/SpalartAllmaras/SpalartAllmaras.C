@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "SpalartAllmaras.H"
+#include "fvOptions.H"
 #include "bound.H"
 #include "wallDist.H"
 
@@ -108,7 +109,7 @@ tmp<volScalarField> SpalartAllmaras<BasicTurbulenceModel>::fw
             scalar(10.0)
         )
     );
-    r.boundaryField() == 0.0;
+    r.boundaryFieldRef() == 0.0;
 
     const volScalarField g(r + Cw2_*(pow6(r) - r));
 
@@ -124,6 +125,7 @@ void SpalartAllmaras<BasicTurbulenceModel>::correctNut
 {
     this->nut_ = nuTilda_*fv1;
     this->nut_.correctBoundaryConditions();
+    fv::options::New(this->mesh_).correct(this->nut_);
 
     BasicTurbulenceModel::correctNut();
 }
@@ -151,7 +153,7 @@ SpalartAllmaras<BasicTurbulenceModel>::SpalartAllmaras
     const word& type
 )
 :
-    eddyViscosity<RASModel<BasicTurbulenceModel> >
+    eddyViscosity<RASModel<BasicTurbulenceModel>>
     (
         type,
         alpha,
@@ -255,7 +257,6 @@ SpalartAllmaras<BasicTurbulenceModel>::SpalartAllmaras
 {
     if (type == typeName)
     {
-        correctNut();
         this->printCoeffs(type);
     }
 }
@@ -266,7 +267,7 @@ SpalartAllmaras<BasicTurbulenceModel>::SpalartAllmaras
 template<class BasicTurbulenceModel>
 bool SpalartAllmaras<BasicTurbulenceModel>::read()
 {
-    if (eddyViscosity<RASModel<BasicTurbulenceModel> >::read())
+    if (eddyViscosity<RASModel<BasicTurbulenceModel>>::read())
     {
         sigmaNut_.readIfPresent(this->coeffDict());
         kappa_.readIfPresent(this->coeffDict());
@@ -321,7 +322,7 @@ tmp<volScalarField> SpalartAllmaras<BasicTurbulenceModel>::k() const
 template<class BasicTurbulenceModel>
 tmp<volScalarField> SpalartAllmaras<BasicTurbulenceModel>::epsilon() const
 {
-    WarningIn("tmp<volScalarField> SpalartAllmaras::epsilon() const")
+    WarningInFunction
         << "Turbulence kinetic energy dissipation rate not defined for "
         << "Spalart-Allmaras model. Returning zero field"
         << endl;
@@ -355,8 +356,9 @@ void SpalartAllmaras<BasicTurbulenceModel>::correct()
     const alphaField& alpha = this->alpha_;
     const rhoField& rho = this->rho_;
     const surfaceScalarField& alphaRhoPhi = this->alphaRhoPhi_;
+    fv::options& fvOptions(fv::options::New(this->mesh_));
 
-    eddyViscosity<RASModel<BasicTurbulenceModel> >::correct();
+    eddyViscosity<RASModel<BasicTurbulenceModel>>::correct();
 
     const volScalarField chi(this->chi());
     const volScalarField fv1(this->fv1(chi));
@@ -372,10 +374,13 @@ void SpalartAllmaras<BasicTurbulenceModel>::correct()
      ==
         Cb1_*alpha*rho*Stilda*nuTilda_
       - fvm::Sp(Cw1_*alpha*rho*fw(Stilda)*nuTilda_/sqr(y_), nuTilda_)
+      + fvOptions(alpha, rho, nuTilda_)
     );
 
-    nuTildaEqn().relax();
+    nuTildaEqn.ref().relax();
+    fvOptions.constrain(nuTildaEqn.ref());
     solve(nuTildaEqn);
+    fvOptions.correct(nuTilda_);
     bound(nuTilda_, dimensionedScalar("0", nuTilda_.dimensions(), 0.0));
     nuTilda_.correctBoundaryConditions();
 

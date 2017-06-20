@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -36,6 +36,7 @@ SourceFiles
 #define gaussConvectionScheme_H
 
 #include "convectionScheme.H"
+#include "etcFiles.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -62,7 +63,7 @@ class gaussConvectionScheme
 {
     // Private data
 
-        tmp<surfaceInterpolationScheme<Type> > tinterpScheme_;
+        tmp<surfaceInterpolationScheme<Type>> tinterpScheme_;
 
 
     // Private Member Functions
@@ -87,7 +88,7 @@ public:
         (
             const fvMesh& mesh,
             const surfaceScalarField& faceFlux,
-            const tmp<surfaceInterpolationScheme<Type> >& scheme
+            const tmp<surfaceInterpolationScheme<Type>>& scheme
         )
         :
             convectionScheme<Type>(mesh, faceFlux),
@@ -120,7 +121,7 @@ public:
             {
                 fileNameList controlDictFiles(findEtcFiles("controlDict"));
 
-                IOWarningIn("gaussConvectionScheme", is)
+                IOWarningInFunction(is)
                     << "Unbounded 'Gauss' div scheme used in "
                        "steady-state solver, use 'bounded Gauss' "
                        "to ensure boundedness.\n"
@@ -136,25 +137,25 @@ public:
 
         const surfaceInterpolationScheme<Type>& interpScheme() const;
 
-        tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > interpolate
+        tmp<GeometricField<Type, fvsPatchField, surfaceMesh>> interpolate
         (
             const surfaceScalarField&,
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
 
-        tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > flux
+        tmp<GeometricField<Type, fvsPatchField, surfaceMesh>> flux
         (
             const surfaceScalarField&,
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
 
-        tmp<fvMatrix<Type> > fvmDiv
+        tmp<fvMatrix<Type>> fvmDiv
         (
             const surfaceScalarField&,
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
 
-        tmp<GeometricField<Type, fvPatchField, volMesh> > fvcDiv
+        tmp<GeometricField<Type, fvPatchField, volMesh>> fvcDiv
         (
             const surfaceScalarField&,
             const GeometricField<Type, fvPatchField, volMesh>&
@@ -173,7 +174,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "gaussConvectionScheme.C"
+    #include "gaussConvectionScheme.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

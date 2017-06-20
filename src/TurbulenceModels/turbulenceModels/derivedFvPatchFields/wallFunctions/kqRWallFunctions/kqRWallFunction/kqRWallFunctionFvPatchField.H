@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -34,17 +34,16 @@ Description
 
     It is a simple wrapper around the zero-gradient condition.
 
-    \heading Patch usage
-
+Usage
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            kqRWallFunction;
     }
     \endverbatim
 
-SeeAlso
+See also
     Foam::zeroGradientFvPatchField
 
 SourceFiles
@@ -119,9 +118,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchField<Type>> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new kqRWallFunctionFvPatchField(*this)
             );
@@ -135,12 +134,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchField<Type>> clone
         (
             const DimensionedField<Type, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new kqRWallFunctionFvPatchField(*this, iF)
             );
@@ -154,7 +153,7 @@ public:
             //- Evaluate the patchField
             virtual void evaluate
             (
-                const Pstream::commsTypes commsType=Pstream::Pstream::blocking
+                const Pstream::commsTypes commsType=Pstream::blocking
             );
 
 
@@ -172,7 +171,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "kqRWallFunctionFvPatchField.C"
+    #include "kqRWallFunctionFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

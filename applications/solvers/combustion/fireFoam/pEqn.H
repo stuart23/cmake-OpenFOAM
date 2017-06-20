@@ -2,17 +2,15 @@ rho = thermo.rho();
 
 volScalarField rAU(1.0/UEqn.A());
 surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rho*rAU));
+volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
 
-volVectorField HbyA("HbyA", U);
-HbyA = rAU*UEqn.H();
-
-surfaceScalarField phig(-rhorAUf*ghf*fvc::snGrad(rho)*mesh.magSf());
+surfaceScalarField phig("phig", -rhorAUf*ghf*fvc::snGrad(rho)*mesh.magSf());
 
 surfaceScalarField phiHbyA
 (
     "phiHbyA",
     (
-        (fvc::interpolate(rho*HbyA) & mesh.Sf())
+        fvc::flux(rho*HbyA)
       + rhorAUf*fvc::ddtCorr(rho, U, phi)
     )
   + phig
@@ -20,24 +18,17 @@ surfaceScalarField phiHbyA
 
 MRF.makeRelative(fvc::interpolate(rho), phiHbyA);
 
-// Update the fixedFluxPressure BCs to ensure flux consistency
-setSnGrad<fixedFluxPressureFvPatchScalarField>
-(
-    p_rgh.boundaryField(),
-    (
-        phiHbyA.boundaryField()
-      - MRF.relative(mesh.Sf().boundaryField() & U.boundaryField())
-       *rho.boundaryField()
-    )/(mesh.magSf().boundaryField()*rhorAUf.boundaryField())
-);
+// Update the pressure BCs to ensure flux consistency
+constrainPressure(p_rgh, rho, U, phiHbyA, rhorAUf, MRF);
 
 while (pimple.correctNonOrthogonal())
 {
     fvScalarMatrix p_rghEqn
     (
-        fvc::ddt(psi, rho)*gh
+        fvm::ddt(psi, p_rgh)
+      + fvc::ddt(psi, rho)*gh
+      + fvc::ddt(psi)*pRef
       + fvc::div(phiHbyA)
-      + fvm::ddt(psi, p_rgh)
       - fvm::laplacian(rhorAUf, p_rgh)
      ==
         parcels.Srho()
@@ -56,7 +47,7 @@ while (pimple.correctNonOrthogonal())
     }
 }
 
-p = p_rgh + rho*gh;
+p = p_rgh + rho*gh + pRef;
 
 #include "rhoEqn.H"
 #include "compressibleContinuityErrs.H"

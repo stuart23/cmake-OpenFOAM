@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -44,7 +44,7 @@ pressureInletOutletParSlipVelocityFvPatchVectorField
     rhoName_("rho")
 {
     refValue() = *this;
-    refGrad() = vector::zero;
+    refGrad() = Zero;
     valueFraction() = 0.0;
 }
 
@@ -78,7 +78,7 @@ pressureInletOutletParSlipVelocityFvPatchVectorField
 {
     fvPatchVectorField::operator=(vectorField("value", dict, p.size()));
     refValue() = *this;
-    refGrad() = vector::zero;
+    refGrad() = Zero;
     valueFraction() = 0.0;
 }
 
@@ -143,14 +143,11 @@ void Foam::pressureInletOutletParSlipVelocityFvPatchVectorField::updateCoeffs()
     }
     else
     {
-        FatalErrorIn
-        (
-            "pressureInletOutletParSlipVelocityFvPatchVectorField::"
-            "updateCoeffs()"
-        )   << "dimensions of phi are not correct" << nl
+        FatalErrorInFunction
+            << "dimensions of phi are not correct" << nl
             << "    on patch " << this->patch().name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
             << exit(FatalError);
     }
 

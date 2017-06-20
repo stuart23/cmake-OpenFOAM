@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -54,7 +54,7 @@ Foam::fv::cellLimitedGrad<Foam::scalar>::calcGrad
         return tGrad;
     }
 
-    volVectorField& g = tGrad();
+    volVectorField& g = tGrad.ref();
 
     const labelUList& owner = mesh.owner();
     const labelUList& neighbour = mesh.neighbour();
@@ -62,8 +62,8 @@ Foam::fv::cellLimitedGrad<Foam::scalar>::calcGrad
     const volVectorField& C = mesh.C();
     const surfaceVectorField& Cf = mesh.Cf();
 
-    scalarField maxVsf(vsf.internalField());
-    scalarField minVsf(vsf.internalField());
+    scalarField maxVsf(vsf.primitiveField());
+    scalarField minVsf(vsf.primitiveField());
 
     forAll(owner, facei)
     {
@@ -81,7 +81,7 @@ Foam::fv::cellLimitedGrad<Foam::scalar>::calcGrad
     }
 
 
-    const volScalarField::GeometricBoundaryField& bsf = vsf.boundaryField();
+    const volScalarField::Boundary& bsf = vsf.boundaryField();
 
     forAll(bsf, patchi)
     {
@@ -130,7 +130,7 @@ Foam::fv::cellLimitedGrad<Foam::scalar>::calcGrad
 
 
     // create limiter
-    scalarField limiter(vsf.internalField().size(), 1.0);
+    scalarField limiter(vsf.primitiveField().size(), 1.0);
 
     forAll(owner, facei)
     {
@@ -183,7 +183,7 @@ Foam::fv::cellLimitedGrad<Foam::scalar>::calcGrad
             << " average: " << gAverage(limiter) << endl;
     }
 
-    g.internalField() *= limiter;
+    g.primitiveFieldRef() *= limiter;
     g.correctBoundaryConditions();
     gaussGrad<scalar>::correctBoundaryConditions(vsf, g);
 
@@ -208,7 +208,7 @@ Foam::fv::cellLimitedGrad<Foam::vector>::calcGrad
         return tGrad;
     }
 
-    volTensorField& g = tGrad();
+    volTensorField& g = tGrad.ref();
 
     const labelUList& owner = mesh.owner();
     const labelUList& neighbour = mesh.neighbour();
@@ -216,8 +216,8 @@ Foam::fv::cellLimitedGrad<Foam::vector>::calcGrad
     const volVectorField& C = mesh.C();
     const surfaceVectorField& Cf = mesh.Cf();
 
-    vectorField maxVsf(vsf.internalField());
-    vectorField minVsf(vsf.internalField());
+    vectorField maxVsf(vsf.primitiveField());
+    vectorField minVsf(vsf.primitiveField());
 
     forAll(owner, facei)
     {
@@ -235,7 +235,7 @@ Foam::fv::cellLimitedGrad<Foam::vector>::calcGrad
     }
 
 
-    const volVectorField::GeometricBoundaryField& bsf = vsf.boundaryField();
+    const volVectorField::Boundary& bsf = vsf.boundaryField();
 
     forAll(bsf, patchi)
     {
@@ -283,7 +283,7 @@ Foam::fv::cellLimitedGrad<Foam::vector>::calcGrad
 
 
     // create limiter
-    vectorField limiter(vsf.internalField().size(), vector::one);
+    vectorField limiter(vsf.primitiveField().size(), vector::one);
 
     forAll(owner, facei)
     {
@@ -336,7 +336,7 @@ Foam::fv::cellLimitedGrad<Foam::vector>::calcGrad
             << " average: " << gAverage(limiter) << endl;
     }
 
-    tensorField& gIf = g.internalField();
+    tensorField& gIf = g.primitiveFieldRef();
 
     forAll(gIf, celli)
     {

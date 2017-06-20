@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,59 +26,22 @@ License
 #include "fixedGradientFvPatchField.H"
 #include "dictionary.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-fixedGradientFvPatchField<Type>::fixedGradientFvPatchField
+Foam::fixedGradientFvPatchField<Type>::fixedGradientFvPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF
 )
 :
     fvPatchField<Type>(p, iF),
-    gradient_(p.size(), pTraits<Type>::zero)
+    gradient_(p.size(), Zero)
 {}
 
 
 template<class Type>
-fixedGradientFvPatchField<Type>::fixedGradientFvPatchField
-(
-    const fixedGradientFvPatchField<Type>& ptf,
-    const fvPatch& p,
-    const DimensionedField<Type, volMesh>& iF,
-    const fvPatchFieldMapper& mapper
-)
-:
-    fvPatchField<Type>(ptf, p, iF, mapper),
-    gradient_(ptf.gradient_, mapper)
-{
-    if (notNull(iF) && mapper.hasUnmapped())
-    {
-        WarningIn
-        (
-            "fixedGradientFvPatchField<Type>::fixedGradientFvPatchField\n"
-            "(\n"
-            "    const fixedGradientFvPatchField<Type>&,\n"
-            "    const fvPatch&,\n"
-            "    const DimensionedField<Type, volMesh>&,\n"
-            "    const fvPatchFieldMapper&\n"
-            ")\n"
-        )   << "On field " << iF.name() << " patch " << p.name()
-            << " patchField " << this->type()
-            << " : mapper does not map all values." << nl
-            << "    To avoid this warning fully specify the mapping in derived"
-            << " patch fields." << endl;
-    }
-}
-
-
-template<class Type>
-fixedGradientFvPatchField<Type>::fixedGradientFvPatchField
+Foam::fixedGradientFvPatchField<Type>::fixedGradientFvPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
@@ -93,7 +56,31 @@ fixedGradientFvPatchField<Type>::fixedGradientFvPatchField
 
 
 template<class Type>
-fixedGradientFvPatchField<Type>::fixedGradientFvPatchField
+Foam::fixedGradientFvPatchField<Type>::fixedGradientFvPatchField
+(
+    const fixedGradientFvPatchField<Type>& ptf,
+    const fvPatch& p,
+    const DimensionedField<Type, volMesh>& iF,
+    const fvPatchFieldMapper& mapper
+)
+:
+    fvPatchField<Type>(ptf, p, iF, mapper),
+    gradient_(ptf.gradient_, mapper)
+{
+    if (notNull(iF) && mapper.hasUnmapped())
+    {
+        WarningInFunction
+            << "On field " << iF.name() << " patch " << p.name()
+            << " patchField " << this->type()
+            << " : mapper does not map all values." << nl
+            << "    To avoid this warning fully specify the mapping in derived"
+            << " patch fields." << endl;
+    }
+}
+
+
+template<class Type>
+Foam::fixedGradientFvPatchField<Type>::fixedGradientFvPatchField
 (
     const fixedGradientFvPatchField<Type>& ptf
 )
@@ -104,7 +91,7 @@ fixedGradientFvPatchField<Type>::fixedGradientFvPatchField
 
 
 template<class Type>
-fixedGradientFvPatchField<Type>::fixedGradientFvPatchField
+Foam::fixedGradientFvPatchField<Type>::fixedGradientFvPatchField
 (
     const fixedGradientFvPatchField<Type>& ptf,
     const DimensionedField<Type, volMesh>& iF
@@ -118,7 +105,7 @@ fixedGradientFvPatchField<Type>::fixedGradientFvPatchField
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-void fixedGradientFvPatchField<Type>::autoMap
+void Foam::fixedGradientFvPatchField<Type>::autoMap
 (
     const fvPatchFieldMapper& m
 )
@@ -129,7 +116,7 @@ void fixedGradientFvPatchField<Type>::autoMap
 
 
 template<class Type>
-void fixedGradientFvPatchField<Type>::rmap
+void Foam::fixedGradientFvPatchField<Type>::rmap
 (
     const fvPatchField<Type>& ptf,
     const labelList& addr
@@ -138,14 +125,14 @@ void fixedGradientFvPatchField<Type>::rmap
     fvPatchField<Type>::rmap(ptf, addr);
 
     const fixedGradientFvPatchField<Type>& fgptf =
-        refCast<const fixedGradientFvPatchField<Type> >(ptf);
+        refCast<const fixedGradientFvPatchField<Type>>(ptf);
 
     gradient_.rmap(fgptf.gradient_, addr);
 }
 
 
 template<class Type>
-void fixedGradientFvPatchField<Type>::evaluate(const Pstream::commsTypes)
+void Foam::fixedGradientFvPatchField<Type>::evaluate(const Pstream::commsTypes)
 {
     if (!this->updated())
     {
@@ -162,17 +149,19 @@ void fixedGradientFvPatchField<Type>::evaluate(const Pstream::commsTypes)
 
 
 template<class Type>
-tmp<Field<Type> > fixedGradientFvPatchField<Type>::valueInternalCoeffs
+Foam::tmp<Foam::Field<Type>>
+Foam::fixedGradientFvPatchField<Type>::valueInternalCoeffs
 (
     const tmp<scalarField>&
 ) const
 {
-    return tmp<Field<Type> >(new Field<Type>(this->size(), pTraits<Type>::one));
+    return tmp<Field<Type>>(new Field<Type>(this->size(), pTraits<Type>::one));
 }
 
 
 template<class Type>
-tmp<Field<Type> > fixedGradientFvPatchField<Type>::valueBoundaryCoeffs
+Foam::tmp<Foam::Field<Type>>
+Foam::fixedGradientFvPatchField<Type>::valueBoundaryCoeffs
 (
     const tmp<scalarField>&
 ) const
@@ -182,34 +171,30 @@ tmp<Field<Type> > fixedGradientFvPatchField<Type>::valueBoundaryCoeffs
 
 
 template<class Type>
-tmp<Field<Type> > fixedGradientFvPatchField<Type>::
-gradientInternalCoeffs() const
+Foam::tmp<Foam::Field<Type>>
+Foam::fixedGradientFvPatchField<Type>::gradientInternalCoeffs() const
 {
-    return tmp<Field<Type> >
+    return tmp<Field<Type>>
     (
-        new Field<Type>(this->size(), pTraits<Type>::zero)
+        new Field<Type>(this->size(), Zero)
     );
 }
 
 
 template<class Type>
-tmp<Field<Type> > fixedGradientFvPatchField<Type>::
-gradientBoundaryCoeffs() const
+Foam::tmp<Foam::Field<Type>>
+Foam::fixedGradientFvPatchField<Type>::gradientBoundaryCoeffs() const
 {
     return gradient();
 }
 
 
 template<class Type>
-void fixedGradientFvPatchField<Type>::write(Ostream& os) const
+void Foam::fixedGradientFvPatchField<Type>::write(Ostream& os) const
 {
     fvPatchField<Type>::write(os);
     gradient_.writeEntry("gradient", os);
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

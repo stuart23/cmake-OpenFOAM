@@ -1,3 +1,5 @@
+#include "readGravitationalAcceleration.H"
+
 word continuousPhaseName
 (
     IOdictionary
@@ -151,7 +153,7 @@ alphac.correctBoundaryConditions();
 surfaceScalarField alphacf("alphacf", fvc::interpolate(alphac));
 surfaceScalarField alphaPhic("alphaPhic", alphacf*phic);
 
-autoPtr<PhaseIncompressibleTurbulenceModel<singlePhaseTransportModel> >
+autoPtr<PhaseIncompressibleTurbulenceModel<singlePhaseTransportModel>>
 continuousPhaseTurbulence
 (
     PhaseIncompressibleTurbulenceModel<singlePhaseTransportModel>::New

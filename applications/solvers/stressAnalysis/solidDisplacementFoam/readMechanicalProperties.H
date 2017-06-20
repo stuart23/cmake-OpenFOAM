@@ -41,8 +41,7 @@
                     "rho",
                     dimMass/dimVolume,
                     rhoValue
-                ),
-                zeroGradientFvPatchField<scalar>::typeName
+                )
             )
         );
     }
@@ -61,10 +60,8 @@
     }
     else
     {
-        FatalErrorIn
-        (
-            "readMechanicalProperties.H"
-        )   << "Valid type entries are uniform or field for rho"
+        FatalErrorInFunction
+            << "Valid type entries are uniform or field for rho"
             << abort(FatalError);
     }
 
@@ -99,8 +96,7 @@
                     "Erho",
                     dimMass/dimLength/sqr(dimTime),
                     rhoEValue
-                ),
-                zeroGradientFvPatchField<scalar>::typeName
+                )
             )
         );
     }
@@ -119,10 +115,8 @@
     }
     else
     {
-        FatalErrorIn
-        (
-            "readMechanicalProperties.H"
-        )   << "Valid type entries are uniform or field for E"
+        FatalErrorInFunction
+            << "Valid type entries are uniform or field for E"
             << abort(FatalError);
     }
 
@@ -156,8 +150,7 @@
                     "nu",
                     dimless,
                     nuValue
-                ),
-                zeroGradientFvPatchField<scalar>::typeName
+                )
             )
         );
     }
@@ -175,10 +168,8 @@
     }
     else
     {
-        FatalErrorIn
-        (
-            "readMechanicalProperties.H"
-        )   << "Valid type entries are uniform or field for nu"
+        FatalErrorInFunction
+            << "Valid type entries are uniform or field for nu"
             << abort(FatalError);
     }
 

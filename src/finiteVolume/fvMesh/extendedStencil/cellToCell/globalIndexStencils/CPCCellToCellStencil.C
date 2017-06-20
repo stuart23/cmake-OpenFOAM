@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -29,7 +29,6 @@ License
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-// Calculates per point the neighbour data (= pointCells)
 void Foam::CPCCellToCellStencil::calcPointBoundaryData
 (
     const boolList& isValidBFace,
@@ -43,15 +42,15 @@ void Foam::CPCCellToCellStencil::calcPointBoundaryData
 
     forAll(boundaryPoints, i)
     {
-        label pointI = boundaryPoints[i];
+        label pointi = boundaryPoints[i];
 
         neiGlobal.insert
         (
-            pointI,
+            pointi,
             calcFaceCells
             (
                 isValidBFace,
-                mesh().pointFaces()[pointI],
+                mesh().pointFaces()[pointi],
                 pointGlobals
             )
         );
@@ -67,8 +66,6 @@ void Foam::CPCCellToCellStencil::calcPointBoundaryData
 }
 
 
-// Calculates per cell the neighbour data (= cell or boundary in global
-// numbering). First element is always cell itself!
 void Foam::CPCCellToCellStencil::calcCellStencil
 (
     labelListList& globalCellCells
@@ -98,23 +95,23 @@ void Foam::CPCCellToCellStencil::calcCellStencil
 
     forAll(boundaryPoints, i)
     {
-        label pointI = boundaryPoints[i];
+        label pointi = boundaryPoints[i];
 
-        const labelList& pGlobals = neiGlobal[pointI];
+        const labelList& pGlobals = neiGlobal[pointi];
 
         // Distribute to all pointCells
-        const labelList& pCells = mesh().pointCells(pointI);
+        const labelList& pCells = mesh().pointCells(pointi);
 
         forAll(pCells, j)
         {
-            label cellI = pCells[j];
+            label celli = pCells[j];
 
             // Insert pGlobals into globalCellCells
             merge
             (
-                globalNumbering().toGlobal(cellI),
+                globalNumbering().toGlobal(celli),
                 pGlobals,
-                globalCellCells[cellI]
+                globalCellCells[celli]
             );
         }
     }
@@ -123,29 +120,29 @@ void Foam::CPCCellToCellStencil::calcCellStencil
     // Do remaining points cells
     labelHashSet pointGlobals;
 
-    for (label pointI = 0; pointI < mesh().nPoints(); pointI++)
+    for (label pointi = 0; pointi < mesh().nPoints(); pointi++)
     {
         labelList pGlobals
         (
             calcFaceCells
             (
                 isValidBFace,
-                mesh().pointFaces()[pointI],
+                mesh().pointFaces()[pointi],
                 pointGlobals
             )
         );
 
-        const labelList& pCells = mesh().pointCells(pointI);
+        const labelList& pCells = mesh().pointCells(pointi);
 
         forAll(pCells, j)
         {
-            label cellI = pCells[j];
+            label celli = pCells[j];
 
             merge
             (
-                globalNumbering().toGlobal(cellI),
+                globalNumbering().toGlobal(celli),
                 pGlobals,
-                globalCellCells[cellI]
+                globalCellCells[celli]
             );
         }
     }

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -55,13 +55,7 @@ filmModel() const
         modelNames.append(iter()->regionMesh().name());
     }
 
-    FatalErrorIn
-    (
-        "const filmPyrolysisRadiativeCoupledMixedFvPatchScalarField::"
-        "filmModelType& "
-        "filmPyrolysisRadiativeCoupledMixedFvPatchScalarField::"
-        "filmModel() const"
-    )
+    FatalErrorInFunction
         << "Unable to locate film region " << filmRegionName_
         << ".  Available regions include: " << modelNames
         << abort(FatalError);
@@ -93,13 +87,7 @@ pyrModel() const
     }
 
 
-    FatalErrorIn
-    (
-        "const filmPyrolysisRadiativeCoupledMixedFvPatchScalarField::"
-        "pyrolysisModelType& "
-        "filmPyrolysisRadiativeCoupledMixedFvPatchScalarField::"
-        "pyrModel() const"
-    )
+    FatalErrorInFunction
         << "Unable to locate pyrolysis region " << pyrolysisRegionName_
         << ".  Available regions include: " << modelNames
         << abort(FatalError);
@@ -180,20 +168,11 @@ filmPyrolysisRadiativeCoupledMixedFvPatchScalarField
 {
     if (!isA<mappedPatchBase>(this->patch().patch()))
     {
-        FatalErrorIn
-        (
-            "filmPyrolysisRadiativeCoupledMixedFvPatchScalarField::"
-            "filmPyrolysisRadiativeCoupledMixedFvPatchScalarField\n"
-            "(\n"
-            "    const fvPatch& p,\n"
-            "    const DimensionedField<scalar, volMesh>& iF,\n"
-            "    const dictionary& dict\n"
-            ")\n"
-        )   << "\n    patch type '" << p.type()
+        FatalErrorInFunction
             << "' not type '" << mappedPatchBase::typeName << "'"
             << "\n    for patch " << p.name()
-            << " of field " << dimensionedInternalField().name()
-            << " in file " << dimensionedInternalField().objectPath()
+            << " of field " << internalField().name()
+            << " in file " << internalField().objectPath()
             << exit(FatalError);
     }
 
@@ -248,12 +227,12 @@ void filmPyrolysisRadiativeCoupledMixedFvPatchScalarField::updateCoeffs()
     const mappedPatchBase& mpp =
         refCast<const mappedPatchBase>(patch().patch());
 
-    const label patchI = patch().index();
-    const label nbrPatchI = mpp.samplePolyPatch().index();
+    const label patchi = patch().index();
+    const label nbrPatchi = mpp.samplePolyPatch().index();
     const polyMesh& mesh = patch().boundaryMesh().mesh();
     const polyMesh& nbrMesh = mpp.sampleMesh();
     const fvPatch& nbrPatch =
-        refCast<const fvMesh>(nbrMesh).boundary()[nbrPatchI];
+        refCast<const fvMesh>(nbrMesh).boundary()[nbrPatchi];
 
     scalarField intFld(patchInternalField());
 
@@ -292,10 +271,10 @@ void filmPyrolysisRadiativeCoupledMixedFvPatchScalarField::updateCoeffs()
     // Obtain Rad heat (Qr)
     scalarField Qr(patch().size(), 0.0);
 
-    label coupledPatchI = -1;
+    label coupledPatchi = -1;
     if (pyrolysisRegionName_ == mesh.name())
     {
-        coupledPatchI = patchI;
+        coupledPatchi = patchi;
         if (QrName_ != "none")
         {
             Qr = nbrPatch.lookupPatchField<volScalarField, scalar>(QrName_);
@@ -304,7 +283,7 @@ void filmPyrolysisRadiativeCoupledMixedFvPatchScalarField::updateCoeffs()
     }
     else if (pyrolysis.primaryMesh().name() == mesh.name())
     {
-        coupledPatchI = nbrPatch.index();
+        coupledPatchi = nbrPatch.index();
         if (QrName_ != "none")
         {
             Qr = patch().lookupPatchField<volScalarField, scalar>(QrName_);
@@ -312,27 +291,23 @@ void filmPyrolysisRadiativeCoupledMixedFvPatchScalarField::updateCoeffs()
     }
     else
     {
-        FatalErrorIn
-        (
-            "void filmPyrolysisRadiativeCoupledMixedFvPatchScalarField::"
-            "updateCoeffs()"
-        )
+        FatalErrorInFunction
             << type() << " condition is intended to be applied to either the "
             << "primary or pyrolysis regions only"
             << exit(FatalError);
     }
 
-    const label filmPatchI = pyrolysis.nbrCoupledPatchID(film, coupledPatchI);
+    const label filmPatchi = pyrolysis.nbrCoupledPatchID(film, coupledPatchi);
 
-    const scalarField htcw(film.htcw().h()().boundaryField()[filmPatchI]);
+    const scalarField htcw(film.htcw().h()().boundaryField()[filmPatchi]);
 
     // Obtain htcw
     htcwfilm =
         pyrolysis.mapRegionPatchField
         (
             film,
-            coupledPatchI,
-            filmPatchI,
+            coupledPatchi,
+            filmPatchi,
             htcw,
             true
         );
@@ -340,8 +315,8 @@ void filmPyrolysisRadiativeCoupledMixedFvPatchScalarField::updateCoeffs()
 
     // Obtain Tfilm at the boundary through Ts.
     // NOTE: Tf is not good as at the boundary it will retrieve Tp
-    Tfilm = film.Ts().boundaryField()[filmPatchI];
-    film.toPrimary(filmPatchI, Tfilm);
+    Tfilm = film.Ts().boundaryField()[filmPatchi];
+    film.toPrimary(filmPatchi, Tfilm);
 
     // Obtain delta
     filmDelta =
@@ -349,7 +324,7 @@ void filmPyrolysisRadiativeCoupledMixedFvPatchScalarField::updateCoeffs()
         (
             film,
             "deltaf",
-            coupledPatchI,
+            coupledPatchi,
             true
         );
 
@@ -387,10 +362,10 @@ void filmPyrolysisRadiativeCoupledMixedFvPatchScalarField::updateCoeffs()
 
         Info<< mesh.name() << ':'
             << patch().name() << ':'
-            << this->dimensionedInternalField().name() << " <- "
+            << this->internalField().name() << " <- "
             << nbrMesh.name() << ':'
             << nbrPatch.name() << ':'
-            << this->dimensionedInternalField().name() << " :" << nl
+            << this->internalField().name() << " :" << nl
             << "     convective heat[W] : " << Qc << nl
             << "     radiative heat [W] : " << Qr << nl
             << "     total heat     [W] : " << Qt << nl

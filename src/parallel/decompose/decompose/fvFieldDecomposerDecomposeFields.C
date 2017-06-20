@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,7 +33,7 @@ License
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::GeometricField<Type, Foam::fvPatchField, Foam::volMesh> >
+Foam::tmp<Foam::GeometricField<Type, Foam::fvPatchField, Foam::volMesh>>
 Foam::fvFieldDecomposer::decomposeField
 (
     const GeometricField<Type, fvPatchField, volMesh>& field,
@@ -41,7 +41,7 @@ Foam::fvFieldDecomposer::decomposeField
 ) const
 {
     // 1. Create the complete field with dummy patch fields
-    PtrList<fvPatchField<Type> > patchFields(boundaryAddressing_.size());
+    PtrList<fvPatchField<Type>> patchFields(boundaryAddressing_.size());
 
     forAll(boundaryAddressing_, patchi)
     {
@@ -58,7 +58,7 @@ Foam::fvFieldDecomposer::decomposeField
     }
 
     // Create the field for the processor
-    tmp<GeometricField<Type, fvPatchField, volMesh> > tresF
+    tmp<GeometricField<Type, fvPatchField, volMesh>> tresF
     (
         new GeometricField<Type, fvPatchField, volMesh>
         (
@@ -72,18 +72,18 @@ Foam::fvFieldDecomposer::decomposeField
             ),
             procMesh_,
             field.dimensions(),
-            Field<Type>(field.internalField(), cellAddressing_),
+            Field<Type>(field.primitiveField(), cellAddressing_),
             patchFields
         )
     );
-    GeometricField<Type, fvPatchField, volMesh>& resF = tresF();
+    GeometricField<Type, fvPatchField, volMesh>& resF = tresF.ref();
 
 
     // 2. Change the fvPatchFields to the correct type using a mapper
     //  constructor (with reference to the now correct internal field)
 
     typename GeometricField<Type, fvPatchField, volMesh>::
-        GeometricBoundaryField& bf = resF.boundaryField();
+        Boundary& bf = resF.boundaryFieldRef();
 
     forAll(bf, patchi)
     {
@@ -96,7 +96,7 @@ Foam::fvFieldDecomposer::decomposeField
                 (
                     field.boundaryField()[boundaryAddressing_[patchi]],
                     procMesh_.boundary()[patchi],
-                    resF.dimensionedInternalField(),
+                    resF(),
                     *patchFieldDecomposerPtrs_[patchi]
                 )
             );
@@ -109,10 +109,10 @@ Foam::fvFieldDecomposer::decomposeField
                 new processorCyclicFvPatchField<Type>
                 (
                     procMesh_.boundary()[patchi],
-                    resF.dimensionedInternalField(),
+                    resF(),
                     Field<Type>
                     (
-                        field.internalField(),
+                        field.primitiveField(),
                         *processorVolPatchFieldDecomposerPtrs_[patchi]
                     )
                 )
@@ -126,10 +126,10 @@ Foam::fvFieldDecomposer::decomposeField
                 new processorFvPatchField<Type>
                 (
                     procMesh_.boundary()[patchi],
-                    resF.dimensionedInternalField(),
+                    resF(),
                     Field<Type>
                     (
-                        field.internalField(),
+                        field.primitiveField(),
                         *processorVolPatchFieldDecomposerPtrs_[patchi]
                     )
                 )
@@ -143,13 +143,13 @@ Foam::fvFieldDecomposer::decomposeField
                 new emptyFvPatchField<Type>
                 (
                     procMesh_.boundary()[patchi],
-                    resF.dimensionedInternalField()
+                    resF()
                 )
             );
         }
         else
         {
-            FatalErrorIn("fvFieldDecomposer::decomposeField()")
+            FatalErrorInFunction
                 << "Unknown type." << abort(FatalError);
         }
     }
@@ -160,7 +160,7 @@ Foam::fvFieldDecomposer::decomposeField
 
 
 template<class Type>
-Foam::tmp<Foam::GeometricField<Type, Foam::fvsPatchField, Foam::surfaceMesh> >
+Foam::tmp<Foam::GeometricField<Type, Foam::fvsPatchField, Foam::surfaceMesh>>
 Foam::fvFieldDecomposer::decomposeField
 (
     const GeometricField<Type, fvsPatchField, surfaceMesh>& field
@@ -182,7 +182,7 @@ Foam::fvFieldDecomposer::decomposeField
     // Create and map the internal field values
     Field<Type> internalField
     (
-        field.internalField(),
+        field.primitiveField(),
         mapAddr
     );
 
@@ -193,9 +193,9 @@ Foam::fvFieldDecomposer::decomposeField
     // (i.e. using slices)
     Field<Type> allFaceField(field.mesh().nFaces());
 
-    forAll(field.internalField(), i)
+    forAll(field.primitiveField(), i)
     {
-        allFaceField[i] = field.internalField()[i];
+        allFaceField[i] = field.primitiveField()[i];
     }
 
     forAll(field.boundaryField(), patchi)
@@ -212,7 +212,7 @@ Foam::fvFieldDecomposer::decomposeField
 
 
     // 1. Create the complete field with dummy patch fields
-    PtrList<fvsPatchField<Type> > patchFields(boundaryAddressing_.size());
+    PtrList<fvsPatchField<Type>> patchFields(boundaryAddressing_.size());
 
     forAll(boundaryAddressing_, patchi)
     {
@@ -228,7 +228,7 @@ Foam::fvFieldDecomposer::decomposeField
         );
     }
 
-    tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > tresF
+    tmp<GeometricField<Type, fvsPatchField, surfaceMesh>> tresF
     (
         new GeometricField<Type, fvsPatchField, surfaceMesh>
         (
@@ -242,18 +242,18 @@ Foam::fvFieldDecomposer::decomposeField
             ),
             procMesh_,
             field.dimensions(),
-            Field<Type>(field.internalField(), mapAddr),
+            Field<Type>(field.primitiveField(), mapAddr),
             patchFields
         )
     );
-    GeometricField<Type, fvsPatchField, surfaceMesh>& resF = tresF();
+    GeometricField<Type, fvsPatchField, surfaceMesh>& resF = tresF.ref();
 
 
     // 2. Change the fvsPatchFields to the correct type using a mapper
     //  constructor (with reference to the now correct internal field)
 
     typename GeometricField<Type, fvsPatchField, surfaceMesh>::
-        GeometricBoundaryField& bf = resF.boundaryField();
+        Boundary& bf = resF.boundaryFieldRef();
 
     forAll(boundaryAddressing_, patchi)
     {
@@ -266,7 +266,7 @@ Foam::fvFieldDecomposer::decomposeField
                 (
                     field.boundaryField()[boundaryAddressing_[patchi]],
                     procMesh_.boundary()[patchi],
-                    resF.dimensionedInternalField(),
+                    resF(),
                     *patchFieldDecomposerPtrs_[patchi]
                 )
             );
@@ -279,7 +279,7 @@ Foam::fvFieldDecomposer::decomposeField
                 new processorCyclicFvsPatchField<Type>
                 (
                     procMesh_.boundary()[patchi],
-                    resF.dimensionedInternalField(),
+                    resF(),
                     Field<Type>
                     (
                         allFaceField,
@@ -296,7 +296,7 @@ Foam::fvFieldDecomposer::decomposeField
                 new processorFvsPatchField<Type>
                 (
                     procMesh_.boundary()[patchi],
-                    resF.dimensionedInternalField(),
+                    resF(),
                     Field<Type>
                     (
                         allFaceField,
@@ -307,7 +307,7 @@ Foam::fvFieldDecomposer::decomposeField
         }
         else
         {
-            FatalErrorIn("fvFieldDecomposer::decomposeField()")
+            FatalErrorInFunction
                 << "Unknown type." << abort(FatalError);
         }
     }
@@ -323,9 +323,9 @@ void Foam::fvFieldDecomposer::decomposeFields
     const PtrList<GeoField>& fields
 ) const
 {
-    forAll(fields, fieldI)
+    forAll(fields, fieldi)
     {
-        decomposeField(fields[fieldI])().write();
+        decomposeField(fields[fieldi])().write();
     }
 }
 

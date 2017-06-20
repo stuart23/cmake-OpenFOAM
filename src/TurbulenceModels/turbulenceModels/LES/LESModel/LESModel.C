@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -80,6 +80,28 @@ Foam::LESModel<BasicTurbulenceModel>::LESModel
         )
     ),
 
+    epsilonMin_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "epsilonMin",
+            LESDict_,
+            kMin_.dimensions()/dimTime,
+            SMALL
+        )
+    ),
+
+    omegaMin_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "omegaMin",
+            LESDict_,
+            dimless/dimTime,
+            SMALL
+        )
+    ),
+
     delta_
     (
         LESdelta::New
@@ -99,7 +121,7 @@ Foam::LESModel<BasicTurbulenceModel>::LESModel
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 
 template<class BasicTurbulenceModel>
-Foam::autoPtr<Foam::LESModel<BasicTurbulenceModel> >
+Foam::autoPtr<Foam::LESModel<BasicTurbulenceModel>>
 Foam::LESModel<BasicTurbulenceModel>::New
 (
     const alphaField& alpha,
@@ -136,17 +158,8 @@ Foam::LESModel<BasicTurbulenceModel>::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "LESModel::New"
-            "("
-                "const volScalarField&, "
-                "const volVectorField&, "
-                "const surfaceScalarField&, "
-                "transportModel&, "
-                "const word&"
-            ")"
-        )   << "Unknown LESModel type "
+        FatalErrorInFunction
+            << "Unknown LESModel type "
             << modelType << nl << nl
             << "Valid LESModel types:" << endl
             << dictionaryConstructorTablePtr_->sortedToc()

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -167,16 +167,16 @@ public:
             // Interpolators for continuous phase fields
 
                 //- Temperature field interpolator
-                autoPtr<interpolation<scalar> > TInterp_;
+                autoPtr<interpolation<scalar>> TInterp_;
 
                 //- Specific heat capacity field interpolator
-                autoPtr<interpolation<scalar> > CpInterp_;
+                autoPtr<interpolation<scalar>> CpInterp_;
 
                 //- Thermal conductivity field interpolator
-                autoPtr<interpolation<scalar> > kappaInterp_;
+                autoPtr<interpolation<scalar>> kappaInterp_;
 
                 //- Radiation field interpolator
-                autoPtr<interpolation<scalar> > GInterp_;
+                autoPtr<interpolation<scalar>> GInterp_;
 
 
     public:
@@ -251,7 +251,7 @@ protected:
         (
             TrackData& td,
             const scalar dt,           // timestep
-            const label cellI,         // owner cell
+            const label celli,         // owner cell
             const scalar Re,           // Reynolds number
             const scalar Pr,           // Prandtl number - surface
             const scalar kappa,        // Thermal conductivity - surface
@@ -286,8 +286,8 @@ public:
         (
             const polyMesh& mesh,
             const vector& position,
-            const label cellI,
-            const label tetFaceI,
+            const label celli,
+            const label tetFacei,
             const label tetPtI
         );
 
@@ -296,8 +296,8 @@ public:
         (
             const polyMesh& mesh,
             const vector& position,
-            const label cellI,
-            const label tetFaceI,
+            const label celli,
+            const label tetFacei,
             const label tetPtI,
             const label typeId,
             const scalar nParticle0,
@@ -349,9 +349,9 @@ public:
                 mesh_(mesh)
             {}
 
-            autoPtr<ThermoParcel<ParcelType> > operator()(Istream& is) const
+            autoPtr<ThermoParcel<ParcelType>> operator()(Istream& is) const
             {
-                return autoPtr<ThermoParcel<ParcelType> >
+                return autoPtr<ThermoParcel<ParcelType>>
                 (
                     new ThermoParcel<ParcelType>(mesh_, is, true)
                 );
@@ -396,7 +396,7 @@ public:
             (
                 TrackData& td,
                 const scalar dt,
-                const label cellI
+                const label celli
             );
 
             //- Correct cell values using latest transfer information
@@ -405,7 +405,7 @@ public:
             (
                 TrackData& td,
                 const scalar dt,
-                const label cellI
+                const label celli
             );
 
             //- Calculate surface thermo properties
@@ -413,7 +413,7 @@ public:
             void calcSurfaceValues
             (
                 TrackData& td,
-                const label cellI,
+                const label celli,
                 const scalar T,
                 scalar& Ts,
                 scalar& rhos,
@@ -428,7 +428,7 @@ public:
             (
                 TrackData& td,
                 const scalar dt,
-                const label cellI
+                const label celli
             );
 
 

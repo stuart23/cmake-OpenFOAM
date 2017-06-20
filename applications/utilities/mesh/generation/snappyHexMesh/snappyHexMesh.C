@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -32,9 +32,9 @@ Description
 #include "argList.H"
 #include "Time.H"
 #include "fvMesh.H"
-#include "autoRefineDriver.H"
-#include "autoSnapDriver.H"
-#include "autoLayerDriver.H"
+#include "snappyRefineDriver.H"
+#include "snappySnapDriver.H"
+#include "snappyLayerDriver.H"
 #include "searchableSurfaces.H"
 #include "refinementSurfaces.H"
 #include "refinementFeatures.H"
@@ -57,6 +57,7 @@ Description
 #include "MeshedSurface.H"
 #include "globalIndex.H"
 #include "IOmanip.H"
+#include "fvMeshTools.H"
 
 using namespace Foam;
 
@@ -106,11 +107,11 @@ autoPtr<refinementSurfaces> createRefinementSurfaces
     labelList globalMaxLevel(surfI, 0);
     labelList globalLevelIncr(surfI, 0);
     PtrList<dictionary> globalPatchInfo(surfI);
-    List<Map<label> > regionMinLevel(surfI);
-    List<Map<label> > regionMaxLevel(surfI);
-    List<Map<label> > regionLevelIncr(surfI);
-    List<Map<scalar> > regionAngle(surfI);
-    List<Map<autoPtr<dictionary> > > regionPatchInfo(surfI);
+    List<Map<label>> regionMinLevel(surfI);
+    List<Map<label>> regionMaxLevel(surfI);
+    List<Map<label>> regionLevelIncr(surfI);
+    List<Map<scalar>> regionAngle(surfI);
+    List<Map<autoPtr<dictionary>>> regionPatchInfo(surfI);
 
     HashSet<word> unmatchedKeys(surfacesDict.toc());
 
@@ -300,8 +301,8 @@ autoPtr<refinementSurfaces> createRefinementSurfaces
               + regionLevelIncr[surfI][iter.key()];
         }
 
-        const Map<autoPtr<dictionary> >& localInfo = regionPatchInfo[surfI];
-        forAllConstIter(Map<autoPtr<dictionary> >, localInfo, iter)
+        const Map<autoPtr<dictionary>>& localInfo = regionPatchInfo[surfI];
+        forAllConstIter(Map<autoPtr<dictionary>>, localInfo, iter)
         {
             label globalRegionI = regionOffset[surfI] + iter.key();
             patchInfo.set(globalRegionI, iter()().clone());
@@ -411,10 +412,10 @@ void extractSurface
     labelList patchToCompactZone(bMesh.size(), -1);
     forAllConstIter(HashTable<label>, compactZoneID, iter)
     {
-        label patchI = bMesh.findPatchID(iter.key());
-        if (patchI != -1)
+        label patchi = bMesh.findPatchID(iter.key());
+        if (patchi != -1)
         {
-            patchToCompactZone[patchI] = iter();
+            patchToCompactZone[patchi] = iter();
         }
     }
 
@@ -555,7 +556,7 @@ scalar getMergeDistance(const polyMesh& mesh, const scalar mergeTol)
 
         if (mergeTol < writeTol)
         {
-            FatalErrorIn("getMergeDistance(const polyMesh&, const dictionary&)")
+            FatalErrorInFunction
                 << "Your current settings specify ASCII writing with "
                 << IOstream::defaultPrecision() << " digits precision." << nl
                 << "Your merging tolerance (" << mergeTol
@@ -568,6 +569,73 @@ scalar getMergeDistance(const polyMesh& mesh, const scalar mergeTol)
     }
 
     return mergeDist;
+}
+
+
+void removeZeroSizedPatches(fvMesh& mesh)
+{
+    // Remove any zero-sized ones. Assumes
+    // - processor patches are already only there if needed
+    // - all other patches are available on all processors
+    // - but coupled ones might still be needed, even if zero-size
+    //   (e.g. processorCyclic)
+    // See also logic in createPatch.
+    const polyBoundaryMesh& pbm = mesh.boundaryMesh();
+
+    labelList oldToNew(pbm.size(), -1);
+    label newPatchi = 0;
+    forAll(pbm, patchi)
+    {
+        const polyPatch& pp = pbm[patchi];
+
+        if (!isA<processorPolyPatch>(pp))
+        {
+            if
+            (
+                isA<coupledPolyPatch>(pp)
+             || returnReduce(pp.size(), sumOp<label>())
+            )
+            {
+                // Coupled (and unknown size) or uncoupled and used
+                oldToNew[patchi] = newPatchi++;
+            }
+        }
+    }
+
+    forAll(pbm, patchi)
+    {
+        const polyPatch& pp = pbm[patchi];
+
+        if (isA<processorPolyPatch>(pp))
+        {
+            oldToNew[patchi] = newPatchi++;
+        }
+    }
+
+
+    const label nKeepPatches = newPatchi;
+
+    // Shuffle unused ones to end
+    if (nKeepPatches != pbm.size())
+    {
+        Info<< endl
+            << "Removing zero-sized patches:" << endl << incrIndent;
+
+        forAll(oldToNew, patchi)
+        {
+            if (oldToNew[patchi] == -1)
+            {
+                Info<< indent << pbm[patchi].name()
+                    << " type " << pbm[patchi].type()
+                    << " at position " << patchi << endl;
+                oldToNew[patchi] = newPatchi++;
+            }
+        }
+        Info<< decrIndent;
+
+        fvMeshTools::reorderPatches(mesh, oldToNew, nKeepPatches, true);
+        Info<< endl;
+    }
 }
 
 
@@ -684,7 +752,7 @@ int main(int argc, char *argv[])
 //                    runTime,
 //                    IOobject::NO_READ
 //                ),
-//                xferMove<Field<vector> >(bb.points()()),
+//                xferMove<Field<vector>>(bb.points()()),
 //                faces.xfer(),
 //                owner.xfer(),
 //                neighbour.xfer()
@@ -812,6 +880,8 @@ int main(int argc, char *argv[])
         readScalar(meshDict.lookup("mergeTolerance"))
     );
 
+    const Switch keepPatches(meshDict.lookupOrDefault("keepPatches", false));
+
 
 
     // Read decomposePar dictionary
@@ -868,9 +938,9 @@ int main(int argc, char *argv[])
     if (debugLevel > 0)
     {
         meshRefinement::debug   = debugLevel;
-        autoRefineDriver::debug = debugLevel;
-        autoSnapDriver::debug   = debugLevel;
-        autoLayerDriver::debug  = debugLevel;
+        snappyRefineDriver::debug = debugLevel;
+        snappySnapDriver::debug   = debugLevel;
+        snappyLayerDriver::debug  = debugLevel;
     }
 
     // Set file writing level
@@ -1045,7 +1115,7 @@ int main(int argc, char *argv[])
         (
             100.0,      // max size ratio
             1e-9,       // intersection tolerance
-            autoPtr<writer<scalar> >(new vtkSetWriter<scalar>()),
+            autoPtr<writer<scalar>>(new vtkSetWriter<scalar>()),
             0.01,       // min triangle quality
             true
         );
@@ -1164,11 +1234,11 @@ int main(int argc, char *argv[])
                 {
                     label globalRegionI = surfaces.globalRegion(surfI, i);
 
-                    label patchI;
+                    label patchi;
 
                     if (surfacePatchInfo.set(globalRegionI))
                     {
-                        patchI = meshRefiner.addMeshedPatch
+                        patchi = meshRefiner.addMeshedPatch
                         (
                             regNames[i],
                             surfacePatchInfo[globalRegionI]
@@ -1179,7 +1249,7 @@ int main(int argc, char *argv[])
                         dictionary patchInfo;
                         patchInfo.set("type", wallPolyPatch::typeName);
 
-                        patchI = meshRefiner.addMeshedPatch
+                        patchi = meshRefiner.addMeshedPatch
                         (
                             regNames[i],
                             patchInfo
@@ -1187,12 +1257,12 @@ int main(int argc, char *argv[])
                     }
 
                     Info<< setf(ios_base::left)
-                        << setw(6) << patchI
-                        << setw(20) << mesh.boundaryMesh()[patchI].type()
+                        << setw(6) << patchi
+                        << setw(20) << mesh.boundaryMesh()[patchi].type()
                         << setw(30) << regNames[i] << nl;
 
-                    globalToMasterPatch[globalRegionI] = patchI;
-                    globalToSlavePatch[globalRegionI] = patchI;
+                    globalToMasterPatch[globalRegionI] = patchi;
+                    globalToSlavePatch[globalRegionI] = patchi;
                 }
             }
             else
@@ -1204,11 +1274,11 @@ int main(int argc, char *argv[])
 
                     // Add master side patch
                     {
-                        label patchI;
+                        label patchi;
 
                         if (surfacePatchInfo.set(globalRegionI))
                         {
-                            patchI = meshRefiner.addMeshedPatch
+                            patchi = meshRefiner.addMeshedPatch
                             (
                                 regNames[i],
                                 surfacePatchInfo[globalRegionI]
@@ -1219,7 +1289,7 @@ int main(int argc, char *argv[])
                             dictionary patchInfo;
                             patchInfo.set("type", wallPolyPatch::typeName);
 
-                            patchI = meshRefiner.addMeshedPatch
+                            patchi = meshRefiner.addMeshedPatch
                             (
                                 regNames[i],
                                 patchInfo
@@ -1227,20 +1297,20 @@ int main(int argc, char *argv[])
                         }
 
                         Info<< setf(ios_base::left)
-                            << setw(6) << patchI
-                            << setw(20) << mesh.boundaryMesh()[patchI].type()
+                            << setw(6) << patchi
+                            << setw(20) << mesh.boundaryMesh()[patchi].type()
                             << setw(30) << regNames[i] << nl;
 
-                        globalToMasterPatch[globalRegionI] = patchI;
+                        globalToMasterPatch[globalRegionI] = patchi;
                     }
                     // Add slave side patch
                     {
                         const word slaveName = regNames[i] + "_slave";
-                        label patchI;
+                        label patchi;
 
                         if (surfacePatchInfo.set(globalRegionI))
                         {
-                            patchI = meshRefiner.addMeshedPatch
+                            patchi = meshRefiner.addMeshedPatch
                             (
                                 slaveName,
                                 surfacePatchInfo[globalRegionI]
@@ -1251,7 +1321,7 @@ int main(int argc, char *argv[])
                             dictionary patchInfo;
                             patchInfo.set("type", wallPolyPatch::typeName);
 
-                            patchI = meshRefiner.addMeshedPatch
+                            patchi = meshRefiner.addMeshedPatch
                             (
                                 slaveName,
                                 patchInfo
@@ -1259,11 +1329,11 @@ int main(int argc, char *argv[])
                         }
 
                         Info<< setf(ios_base::left)
-                            << setw(6) << patchI
-                            << setw(20) << mesh.boundaryMesh()[patchI].type()
+                            << setw(6) << patchi
+                            << setw(20) << mesh.boundaryMesh()[patchi].type()
                             << setw(30) << slaveName << nl;
 
-                        globalToSlavePatch[globalRegionI] = patchI;
+                        globalToSlavePatch[globalRegionI] = patchi;
                     }
                 }
             }
@@ -1290,7 +1360,7 @@ int main(int argc, char *argv[])
 
     if (Pstream::parRun() && !decomposer.parallelAware())
     {
-        FatalErrorIn(args.executable())
+        FatalErrorInFunction
             << "You have selected decomposition method "
             << decomposer.typeName
             << " which is not parallel aware." << endl
@@ -1326,7 +1396,7 @@ int main(int argc, char *argv[])
     {
         cpuTime timer;
 
-        autoRefineDriver refineDriver
+        snappyRefineDriver refineDriver
         (
             meshRefiner,
             decomposer,
@@ -1351,6 +1421,12 @@ int main(int argc, char *argv[])
             motionDict
         );
 
+
+        if (!keepPatches && !wantSnap && !wantLayers)
+        {
+            removeZeroSizedPatches(mesh);
+        }
+
         writeMesh
         (
             "Refined mesh",
@@ -1367,7 +1443,7 @@ int main(int argc, char *argv[])
     {
         cpuTime timer;
 
-        autoSnapDriver snapDriver
+        snappySnapDriver snapDriver
         (
             meshRefiner,
             globalToMasterPatch,
@@ -1392,6 +1468,11 @@ int main(int argc, char *argv[])
             snapParams
         );
 
+        if (!keepPatches && !wantLayers)
+        {
+            removeZeroSizedPatches(mesh);
+        }
+
         writeMesh
         (
             "Snapped mesh",
@@ -1408,7 +1489,7 @@ int main(int argc, char *argv[])
     {
         cpuTime timer;
 
-        autoLayerDriver layerDriver
+        snappyLayerDriver layerDriver
         (
             meshRefiner,
             globalToMasterPatch,
@@ -1437,6 +1518,11 @@ int main(int argc, char *argv[])
             decomposer,
             distributor
         );
+
+        if (!keepPatches)
+        {
+            removeZeroSizedPatches(mesh);
+        }
 
         writeMesh
         (
@@ -1491,13 +1577,13 @@ int main(int argc, char *argv[])
         }
         else
         {
-            forAll(bMesh, patchI)
+            forAll(bMesh, patchi)
             {
-                const polyPatch& patch = bMesh[patchI];
+                const polyPatch& patch = bMesh[patchi];
 
                 if (!isA<processorPolyPatch>(patch))
                 {
-                    includePatches.insert(patchI);
+                    includePatches.insert(patchi);
                 }
             }
         }

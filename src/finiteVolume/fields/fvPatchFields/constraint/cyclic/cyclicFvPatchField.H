@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -31,11 +31,10 @@ Description
     This boundary condition enforces a cyclic condition between a pair of
     boundaries.
 
-    \heading Patch usage
-
+Usage
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            cyclic;
     }
@@ -83,7 +82,7 @@ class cyclicFvPatchField
 
         //- Return neighbour side field given internal fields
         template<class Type2>
-        tmp<Field<Type2> > neighbourSideField
+        tmp<Field<Type2>> neighbourSideField
         (
             const Field<Type2>&
         ) const;
@@ -128,9 +127,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchField<Type>> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new cyclicFvPatchField<Type>(*this)
             );
@@ -144,12 +143,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchField<Type>> clone
         (
             const DimensionedField<Type, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new cyclicFvPatchField<Type>(*this, iF)
             );
@@ -170,7 +169,7 @@ public:
         // Evaluation functions
 
             //- Return neighbour coupled internal cell data
-            tmp<Field<Type> > patchNeighbourField() const;
+            tmp<Field<Type>> patchNeighbourField() const;
 
             //- Return reference to neighbour patchField
             const cyclicFvPatchField<Type>& neighbourPatchField() const;
@@ -236,7 +235,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "cyclicFvPatchField.C"
+    #include "cyclicFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

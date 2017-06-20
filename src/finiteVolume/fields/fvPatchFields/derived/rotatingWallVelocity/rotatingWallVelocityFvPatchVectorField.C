@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -39,24 +39,8 @@ rotatingWallVelocityFvPatchVectorField
 :
     fixedValueFvPatchField<vector>(p, iF),
     origin_(),
-    axis_(vector::zero),
+    axis_(Zero),
     omega_(0)
-{}
-
-
-Foam::rotatingWallVelocityFvPatchVectorField::
-rotatingWallVelocityFvPatchVectorField
-(
-    const rotatingWallVelocityFvPatchVectorField& ptf,
-    const fvPatch& p,
-    const DimensionedField<vector, volMesh>& iF,
-    const fvPatchFieldMapper& mapper
-)
-:
-    fixedValueFvPatchField<vector>(ptf, p, iF, mapper),
-    origin_(ptf.origin_),
-    axis_(ptf.axis_),
-    omega_(ptf.omega_().clone().ptr())
 {}
 
 
@@ -71,7 +55,7 @@ rotatingWallVelocityFvPatchVectorField
     fixedValueFvPatchField<vector>(p, iF),
     origin_(dict.lookup("origin")),
     axis_(dict.lookup("axis")),
-    omega_(DataEntry<scalar>::New("omega", dict))
+    omega_(Function1<scalar>::New("omega", dict))
 {
     if (dict.found("value"))
     {
@@ -91,13 +75,29 @@ rotatingWallVelocityFvPatchVectorField
 Foam::rotatingWallVelocityFvPatchVectorField::
 rotatingWallVelocityFvPatchVectorField
 (
+    const rotatingWallVelocityFvPatchVectorField& ptf,
+    const fvPatch& p,
+    const DimensionedField<vector, volMesh>& iF,
+    const fvPatchFieldMapper& mapper
+)
+:
+    fixedValueFvPatchField<vector>(ptf, p, iF, mapper),
+    origin_(ptf.origin_),
+    axis_(ptf.axis_),
+    omega_(ptf.omega_, false)
+{}
+
+
+Foam::rotatingWallVelocityFvPatchVectorField::
+rotatingWallVelocityFvPatchVectorField
+(
     const rotatingWallVelocityFvPatchVectorField& rwvpvf
 )
 :
     fixedValueFvPatchField<vector>(rwvpvf),
     origin_(rwvpvf.origin_),
     axis_(rwvpvf.axis_),
-    omega_(rwvpvf.omega_().clone().ptr())
+    omega_(rwvpvf.omega_, false)
 {}
 
 
@@ -111,7 +111,7 @@ rotatingWallVelocityFvPatchVectorField
     fixedValueFvPatchField<vector>(rwvpvf, iF),
     origin_(rwvpvf.origin_),
     axis_(rwvpvf.axis_),
-    omega_(rwvpvf.omega_().clone().ptr())
+    omega_(rwvpvf.omega_, false)
 {}
 
 

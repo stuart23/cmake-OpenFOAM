@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,59 +30,42 @@ using namespace Foam::constant::mathematical;
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-namespace Foam
+template<>
+const char* const Foam::tensor::vsType::typeName = "tensor";
+
+template<>
+const char* const Foam::tensor::vsType::componentNames[] =
 {
-    template<>
-    const char* const tensor::typeName = "tensor";
+    "xx", "xy", "xz",
+    "yx", "yy", "yz",
+    "zx", "zy", "zz"
+};
 
-    template<>
-    const char* tensor::componentNames[] =
-    {
-        "xx", "xy", "xz",
-        "yx", "yy", "yz",
-        "zx", "zy", "zz"
-    };
+template<>
+const Foam::tensor Foam::tensor::vsType::zero(tensor::uniform(0));
 
-    template<>
-    const tensor tensor::zero
-    (
-        0, 0, 0,
-        0, 0, 0,
-        0, 0, 0
-    );
+template<>
+const Foam::tensor Foam::tensor::vsType::one(tensor::uniform(1));
 
-    template<>
-    const tensor tensor::one
-    (
-        1, 1, 1,
-        1, 1, 1,
-        1, 1, 1
-    );
+template<>
+const Foam::tensor Foam::tensor::vsType::max(tensor::uniform(VGREAT));
 
-    template<>
-    const tensor tensor::max
-    (
-        VGREAT, VGREAT, VGREAT,
-        VGREAT, VGREAT, VGREAT,
-        VGREAT, VGREAT, VGREAT
-    );
+template<>
+const Foam::tensor Foam::tensor::vsType::min(tensor::uniform(-VGREAT));
 
-    template<>
-    const tensor tensor::min
-    (
-        -VGREAT, -VGREAT, -VGREAT,
-        -VGREAT, -VGREAT, -VGREAT,
-        -VGREAT, -VGREAT, -VGREAT
-    );
+template<>
+const Foam::tensor Foam::tensor::vsType::rootMax(tensor::uniform(ROOTVGREAT));
 
-    template<>
-    const tensor tensor::I
-    (
-        1, 0, 0,
-        0, 1, 0,
-        0, 0, 1
-    );
-}
+template<>
+const Foam::tensor Foam::tensor::vsType::rootMin(tensor::uniform(-ROOTVGREAT));
+
+template<>
+const Foam::tensor Foam::tensor::I
+(
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 1
+);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -140,7 +123,7 @@ Foam::vector Foam::eigenValues(const tensor& t)
         }
 
         // Two identical roots and one distinct root
-        else if (mag(PPP/QQ - 1) < SMALL)
+        else if (mag(QQ) > SMALL && mag(PPP/QQ - 1) < SMALL)
         {
             scalar sqrtP = sqrt(P);
             scalar signQ = sign(Q);
@@ -165,7 +148,7 @@ Foam::vector Foam::eigenValues(const tensor& t)
         // based on the above logic, PPP must be less than QQ
         else
         {
-            WarningIn("eigenValues(const tensor&)")
+            WarningInFunction
                 << "complex eigenvalues detected for tensor: " << t
                 << endl;
 

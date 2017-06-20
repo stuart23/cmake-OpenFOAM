@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2014-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2014-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -27,6 +27,7 @@ License
 #include "phasePair.H"
 #include "fvcGrad.H"
 #include "surfaceInterpolate.H"
+#include "zeroGradientFvPatchFields.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -66,7 +67,7 @@ Foam::dragModels::segregated::~segregated()
 
 Foam::tmp<Foam::volScalarField> Foam::dragModels::segregated::CdRe() const
 {
-    FatalErrorIn("Foam::dragModels::segregated::CdRe() const")
+    FatalErrorInFunction
         << "Not implemented."
         << "Drag coefficient not defined for the segregated model."
         << exit(FatalError);
@@ -103,7 +104,7 @@ Foam::tmp<Foam::volScalarField> Foam::dragModels::segregated::K() const
         dimensionedScalar("L", dimLength, 0),
         zeroGradientFvPatchField<scalar>::typeName
     );
-    L.internalField() = cbrt(mesh.V());
+    L.primitiveFieldRef() = cbrt(mesh.V());
     L.correctBoundaryConditions();
 
     volScalarField I

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -130,7 +130,7 @@ kappa() const
 
         case UNDEFINED:
         {
-            FatalErrorIn("energyRegionCoupledFvPatchScalarField::kappa() const")
+            FatalErrorInFunction
                     << " on mesh " << this->db().name() << " patch "
                     << patch().name()
                     << " could not find a method in. Methods are:  "
@@ -190,14 +190,14 @@ weights() const
     const scalarField nbrAlphaDelta(nbrAlpha/nbrDeltas);
 
     tmp<scalarField> tw(new scalarField(deltas.size()));
-    scalarField& w = tw();
+    scalarField& w = tw.ref();
 
-    forAll(alphaDelta, faceI)
+    forAll(alphaDelta, facei)
     {
-        scalar di = alphaDelta[faceI];
-        scalar dni = nbrAlphaDelta[faceI];
+        scalar di = alphaDelta[facei];
+        scalar dni = nbrAlphaDelta[facei];
 
-        w[faceI] = di/(di + dni);
+        w[facei] = di/(di + dni);
     }
 
     return tw;
@@ -255,20 +255,11 @@ energyRegionCoupledFvPatchScalarField
 
     if (!isA<regionCoupledBase>(this->patch().patch()))
     {
-        FatalErrorIn
-        (
-            "energyRegionCoupledFvPatchScalarField::"
-            "energyRegionCoupledFvPatchScalarField\n"
-            "(\n"
-            "    const fvPatch& p,\n"
-            "    const DimensionedField<scalar, volMesh>& iF,\n"
-            "    const dictionary& dict\n"
-            ")\n"
-        )   << "\n    patch type '" << p.type()
+        FatalErrorInFunction
             << "' not type '" << regionCoupledBase::typeName << "'"
             << "\n    for patch " << p.name()
-            << " of field " << dimensionedInternalField().name()
-            << " in file " << dimensionedInternalField().objectPath()
+            << " of field " << internalField().name()
+            << " in file " << internalField().objectPath()
             << exit(FatalError);
     }
 }
@@ -308,7 +299,6 @@ energyRegionCoupledFvPatchScalarField
 Foam::tmp<Foam::scalarField> Foam::energyRegionCoupledFvPatchScalarField::
 snGrad() const
 {
-    Debug("snGrad");
     return
         regionCoupledPatch_.patch().deltaCoeffs()
        *(*this - patchInternalField());
@@ -318,7 +308,6 @@ snGrad() const
 Foam::tmp<Foam::scalarField> Foam::energyRegionCoupledFvPatchScalarField::
 snGrad(const scalarField&) const
 {
-    Debug("snGrad");
     return snGrad();
 }
 
@@ -353,7 +342,7 @@ void Foam::energyRegionCoupledFvPatchScalarField::evaluate
 }
 
 
-Foam::tmp<Foam::Field<Foam::scalar> >
+Foam::tmp<Foam::Field<Foam::scalar>>
 Foam::energyRegionCoupledFvPatchScalarField::
 patchNeighbourField() const
 {
@@ -365,7 +354,7 @@ patchNeighbourField() const
 
     const scalarField nbrIntT
     (
-        nbrThermoPtr_->T().internalField(), nbrFaceCells
+        nbrThermoPtr_->T().primitiveField(), nbrFaceCells
     );
 
     scalarField intNbrT
@@ -390,7 +379,7 @@ patchNeighbourTemperatureField() const
 
     const scalarField nbrIntT
     (
-        nbrThermoPtr_->T().internalField(), nbrFaceCells
+        nbrThermoPtr_->T().primitiveField(), nbrFaceCells
     );
 
      tmp<scalarField> tintNbrT =
@@ -407,7 +396,7 @@ patchInternalTemperatureField() const
 
     tmp<scalarField> tintT
     (
-        new scalarField(thermoPtr_->T().internalField(), faceCells)
+        new scalarField(thermoPtr_->T().primitiveField(), faceCells)
     );
 
     return tintT;
@@ -427,7 +416,7 @@ void Foam::energyRegionCoupledFvPatchScalarField::updateInterfaceMatrix
 
     scalarField myHE(this->size());
 
-    if (&psiInternal == &internalField())
+    if (&psiInternal == &primitiveField())
     {
         label patchi = this->patch().index();
         const scalarField& pp =  thermoPtr_->p().boundaryField()[patchi];
@@ -463,15 +452,7 @@ void Foam::energyRegionCoupledFvPatchScalarField::updateInterfaceMatrix
     const Pstream::commsTypes
 ) const
 {
-    notImplemented
-    (
-        "energyRegionCoupledFvPatchScalarField::updateInterfaceMatrix()"
-        "("
-        "Field<scalar>& "
-        "const Field<scalar>&"
-        "const scalarField& "
-        "const Pstream::commsTypes"
-    );
+    NotImplemented;
 }
 
 

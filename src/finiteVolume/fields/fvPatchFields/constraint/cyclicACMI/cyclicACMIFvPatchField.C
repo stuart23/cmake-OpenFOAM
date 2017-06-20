@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -56,20 +56,11 @@ Foam::cyclicACMIFvPatchField<Type>::cyclicACMIFvPatchField
 {
     if (!isA<cyclicACMIFvPatch>(this->patch()))
     {
-        FatalErrorIn
-        (
-            "cyclicACMIFvPatchField<Type>::cyclicACMIFvPatchField"
-            "("
-                "const cyclicACMIFvPatchField<Type>& ,"
-                "const fvPatch&, "
-                "const DimensionedField<Type, volMesh>&, "
-                "const fvPatchFieldMapper&"
-            ")"
-        )   << "    patch type '" << p.type()
+        FatalErrorInFunction
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
             << exit(FatalIOError);
     }
 }
@@ -89,20 +80,14 @@ Foam::cyclicACMIFvPatchField<Type>::cyclicACMIFvPatchField
 {
     if (!isA<cyclicACMIFvPatch>(p))
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "cyclicACMIFvPatchField<Type>::cyclicACMIFvPatchField"
-            "("
-                "const fvPatch&, "
-                "const DimensionedField<Type, volMesh>&, "
-                "const dictionary&"
-            ")",
             dict
         )   << "    patch type '" << p.type()
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
             << exit(FatalIOError);
     }
 
@@ -148,33 +133,26 @@ bool Foam::cyclicACMIFvPatchField<Type>::coupled() const
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::cyclicACMIFvPatchField<Type>::patchNeighbourField() const
 {
-    const Field<Type>& iField = this->internalField();
-    const labelUList& nbrFaceCellsCoupled =
-        cyclicACMIPatch_.cyclicACMIPatch().neighbPatch().faceCells();
-    const labelUList& faceCellsNonOverlap =
-        cyclicACMIPatch_.cyclicACMIPatch().nonOverlapPatch().faceCells();
-
-    Field<Type> pnfCoupled(iField, nbrFaceCellsCoupled);
-    Field<Type> pfNonOverlap(iField, faceCellsNonOverlap);
-
-    tmp<Field<Type> > tpnf
+    const Field<Type>& iField = this->primitiveField();
+    const cyclicACMIPolyPatch& cpp = cyclicACMIPatch_.cyclicACMIPatch();
+    tmp<Field<Type>> tpnf
     (
-        new Field<Type>
+        cyclicACMIPatch_.interpolate
         (
-            cyclicACMIPatch_.interpolate
+            Field<Type>
             (
-                pnfCoupled,
-                pfNonOverlap
+                iField,
+                cpp.neighbPatch().faceCells()
             )
         )
     );
 
     if (doTransform())
     {
-        tpnf() = transform(forwardT(), tpnf());
+        tpnf.ref() = transform(forwardT(), tpnf());
     }
 
     return tpnf;
@@ -188,10 +166,10 @@ Foam::cyclicACMIFvPatchField<Type>::neighbourPatchField() const
     const GeometricField<Type, fvPatchField, volMesh>& fld =
         static_cast<const GeometricField<Type, fvPatchField, volMesh>&>
         (
-            this->internalField()
+            this->primitiveField()
         );
 
-    return refCast<const cyclicACMIFvPatchField<Type> >
+    return refCast<const cyclicACMIFvPatchField<Type>>
     (
         fld.boundaryField()[cyclicACMIPatch_.neighbPatchID()]
     );
@@ -205,7 +183,7 @@ Foam::cyclicACMIFvPatchField<Type>::nonOverlapPatchField() const
     const GeometricField<Type, fvPatchField, volMesh>& fld =
         static_cast<const GeometricField<Type, fvPatchField, volMesh>&>
         (
-            this->internalField()
+            this->primitiveField()
         );
 
     return fld.boundaryField()[cyclicACMIPatch_.nonOverlapPatchID()];
@@ -222,10 +200,12 @@ void Foam::cyclicACMIFvPatchField<Type>::updateInterfaceMatrix
     const Pstream::commsTypes
 ) const
 {
+    const cyclicACMIPolyPatch& cpp = cyclicACMIPatch_.cyclicACMIPatch();
+
     // note: only applying coupled contribution
 
     const labelUList& nbrFaceCellsCoupled =
-        cyclicACMIPatch_.cyclicACMIPatch().neighbPatch().faceCells();
+        cpp.neighbPatch().faceCells();
 
     scalarField pnf(psiInternal, nbrFaceCellsCoupled);
 
@@ -252,10 +232,11 @@ void Foam::cyclicACMIFvPatchField<Type>::updateInterfaceMatrix
     const Pstream::commsTypes
 ) const
 {
+    const cyclicACMIPolyPatch& cpp = cyclicACMIPatch_.cyclicACMIPatch();
+
     // note: only applying coupled contribution
 
-    const labelUList& nbrFaceCellsCoupled =
-        cyclicACMIPatch_.cyclicACMIPatch().neighbPatch().faceCells();
+    const labelUList& nbrFaceCellsCoupled = cpp.neighbPatch().faceCells();
 
     Field<Type> pnf(psiInternal, nbrFaceCellsCoupled);
 
@@ -274,149 +255,6 @@ void Foam::cyclicACMIFvPatchField<Type>::updateInterfaceMatrix
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> > Foam::cyclicACMIFvPatchField<Type>::snGrad
-(
-    const scalarField& deltaCoeffs
-) const
-{
-    // note: only applying coupled contribution
-    return coupledFvPatchField<Type>::snGrad(deltaCoeffs);
-}
-
-
-template<class Type>
-void Foam::cyclicACMIFvPatchField<Type>::updateCoeffs()
-{
-    // update non-overlap patch - some will implement updateCoeffs, and
-    // others will implement evaluate
-
-    // scale neighbour field by (1 - mask)
-
-    const scalarField& mask = cyclicACMIPatch_.cyclicACMIPatch().mask();
-    const fvPatchField<Type>& npf = nonOverlapPatchField();
-    const_cast<fvPatchField<Type>&>(npf).updateCoeffs(1.0 - mask);
-}
-
-
-template<class Type>
-void Foam::cyclicACMIFvPatchField<Type>::initEvaluate
-(
-    const Pstream::commsTypes comms
-)
-{
-    // update non-overlap patch (if not already updated by updateCoeffs)
-
-    // scale neighbour field by (1 - mask)
-
-    fvPatchField<Type>& npf =
-        const_cast<fvPatchField<Type>&>(nonOverlapPatchField());
-
-    if (!npf.updated())
-    {
-        const scalarField& mask = cyclicACMIPatch_.cyclicACMIPatch().mask();
-
-        npf.evaluate(comms);
-
-        npf *= 1.0 - mask;
-    }
-}
-
-
-template<class Type>
-void Foam::cyclicACMIFvPatchField<Type>::evaluate
-(
-    const Pstream::commsTypes comms
-)
-{
-    // blend contributions from the coupled and non-overlap patches
-
-    // neighbour patch field is updated via updateCoeffs or initEvaluate
-    // and is already scaled by (1 - mask)
-    const fvPatchField<Type>& npf = nonOverlapPatchField();
-
-    coupledFvPatchField<Type>::evaluate(comms);
-    const Field<Type>& cpf = *this;
-
-    const scalarField& mask = cyclicACMIPatch_.cyclicACMIPatch().mask();
-    Field<Type>::operator=(mask*cpf + npf);
-
-    fvPatchField<Type>::evaluate();
-}
-
-
-template<class Type>
-Foam::tmp<Foam::Field<Type> >
-Foam::cyclicACMIFvPatchField<Type>::valueInternalCoeffs
-(
-    const tmp<scalarField>& w
-) const
-{
-    // note: do not blend based on mask field
-    // - when applied this is scaled by the areas which are already scaled
-    return coupledFvPatchField<Type>::valueInternalCoeffs(w);
-}
-
-
-template<class Type>
-Foam::tmp<Foam::Field<Type> >
-Foam::cyclicACMIFvPatchField<Type>::valueBoundaryCoeffs
-(
-    const tmp<scalarField>& w
-) const
-{
-    // note: do not blend based on mask field
-    // - when applied this is scaled by the areas which are already scaled
-    return coupledFvPatchField<Type>::valueBoundaryCoeffs(w);
-}
-
-
-template<class Type>
-Foam::tmp<Foam::Field<Type> >
-Foam::cyclicACMIFvPatchField<Type>::gradientInternalCoeffs
-(
-    const scalarField& deltaCoeffs
-) const
-{
-    // note: do not blend based on mask field
-    // - when applied this is scaled by the areas which are already scaled
-    return coupledFvPatchField<Type>::gradientInternalCoeffs(deltaCoeffs);
-}
-
-
-template<class Type>
-Foam::tmp<Foam::Field<Type> >
-Foam::cyclicACMIFvPatchField<Type>::gradientInternalCoeffs() const
-{
-    // note: do not blend based on mask field
-    // - when applied this is scaled by the areas which are already scaled
-    return coupledFvPatchField<Type>::gradientInternalCoeffs();
-}
-
-
-template<class Type>
-Foam::tmp<Foam::Field<Type> >
-Foam::cyclicACMIFvPatchField<Type>::gradientBoundaryCoeffs
-(
-    const scalarField& deltaCoeffs
-) const
-{
-    // note: do not blend based on mask field
-    // - when applied this is scaled by the areas which are already scaled
-    return coupledFvPatchField<Type>::gradientBoundaryCoeffs(deltaCoeffs);
-}
-
-
-template<class Type>
-Foam::tmp<Foam::Field<Type> >
-Foam::cyclicACMIFvPatchField<Type>::gradientBoundaryCoeffs() const
-{
-    // note: do not blend based on mask field
-    // - when applied this is scaled by the areas which are already scaled
-    return coupledFvPatchField<Type>::gradientBoundaryCoeffs();
-}
-
-
-template<class Type>
 void Foam::cyclicACMIFvPatchField<Type>::manipulateMatrix
 (
     fvMatrix<Type>& matrix
@@ -429,6 +267,21 @@ void Foam::cyclicACMIFvPatchField<Type>::manipulateMatrix
     const fvPatchField<Type>& npf = nonOverlapPatchField();
 
     const_cast<fvPatchField<Type>&>(npf).manipulateMatrix(matrix, 1.0 - mask);
+}
+
+
+template<class Type>
+void Foam::cyclicACMIFvPatchField<Type>::updateCoeffs()
+{
+    // Update non-overlap patch - some will implement updateCoeffs, and
+    // others will implement evaluate
+
+    // Pass in (1 - mask) to give non-overlap patch the chance to do
+    // manipulation of non-face based data
+
+    const scalarField& mask = cyclicACMIPatch_.cyclicACMIPatch().mask();
+    const fvPatchField<Type>& npf = nonOverlapPatchField();
+    const_cast<fvPatchField<Type>&>(npf).updateWeightedCoeffs(1.0 - mask);
 }
 
 

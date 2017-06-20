@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -34,7 +34,7 @@ Foam::CloudFunctionObjectList<CloudType>::CloudFunctionObjectList
     CloudType& owner
 )
 :
-    PtrList<CloudFunctionObject<CloudType> >(),
+    PtrList<CloudFunctionObject<CloudType>>(),
     owner_(owner),
     dict_(dictionary::null)
 {}
@@ -48,7 +48,7 @@ Foam::CloudFunctionObjectList<CloudType>::CloudFunctionObjectList
     const bool readFields
 )
 :
-    PtrList<CloudFunctionObject<CloudType> >(),
+    PtrList<CloudFunctionObject<CloudType>>(),
     owner_(owner),
     dict_(dict)
 {
@@ -98,7 +98,7 @@ Foam::CloudFunctionObjectList<CloudType>::CloudFunctionObjectList
     const CloudFunctionObjectList& cfol
 )
 :
-    PtrList<CloudFunctionObject<CloudType> >(cfol),
+    PtrList<CloudFunctionObject<CloudType>>(cfol),
     owner_(cfol.owner_),
     dict_(cfol.dict_)
 {}
@@ -137,7 +137,7 @@ template<class CloudType>
 void Foam::CloudFunctionObjectList<CloudType>::postMove
 (
     typename CloudType::parcelType& p,
-    const label cellI,
+    const label celli,
     const scalar dt,
     const point& position0,
     bool& keepParticle
@@ -145,7 +145,7 @@ void Foam::CloudFunctionObjectList<CloudType>::postMove
 {
     forAll(*this, i)
     {
-        this->operator[](i).postMove(p, cellI, dt, position0, keepParticle);
+        this->operator[](i).postMove(p, celli, dt, position0, keepParticle);
 
         if (!keepParticle)
         {
@@ -188,13 +188,13 @@ template<class CloudType>
 void Foam::CloudFunctionObjectList<CloudType>::postFace
 (
     const typename CloudType::parcelType& p,
-    const label faceI,
+    const label facei,
     bool& keepParticle
 )
 {
     forAll(*this, i)
     {
-        this->operator[](i).postFace(p, faceI, keepParticle);
+        this->operator[](i).postFace(p, facei, keepParticle);
 
         if (!keepParticle)
         {

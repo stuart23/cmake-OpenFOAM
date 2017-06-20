@@ -97,7 +97,7 @@
 
         phiHbyAs[phasei] =
         (
-            (fvc::interpolate(HbyAs[phasei]) & mesh.Sf())
+            fvc::flux(HbyAs[phasei])
           + rAlphaAUfs[phasei]*fvc::ddtCorr(phase.U(), phase.phi())
         );
         MRF.makeRelative(phiHbyAs[phasei]);
@@ -187,7 +187,7 @@
 
     // Update the fixedFluxPressure BCs to ensure flux consistency
     {
-        surfaceScalarField::GeometricBoundaryField phib(phi.boundaryField());
+        surfaceScalarField::Boundary phib(phi.boundaryField());
         phib = 0;
         phasei = 0;
         forAllIter(PtrDictionary<phaseModel>, fluid.phases(), iter)
@@ -203,7 +203,7 @@
 
         setSnGrad<fixedFluxPressureFvPatchScalarField>
         (
-            p_rgh.boundaryField(),
+            p_rgh.boundaryFieldRef(),
             (
                 phiHbyA.boundaryField() - MRF.relative(phib)
             )/(mesh.magSf().boundaryField()*rAUf.boundaryField())
@@ -264,7 +264,7 @@
 
             mSfGradp = pEqnIncomp.flux()/rAUf;
 
-            U = dimensionedVector("U", dimVelocity, vector::zero);
+            U = dimensionedVector("U", dimVelocity, Zero);
 
             phasei = 0;
             forAllIter(PtrDictionary<phaseModel>, fluid.phases(), iter)

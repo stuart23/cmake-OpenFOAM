@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,7 +25,23 @@ Class
     Foam::ptscotchDecomp
 
 Description
-    PTScotch domain decomposition
+    PTScotch domain decomposition.
+    For the main details about how to define the strategies, see scotchDecomp.
+
+    Nonetheless, when decomposing in parallel, using <tt>writeGraph=true</tt>
+    will write out \c .dgr files for debugging. For example, use these files
+    with \c dgpart as follows:
+
+    \verbatim
+    mpirun -np 4 dgpart 2 'region0_%r.dgr'
+    \endverbatim
+
+    where:
+      - %r gets replaced by current processor rank
+      - it will decompose into 2 domains
+
+See also
+    Foam::scotchDecomp
 
 SourceFiles
     ptscotchDecomp.C
@@ -49,13 +65,6 @@ class ptscotchDecomp
     public decompositionMethod
 {
     // Private Member Functions
-
-        //- Insert list in front of list.
-        template<class Type>
-        static void prepend(const UList<Type>&, List<Type>&);
-        //- Insert list at end of list.
-        template<class Type>
-        static void append(const UList<Type>&, List<Type>&);
 
         //- Check and print error message
         static void check(const int, const char*);
@@ -157,12 +166,6 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#ifdef NoRepository
-#   include "ptscotchDecompTemplates.C"
-#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

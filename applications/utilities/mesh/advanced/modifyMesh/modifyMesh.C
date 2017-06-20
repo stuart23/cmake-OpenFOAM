@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -79,9 +79,9 @@ label findPoint(const primitivePatch& pp, const point& nearPoint)
 
     forAll(meshPoints, i)
     {
-        label pointI = meshPoints[i];
+        label pointi = meshPoints[i];
 
-        scalar distSqr = magSqr(nearPoint - points[pointI]);
+        scalar distSqr = magSqr(nearPoint - points[pointi]);
 
         if (distSqr < minDistSqr)
         {
@@ -89,12 +89,12 @@ label findPoint(const primitivePatch& pp, const point& nearPoint)
             almostMinI = minI;
 
             minDistSqr = distSqr;
-            minI = pointI;
+            minI = pointi;
         }
         else if (distSqr < almostMinDistSqr)
         {
             almostMinDistSqr = distSqr;
-            almostMinI = pointI;
+            almostMinI = pointi;
         }
     }
 
@@ -223,9 +223,9 @@ label findFace
     scalar almostMinDist = GREAT;
     label almostMinI = -1;
 
-    forAll(pp, patchFaceI)
+    forAll(pp, patchFacei)
     {
-        pointHit pHit(pp[patchFaceI].nearestPoint(nearPoint, points));
+        pointHit pHit(pp[patchFacei].nearestPoint(nearPoint, points));
 
         if (pHit.hit())
         {
@@ -235,12 +235,12 @@ label findFace
                 almostMinI = minI;
 
                 minDist = pHit.distance();
-                minI = patchFaceI + mesh.nInternalFaces();
+                minI = patchFacei + mesh.nInternalFaces();
             }
             else if (pHit.distance() < almostMinDist)
             {
                 almostMinDist = pHit.distance();
-                almostMinI = patchFaceI + mesh.nInternalFaces();
+                almostMinI = patchFacei + mesh.nInternalFaces();
             }
         }
     }
@@ -279,35 +279,35 @@ label findFace
 // Find cell with cell centre close to given point.
 label findCell(const primitiveMesh& mesh, const point& nearPoint)
 {
-    label cellI = mesh.findCell(nearPoint);
+    label celli = mesh.findCell(nearPoint);
 
-    if (cellI != -1)
+    if (celli != -1)
     {
-        scalar distToCcSqr = magSqr(nearPoint - mesh.cellCentres()[cellI]);
+        scalar distToCcSqr = magSqr(nearPoint - mesh.cellCentres()[celli]);
 
-        const labelList& cPoints = mesh.cellPoints()[cellI];
+        const labelList& cPoints = mesh.cellPoints()[celli];
 
         label minI = -1;
         scalar minDistSqr = GREAT;
 
         forAll(cPoints, i)
         {
-            label pointI = cPoints[i];
+            label pointi = cPoints[i];
 
-            scalar distSqr = magSqr(nearPoint - mesh.points()[pointI]);
+            scalar distSqr = magSqr(nearPoint - mesh.points()[pointi]);
 
             if (distSqr < minDistSqr)
             {
                 minDistSqr = distSqr;
-                minI = pointI;
+                minI = pointi;
             }
         }
 
         // Decide if nearPoint unique enough.
         Info<< "Found to point " << nearPoint << nl
-            << "    nearest cell       : " << cellI
+            << "    nearest cell       : " << celli
             << " distance " << Foam::sqrt(distToCcSqr)
-            << " to cell centre " << mesh.cellCentres()[cellI] << nl
+            << " to cell centre " << mesh.cellCentres()[celli] << nl
             << "    nearest mesh point : " << minI
             << " distance " << Foam::sqrt(minDistSqr)
             << " to " << mesh.points()[minI] << nl
@@ -318,11 +318,11 @@ label findCell(const primitiveMesh& mesh, const point& nearPoint)
             Info<< "Mesh point too close to nearest cell centre. Aborting"
                 << endl;
 
-            cellI = -1;
+            celli = -1;
         }
     }
 
-    return cellI;
+    return celli;
 }
 
 
@@ -355,9 +355,9 @@ int main(int argc, char *argv[])
     );
 
     // Read all from the dictionary.
-    List<Pair<point> > pointsToMove(dict.lookup("pointsToMove"));
-    List<Pair<point> > edgesToSplit(dict.lookup("edgesToSplit"));
-    List<Pair<point> > facesToTriangulate
+    List<Pair<point>> pointsToMove(dict.lookup("pointsToMove"));
+    List<Pair<point>> edgesToSplit(dict.lookup("edgesToSplit"));
+    List<Pair<point>> facesToTriangulate
     (
         dict.lookup("facesToTriangulate")
     );
@@ -369,15 +369,15 @@ int main(int argc, char *argv[])
      || facesToTriangulate.size()
     );
 
-    List<Pair<point> > edgesToCollapse(dict.lookup("edgesToCollapse"));
+    List<Pair<point>> edgesToCollapse(dict.lookup("edgesToCollapse"));
 
     bool collapseEdge = edgesToCollapse.size();
 
-    List<Pair<point> > cellsToPyramidise(dict.lookup("cellsToSplit"));
+    List<Pair<point>> cellsToPyramidise(dict.lookup("cellsToSplit"));
 
     bool cellsToSplit = cellsToPyramidise.size();
 
-    // List<Tuple2<pointField,point> >
+    // List<Tuple2<pointField,point>>
     //     cellsToCreate(dict.lookup("cellsToCreate"));
 
     Info<< "Read from " << dict.name() << nl
@@ -399,7 +399,7 @@ int main(int argc, char *argv[])
      || (collapseEdge && cellsToSplit)
     )
     {
-        FatalErrorIn(args.executable())
+        FatalErrorInFunction
             << "Used more than one mesh modifying module "
             << "(boundary cutting, cell splitting, edge collapsing)" << nl
             << "Please do them in separate passes." << exit(FatalError);
@@ -429,11 +429,11 @@ int main(int argc, char *argv[])
     {
         const Pair<point>& pts = pointsToMove[i];
 
-        label pointI = findPoint(allBoundary, pts.first());
+        label pointi = findPoint(allBoundary, pts.first());
 
-        if (pointI == -1 || !pointToPos.insert(pointI, pts.second()))
+        if (pointi == -1 || !pointToPos.insert(pointi, pts.second()))
         {
-            Info<< "Could not insert mesh point " << pointI
+            Info<< "Could not insert mesh point " << pointi
                 << " for input point " << pts.first() << nl
                 << "Perhaps the point is already marked for moving?" << endl;
             validInputs = false;
@@ -442,7 +442,7 @@ int main(int argc, char *argv[])
 
 
     Info<< nl << "Looking up edges to split ..." << nl << endl;
-    Map<List<point> > edgeToCuts(edgesToSplit.size());
+    Map<List<point>> edgeToCuts(edgesToSplit.size());
     forAll(edgesToSplit, i)
     {
         const Pair<point>& pts = edgesToSplit[i];
@@ -470,11 +470,11 @@ int main(int argc, char *argv[])
     {
         const Pair<point>& pts = facesToTriangulate[i];
 
-        label faceI = findFace(mesh, allBoundary, pts.first());
+        label facei = findFace(mesh, allBoundary, pts.first());
 
-        if (faceI == -1 || !faceToDecompose.insert(faceI, pts.second()))
+        if (facei == -1 || !faceToDecompose.insert(facei, pts.second()))
         {
-            Info<< "Could not insert mesh face " << faceI
+            Info<< "Could not insert mesh face " << facei
                 << " for input point " << pts.first() << nl
                 << "Perhaps the face is already marked for splitting?" << endl;
 
@@ -491,11 +491,11 @@ int main(int argc, char *argv[])
     {
         const Pair<point>& pts = cellsToPyramidise[i];
 
-        label cellI = findCell(mesh, pts.first());
+        label celli = findCell(mesh, pts.first());
 
-        if (cellI == -1 || !cellToPyrCentre.insert(cellI, pts.second()))
+        if (celli == -1 || !cellToPyrCentre.insert(celli, pts.second()))
         {
-            Info<< "Could not insert mesh cell " << cellI
+            Info<< "Could not insert mesh cell " << celli
                 << " for input point " << pts.first() << nl
                 << "Perhaps the cell is already marked for splitting?" << endl;
 

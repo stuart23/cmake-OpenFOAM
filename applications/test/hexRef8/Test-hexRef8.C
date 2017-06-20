@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
         dimensionedScalar("one", dimless, 1.0),
         calculatedPointPatchScalarField::typeName
     );
-    pointX.internalField() = mesh.points().component(0);
+    pointX.primitiveFieldRef() = mesh.points().component(0);
     pointX.correctBoundaryConditions();
     Info<< "Writing x-component field "
         << pointX.name() << " in " << runTime.timeName() << endl;
@@ -309,7 +309,7 @@ int main(int argc, char *argv[])
         {
             if (mesh.V().size() != mesh.nCells())
             {
-                FatalErrorIn(args.executable())
+                FatalErrorInFunction
                     << "Volume not mapped. V:" << mesh.V().size()
                     << " nCells:" << mesh.nCells()
                     << exit(FatalError);
@@ -322,7 +322,7 @@ int main(int argc, char *argv[])
 
             if (mag(newVol-totalVol)/totalVol > 1e-10)
             {
-                FatalErrorIn(args.executable())
+                FatalErrorInFunction
                     << "Volume loss: old volume:" << totalVol
                     << "  new volume:" << newVol
                     << exit(FatalError);
@@ -344,7 +344,7 @@ int main(int argc, char *argv[])
 
             if (notEqual(max, 1.0, 1e-10) || notEqual(min, 1.0, 1e-10))
             {
-                FatalErrorIn(args.executable())
+                FatalErrorInFunction
                     << "Uniform volVectorField not preserved."
                     << " Min and max should both be 1.0. min:" << min
                     << " max:" << max
@@ -381,15 +381,15 @@ int main(int argc, char *argv[])
         // Check face field mapping
         if (surfaceOne.size())
         {
-            const scalar max = gMax(surfaceOne.internalField());
-            const scalar min = gMin(surfaceOne.internalField());
+            const scalar max = gMax(surfaceOne.primitiveField());
+            const scalar min = gMin(surfaceOne.primitiveField());
 
             Info<< "Uniform surface field min = " << min
                 << "  max = " << max << endl;
 
             if (notEqual(max, 1.0, 1e-10) || notEqual(min, 1.0, 1e-10))
             {
-                FatalErrorIn(args.executable())
+                FatalErrorInFunction
                     << "Uniform surfaceScalarField not preserved."
                     << " Min and max should both be 1.0. min:" << min
                     << " max:" << max

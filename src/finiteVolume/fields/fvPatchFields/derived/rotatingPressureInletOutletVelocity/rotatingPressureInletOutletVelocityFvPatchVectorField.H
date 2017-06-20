@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,8 +33,7 @@ Description
     for outflow (as defined by the flux); for inflow, the velocity is obtained
     from the flux with a direction normal to the patch faces.
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         phi          | flux field name         | no          | phi
@@ -44,7 +43,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            rotatingPressureInletOutletVelocity;
         phi             phi;
@@ -53,7 +52,7 @@ Description
     }
     \endverbatim
 
-    The \c omega entry is a DataEntry type, able to describe time varying
+    The \c omega entry is a Function1 type, able to describe time varying
     functions.
 
 Note
@@ -62,8 +61,9 @@ Note
     - negative flux (into of domain): derive from the flux in the patch-normal
       direction
 
-SeeAlso
+See also
     Foam::pressureInletOutletVelocityFvPatchVectorField
+    Foam::Function1Types
 
 SourceFiles
     rotatingPressureInletOutletVelocityFvPatchVectorField.C
@@ -75,7 +75,7 @@ SourceFiles
 
 #include "fvPatchFields.H"
 #include "pressureInletOutletVelocityFvPatchVectorField.H"
-#include "DataEntry.H"
+#include "Function1.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -93,7 +93,7 @@ class rotatingPressureInletOutletVelocityFvPatchVectorField
     // Private data
 
         //- Angular velocity of the frame
-        autoPtr<DataEntry<vector> > omega_;
+        autoPtr<Function1<vector>> omega_;
 
 
     // Private Member Functions

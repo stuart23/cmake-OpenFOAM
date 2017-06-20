@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,12 +30,12 @@ License
 template<class CloudType>
 Foam::label Foam::ParticleErosion<CloudType>::applyToPatch
 (
-    const label globalPatchI
+    const label globalPatchi
 ) const
 {
     forAll(patchIDs_, i)
     {
-        if (patchIDs_[i] == globalPatchI)
+        if (patchIDs_[i] == globalPatchi)
         {
             return i;
         }
@@ -54,7 +54,7 @@ void Foam::ParticleErosion<CloudType>::write()
     }
     else
     {
-        FatalErrorIn("void Foam::ParticleErosion<CloudType>::write()")
+        FatalErrorInFunction
             << "QPtr not valid" << abort(FatalError);
     }
 }
@@ -87,14 +87,8 @@ Foam::ParticleErosion<CloudType>::ParticleErosion
 
         if (patchIDs.empty())
         {
-            WarningIn
-            (
-                "Foam::ParticleErosion<CloudType>::ParticleErosion"
-                "("
-                    "const dictionary&, "
-                    "CloudType& "
-                ")"
-            )   << "Cannot find any patch names matching " << patchName[i]
+            WarningInFunction
+                << "Cannot find any patch names matching " << patchName[i]
                 << endl;
         }
 
@@ -137,7 +131,7 @@ void Foam::ParticleErosion<CloudType>::preEvolve()
 {
     if (QPtr_.valid())
     {
-        QPtr_->internalField() = 0.0;
+        QPtr_->primitiveFieldRef() = 0.0;
     }
     else
     {
@@ -173,11 +167,11 @@ void Foam::ParticleErosion<CloudType>::postPatch
     bool&
 )
 {
-    const label patchI = pp.index();
+    const label patchi = pp.index();
 
-    const label localPatchI = applyToPatch(patchI);
+    const label localPatchi = applyToPatch(patchi);
 
-    if (localPatchI != -1)
+    if (localPatchi != -1)
     {
         vector nw;
         vector Up;
@@ -202,8 +196,8 @@ void Foam::ParticleErosion<CloudType>::postPatch
 
         const scalar coeff = p.nParticle()*p.mass()*sqr(magU)/(p_*psi_*K_);
 
-        const label patchFaceI = pp.whichFace(p.face());
-        scalar& Q = QPtr_->boundaryField()[patchI][patchFaceI];
+        const label patchFacei = pp.whichFace(p.face());
+        scalar& Q = QPtr_->boundaryFieldRef()[patchi][patchFacei];
         if (tan(alpha) < K_/6.0)
         {
             Q += coeff*(sin(2.0*alpha) - 6.0/K_*sqr(sin(alpha)));

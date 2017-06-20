@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -85,7 +85,7 @@ patchInjection::patchInjection
 
     if (!patchIDs_.size())
     {
-        FatalErrorIn("patchInjection::patchInjection")
+        FatalErrorInFunction
             << "No patches selected"
             << exit(FatalError);
     }
@@ -142,7 +142,7 @@ void patchInjection::correct
 
     injectionModel::correct();
 
-    if (outputTime())
+    if (writeTime())
     {
         scalarField patchInjectedMasses0
         (

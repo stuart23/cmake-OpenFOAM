@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -104,7 +104,7 @@ public:
         coordinateSystems
         (
             const IOobject&,
-            const Xfer<PtrList<coordinateSystem> >&
+            const Xfer<PtrList<coordinateSystem>>&
         );
 
 
@@ -121,10 +121,6 @@ public:
 
         //- Find and return index for the first match, return -1 if not found
         label findIndex(const keyType& key) const;
-
-        //- Find and return index for the first match, returns -1 if not found
-        // \deprecated use findIndex() instead (deprecated Jul 2010)
-        label find(const keyType& key) const;
 
         //- Search for given key
         bool found(const keyType& key) const;

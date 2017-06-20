@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -193,7 +193,6 @@ void Foam::GAMGSolver::agglomerateMatrix
 }
 
 
-// Agglomerate only the interface coefficients.
 void Foam::GAMGSolver::agglomerateInterfaceCoefficients
 (
     const label fineLevelIndex,
@@ -279,8 +278,6 @@ void Foam::GAMGSolver::agglomerateInterfaceCoefficients
 }
 
 
-// Gather matrices.
-// Note: matrices get constructed with dummy mesh
 void Foam::GAMGSolver::gatherMatrices
 (
     const labelList& procIDs,
@@ -293,10 +290,10 @@ void Foam::GAMGSolver::gatherMatrices
     const lduInterfaceFieldPtrsList& interfaces,
 
     PtrList<lduMatrix>& otherMats,
-    PtrList<FieldField<Field, scalar> >& otherBouCoeffs,
-    PtrList<FieldField<Field, scalar> >& otherIntCoeffs,
+    PtrList<FieldField<Field, scalar>>& otherBouCoeffs,
+    PtrList<FieldField<Field, scalar>>& otherIntCoeffs,
     List<boolList>& otherTransforms,
-    List<List<label> >& otherRanks
+    List<List<label>>& otherRanks
 ) const
 {
     if (debug)
@@ -315,14 +312,14 @@ void Foam::GAMGSolver::gatherMatrices
         otherTransforms.setSize(procIDs.size()-1);
         otherRanks.setSize(procIDs.size()-1);
 
-        for (label procI = 1; procI < procIDs.size(); procI++)
+        for (label proci = 1; proci < procIDs.size(); proci++)
         {
-            label otherI = procI-1;
+            label otherI = proci-1;
 
             IPstream fromSlave
             (
                 Pstream::scheduled,
-                procIDs[procI],
+                procIDs[proci],
                 0,          // bufSize
                 Pstream::msgType(),
                 meshComm
@@ -448,10 +445,10 @@ void Foam::GAMGSolver::procAgglomerateMatrix
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     PtrList<lduMatrix> otherMats;
-    PtrList<FieldField<Field, scalar> > otherBouCoeffs;
-    PtrList<FieldField<Field, scalar> > otherIntCoeffs;
+    PtrList<FieldField<Field, scalar>> otherBouCoeffs;
+    PtrList<FieldField<Field, scalar>> otherIntCoeffs;
     List<boolList> otherTransforms;
-    List<List<label> > otherRanks;
+    List<List<label>> otherRanks;
     gatherMatrices
     (
         agglomProcIDs,
@@ -500,14 +497,13 @@ void Foam::GAMGSolver::procAgglomerateMatrix
         if (coarsestMatrix.hasDiag())
         {
             scalarField& allDiag = allMatrix.diag();
+
             SubList<scalar>
             (
                 allDiag,
                 coarsestMatrix.diag().size()
-            ).assign
-            (
-                coarsestMatrix.diag()
-            );
+            ) = coarsestMatrix.diag();
+
             forAll(otherMats, i)
             {
                 SubList<scalar>
@@ -515,10 +511,7 @@ void Foam::GAMGSolver::procAgglomerateMatrix
                     allDiag,
                     otherMats[i].diag().size(),
                     cellOffsets[i+1]
-                ).assign
-                (
-                    otherMats[i].diag()
-                );
+                ) = otherMats[i].diag();
             }
         }
         if (coarsestMatrix.hasLower())
@@ -577,22 +570,22 @@ void Foam::GAMGSolver::procAgglomerateMatrix
         }
 
         labelList nBounFaces(allMeshInterfaces.size());
-        forAll(boundaryMap, procI)
+        forAll(boundaryMap, proci)
         {
             const FieldField<Field, scalar>& procBouCoeffs
             (
-                (procI == 0)
+                (proci == 0)
               ? coarsestBouCoeffs
-              : otherBouCoeffs[procI-1]
+              : otherBouCoeffs[proci-1]
             );
             const FieldField<Field, scalar>& procIntCoeffs
             (
-                (procI == 0)
+                (proci == 0)
               ? coarsestIntCoeffs
-              : otherIntCoeffs[procI-1]
+              : otherIntCoeffs[proci-1]
             );
 
-            const labelList& bMap = boundaryMap[procI];
+            const labelList& bMap = boundaryMap[proci];
             forAll(bMap, procIntI)
             {
                 label allIntI = bMap[procIntI];
@@ -608,7 +601,7 @@ void Foam::GAMGSolver::procAgglomerateMatrix
 
                         bool doTransform = false;
                         int rank = -1;
-                        if (procI == 0)
+                        if (proci == 0)
                         {
                             const processorGAMGInterfaceField& procInt =
                                 refCast
@@ -624,8 +617,8 @@ void Foam::GAMGSolver::procAgglomerateMatrix
                         else
                         {
                             doTransform =
-                                otherTransforms[procI-1][procIntI];
-                            rank = otherRanks[procI-1][procIntI];
+                                otherTransforms[proci-1][procIntI];
+                            rank = otherRanks[proci-1][procIntI];
                         }
 
                         allPrimitiveInterfaces.set
@@ -654,28 +647,28 @@ void Foam::GAMGSolver::procAgglomerateMatrix
                     scalarField& allBou = allInterfaceBouCoeffs[allIntI];
                     scalarField& allInt = allInterfaceIntCoeffs[allIntI];
 
-                    const labelList& map = boundaryFaceMap[procI][procIntI];
+                    const labelList& map = boundaryFaceMap[proci][procIntI];
 
                     const scalarField& procBou = procBouCoeffs[procIntI];
                     const scalarField& procInt = procIntCoeffs[procIntI];
 
                     forAll(map, i)
                     {
-                        label allFaceI = map[i];
-                        if (allFaceI < 0)
+                        label allFacei = map[i];
+                        if (allFacei < 0)
                         {
-                            FatalErrorIn("GAMGSolver::GAMGSolver()")
+                            FatalErrorInFunction
                                 << "problem." << abort(FatalError);
                         }
-                        allBou[allFaceI] = procBou[i];
-                        allInt[allFaceI] = procInt[i];
+                        allBou[allFacei] = procBou[i];
+                        allInt[allFacei] = procInt[i];
                     }
                 }
                 else if (procBouCoeffs.set(procIntI))
                 {
                     // Boundary has become internal face
 
-                    const labelList& map = boundaryFaceMap[procI][procIntI];
+                    const labelList& map = boundaryFaceMap[proci][procIntI];
                     const scalarField& procBou = procBouCoeffs[procIntI];
                     const scalarField& procInt = procIntCoeffs[procIntI];
 
@@ -684,28 +677,28 @@ void Foam::GAMGSolver::procAgglomerateMatrix
                     {
                         if (map[i] >= 0)
                         {
-                            label allFaceI = map[i];
+                            label allFacei = map[i];
 
                             if (coarsestMatrix.hasUpper())
                             {
-                                allMatrix.upper()[allFaceI] = -procBou[i];
+                                allMatrix.upper()[allFacei] = -procBou[i];
                             }
                             if (coarsestMatrix.hasLower())
                             {
-                                allMatrix.lower()[allFaceI] = -procInt[i];
+                                allMatrix.lower()[allFacei] = -procInt[i];
                             }
                         }
                         else
                         {
-                            label allFaceI = -map[i]-1;
+                            label allFacei = -map[i]-1;
 
                             if (coarsestMatrix.hasUpper())
                             {
-                                allMatrix.upper()[allFaceI] = -procInt[i];
+                                allMatrix.upper()[allFacei] = -procInt[i];
                             }
                             if (coarsestMatrix.hasLower())
                             {
-                                allMatrix.lower()[allFaceI] = -procBou[i];
+                                allMatrix.lower()[allFacei] = -procBou[i];
                             }
                         }
                     }
@@ -728,11 +721,11 @@ void Foam::GAMGSolver::procAgglomerateMatrix
         //
         //        //const scalarField& bouCoeffs = allInterfaceBouCoeffs[intI];
         //        //const scalarField& intCoeffs = allInterfaceIntCoeffs[intI];
-        //        //forAll(bouCoeffs, faceI)
+        //        //forAll(bouCoeffs, facei)
         //        //{
-        //        //    Pout<< "        " << faceI
-        //        //        << "\tbou:" << bouCoeffs[faceI]
-        //        //        << "\tint:" << intCoeffs[faceI]
+        //        //    Pout<< "        " << facei
+        //        //        << "\tbou:" << bouCoeffs[facei]
+        //        //        << "\tint:" << intCoeffs[facei]
         //        //        << endl;
         //        //}
         //    }
@@ -751,15 +744,15 @@ void Foam::GAMGSolver::procAgglomerateMatrix
 )
 {
     autoPtr<lduMatrix> allMatrixPtr;
-    autoPtr<FieldField<Field, scalar> > allInterfaceBouCoeffs
+    autoPtr<FieldField<Field, scalar>> allInterfaceBouCoeffs
     (
         new FieldField<Field, scalar>(0)
     );
-    autoPtr<FieldField<Field, scalar> > allInterfaceIntCoeffs
+    autoPtr<FieldField<Field, scalar>> allInterfaceIntCoeffs
     (
         new FieldField<Field, scalar>(0)
     );
-    autoPtr<PtrList<lduInterfaceField> > allPrimitiveInterfaces
+    autoPtr<PtrList<lduInterfaceField>> allPrimitiveInterfaces
     (
         new PtrList<lduInterfaceField>(0)
     );

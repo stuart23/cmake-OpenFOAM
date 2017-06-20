@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -155,23 +155,21 @@ void Foam::mappedFlowRateFvPatchVectorField::updateCoeffs()
             scalar phi = gSum(rhop*(*this) & patch().Sf());
             Info<< patch().boundaryMesh().mesh().name() << ':'
                 << patch().name() << ':'
-                << this->dimensionedInternalField().name() << " <- "
+                << this->internalField().name() << " <- "
                 << nbrMesh.name() << ':'
                 << nbrPatch.name() << ':'
-                << this->dimensionedInternalField().name() << " :"
+                << this->internalField().name() << " :"
                 << " mass flux[Kg/s]:" << -phi
                 << endl;
         }
     }
     else
     {
-        FatalErrorIn
-        (
-            "mappedFlowRateFvPatchVectorField::updateCoeffs()"
-        )   << "dimensions of " << phiName_ << " are incorrect" << nl
+        FatalErrorInFunction
+            << "dimensions of " << phiName_ << " are incorrect" << nl
             << "    on patch " << this->patch().name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
             << nl << exit(FatalError);
     }
 

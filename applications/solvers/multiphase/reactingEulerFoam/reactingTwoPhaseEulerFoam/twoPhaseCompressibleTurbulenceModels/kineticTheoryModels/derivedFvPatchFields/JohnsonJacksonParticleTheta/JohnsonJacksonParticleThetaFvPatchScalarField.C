@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2014-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2014-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -48,8 +48,8 @@ JohnsonJacksonParticleThetaFvPatchScalarField
 )
 :
     mixedFvPatchScalarField(p, iF),
-    restitutionCoefficient_(p.size()),
-    specularityCoefficient_(p.size())
+    restitutionCoefficient_("restitutionCoefficient", dimless, 0),
+    specularityCoefficient_("specularityCoefficient", dimless, 0)
 {}
 
 
@@ -97,16 +97,8 @@ JohnsonJacksonParticleThetaFvPatchScalarField
      || (restitutionCoefficient_.value() > 1)
     )
     {
-        FatalErrorIn
-        (
-            "Foam::JohnsonJacksonParticleThetaFvPatchScalarField::"
-            "JohnsonJacksonParticleThetaFvPatchScalarField"
-            "("
-                "const fvPatch& p,"
-                "const DimensionedField<scalar, volMesh>& iF,"
-                "const dictionary& dict"
-            ")"
-        )   << "The restitution coefficient has to be between 0 and 1"
+        FatalErrorInFunction
+            << "The restitution coefficient has to be between 0 and 1"
             << abort(FatalError);
     }
 
@@ -116,16 +108,8 @@ JohnsonJacksonParticleThetaFvPatchScalarField
      || (specularityCoefficient_.value() > 1)
     )
     {
-        FatalErrorIn
-        (
-            "Foam::JohnsonJacksonParticleThetaFvPatchScalarField::"
-            "JohnsonJacksonParticleThetaFvPatchScalarField"
-            "("
-                "const fvPatch& p,"
-                "const DimensionedField<scalar, volMesh>& iF,"
-                "const dictionary& dict"
-            ")"
-        )   << "The specularity coefficient has to be between 0 and 1"
+        FatalErrorInFunction
+            << "The specularity coefficient has to be between 0 and 1"
             << abort(FatalError);
     }
 
@@ -197,7 +181,7 @@ void Foam::JohnsonJacksonParticleThetaFvPatchScalarField::updateCoeffs()
 
     const phaseModel& phased
     (
-        fluid.phase1().name() == dimensionedInternalField().group()
+        fluid.phase1().name() == internalField().group()
       ? fluid.phase1()
       : fluid.phase2()
     );

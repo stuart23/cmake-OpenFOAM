@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -91,7 +91,7 @@ class multiphaseSystem
         (
             const phaseModel& alpha1,
             const phaseModel& alpha2,
-            surfaceVectorField::GeometricBoundaryField& nHatb
+            surfaceVectorField::Boundary& nHatb
         ) const;
 
         tmp<volScalarField> K
@@ -167,10 +167,10 @@ public:
         virtual tmp<volScalarField> Kd(const phaseModel& phase) const = 0;
 
         //- Return the combined force (lift + wall-lubrication) for phase pair
-        virtual autoPtr<PtrList<Foam::volVectorField> > Fs() const = 0;
+        virtual autoPtr<PtrList<Foam::volVectorField>> Fs() const = 0;
 
         //- Return the turbulent dispersion force on faces for phase pair
-        virtual autoPtr<PtrList<Foam::surfaceScalarField> > phiDs
+        virtual autoPtr<PtrList<Foam::surfaceScalarField>> phiDs
         (
             const PtrList<volScalarField>& rAUs
         ) const = 0;

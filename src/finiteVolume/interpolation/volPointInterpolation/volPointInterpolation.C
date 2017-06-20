@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -31,19 +31,17 @@ License
 #include "pointConstraints.H"
 #include "surfaceFields.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(volPointInterpolation, 0);
+    defineTypeNameAndDebug(volPointInterpolation, 0);
+}
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void volPointInterpolation::calcBoundaryAddressing()
+void Foam::volPointInterpolation::calcBoundaryAddressing()
 {
     if (debug)
     {
@@ -79,23 +77,23 @@ void volPointInterpolation::calcBoundaryAddressing()
     // cyclicAMI
     const surfaceScalarField& magSf = mesh().magSf();
 
-    forAll(pbm, patchI)
+    forAll(pbm, patchi)
     {
-        const polyPatch& pp = pbm[patchI];
+        const polyPatch& pp = pbm[patchi];
 
         if
         (
             !isA<emptyPolyPatch>(pp)
-         && !magSf.boundaryField()[patchI].coupled()
+         && !magSf.boundaryField()[patchi].coupled()
         )
         {
-            label bFaceI = pp.start()-mesh().nInternalFaces();
+            label bFacei = pp.start()-mesh().nInternalFaces();
 
             forAll(pp, i)
             {
-                boundaryIsPatchFace_[bFaceI] = true;
+                boundaryIsPatchFace_[bFacei] = true;
 
-                const face& f = boundary[bFaceI++];
+                const face& f = boundary[bFacei++];
 
                 forAll(f, fp)
                 {
@@ -118,13 +116,13 @@ void volPointInterpolation::calcBoundaryAddressing()
             orEqOp<bool>()
         );
 
-        forAll(isPatchPoint_, pointI)
+        forAll(isPatchPoint_, pointi)
         {
-            if (isPatchPoint_[pointI] != oldData[pointI])
+            if (isPatchPoint_[pointi] != oldData[pointi])
             {
                 Pout<< "volPointInterpolation::calcBoundaryAddressing():"
-                    << " added dangling mesh point:" << pointI
-                    << " at:" << mesh().points()[pointI]
+                    << " added dangling mesh point:" << pointi
+                    << " at:" << mesh().points()[pointi]
                     << endl;
             }
         }
@@ -154,7 +152,7 @@ void volPointInterpolation::calcBoundaryAddressing()
 }
 
 
-void volPointInterpolation::makeInternalWeights(scalarField& sumWeights)
+void Foam::volPointInterpolation::makeInternalWeights(scalarField& sumWeights)
 {
     if (debug)
     {
@@ -194,7 +192,7 @@ void volPointInterpolation::makeInternalWeights(scalarField& sumWeights)
 }
 
 
-void volPointInterpolation::makeBoundaryWeights(scalarField& sumWeights)
+void Foam::volPointInterpolation::makeBoundaryWeights(scalarField& sumWeights)
 {
     if (debug)
     {
@@ -212,25 +210,25 @@ void volPointInterpolation::makeBoundaryWeights(scalarField& sumWeights)
 
     forAll(boundary.meshPoints(), i)
     {
-        label pointI = boundary.meshPoints()[i];
+        label pointi = boundary.meshPoints()[i];
 
-        if (isPatchPoint_[pointI])
+        if (isPatchPoint_[pointi])
         {
             const labelList& pFaces = boundary.pointFaces()[i];
 
             scalarList& pw = boundaryPointWeights_[i];
             pw.setSize(pFaces.size());
 
-            sumWeights[pointI] = 0.0;
+            sumWeights[pointi] = 0.0;
 
             forAll(pFaces, i)
             {
                 if (boundaryIsPatchFace_[pFaces[i]])
                 {
-                    label faceI = mesh().nInternalFaces() + pFaces[i];
+                    label facei = mesh().nInternalFaces() + pFaces[i];
 
-                    pw[i] = 1.0/mag(points[pointI] - faceCentres[faceI]);
-                    sumWeights[pointI] += pw[i];
+                    pw[i] = 1.0/mag(points[pointi] - faceCentres[facei]);
+                    sumWeights[pointi] += pw[i];
                 }
                 else
                 {
@@ -242,7 +240,7 @@ void volPointInterpolation::makeBoundaryWeights(scalarField& sumWeights)
 }
 
 
-void volPointInterpolation::makeWeights()
+void Foam::volPointInterpolation::makeWeights()
 {
     if (debug)
     {
@@ -279,13 +277,13 @@ void volPointInterpolation::makeWeights()
 
     //forAll(boundary.meshPoints(), i)
     //{
-    //    label pointI = boundary.meshPoints()[i];
+    //    label pointi = boundary.meshPoints()[i];
     //
-    //    if (isPatchPoint_[pointI])
+    //    if (isPatchPoint_[pointi])
     //    {
     //        Pout<< "Calculated Weight at boundary point:" << i
-    //            << " at:" << mesh().points()[pointI]
-    //            << " sumWeight:" << sumWeights[pointI]
+    //            << " at:" << mesh().points()[pointi]
+    //            << " sumWeight:" << sumWeights[pointi]
     //            << " from:" << boundaryPointWeights_[i]
     //            << endl;
     //    }
@@ -311,13 +309,13 @@ void volPointInterpolation::makeWeights()
 
 
     // Normalise internal weights
-    forAll(pointWeights_, pointI)
+    forAll(pointWeights_, pointi)
     {
-        scalarList& pw = pointWeights_[pointI];
+        scalarList& pw = pointWeights_[pointi];
         // Note:pw only sized for !isPatchPoint
         forAll(pw, i)
         {
-            pw[i] /= sumWeights[pointI];
+            pw[i] /= sumWeights[pointi];
         }
     }
 
@@ -326,13 +324,13 @@ void volPointInterpolation::makeWeights()
 
     forAll(boundary.meshPoints(), i)
     {
-        label pointI = boundary.meshPoints()[i];
+        label pointi = boundary.meshPoints()[i];
 
         scalarList& pw = boundaryPointWeights_[i];
         // Note:pw only sized for isPatchPoint
         forAll(pw, i)
         {
-            pw[i] /= sumWeights[pointI];
+            pw[i] /= sumWeights[pointi];
         }
     }
 
@@ -348,7 +346,7 @@ void volPointInterpolation::makeWeights()
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-volPointInterpolation::volPointInterpolation(const fvMesh& vm)
+Foam::volPointInterpolation::volPointInterpolation(const fvMesh& vm)
 :
     MeshObject<fvMesh, Foam::UpdateableMeshObject, volPointInterpolation>(vm)
 {
@@ -358,19 +356,19 @@ volPointInterpolation::volPointInterpolation(const fvMesh& vm)
 
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
 
-volPointInterpolation::~volPointInterpolation()
+Foam::volPointInterpolation::~volPointInterpolation()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void volPointInterpolation::updateMesh(const mapPolyMesh&)
+void Foam::volPointInterpolation::updateMesh(const mapPolyMesh&)
 {
     makeWeights();
 }
 
 
-bool volPointInterpolation::movePoints()
+bool Foam::volPointInterpolation::movePoints()
 {
     makeWeights();
 
@@ -378,7 +376,7 @@ bool volPointInterpolation::movePoints()
 }
 
 
-void volPointInterpolation::interpolateDisplacement
+void Foam::volPointInterpolation::interpolateDisplacement
 (
     const volVectorField& vf,
     pointVectorField& pf
@@ -395,9 +393,5 @@ void volPointInterpolation::interpolateDisplacement
     pcs.constrainDisplacement(pf, false);
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

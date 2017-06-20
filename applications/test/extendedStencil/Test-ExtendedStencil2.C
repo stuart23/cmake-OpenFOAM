@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
         CFCCellToCellStencil stencil(mesh);
 
         // Construct exchange map and renumber stencil
-        List<Map<label> > compactMap(Pstream::nProcs());
+        List<Map<label>> compactMap(Pstream::nProcs());
         mapDistribute map
         (
             stencil.globalNumbering(),
@@ -142,23 +142,23 @@ int main(int argc, char *argv[])
 
 
         // Collect the data in stencil form
-        List<List<vector> > stencilPoints;
+        List<List<vector>> stencilPoints;
         {
             const volVectorField& fld = mesh.C();
 
             // 1. Construct cell data in compact addressing
-            List<point> compactFld(map.constructSize(), pTraits<point>::zero);
+            List<point> compactFld(map.constructSize(), Zero);
 
             // Insert my internal values
-            forAll(fld, cellI)
+            forAll(fld, celli)
             {
-                compactFld[cellI] = fld[cellI];
+                compactFld[celli] = fld[celli];
             }
             // Insert my boundary values
             label nCompact = fld.size();
-            forAll(fld.boundaryField(), patchI)
+            forAll(fld.boundaryField(), patchi)
             {
-                const fvPatchField<vector>& pfld = fld.boundaryField()[patchI];
+                const fvPatchField<vector>& pfld = fld.boundaryField()[patchi];
 
                 forAll(pfld, i)
                 {
@@ -172,27 +172,27 @@ int main(int argc, char *argv[])
             // 2. Pull to stencil
             stencilPoints.setSize(stencil.size());
 
-            forAll(stencil, cellI)
+            forAll(stencil, celli)
             {
-                const labelList& compactCells = stencil[cellI];
+                const labelList& compactCells = stencil[celli];
 
-                stencilPoints[cellI].setSize(compactCells.size());
+                stencilPoints[celli].setSize(compactCells.size());
 
                 forAll(compactCells, i)
                 {
-                    stencilPoints[cellI][i] = compactFld[compactCells[i]];
+                    stencilPoints[celli][i] = compactFld[compactCells[i]];
                 }
             }
         }
 
 
-        forAll(stencilPoints, cellI)
+        forAll(stencilPoints, celli)
         {
             writeStencilOBJ
             (
-                runTime.path()/"centredCell" + Foam::name(cellI) + ".obj",
-                mesh.cellCentres()[cellI],
-                stencilPoints[cellI]
+                runTime.path()/"centredCell" + Foam::name(celli) + ".obj",
+                mesh.cellCentres()[celli],
+                stencilPoints[celli]
             );
         }
     }

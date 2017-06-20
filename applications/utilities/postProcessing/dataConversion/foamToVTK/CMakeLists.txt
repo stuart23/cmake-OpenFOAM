@@ -1,26 +1,19 @@
-set( EXE_NAME foamToVTK )
+set( EXE_NAME foamToVTK_exe )
 
 set( SOURCES
 
-surfaceMeshWriter.C
 foamToVTK.C
-internalWriter.C
-lagrangianWriter.C
-patchWriter.C
-writeFuns.C
-writeFaceSet.C
-writePointSet.C
-writeSurfFields.C
-vtkMesh.C
-vtkTopo.C
 
 )
 
 ## Define the output
 add_executable( ${EXE_NAME} ${SOURCES} )
 install( TARGETS ${EXE_NAME} DESTINATION bin )
+set_target_properties( ${EXE_NAME} PROPERTIES
+	OUTPUT_NAME foamToVTK
+)	
 
-target_link_libraries( ${EXE_NAME} finiteVolume lagrangian genericPatchFields meshTools OpenFOAM dl m )
+target_link_libraries( ${EXE_NAME} foamToVTK finiteVolume lagrangian genericPatchFields OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/postProcessing/dataConversion/foamToVTK )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )

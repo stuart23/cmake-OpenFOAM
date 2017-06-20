@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -36,13 +36,12 @@ Description
     - subsonic outflow is applied via a zero-gradient condition from inside
       the domain.
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
-        TName        | Temperature field name  | no          | T
-        pName        | Pressure field name     | no          | p
-        psiName      | Compressibility field name | no       | thermo:psi
+        T            | Temperature field name  | no          | T
+        p            | Pressure field name     | no          | p
+        psi          | Compressibility field name | no       | thermo:psi
         UInf         | free-stream velocity    | yes         |
         pInf         | free-stream pressure    | yes         |
         TInf         | free-stream temperature | yes         |
@@ -51,7 +50,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            supersonicFreestream;
         UInf            500;

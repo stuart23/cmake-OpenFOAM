@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -42,8 +42,8 @@ Foam::dsmcParcel::dsmcParcel
     const vector& position,
     const vector& U,
     const scalar Ei,
-    const label cellI,
-    const label tetFaceI,
+    const label celli,
+    const label tetFacei,
     const label tetPtI,
     const label typeId
 )
@@ -54,8 +54,8 @@ Foam::dsmcParcel::dsmcParcel
         position,
         U,
         Ei,
-        cellI,
-        tetFaceI,
+        celli,
+        tetFacei,
         tetPtI,
         typeId
     )

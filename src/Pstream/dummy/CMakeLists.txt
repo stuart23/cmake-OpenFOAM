@@ -25,6 +25,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/IndirectL
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/List )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/ListOps )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/PtrList )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/UPtrList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/UIndirectList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/Lists/UList )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/containers/NamedEnum )
@@ -73,4 +74,5 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/lists )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/string )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/word )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/strings/wordRe )
+include_directories( ${CMAKE_SOURCE_DIR}/src/OpenFOAM/primitives/zero )
 

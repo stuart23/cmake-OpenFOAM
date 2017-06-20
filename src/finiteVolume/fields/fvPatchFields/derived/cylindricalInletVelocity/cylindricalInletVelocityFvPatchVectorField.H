@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -32,8 +32,7 @@ Description
     cylindrical co-ordinates given a central axis, central point, rpm, axial
     and radial velocity.
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         axis         | axis of rotation        | yes         |
@@ -45,7 +44,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            cylindricalInletVelocity;
         axis            (0 0 1);
@@ -57,13 +56,13 @@ Description
     \endverbatim
 
 Note
-    The \c axialVelocity, \c radialVelocity and \c rpm entries are DataEntry
+    The \c axialVelocity, \c radialVelocity and \c rpm entries are Function1
     types, able to describe time varying functions.  The example above gives
     the usage for supplying constant values.
 
-SeeAlso
+See also
     Foam::fixedValueFvPatchField
-    Foam::DataEntry
+    Foam::Function1Types
 
 SourceFiles
     cylindricalInletVelocityFvPatchVectorField.C
@@ -74,7 +73,7 @@ SourceFiles
 #define cylindricalInletVelocityFvPatchVectorField_H
 
 #include "fixedValueFvPatchFields.H"
-#include "DataEntry.H"
+#include "Function1.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -97,13 +96,13 @@ class cylindricalInletVelocityFvPatchVectorField
         const vector axis_;
 
         //- Axial velocity
-        autoPtr<DataEntry<scalar> > axialVelocity_;
+        autoPtr<Function1<scalar>> axialVelocity_;
 
         //- Radial velocity
-        autoPtr<DataEntry<scalar> > radialVelocity_;
+        autoPtr<Function1<scalar>> radialVelocity_;
 
         //- RPM
-        autoPtr<DataEntry<scalar> > rpm_;
+        autoPtr<Function1<scalar>> rpm_;
 
 
 public:

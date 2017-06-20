@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -95,10 +95,10 @@ inline Foam::FixedList<T, Size>::FixedList(const FixedList<T, Size>& lst)
 
 
 template<class T, unsigned Size>
-inline Foam::autoPtr< Foam::FixedList<T, Size> >
+inline Foam::autoPtr<Foam::FixedList<T, Size>>
 Foam::FixedList<T, Size>::clone() const
 {
-    return autoPtr< FixedList<T, Size> >(new FixedList<T, Size>(*this));
+    return autoPtr<FixedList<T, Size>>(new FixedList<T, Size>(*this));
 }
 
 
@@ -107,7 +107,7 @@ Foam::FixedList<T, Size>::clone() const
 template<class T, unsigned Size>
 inline const Foam::FixedList<T, Size>& Foam::FixedList<T, Size>::null()
 {
-    return NullObjectRef<FixedList<T, Size> >();
+    return NullObjectRef<FixedList<T, Size>>();
 }
 
 
@@ -125,40 +125,36 @@ inline Foam::label Foam::FixedList<T, Size>::rcIndex(const label i) const
 }
 
 
-// Check start is within valid range (0 ... size-1).
 template<class T, unsigned Size>
 inline void Foam::FixedList<T, Size>::checkStart(const label start) const
 {
     if (start < 0 || (start && unsigned(start) >= Size))
     {
-        FatalErrorIn("FixedList<T, Size>::checkStart(const label)")
+        FatalErrorInFunction
             << "start " << start << " out of range 0 ... " << (Size-1)
             << abort(FatalError);
     }
 }
 
 
-// Check size is within valid range (0 ... size).
 template<class T, unsigned Size>
 inline void Foam::FixedList<T, Size>::checkSize(const label size) const
 {
     if (size < 0 || unsigned(size) > Size)
     {
-        FatalErrorIn("FixedList<T, Size>::checkSize(const label)")
+        FatalErrorInFunction
             << "size " << size << " out of range 0 ... " << (Size)
             << abort(FatalError);
     }
 }
 
 
-// Check index i is within valid range (0 ... size-1)
-// The check for zero-sized list is already done in static assert
 template<class T, unsigned Size>
 inline void Foam::FixedList<T, Size>::checkIndex(const label i) const
 {
     if (i < 0 || unsigned(i) >= Size)
     {
-        FatalErrorIn("FixedList<T, Size>::checkIndex(const label)")
+        FatalErrorInFunction
             << "index " << i << " out of range 0 ... " << (Size-1)
             << abort(FatalError);
     }
@@ -168,17 +164,17 @@ inline void Foam::FixedList<T, Size>::checkIndex(const label i) const
 template<class T, unsigned Size>
 inline void Foam::FixedList<T, Size>::resize(const label s)
 {
-#   ifdef FULLDEBUG
+    #ifdef FULLDEBUG
     checkSize(s);
-#   endif
+    #endif
 }
 
 template<class T, unsigned Size>
 inline void Foam::FixedList<T, Size>::setSize(const label s)
 {
-#   ifdef FULLDEBUG
+    #ifdef FULLDEBUG
     checkSize(s);
-#   endif
+    #endif
 }
 
 template<class T, unsigned Size>
@@ -237,24 +233,22 @@ inline const T& Foam::FixedList<T, Size>::last() const
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
-// element access
 template<class T, unsigned Size>
 inline T& Foam::FixedList<T, Size>::operator[](const label i)
 {
-#   ifdef FULLDEBUG
+    #ifdef FULLDEBUG
     checkIndex(i);
-#   endif
+    #endif
     return v_[i];
 }
 
 
-// const element access
 template<class T, unsigned Size>
 inline const T& Foam::FixedList<T, Size>::operator[](const label i) const
 {
-#   ifdef FULLDEBUG
+    #ifdef FULLDEBUG
     checkIndex(i);
-#   endif
+    #endif
     return v_[i];
 }
 
@@ -435,12 +429,12 @@ inline unsigned Foam::FixedList<T, Size>::Hash<HashT>::operator()
 {
     if (contiguous<T>())
     {
-        // hash directly
+        // Hash directly
         return Hasher(lst.v_, sizeof(lst.v_), seed);
     }
     else
     {
-        // hash incrementally
+        // Hash incrementally
         unsigned val = seed;
 
         for (unsigned i=0; i<Size; i++)

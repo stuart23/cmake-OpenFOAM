@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,24 +28,24 @@ License
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::GeometricField<Type, Foam::fvsPatchField, Foam::surfaceMesh> >
+Foam::tmp<Foam::GeometricField<Type, Foam::fvsPatchField, Foam::surfaceMesh>>
 Foam::extendedUpwindCellToFaceStencil::weightedSum
 (
     const surfaceScalarField& phi,
     const GeometricField<Type, fvPatchField, volMesh>& fld,
-    const List<List<scalar> >& ownWeights,
-    const List<List<scalar> >& neiWeights
+    const List<List<scalar>>& ownWeights,
+    const List<List<scalar>>& neiWeights
 ) const
 {
     const fvMesh& mesh = fld.mesh();
 
     // Collect internal and boundary values
-    List<List<Type> > ownFld;
+    List<List<Type>> ownFld;
     collectData(ownMap(), ownStencil(), fld, ownFld);
-    List<List<Type> > neiFld;
+    List<List<Type>> neiFld;
     collectData(neiMap(), neiStencil(), fld, neiFld);
 
-    tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > tsfCorr
+    tmp<GeometricField<Type, fvsPatchField, surfaceMesh>> tsfCorr
     (
         new GeometricField<Type, fvsPatchField, surfaceMesh>
         (
@@ -63,34 +63,34 @@ Foam::extendedUpwindCellToFaceStencil::weightedSum
             (
                 fld.name(),
                 fld.dimensions(),
-                pTraits<Type>::zero
+                Zero
             )
         )
     );
-    GeometricField<Type, fvsPatchField, surfaceMesh>& sf = tsfCorr();
+    GeometricField<Type, fvsPatchField, surfaceMesh>& sf = tsfCorr.ref();
 
     // Internal faces
-    for (label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
+    for (label facei = 0; facei < mesh.nInternalFaces(); facei++)
     {
-        if (phi[faceI] > 0)
+        if (phi[facei] > 0)
         {
             // Flux out of owner. Use upwind (= owner side) stencil.
-            const List<Type>& stField = ownFld[faceI];
-            const List<scalar>& stWeight = ownWeights[faceI];
+            const List<Type>& stField = ownFld[facei];
+            const List<scalar>& stWeight = ownWeights[facei];
 
             forAll(stField, i)
             {
-                sf[faceI] += stField[i]*stWeight[i];
+                sf[facei] += stField[i]*stWeight[i];
             }
         }
         else
         {
-            const List<Type>& stField = neiFld[faceI];
-            const List<scalar>& stWeight = neiWeights[faceI];
+            const List<Type>& stField = neiFld[facei];
+            const List<scalar>& stWeight = neiWeights[facei];
 
             forAll(stField, i)
             {
-                sf[faceI] += stField[i]*stWeight[i];
+                sf[facei] += stField[i]*stWeight[i];
             }
         }
     }
@@ -98,7 +98,7 @@ Foam::extendedUpwindCellToFaceStencil::weightedSum
     // Boundaries. Either constrained or calculated so assign value
     // directly (instead of nicely using operator==)
     typename GeometricField<Type, fvsPatchField, surfaceMesh>::
-        GeometricBoundaryField& bSfCorr = sf.boundaryField();
+        Boundary& bSfCorr = sf.boundaryFieldRef();
 
     forAll(bSfCorr, patchi)
     {
@@ -106,15 +106,15 @@ Foam::extendedUpwindCellToFaceStencil::weightedSum
 
         if (pSfCorr.coupled())
         {
-            label faceI = pSfCorr.patch().start();
+            label facei = pSfCorr.patch().start();
 
             forAll(pSfCorr, i)
             {
                 if (phi.boundaryField()[patchi][i] > 0)
                 {
                     // Flux out of owner. Use upwind (= owner side) stencil.
-                    const List<Type>& stField = ownFld[faceI];
-                    const List<scalar>& stWeight = ownWeights[faceI];
+                    const List<Type>& stField = ownFld[facei];
+                    const List<scalar>& stWeight = ownWeights[facei];
 
                     forAll(stField, j)
                     {
@@ -123,15 +123,15 @@ Foam::extendedUpwindCellToFaceStencil::weightedSum
                 }
                 else
                 {
-                    const List<Type>& stField = neiFld[faceI];
-                    const List<scalar>& stWeight = neiWeights[faceI];
+                    const List<Type>& stField = neiFld[facei];
+                    const List<scalar>& stWeight = neiWeights[facei];
 
                     forAll(stField, j)
                     {
                         pSfCorr[i] += stField[j]*stWeight[j];
                     }
                 }
-                faceI++;
+                facei++;
             }
         }
     }

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -129,20 +129,7 @@ void Foam::nastranSurfaceWriter::writeTemplate
 {
     if (!fieldMap_.found(fieldName))
     {
-        WarningIn
-        (
-            "void Foam::nastranSurfaceWriter::writeTemplate"
-            "("
-                "const fileName&, "
-                "const fileName&, "
-                "const pointField&, "
-                "const faceList&, "
-                "const word&, "
-                "const Field<Type>&, "
-                "const bool, "
-                "const bool"
-            ") const"
-        )
+        WarningInFunction
             << "No mapping found between field " << fieldName
             << " and corresponding Nastran field.  Available types are:"
             << fieldMap_
@@ -176,7 +163,7 @@ void Foam::nastranSurfaceWriter::writeTemplate
         << "$" << nl
         << "BEGIN BULK" << nl;
 
-    List<DynamicList<face> > decomposedFaces(faces.size());
+    List<DynamicList<face>> decomposedFaces(faces.size());
 
     writeGeometry(points, faces, decomposedFaces, os);
 
@@ -192,10 +179,10 @@ void Foam::nastranSurfaceWriter::writeTemplate
         forAll(decomposedFaces, i)
         {
             const DynamicList<face>& dFaces = decomposedFaces[i];
-            forAll(dFaces, faceI)
+            forAll(dFaces, facei)
             {
-                Type v = pTraits<Type>::zero;
-                const face& f = dFaces[faceI];
+                Type v = Zero;
+                const face& f = dFaces[facei];
 
                 forAll(f, fptI)
                 {
@@ -215,9 +202,9 @@ void Foam::nastranSurfaceWriter::writeTemplate
         {
             const DynamicList<face>& dFaces = decomposedFaces[i];
 
-            forAll(dFaces, faceI)
+            forAll(dFaces, facei)
             {
-                writeFaceValue(nasFieldName, values[faceI], ++n, os);
+                writeFaceValue(nasFieldName, values[facei], ++n, os);
             }
         }
     }

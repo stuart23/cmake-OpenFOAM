@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -36,9 +36,8 @@ Description
 #include "immiscibleIncompressibleThreePhaseMixture.H"
 #include "turbulentTransportModel.H"
 #include "pimpleControl.H"
-#include "fvIOoptionList.H"
+#include "fvOptions.H"
 #include "CorrectPhi.H"
-#include "fixedFluxPressureFvPatchScalarField.H"
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
 
@@ -46,19 +45,20 @@ Description
 
 int main(int argc, char *argv[])
 {
+    #include "postProcess.H"
+
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
-
-    pimpleControl pimple(mesh);
-
+    #include "createControl.H"
     #include "createTimeControls.H"
     #include "createRDeltaT.H"
     #include "initContinuityErrs.H"
     #include "createFields.H"
-    #include "createMRF.H"
     #include "createFvOptions.H"
     #include "correctPhi.H"
+
+    turbulence->validate();
 
     if (!LTS)
     {

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -69,9 +69,9 @@ inclinedFilmNusseltHeightFvPatchScalarField
 )
 :
     fixedValueFvPatchScalarField(p, iF),
-    GammaMean_(DataEntry<scalar>::New("GammaMean", dict)),
-    a_(DataEntry<scalar>::New("a", dict)),
-    omega_(DataEntry<scalar>::New("omega", dict))
+    GammaMean_(Function1<scalar>::New("GammaMean", dict)),
+    a_(Function1<scalar>::New("a", dict)),
+    omega_(Function1<scalar>::New("omega", dict))
 {
     fvPatchScalarField::operator=(scalarField("value", dict, p.size()));
 }
@@ -113,7 +113,7 @@ void Foam::inclinedFilmNusseltHeightFvPatchScalarField::updateCoeffs()
         return;
     }
 
-    const label patchI = patch().index();
+    const label patchi = patch().index();
 
     // retrieve the film region from the database
 
@@ -135,16 +135,11 @@ void Foam::inclinedFilmNusseltHeightFvPatchScalarField::updateCoeffs()
     const vectorField n(-patch().nf());
 
     // TODO: currently re-evaluating the entire gTan field to return this patch
-    const scalarField gTan(film.gTan()().boundaryField()[patchI] & n);
+    const scalarField gTan(film.gTan()().boundaryField()[patchi] & n);
 
     if (patch().size() && (max(mag(gTan)) < SMALL))
     {
-        WarningIn
-        (
-            "void Foam::inclinedFilmNusseltHeightFvPatchScalarField::"
-            "updateCoeffs()"
-        )
-            << "Tangential gravity component is zero.  This boundary condition "
+        WarningInFunction
             << "is designed to operate on patches inclined with respect to "
             << "gravity"
             << endl;
@@ -152,7 +147,7 @@ void Foam::inclinedFilmNusseltHeightFvPatchScalarField::updateCoeffs()
 
     const volVectorField& nHat = film.nHat();
 
-    const vectorField nHatp(nHat.boundaryField()[patchI].patchInternalField());
+    const vectorField nHatp(nHat.boundaryField()[patchi].patchInternalField());
 
     vectorField nTan(nHatp ^ n);
     nTan /= mag(nTan) + ROOTVSMALL;
@@ -173,10 +168,10 @@ void Foam::inclinedFilmNusseltHeightFvPatchScalarField::updateCoeffs()
     const scalarField G(GMean + a*sin(omega*constant::mathematical::twoPi*d));
 
     const volScalarField& mu = film.mu();
-    const scalarField mup(mu.boundaryField()[patchI].patchInternalField());
+    const scalarField mup(mu.boundaryField()[patchi].patchInternalField());
 
     const volScalarField& rho = film.rho();
-    const scalarField rhop(rho.boundaryField()[patchI].patchInternalField());
+    const scalarField rhop(rho.boundaryField()[patchi].patchInternalField());
 
     const scalarField Re(max(G, scalar(0.0))/mup);
 

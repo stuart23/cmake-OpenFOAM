@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::autoPtr<Foam::DevolatilisationModel<CloudType> >
+Foam::autoPtr<Foam::DevolatilisationModel<CloudType>>
 Foam::DevolatilisationModel<CloudType>::New
 (
     const dictionary& dict,
@@ -44,21 +44,15 @@ Foam::DevolatilisationModel<CloudType>::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "DevolatilisationModel<CloudType>::New"
-            "("
-                "const dictionary&, "
-                "CloudType&"
-            ")"
-        )   << "Unknown devolatilisation model type "
+        FatalErrorInFunction
+            << "Unknown devolatilisation model type "
             << modelType << nl << nl
             << "Valid devolatilisation model types are:" << nl
             << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 
-    return autoPtr<DevolatilisationModel<CloudType> >(cstrIter()(dict, owner));
+    return autoPtr<DevolatilisationModel<CloudType>>(cstrIter()(dict, owner));
 }
 
 

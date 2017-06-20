@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -139,19 +139,15 @@ Foam::coordinateSystem::coordinateSystem
 
         if (debug)
         {
-            Info<< "coordinateSystem::coordinateSystem"
-                "(const objectRegistry&, const dictionary&):"
-                << nl << "using global coordinate system: "
+            InfoInFunction
+                << "Using global coordinate system: "
                 << key << "=" << index << endl;
         }
 
         if (index < 0)
         {
-            FatalErrorIn
-            (
-                "coordinateSystem::coordinateSystem"
-                "(const objectRegistry&, const dictionary&):"
-            )   << "could not find coordinate system: " << key << nl
+            FatalErrorInFunction
+                << "could not find coordinate system: " << key << nl
                 << "available coordinate systems: " << lst.toc() << nl << nl
                 << exit(FatalError);
         }
@@ -285,7 +281,7 @@ Foam::tmp<Foam::vectorField> Foam::coordinateSystem::globalToLocal
 void Foam::coordinateSystem::clear()
 {
     note_.clear();
-    origin_ = point::zero;
+    origin_ = Zero;
     R_->clear();
 }
 

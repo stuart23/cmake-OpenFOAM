@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -70,7 +70,7 @@ public:
     typedef typename GeoMesh::Mesh Mesh;
     typedef typename GeoMesh::BoundaryMesh BoundaryMesh;
 
-    class DimensionedInternalField;
+    class Internal;
 
 
 private:
@@ -79,7 +79,7 @@ private:
 
         //- Slice the given field and a create a PtrList of SlicedPatchField
         //  from which the boundary field is built
-        tmp<FieldField<PatchField, Type> >  slicedBoundaryField
+        tmp<FieldField<PatchField, Type>>  slicedBoundaryField
         (
             const Mesh& mesh,
             const Field<Type>& completeField,
@@ -89,7 +89,7 @@ private:
 
         //- Slice the given field and a create a PtrList of SlicedPatchField
         //  from which the boundary field is built
-        tmp<FieldField<PatchField, Type> >  slicedBoundaryField
+        tmp<FieldField<PatchField, Type>>  slicedBoundaryField
         (
             const Mesh& mesh,
             const FieldField<PatchField, Type>& bField,
@@ -108,7 +108,7 @@ private:
 
         //- Disallow standard assignment to tmp<GeometricField>,
         //  == assignment is allowed.
-        void operator=(const tmp<GeometricField<Type, PatchField, GeoMesh> >&);
+        void operator=(const tmp<GeometricField<Type, PatchField, GeoMesh>>&);
 
 
 public:
@@ -172,7 +172,7 @@ public:
 
 
 /*---------------------------------------------------------------------------*\
-       Class SlicedGeometricField::DimensionedInternalField Declaration
+       Class SlicedGeometricField::Internal Declaration
 \*---------------------------------------------------------------------------*/
 
 //- The internalField of a SlicedGeometricField
@@ -184,9 +184,9 @@ template
     class GeoMesh
 >
 class SlicedGeometricField<Type, PatchField, SlicedPatchField, GeoMesh>::
-DimensionedInternalField
+Internal
 :
-    public GeometricField<Type, PatchField, GeoMesh>::DimensionedInternalField
+    public GeometricField<Type, PatchField, GeoMesh>::Internal
 {
 
 public:
@@ -194,7 +194,7 @@ public:
     // Constructors
 
         //- Construct from components and field to slice
-        DimensionedInternalField
+        Internal
         (
             const IOobject&,
             const Mesh&,
@@ -204,7 +204,7 @@ public:
 
 
     //- Destructor
-    ~DimensionedInternalField();
+    ~Internal();
 };
 
 
@@ -215,7 +215,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "SlicedGeometricField.C"
+    #include "SlicedGeometricField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

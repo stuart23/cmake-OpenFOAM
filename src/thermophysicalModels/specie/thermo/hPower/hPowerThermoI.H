@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -36,10 +36,8 @@ inline void Foam::hPowerThermo<EquationOfState>::checkT
 {
     if (T < 0)
     {
-        FatalErrorIn
-        (
-            "hPowerThermo<EquationOfState>::checkT(const scalar T) const"
-        )   << "attempt to evaluate hPowerThermo<EquationOfState>"
+        FatalErrorInFunction
+            << "attempt to evaluate hPowerThermo<EquationOfState>"
                " for negative temperature " << T
             << abort(FatalError);
     }
@@ -82,10 +80,10 @@ inline Foam::hPowerThermo<EquationOfState>::hPowerThermo
 
 
 template<class EquationOfState>
-inline Foam::autoPtr<Foam::hPowerThermo<EquationOfState> >
+inline Foam::autoPtr<Foam::hPowerThermo<EquationOfState>>
 Foam::hPowerThermo<EquationOfState>::clone() const
 {
-    return autoPtr<hPowerThermo<EquationOfState> >
+    return autoPtr<hPowerThermo<EquationOfState>>
     (
         new hPowerThermo<EquationOfState>(*this)
     );
@@ -93,10 +91,10 @@ Foam::hPowerThermo<EquationOfState>::clone() const
 
 
 template<class EquationOfState>
-inline Foam::autoPtr<Foam::hPowerThermo<EquationOfState> >
+inline Foam::autoPtr<Foam::hPowerThermo<EquationOfState>>
 Foam::hPowerThermo<EquationOfState>::New(Istream& is)
 {
-    return autoPtr<hPowerThermo<EquationOfState> >
+    return autoPtr<hPowerThermo<EquationOfState>>
     (
         new hPowerThermo<EquationOfState>(is)
     );
@@ -104,10 +102,10 @@ Foam::hPowerThermo<EquationOfState>::New(Istream& is)
 
 
 template<class EquationOfState>
-inline Foam::autoPtr<Foam::hPowerThermo<EquationOfState> >
+inline Foam::autoPtr<Foam::hPowerThermo<EquationOfState>>
 Foam::hPowerThermo<EquationOfState>::New(const dictionary& dict)
 {
-    return autoPtr<hPowerThermo<EquationOfState> >
+    return autoPtr<hPowerThermo<EquationOfState>>
     (
         new hPowerThermo<EquationOfState>(dict)
     );
@@ -132,7 +130,7 @@ inline Foam::scalar Foam::hPowerThermo<EquationOfState>::cp
     const scalar p, const scalar T
 ) const
 {
-    return c0_*pow(T/Tref_, n0_);
+    return c0_*pow(T/Tref_, n0_) + EquationOfState::cp(p, T);
 }
 
 
@@ -153,7 +151,8 @@ inline Foam::scalar Foam::hPowerThermo<EquationOfState>::hs
 ) const
 {
     return
-        c0_*(pow(T, n0_ + 1) - pow(Tstd, n0_ + 1))/(pow(Tref_, n0_)*(n0_ + 1));
+        c0_*(pow(T, n0_ + 1) - pow(Tstd, n0_ + 1))/(pow(Tref_, n0_)*(n0_ + 1))
+      + EquationOfState::h(p, T);
 }
 
 

@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  3.0.x                                 |
+|  \\    /   O peration     | Version:  4.x                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -24,6 +24,11 @@ addLayers       false;
 //          surface only. Multi-region surfaces get patch name
 //          surface "_ "region. Default is true
 //singleRegionName false;
+
+
+//Optional: preserve all generated patches. Default is to remove
+//          zero-sized patches.
+//keepPatches true;
 
 
 // Geometry. Definition of all surfaces. All surfaces are of class

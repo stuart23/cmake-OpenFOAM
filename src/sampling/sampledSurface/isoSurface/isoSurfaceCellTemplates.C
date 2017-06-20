@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,6 +26,7 @@ License
 #include "isoSurfaceCell.H"
 #include "polyMesh.H"
 #include "tetMatcher.H"
+#include "isoSurface.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -76,22 +77,18 @@ void Foam::isoSurfaceCell::generateTriPoints
 (
     const DynamicList<Type>& snapped,
 
-    const scalar isoVal0,
     const scalar s0,
     const Type& p0,
     const label p0Index,
 
-    const scalar isoVal1,
     const scalar s1,
     const Type& p1,
     const label p1Index,
 
-    const scalar isoVal2,
     const scalar s2,
     const Type& p2,
     const label p2Index,
 
-    const scalar isoVal3,
     const scalar s3,
     const Type& p3,
     const label p3Index,
@@ -117,167 +114,203 @@ void Foam::isoSurfaceCell::generateTriPoints
         triIndex |= 8;
     }
 
-    // Form the vertices of the triangles for each case
+    /* Form the vertices of the triangles for each case */
     switch (triIndex)
     {
         case 0x00:
         case 0x0F:
         break;
 
-        case 0x0E:
         case 0x01:
+        case 0x0E:
         {
-            // 0 is common point. Orient such that normal points in positive
-            // gradient direction
-            if (isoVal0 >= isoVal1)
+            pts.append
+            (
+                generatePoint(snapped,s0,p0,p0Index,s1,p1,p1Index)
+            );
+            pts.append
+            (
+                generatePoint(snapped,s0,p0,p0Index,s2,p2,p2Index)
+            );
+            pts.append
+            (
+                generatePoint(snapped,s0,p0,p0Index,s3,p3,p3Index)
+            );
+            if (triIndex == 0x0E)
             {
-                pts.append(generatePoint(snapped,s0,p0,p0Index,s1,p1,p1Index));
-                pts.append(generatePoint(snapped,s0,p0,p0Index,s2,p2,p2Index));
-                pts.append(generatePoint(snapped,s0,p0,p0Index,s3,p3,p3Index));
-            }
-            else
-            {
-                pts.append(generatePoint(snapped,s0,p0,p0Index,s2,p2,p2Index));
-                pts.append(generatePoint(snapped,s0,p0,p0Index,s1,p1,p1Index));
-                pts.append(generatePoint(snapped,s0,p0,p0Index,s3,p3,p3Index));
+                // Flip normals
+                label sz = pts.size();
+                Swap(pts[sz-2], pts[sz-1]);
             }
         }
         break;
 
-        case 0x0D:
         case 0x02:
+        case 0x0D:
         {
-            // 1 is common point
-            if (isoVal1 >= isoVal0)
+            pts.append
+            (
+                generatePoint(snapped,s1,p1,p1Index,s0,p0,p0Index)
+            );
+            pts.append
+            (
+                generatePoint(snapped,s1,p1,p1Index,s3,p3,p3Index)
+            );
+            pts.append
+            (
+                generatePoint(snapped,s1,p1,p1Index,s2,p2,p2Index)
+            );
+
+            if (triIndex == 0x0D)
             {
-                pts.append(generatePoint(snapped,s1,p1,p1Index,s0,p0,p0Index));
-                pts.append(generatePoint(snapped,s1,p1,p1Index,s3,p3,p3Index));
-                pts.append(generatePoint(snapped,s1,p1,p1Index,s2,p2,p2Index));
-            }
-            else
-            {
-                pts.append(generatePoint(snapped,s1,p1,p1Index,s3,p3,p3Index));
-                pts.append(generatePoint(snapped,s1,p1,p1Index,s0,p0,p0Index));
-                pts.append(generatePoint(snapped,s1,p1,p1Index,s2,p2,p2Index));
+                // Flip normals
+                label sz = pts.size();
+                Swap(pts[sz-2], pts[sz-1]);
             }
         }
         break;
 
-        case 0x0C:
         case 0x03:
+        case 0x0C:
         {
-            Type s02 = generatePoint(snapped,s0,p0,p0Index,s2,p2,p2Index);
-            Type s13 = generatePoint(snapped,s1,p1,p1Index,s3,p3,p3Index);
+            Type p0p2 =
+                generatePoint(snapped,s0,p0,p0Index,s2,p2,p2Index);
+            Type p1p3 =
+                generatePoint(snapped,s1,p1,p1Index,s3,p3,p3Index);
 
-            if (isoVal0 >= isoVal3)
+            pts.append
+            (
+                generatePoint(snapped,s0,p0,p0Index,s3,p3,p3Index)
+            );
+            pts.append(p1p3);
+            pts.append(p0p2);
+
+            pts.append(p1p3);
+            pts.append
+            (
+                generatePoint(snapped,s1,p1,p1Index,s2,p2,p2Index)
+            );
+            pts.append(p0p2);
+
+            if (triIndex == 0x0C)
             {
-                pts.append(generatePoint(snapped,s0,p0,p0Index,s3,p3,p3Index));
-                pts.append(s02);
-                pts.append(s13);
-                pts.append(s13);
-                pts.append(generatePoint(snapped,s1,p1,p1Index,s2,p2,p2Index));
-                pts.append(s02);
-            }
-            else
-            {
-                pts.append(s02);
-                pts.append(generatePoint(snapped,s0,p0,p0Index,s3,p3,p3Index));
-                pts.append(s13);
-                pts.append(generatePoint(snapped,s1,p1,p1Index,s2,p2,p2Index));
-                pts.append(s13);
-                pts.append(s02);
+                // Flip normals
+                label sz = pts.size();
+                Swap(pts[sz-5], pts[sz-4]);
+                Swap(pts[sz-2], pts[sz-1]);
             }
         }
         break;
 
-        case 0x0B:
         case 0x04:
+        case 0x0B:
         {
-            // 2 is common point
-            if (isoVal2 >= isoVal0)
+            pts.append
+            (
+                generatePoint(snapped,s2,p2,p2Index,s0,p0,p0Index)
+            );
+            pts.append
+            (
+                generatePoint(snapped,s2,p2,p2Index,s1,p1,p1Index)
+            );
+            pts.append
+            (
+                generatePoint(snapped,s2,p2,p2Index,s3,p3,p3Index)
+            );
+
+            if (triIndex == 0x0B)
             {
-                pts.append(generatePoint(snapped,s2,p2,p2Index,s0,p0,p0Index));
-                pts.append(generatePoint(snapped,s2,p2,p2Index,s1,p1,p1Index));
-                pts.append(generatePoint(snapped,s2,p2,p2Index,s3,p3,p3Index));
-            }
-            else
-            {
-                pts.append(generatePoint(snapped,s2,p2,p2Index,s1,p1,p1Index));
-                pts.append(generatePoint(snapped,s2,p2,p2Index,s0,p0,p0Index));
-                pts.append(generatePoint(snapped,s2,p2,p2Index,s3,p3,p3Index));
+                // Flip normals
+                label sz = pts.size();
+                Swap(pts[sz-2], pts[sz-1]);
             }
         }
         break;
 
-        case 0x0A:
         case 0x05:
+        case 0x0A:
         {
-            Type s01 = generatePoint(snapped,s0,p0,p0Index,s1,p1,p1Index);
-            Type s23 = generatePoint(snapped,s2,p2,p2Index,s3,p3,p3Index);
+            Type p0p1 =
+                generatePoint(snapped,s0,p0,p0Index,s1,p1,p1Index);
+            Type p2p3 =
+                generatePoint(snapped,s2,p2,p2Index,s3,p3,p3Index);
 
-            if (isoVal3 >= isoVal0)
+            pts.append(p0p1);
+            pts.append(p2p3);
+            pts.append
+            (
+                generatePoint(snapped,s0,p0,p0Index,s3,p3,p3Index)
+            );
+
+            pts.append(p0p1);
+            pts.append
+            (
+                generatePoint(snapped,s1,p1,p1Index,s2,p2,p2Index)
+            );
+            pts.append(p2p3);
+
+            if (triIndex == 0x0A)
             {
-                pts.append(s01);
-                pts.append(s23);
-                pts.append(generatePoint(snapped,s0,p0,p0Index,s3,p3,p3Index));
-                pts.append(s01);
-                pts.append(generatePoint(snapped,s1,p1,p1Index,s2,p2,p2Index));
-                pts.append(s23);
-            }
-            else
-            {
-                pts.append(s23);
-                pts.append(s01);
-                pts.append(generatePoint(snapped,s0,p0,p0Index,s3,p3,p3Index));
-                pts.append(generatePoint(snapped,s1,p1,p1Index,s2,p2,p2Index));
-                pts.append(s01);
-                pts.append(s23);
+                // Flip normals
+                label sz = pts.size();
+                Swap(pts[sz-5], pts[sz-4]);
+                Swap(pts[sz-2], pts[sz-1]);
             }
         }
         break;
 
-        case 0x09:
         case 0x06:
+        case 0x09:
         {
-            Type s01 = generatePoint(snapped,s0,p0,p0Index,s1,p1,p1Index);
-            Type s23 = generatePoint(snapped,s2,p2,p2Index,s3,p3,p3Index);
+            Type p0p1 =
+                generatePoint(snapped,s0,p0,p0Index,s1,p1,p1Index);
+            Type p2p3 =
+                generatePoint(snapped,s2,p2,p2Index,s3,p3,p3Index);
 
-            if (isoVal3 >= isoVal1)
+            pts.append(p0p1);
+            pts.append
+            (
+                generatePoint(snapped,s1,p1,p1Index,s3,p3,p3Index)
+            );
+            pts.append(p2p3);
+
+            pts.append(p0p1);
+            pts.append(p2p3);
+            pts.append
+            (
+                generatePoint(snapped,s0,p0,p0Index,s2,p2,p2Index)
+            );
+
+            if (triIndex == 0x09)
             {
-                pts.append(s01);
-                pts.append(generatePoint(snapped,s1,p1,p1Index,s3,p3,p3Index));
-                pts.append(s23);
-                pts.append(s01);
-                pts.append(generatePoint(snapped,s0,p0,p0Index,s2,p2,p2Index));
-                pts.append(s23);
-            }
-            else
-            {
-                pts.append(generatePoint(snapped,s1,p1,p1Index,s3,p3,p3Index));
-                pts.append(s01);
-                pts.append(s23);
-                pts.append(generatePoint(snapped,s0,p0,p0Index,s2,p2,p2Index));
-                pts.append(s01);
-                pts.append(s23);
+                // Flip normals
+                label sz = pts.size();
+                Swap(pts[sz-5], pts[sz-4]);
+                Swap(pts[sz-2], pts[sz-1]);
             }
         }
         break;
 
-        case 0x07:
         case 0x08:
+        case 0x07:
         {
-            // 3 is common point
-            if (isoVal3 >= isoVal0)
+            pts.append
+            (
+                generatePoint(snapped,s3,p3,p3Index,s0,p0,p0Index)
+            );
+            pts.append
+            (
+                generatePoint(snapped,s3,p3,p3Index,s2,p2,p2Index)
+            );
+            pts.append
+            (
+                generatePoint(snapped,s3,p3,p3Index,s1,p1,p1Index)
+            );
+            if (triIndex == 0x07)
             {
-                pts.append(generatePoint(snapped,s3,p3,p3Index,s0,p0,p0Index));
-                pts.append(generatePoint(snapped,s3,p3,p3Index,s2,p2,p2Index));
-                pts.append(generatePoint(snapped,s3,p3,p3Index,s1,p1,p1Index));
-            }
-            else
-            {
-                pts.append(generatePoint(snapped,s3,p3,p3Index,s2,p2,p2Index));
-                pts.append(generatePoint(snapped,s3,p3,p3Index,s0,p0,p0Index));
-                pts.append(generatePoint(snapped,s3,p3,p3Index,s1,p1,p1Index));
+                // Flip normals
+                label sz = pts.size();
+                Swap(pts[sz-2], pts[sz-1]);
             }
         }
         break;
@@ -305,15 +338,15 @@ void Foam::isoSurfaceCell::generateTriPoints
     tetMatcher tet;
     label countNotFoundTets = 0;
 
-    forAll(mesh_.cells(), cellI)
+    forAll(mesh_.cells(), celli)
     {
-        if (cellCutType_[cellI] != NOTCUT)
+        if (cellCutType_[celli] != NOTCUT)
         {
             label oldNPoints = triPoints.size();
 
-            const cell& cFaces = mesh_.cells()[cellI];
+            const cell& cFaces = mesh_.cells()[celli];
 
-            if (tet.isA(mesh_, cellI))
+            if (tet.isA(mesh_, celli))
             {
                 // For tets don't do cell-centre decomposition, just use the
                 // tet points and values
@@ -335,28 +368,24 @@ void Foam::isoSurfaceCell::generateTriPoints
 
                 // Start off from positive volume tet to make sure we
                 // generate outwards pointing tets
-                if (mesh_.faceOwner()[cFaces[0]] == cellI)
+                if (mesh_.faceOwner()[cFaces[0]] == celli)
                 {
                     generateTriPoints
                     (
                         snappedPoints,
 
-                        pVals_[f0[1]],
                         pVals[f0[1]],
                         pCoords[f0[1]],
                         snappedPoint[f0[1]],
 
-                        pVals_[f0[0]],
                         pVals[f0[0]],
                         pCoords[f0[0]],
                         snappedPoint[f0[0]],
 
-                        pVals_[f0[2]],
                         pVals[f0[2]],
                         pCoords[f0[2]],
                         snappedPoint[f0[2]],
 
-                        pVals_[oppositeI],
                         pVals[oppositeI],
                         pCoords[oppositeI],
                         snappedPoint[oppositeI],
@@ -370,22 +399,18 @@ void Foam::isoSurfaceCell::generateTriPoints
                     (
                         snappedPoints,
 
-                        pVals_[f0[0]],
                         pVals[f0[0]],
                         pCoords[f0[0]],
                         snappedPoint[f0[0]],
 
-                        pVals_[f0[1]],
                         pVals[f0[1]],
                         pCoords[f0[1]],
                         snappedPoint[f0[1]],
 
-                        pVals_[f0[2]],
                         pVals[f0[2]],
                         pCoords[f0[2]],
                         snappedPoint[f0[2]],
 
-                        pVals_[oppositeI],
                         pVals[oppositeI],
                         pCoords[oppositeI],
                         snappedPoint[oppositeI],
@@ -396,12 +421,12 @@ void Foam::isoSurfaceCell::generateTriPoints
             }
             else
             {
-                forAll(cFaces, cFaceI)
+                forAll(cFaces, cFacei)
                 {
-                    label faceI = cFaces[cFaceI];
-                    const face& f = mesh_.faces()[faceI];
+                    label facei = cFaces[cFacei];
+                    const face& f = mesh_.faces()[facei];
 
-                    label fp0 = mesh_.tetBasePtIs()[faceI];
+                    label fp0 = mesh_.tetBasePtIs()[facei];
 
                     // Skip undefined tets
                     if (fp0 < 0)
@@ -411,7 +436,6 @@ void Foam::isoSurfaceCell::generateTriPoints
                     }
 
                     label fp = f.fcIndex(fp0);
-
                     for (label i = 2; i < f.size(); i++)
                     {
                         label nextFp = f.fcIndex(fp);
@@ -419,31 +443,27 @@ void Foam::isoSurfaceCell::generateTriPoints
 
                         // Start off from positive volume tet to make sure we
                         // generate outwards pointing tets
-                        if (mesh_.faceOwner()[faceI] == cellI)
+                        if (mesh_.faceOwner()[facei] == celli)
                         {
                             generateTriPoints
                             (
                                 snappedPoints,
 
-                                pVals_[tri[1]],
                                 pVals[tri[1]],
                                 pCoords[tri[1]],
                                 snappedPoint[tri[1]],
 
-                                pVals_[tri[0]],
                                 pVals[tri[0]],
                                 pCoords[tri[0]],
                                 snappedPoint[tri[0]],
 
-                                pVals_[tri[2]],
                                 pVals[tri[2]],
                                 pCoords[tri[2]],
                                 snappedPoint[tri[2]],
 
-                                cVals_[cellI],
-                                cVals[cellI],
-                                cCoords[cellI],
-                                snappedCc[cellI],
+                                cVals[celli],
+                                cCoords[celli],
+                                snappedCc[celli],
 
                                 triPoints
                             );
@@ -454,25 +474,21 @@ void Foam::isoSurfaceCell::generateTriPoints
                             (
                                 snappedPoints,
 
-                                pVals_[tri[0]],
                                 pVals[tri[0]],
                                 pCoords[tri[0]],
                                 snappedPoint[tri[0]],
 
-                                pVals_[tri[1]],
                                 pVals[tri[1]],
                                 pCoords[tri[1]],
                                 snappedPoint[tri[1]],
 
-                                pVals_[tri[2]],
                                 pVals[tri[2]],
                                 pCoords[tri[2]],
                                 snappedPoint[tri[2]],
 
-                                cVals_[cellI],
-                                cVals[cellI],
-                                cCoords[cellI],
-                                snappedCc[cellI],
+                                cVals[celli],
+                                cCoords[celli],
+                                snappedCc[celli],
 
                                 triPoints
                             );
@@ -488,14 +504,14 @@ void Foam::isoSurfaceCell::generateTriPoints
             label nCells = (triPoints.size()-oldNPoints)/3;
             for (label i = 0; i < nCells; i++)
             {
-                triMeshCells.append(cellI);
+                triMeshCells.append(celli);
             }
         }
     }
 
     if (countNotFoundTets > 0)
     {
-        WarningIn("Foam::isoSurfaceCell::generateTriPoints")
+        WarningIn("Foam::isoSurfaceCell::generateTriPoints(..)")
             << "Could not find " << countNotFoundTets
             << " tet base points, which may lead to inverted triangles."
             << endl;
@@ -510,72 +526,17 @@ template<class Type>
 Foam::tmp<Foam::Field<Type> >
 Foam::isoSurfaceCell::interpolate
 (
-    const scalarField& cVals,
-    const scalarField& pVals,
     const Field<Type>& cCoords,
     const Field<Type>& pCoords
 ) const
 {
-    DynamicList<Type> triPoints(nCutCells_);
+    DynamicList<Type> triPoints(3*nCutCells_);
     DynamicList<label> triMeshCells(nCutCells_);
 
     // Dummy snap data
     DynamicList<Type> snappedPoints;
     labelList snappedCc(mesh_.nCells(), -1);
     labelList snappedPoint(mesh_.nPoints(), -1);
-
-
-    generateTriPoints
-    (
-        cVals,
-        pVals,
-
-        cCoords,
-        pCoords,
-
-        snappedPoints,
-        snappedCc,
-        snappedPoint,
-
-        triPoints,
-        triMeshCells
-    );
-
-
-    // One value per point
-    tmp<Field<Type> > tvalues(new Field<Type>(points().size()));
-    Field<Type>& values = tvalues();
-
-    forAll(triPoints, i)
-    {
-        label mergedPointI = triPointMergeMap_[i];
-
-        if (mergedPointI >= 0)
-        {
-            values[mergedPointI] = triPoints[i];
-        }
-    }
-
-    return tvalues;
-}
-
-
-template<class Type>
-Foam::tmp<Foam::Field<Type> >
-Foam::isoSurfaceCell::interpolate
-(
-    const Field<Type>& cCoords,
-    const Field<Type>& pCoords
-) const
-{
-    DynamicList<Type> triPoints(nCutCells_);
-    DynamicList<label> triMeshCells(nCutCells_);
-
-    // Dummy snap data
-    DynamicList<Type> snappedPoints;
-    labelList snappedCc(mesh_.nCells(), -1);
-    labelList snappedPoint(mesh_.nPoints(), -1);
-
 
     generateTriPoints
     (
@@ -593,22 +554,12 @@ Foam::isoSurfaceCell::interpolate
         triMeshCells
     );
 
-
-    // One value per point
-    tmp<Field<Type> > tvalues(new Field<Type>(points().size()));
-    Field<Type>& values = tvalues();
-
-    forAll(triPoints, i)
-    {
-        label mergedPointI = triPointMergeMap_[i];
-
-        if (mergedPointI >= 0)
-        {
-            values[mergedPointI] = triPoints[i];
-        }
-    }
-
-    return tvalues;
+    return isoSurface::interpolate
+    (
+        points().size(),
+        triPointMergeMap_,
+        triPoints
+    );
 }
 
 

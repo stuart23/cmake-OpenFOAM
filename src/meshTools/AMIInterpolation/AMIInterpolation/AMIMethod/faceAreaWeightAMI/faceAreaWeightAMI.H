@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -74,42 +74,42 @@ protected:
             //- Calculate addressing and weights using temporary storage
             virtual void calcAddressing
             (
-                List<DynamicList<label> >& srcAddress,
-                List<DynamicList<scalar> >& srcWeights,
-                List<DynamicList<label> >& tgtAddress,
-                List<DynamicList<scalar> >& tgtWeights,
-                label srcFaceI,
-                label tgtFaceI
+                List<DynamicList<label>>& srcAddress,
+                List<DynamicList<scalar>>& srcWeights,
+                List<DynamicList<label>>& tgtAddress,
+                List<DynamicList<scalar>>& tgtWeights,
+                label srcFacei,
+                label tgtFacei
             );
 
-            //- Determine overlap contributions for source face srcFaceI
+            //- Determine overlap contributions for source face srcFacei
             virtual bool processSourceFace
             (
-                const label srcFaceI,
-                const label tgtStartFaceI,
+                const label srcFacei,
+                const label tgtStartFacei,
                 DynamicList<label>& nbrFaces,
                 DynamicList<label>& visitedFaces,
-                List<DynamicList<label> >& srcAddr,
-                List<DynamicList<scalar> >& srcWght,
-                List<DynamicList<label> >& tgtAddr,
-                List<DynamicList<scalar> >& tgtWght
+                List<DynamicList<label>>& srcAddr,
+                List<DynamicList<scalar>>& srcWght,
+                List<DynamicList<label>>& tgtAddr,
+                List<DynamicList<scalar>>& tgtWght
             );
 
             //- Attempt to re-evaluate source faces that have not been included
             virtual void restartUncoveredSourceFace
             (
-                List<DynamicList<label> >& srcAddr,
-                List<DynamicList<scalar> >& srcWght,
-                List<DynamicList<label> >& tgtAddr,
-                List<DynamicList<scalar> >& tgtWght
+                List<DynamicList<label>>& srcAddr,
+                List<DynamicList<scalar>>& srcWght,
+                List<DynamicList<label>>& tgtAddr,
+                List<DynamicList<scalar>>& tgtWght
             );
 
             //- Set the source and target seed faces
             virtual void setNextFaces
             (
                 label& startSeedI,
-                label& srcFaceI,
-                label& tgtFaceI,
+                label& srcFacei,
+                label& tgtFacei,
                 const boolList& mapFlag,
                 labelList& seedFaces,
                 const DynamicList<label>& visitedFaces,
@@ -122,8 +122,8 @@ protected:
             //- Area of intersection between source and target faces
             virtual scalar interArea
             (
-                const label srcFaceI,
-                const label tgtFaceI
+                const label srcFacei,
+                const label tgtFacei
             ) const;
 
 
@@ -164,8 +164,8 @@ public:
                 scalarListList& srcWeights,
                 labelListList& tgtAddress,
                 scalarListList& tgtWeights,
-                label srcFaceI = -1,
-                label tgtFaceI = -1
+                label srcFacei = -1,
+                label tgtFacei = -1
             );
 };
 
@@ -177,7 +177,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "faceAreaWeightAMI.C"
+    #include "faceAreaWeightAMI.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

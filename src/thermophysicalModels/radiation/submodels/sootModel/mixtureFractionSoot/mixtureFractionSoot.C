@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -36,7 +36,7 @@ Foam::radiation::mixtureFractionSoot<ThermoType>::checkThermo
     const fluidThermo& thermo
 )
 {
-    if (isA<singleStepReactingMixture<ThermoType> >(thermo))
+    if (isA<singleStepReactingMixture<ThermoType>>(thermo))
     {
         return dynamic_cast<const singleStepReactingMixture<ThermoType>& >
         (
@@ -45,15 +45,7 @@ Foam::radiation::mixtureFractionSoot<ThermoType>::checkThermo
     }
     else
     {
-        FatalErrorIn
-        (
-            "template<class ThermoType> "
-            "Foam::radiation::mixtureFractionSoot "
-            "("
-                "const dictionary&, "
-                "const fvMesh&"
-            ")"
-        )
+        FatalErrorInFunction
             << "Inconsistent thermo package for " << thermo.type()
             << "Please select a thermo package based on "
             << "singleStepReactingMixture" << exit(FatalError);
@@ -96,7 +88,7 @@ Foam::radiation::mixtureFractionSoot<ThermoType>::mixtureFractionSoot
     sootMax_(-1),
     mappingFieldName_
     (
-        coeffsDict_.lookupOrDefault<word>("mappingFieldName", "none")
+        coeffsDict_.lookupOrDefault<word>("mappingField", "none")
     ),
     mapFieldMax_(1),
     thermo_(mesh.lookupObject<fluidThermo>(basicThermo::dictName)),

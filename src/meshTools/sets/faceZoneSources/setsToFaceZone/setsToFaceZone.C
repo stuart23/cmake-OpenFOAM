@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -111,11 +111,8 @@ void Foam::setsToFaceZone::applyToSet
 {
     if (!isA<faceZoneSet>(set))
     {
-        WarningIn
-        (
-            "setsToFaceZone::applyToSet(const topoSetSource::setAction"
-            ", topoSet"
-        )   << "Operation only allowed on a faceZoneSet." << endl;
+        WarningInFunction
+            << "Operation only allowed on a faceZoneSet." << endl;
     }
     else
     {
@@ -136,18 +133,18 @@ void Foam::setsToFaceZone::applyToSet
 
             forAllConstIter(faceSet, fSet, iter)
             {
-                label faceI = iter.key();
+                label facei = iter.key();
 
-                if (!fzSet.found(faceI))
+                if (!fzSet.found(facei))
                 {
                     bool flipFace = false;
 
-                    label own = mesh_.faceOwner()[faceI];
+                    label own = mesh_.faceOwner()[facei];
                     bool ownFound = cSet.found(own);
 
-                    if (mesh_.isInternalFace(faceI))
+                    if (mesh_.isInternalFace(facei))
                     {
-                        label nei = mesh_.faceNeighbour()[faceI];
+                        label nei = mesh_.faceNeighbour()[facei];
                         bool neiFound = cSet.found(nei);
 
                         if (ownFound && !neiFound)
@@ -160,16 +157,13 @@ void Foam::setsToFaceZone::applyToSet
                         }
                         else
                         {
-                            WarningIn
-                            (
-                                "setsToFaceZone::applyToSet"
-                                "(const topoSetSource::setAction, topoSet)"
-                            )   << "One of owner or neighbour of internal face "
-                                << faceI << " should be in cellSet "
+                            WarningInFunction
+                                << "One of owner or neighbour of internal face "
+                                << facei << " should be in cellSet "
                                 << cSet.name()
                                 << " to be able to determine orientation."
                                 << endl
-                                << "Face:" << faceI << " own:" << own
+                                << "Face:" << facei << " own:" << own
                                 << " OwnInCellSet:" << ownFound
                                 << " nei:" << nei
                                 << " NeiInCellSet:" << neiFound
@@ -187,7 +181,7 @@ void Foam::setsToFaceZone::applyToSet
                         flipFace = !flipFace;
                     }
 
-                    newAddressing.append(faceI);
+                    newAddressing.append(facei);
                     newFlipMap.append(flipFace);
                 }
             }

@@ -26,8 +26,6 @@ pointPatchFields/derived/sixDoFRigidBodyDisplacement/sixDoFRigidBodyDisplacement
 pointPatchFields/derived/uncoupledSixDoFRigidBodyDisplacement/uncoupledSixDoFRigidBodyDisplacementPointPatchVectorField.C
 
 sixDoFRigidBodyMotionSolver/sixDoFRigidBodyMotionSolver.C
-sixDoFRigidBodyMotionSolver/externalPointEdgePoint.C
-sixDoFRigidBodyMotionSolver/pointPatchDist.C
 
 sixDoFSolvers/sixDoFSolver/sixDoFSolver.C
 sixDoFSolvers/sixDoFSolver/newSixDoFSolver.C

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -47,7 +47,7 @@ Foam::AveragingMethod<Type>::AveragingMethod
     {
         FieldField<Field, Type>::append
         (
-            new Field<Type>(size[i], pTraits<Type>::zero)
+            new Field<Type>(size[i], Zero)
         );
     }
 }
@@ -69,7 +69,7 @@ Foam::AveragingMethod<Type>::AveragingMethod
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::autoPtr<Foam::AveragingMethod<Type> >
+Foam::autoPtr<Foam::AveragingMethod<Type>>
 Foam::AveragingMethod<Type>::New
 (
     const IOobject& io,
@@ -87,22 +87,15 @@ Foam::AveragingMethod<Type>::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "Foam::AveragingMethod<Type>::New"
-            "("
-                "const IOobject&, "
-                "const dictionary&, "
-                "const fvMesh&"
-            ")"
-        )   << "Unknown averaging method " << averageType
+        FatalErrorInFunction
+            << "Unknown averaging method " << averageType
             << ", constructor not in hash table" << nl << nl
             << "    Valid averaging methods are:" << nl
             << dictionaryConstructorTablePtr_->sortedToc()
             << abort(FatalError);
     }
 
-    return autoPtr<AveragingMethod<Type> >(cstrIter()(io, dict, mesh));
+    return autoPtr<AveragingMethod<Type>>(cstrIter()(io, dict, mesh));
 }
 
 
@@ -168,7 +161,7 @@ bool Foam::AveragingMethod<Type>::write() const
             mesh_
         ),
         mesh_,
-        dimensioned<Type>("zero", dimless, pTraits<Type>::zero)
+        dimensioned<Type>("zero", dimless, Zero)
     );
     GeometricField<TypeGrad, fvPatchField, volMesh> cellGrad
     (
@@ -179,7 +172,7 @@ bool Foam::AveragingMethod<Type>::write() const
             mesh_
         ),
         mesh_,
-        dimensioned<TypeGrad>("zero", dimless, pTraits<TypeGrad>::zero)
+        dimensioned<TypeGrad>("zero", dimless, Zero)
     );
     GeometricField<Type, pointPatchField, pointMesh> pointValue
     (
@@ -190,7 +183,7 @@ bool Foam::AveragingMethod<Type>::write() const
             mesh_
         ),
         pointMesh_,
-        dimensioned<Type>("zero", dimless, pTraits<Type>::zero)
+        dimensioned<Type>("zero", dimless, Zero)
     );
     GeometricField<TypeGrad, pointPatchField, pointMesh> pointGrad
     (
@@ -201,22 +194,22 @@ bool Foam::AveragingMethod<Type>::write() const
             mesh_
         ),
         pointMesh_,
-        dimensioned<TypeGrad>("zero", dimless, pTraits<TypeGrad>::zero)
+        dimensioned<TypeGrad>("zero", dimless, Zero)
     );
 
     // tet-volume weighted sums
-    forAll(mesh_.C(), cellI)
+    forAll(mesh_.C(), celli)
     {
         const List<tetIndices> cellTets =
-            polyMeshTetDecomposition::cellTetIndices(mesh_, cellI);
+            polyMeshTetDecomposition::cellTetIndices(mesh_, celli);
 
         forAll(cellTets, tetI)
         {
             const tetIndices& tetIs = cellTets[tetI];
             const scalar v = tetIs.tet(mesh_).mag();
 
-            cellValue[cellI] += v*interpolate(mesh_.C()[cellI], tetIs);
-            cellGrad[cellI] += v*interpolateGrad(mesh_.C()[cellI], tetIs);
+            cellValue[celli] += v*interpolate(mesh_.C()[celli], tetIs);
+            cellGrad[celli] += v*interpolateGrad(mesh_.C()[celli], tetIs);
 
             const face& f = mesh_.faces()[tetIs.face()];
             labelList vertices(3);
@@ -226,22 +219,22 @@ bool Foam::AveragingMethod<Type>::write() const
 
             forAll(vertices, vertexI)
             {
-                const label pointI = vertices[vertexI];
+                const label pointi = vertices[vertexI];
 
-                pointVolume[pointI] += v;
-                pointValue[pointI] +=
-                    v*interpolate(mesh_.points()[pointI], tetIs);
-                pointGrad[pointI] +=
-                    v*interpolateGrad(mesh_.points()[pointI], tetIs);
+                pointVolume[pointi] += v;
+                pointValue[pointi] +=
+                    v*interpolate(mesh_.points()[pointi], tetIs);
+                pointGrad[pointi] +=
+                    v*interpolateGrad(mesh_.points()[pointi], tetIs);
             }
         }
     }
 
     // average
-    cellValue.internalField() /= mesh_.V();
-    cellGrad.internalField() /= mesh_.V();
-    pointValue.internalField() /= pointVolume;
-    pointGrad.internalField() /= pointVolume;
+    cellValue.primitiveFieldRef() /= mesh_.V();
+    cellGrad.primitiveFieldRef() /= mesh_.V();
+    pointValue.primitiveFieldRef() /= pointVolume;
+    pointGrad.primitiveFieldRef() /= pointVolume;
 
     // write
     if (!cellValue.write()) return false;

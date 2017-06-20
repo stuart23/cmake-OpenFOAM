@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "PatchInjection.H"
-#include "TimeDataEntry.H"
+#include "TimeFunction1.H"
 #include "distributionModel.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -47,7 +47,7 @@ Foam::PatchInjection<CloudType>::PatchInjection
     U0_(this->coeffDict().lookup("U0")),
     flowRateProfile_
     (
-        TimeDataEntry<scalar>
+        TimeFunction1<scalar>
         (
             owner.db().time(),
             "flowRateProfile",
@@ -175,7 +175,7 @@ void Foam::PatchInjection<CloudType>::setPositionAndCell
     const scalar,
     vector& position,
     label& cellOwner,
-    label& tetFaceI,
+    label& tetFacei,
     label& tetPtI
 )
 {
@@ -185,7 +185,7 @@ void Foam::PatchInjection<CloudType>::setPositionAndCell
         this->owner().rndGen(),
         position,
         cellOwner,
-        tetFaceI,
+        tetFacei,
         tetPtI
     );
 }

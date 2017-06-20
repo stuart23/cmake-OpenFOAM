@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -67,8 +67,8 @@ void Foam::cylindrical::init
         tensorField& R = Rptr_();
         forAll(cells, i)
         {
-            label cellI = cells[i];
-            vector dir = cc[cellI] - origin_;
+            label celli = cells[i];
+            vector dir = cc[celli] - origin_;
             dir /= mag(dir) + VSMALL;
 
             R[i] = axesRotation(e3_, dir).R();
@@ -79,12 +79,12 @@ void Foam::cylindrical::init
         Rptr_.reset(new tensorField(mesh.nCells()));
 
         tensorField& R = Rptr_();
-        forAll(cc, cellI)
+        forAll(cc, celli)
         {
-            vector dir = cc[cellI] - origin_;
+            vector dir = cc[celli] - origin_;
             dir /= mag(dir) + VSMALL;
 
-            R[cellI] = axesRotation(e3_, dir).R();
+            R[celli] = axesRotation(e3_, dir).R();
         }
     }
 }
@@ -100,7 +100,7 @@ Foam::cylindrical::cylindrical
 :
     Rptr_(),
     origin_(point::zero),
-    e3_(vector::zero)
+    e3_(Zero)
 {
     // If origin is specified in the coordinateSystem
     if (dict.parent().found("origin"))
@@ -152,7 +152,7 @@ Foam::cylindrical::cylindrical(const dictionary& dict)
     origin_(),
     e3_()
 {
-    FatalErrorIn("cylindrical(const dictionary&)")
+    FatalErrorInFunction
         << " cylindrical can not be constructed from dictionary "
         << " use the construtctor : "
            "("
@@ -165,8 +165,8 @@ Foam::cylindrical::cylindrical(const dictionary& dict)
 Foam::cylindrical::cylindrical(const tensorField& R)
 :
     Rptr_(),
-    origin_(vector::zero),
-    e3_(vector::zero)
+    origin_(Zero),
+    e3_(Zero)
 {
     Rptr_() = R;
 }
@@ -194,11 +194,11 @@ void Foam::cylindrical::updateCells
 
     forAll(cells, i)
     {
-        label cellI = cells[i];
-        vector dir = cc[cellI] - origin_;
+        label celli = cells[i];
+        vector dir = cc[celli] - origin_;
         dir /= mag(dir) + VSMALL;
 
-        R[cellI] = axesRotation(e3_, dir).R();
+        R[celli] = axesRotation(e3_, dir).R();
     }
 }
 
@@ -210,10 +210,7 @@ Foam::tmp<Foam::vectorField> Foam::cylindrical::transform
 {
     if (Rptr_->size() != vf.size())
     {
-        FatalErrorIn
-        (
-            "tmp<vectorField> cylindrical::transform(const vectorField&)"
-        )
+        FatalErrorInFunction
             << "vectorField st has different size to tensorField "
             << abort(FatalError);
     }
@@ -224,11 +221,8 @@ Foam::tmp<Foam::vectorField> Foam::cylindrical::transform
 
 Foam::vector Foam::cylindrical::transform(const vector& v) const
 {
-    notImplemented
-    (
-        "vector cylindrical::transform(const vector&) const"
-    );
-    return vector::zero;
+    NotImplemented;
+    return Zero;
 }
 
 
@@ -253,11 +247,8 @@ Foam::tmp<Foam::vectorField> Foam::cylindrical::invTransform
 
 Foam::vector Foam::cylindrical::invTransform(const vector& v) const
 {
-    notImplemented
-    (
-        "vector cylindrical::invTransform(const vector&) const"
-    );
-    return vector::zero;
+    NotImplemented;
+    return Zero;
 }
 
 
@@ -278,13 +269,7 @@ Foam::tmp<Foam::tensorField> Foam::cylindrical::transformTensor
 {
     if (Rptr_->size() != tf.size())
     {
-        FatalErrorIn
-        (
-            "tmp<tensorField> cylindrical::transformTensor"
-            "("
-                "const tensorField&"
-            ")"
-        )
+        FatalErrorInFunction
             << "tensorField st has different size to tensorField Tr"
             << abort(FatalError);
     }
@@ -297,12 +282,9 @@ Foam::tensor Foam::cylindrical::transformTensor
     const tensor& t
 ) const
 {
-    notImplemented
-    (
-        "tensor cylindrical::transformTensor(const tensor&) const"
-    );
+    NotImplemented;
 
-    return tensor::zero;
+    return Zero;
 }
 
 
@@ -314,14 +296,7 @@ Foam::tmp<Foam::tensorField> Foam::cylindrical::transformTensor
 {
     if (cellMap.size() != tf.size())
     {
-        FatalErrorIn
-        (
-            "tmp<tensorField> cylindrical::transformTensor"
-            "("
-                "const tensorField&, "
-                "const labelList&"
-            ")"
-        )
+        FatalErrorInFunction
             << "tensorField tf has different size to tensorField Tr"
             << abort(FatalError);
     }
@@ -329,11 +304,11 @@ Foam::tmp<Foam::tensorField> Foam::cylindrical::transformTensor
     const tensorField& R = Rptr_();
     const tensorField Rtr(R.T());
     tmp<tensorField> tt(new tensorField(cellMap.size()));
-    tensorField& t = tt();
+    tensorField& t = tt.ref();
     forAll(cellMap, i)
     {
-        const label cellI = cellMap[i];
-        t[i] = R[cellI] & tf[i] & Rtr[cellI];
+        const label celli = cellMap[i];
+        t[i] = R[celli] & tf[i] & Rtr[celli];
     }
 
     return tt;
@@ -347,13 +322,13 @@ Foam::tmp<Foam::symmTensorField> Foam::cylindrical::transformVector
 {
     if (Rptr_->size() != vf.size())
     {
-        FatalErrorIn("cylindrical::transformVector(const vectorField&)")
+        FatalErrorInFunction
             << "tensorField vf has different size to tensorField Tr"
             << abort(FatalError);
     }
 
     tmp<symmTensorField> tfld(new symmTensorField(Rptr_->size()));
-    symmTensorField& fld = tfld();
+    symmTensorField& fld = tfld.ref();
 
     const tensorField& R = Rptr_();
     forAll(fld, i)
@@ -369,11 +344,8 @@ Foam::symmTensor Foam::cylindrical::transformVector
     const vector& v
 ) const
 {
-    notImplemented
-    (
-        "tensor cylindrical::transformVector(const vector&) const"
-    );
-    return symmTensor::zero;
+    NotImplemented;
+    return Zero;
 }
 
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -43,7 +43,7 @@ void Foam::fvSurfaceMapper::calcAddressing() const
      || insertedObjectLabelsPtr_
     )
     {
-        FatalErrorIn("void fvSurfaceMapper::calcAddressing() const)")
+        FatalErrorInFunction
             << "Addressing already calculated"
             << abort(FatalError);
     }
@@ -64,11 +64,11 @@ void Foam::fvSurfaceMapper::calcAddressing() const
         labelList& addr = *directAddrPtr_;
 
         // Adjust for creation of an internal face from a boundary face
-        forAll(addr, faceI)
+        forAll(addr, facei)
         {
-            if (addr[faceI] > oldNInternal)
+            if (addr[facei] > oldNInternal)
             {
-                addr[faceI] = 0;
+                addr[facei] = 0;
             }
         }
     }
@@ -90,12 +90,12 @@ void Foam::fvSurfaceMapper::calcAddressing() const
         scalarListList& w = *weightsPtr_;
 
         // Adjust for creation of an internal face from a boundary face
-        forAll(addr, faceI)
+        forAll(addr, facei)
         {
-            if (max(addr[faceI]) >= oldNInternal)
+            if (max(addr[facei]) >= oldNInternal)
             {
-                addr[faceI] = labelList(1, label(0));
-                w[faceI] = scalarList(1, 1.0);
+                addr[facei] = labelList(1, label(0));
+                w[facei] = scalarList(1, 1.0);
             }
         }
     }
@@ -112,12 +112,12 @@ void Foam::fvSurfaceMapper::calcAddressing() const
 
         label nIns = 0;
 
-        forAll(insFaces, faceI)
+        forAll(insFaces, facei)
         {
             // If the face is internal, keep it here
-            if (insFaces[faceI] < size())
+            if (insFaces[facei] < size())
             {
-                ins[nIns] = insFaces[faceI];
+                ins[nIns] = insFaces[facei];
                 nIns++;
             }
         }
@@ -144,7 +144,6 @@ void Foam::fvSurfaceMapper::clearOut()
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from components
 Foam::fvSurfaceMapper::fvSurfaceMapper
 (
     const fvMesh& mesh,
@@ -174,11 +173,8 @@ const Foam::labelUList& Foam::fvSurfaceMapper::directAddressing() const
 {
     if (!direct())
     {
-        FatalErrorIn
-        (
-            "const labelUList& fvSurfaceMapper::"
-            "directAddressing() const"
-        )   << "Requested direct addressing for an interpolative mapper."
+        FatalErrorInFunction
+            << "Requested direct addressing for an interpolative mapper."
             << abort(FatalError);
     }
 
@@ -195,10 +191,8 @@ const Foam::labelListList& Foam::fvSurfaceMapper::addressing() const
 {
     if (direct())
     {
-        FatalErrorIn
-        (
-            "const labelListList& fvSurfaceMapper::addressing() const"
-        )   << "Requested interpolative addressing for a direct mapper."
+        FatalErrorInFunction
+            << "Requested interpolative addressing for a direct mapper."
             << abort(FatalError);
     }
 
@@ -215,10 +209,8 @@ const Foam::scalarListList& Foam::fvSurfaceMapper::weights() const
 {
     if (direct())
     {
-        FatalErrorIn
-        (
-            "const scalarListList& fvSurfaceMapper::weights() const"
-        )   << "Requested interpolative weights for a direct mapper."
+        FatalErrorInFunction
+            << "Requested interpolative weights for a direct mapper."
             << abort(FatalError);
     }
 

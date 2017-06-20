@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,8 +25,8 @@ Application
     pimpleDyMFoam.C
 
 Description
-    Transient solver for incompressible, flow of Newtonian fluids
-    on a moving mesh using the PIMPLE (merged PISO-SIMPLE) algorithm.
+    Transient solver for incompressible, turbulent flow of Newtonian fluids
+    on a moving mesh.
 
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
 
@@ -38,27 +38,26 @@ Description
 #include "turbulentTransportModel.H"
 #include "pimpleControl.H"
 #include "CorrectPhi.H"
-#include "fvIOoptionList.H"
-#include "fixedFluxPressureFvPatchScalarField.H"
+#include "fvOptions.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
+    #include "postProcess.H"
+
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createDynamicFvMesh.H"
     #include "initContinuityErrs.H"
-
-    pimpleControl pimple(mesh);
-
+    #include "createControls.H"
     #include "createFields.H"
     #include "createUf.H"
-    #include "createMRF.H"
     #include "createFvOptions.H"
-    #include "createControls.H"
     #include "CourantNo.H"
     #include "setInitialDeltaT.H"
+
+    turbulence->validate();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

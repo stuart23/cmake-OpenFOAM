@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -88,7 +88,7 @@ bool setCellFieldType
 
         if (selectedCells.size() == field.size())
         {
-            field.internalField() = value;
+            field.primitiveFieldRef() = value;
         }
         else
         {
@@ -98,30 +98,24 @@ bool setCellFieldType
             }
         }
 
+        typename GeometricField<Type, fvPatchField, volMesh>::
+            Boundary& fieldBf = field.boundaryFieldRef();
+
         forAll(field.boundaryField(), patchi)
         {
-            field.boundaryField()[patchi] =
-                field.boundaryField()[patchi].patchInternalField();
+            fieldBf[patchi] = fieldBf[patchi].patchInternalField();
         }
 
         if (!field.write())
         {
-            FatalErrorIn
-            (
-                "void setCellFieldType"
-                "(const fvMesh& mesh, const labelList& selectedCells,"
-                "Istream& fieldValueStream)"
-            ) << "Failed writing field " << fieldName << endl;
+            FatalErrorInFunction
+              << "Failed writing field " << fieldName << endl;
         }
     }
     else
     {
-        WarningIn
-        (
-            "void setCellFieldType"
-            "(const fvMesh& mesh, const labelList& selectedCells,"
-            "Istream& fieldValueStream)"
-        ) << "Field " << fieldName << " not found" << endl;
+        WarningInFunction
+          << "Field " << fieldName << " not found" << endl;
 
         // Consume value
         (void)pTraits<Type>(fieldValueStream);
@@ -177,7 +171,7 @@ public:
                 )
             )
             {
-                WarningIn("setCellField::iNew::operator()(Istream& is)")
+                WarningInFunction
                     << "field type " << fieldType << " not currently supported"
                     << endl;
             }
@@ -248,7 +242,7 @@ bool setFaceFieldType
                 field.boundaryField()[patchi].size(),
                 field.boundaryField()[patchi].patch().start()
               - mesh.nInternalFaces()
-            ).assign(field.boundaryField()[patchi]);
+            ) = field.boundaryField()[patchi];
         }
 
         // Override
@@ -266,21 +260,24 @@ bool setFaceFieldType
                 if (!hasWarned)
                 {
                     hasWarned = true;
-                    WarningIn("setFaceFieldType(..)")
+                    WarningInFunction
                         << "Ignoring internal face " << facei
                         << ". Suppressing further warnings." << endl;
                 }
             }
             else
             {
-                label bFaceI = facei-mesh.nInternalFaces();
-                allBoundaryValues[bFaceI] = value;
-                nChanged[mesh.boundaryMesh().patchID()[bFaceI]]++;
+                label bFacei = facei-mesh.nInternalFaces();
+                allBoundaryValues[bFacei] = value;
+                nChanged[mesh.boundaryMesh().patchID()[bFacei]]++;
             }
         }
 
         Pstream::listCombineGather(nChanged, plusEqOp<label>());
         Pstream::listCombineScatter(nChanged);
+
+        typename GeometricField<Type, fvPatchField, volMesh>::
+            Boundary& fieldBf = field.boundaryFieldRef();
 
         // Reassign.
         forAll(field.boundaryField(), patchi)
@@ -290,11 +287,11 @@ bool setFaceFieldType
                 Info<< "    On patch "
                     << field.boundaryField()[patchi].patch().name()
                     << " set " << nChanged[patchi] << " values" << endl;
-                field.boundaryField()[patchi] == SubField<Type>
+                fieldBf[patchi] == SubField<Type>
                 (
                     allBoundaryValues,
-                    field.boundaryField()[patchi].size(),
-                    field.boundaryField()[patchi].patch().start()
+                    fieldBf[patchi].size(),
+                    fieldBf[patchi].patch().start()
                   - mesh.nInternalFaces()
                 );
             }
@@ -302,22 +299,14 @@ bool setFaceFieldType
 
         if (!field.write())
         {
-            FatalErrorIn
-            (
-                "void setFaceFieldType"
-                "(const fvMesh& mesh, const labelList& selectedFaces,"
-                "Istream& fieldValueStream)"
-            )   << "Failed writing field " << field.name() << exit(FatalError);
+            FatalErrorInFunction
+                << "Failed writing field " << field.name() << exit(FatalError);
         }
     }
     else
     {
-        WarningIn
-        (
-            "void setFaceFieldType"
-            "(const fvMesh& mesh, const labelList& selectedFaces,"
-            "Istream& fieldValueStream)"
-        ) << "Field " << fieldName << " not found" << endl;
+        WarningInFunction
+          << "Field " << fieldName << " not found" << endl;
 
         // Consume value
         (void)pTraits<Type>(fieldValueStream);
@@ -373,7 +362,7 @@ public:
                 )
             )
             {
-                WarningIn("setFaceField::iNew::operator()(Istream& is)")
+                WarningInFunction
                     << "field type " << fieldType << " not currently supported"
                     << endl;
             }

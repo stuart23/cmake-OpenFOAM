@@ -27,13 +27,9 @@
     autoPtr<psiChemistryModel> pChemistry(psiChemistryModel::New(mesh));
 
     psiChemistryModel& chemistry = pChemistry();
-    scalar dtChem = refCast<const psiChemistryModel>(chemistry).deltaTChem()[0];
 
     psiReactionThermo& thermo = chemistry.thermo();
     thermo.validate(args.executable(), "h");
-
-    basicMultiComponentMixture& composition = thermo.composition();
-    PtrList<volScalarField>& Y = composition.Y();
 
     volScalarField rho
     (
@@ -47,8 +43,6 @@
         ),
         thermo.rho()
     );
-
-    volScalarField& p = thermo.p();
 
     volScalarField Rspecific
     (
@@ -80,8 +74,7 @@
             IOobject::NO_WRITE
         ),
         mesh,
-        dimensionedVector("zero", dimVelocity, vector::zero),
-        p.boundaryField().types()
+        dimensionedVector("zero", dimVelocity, Zero)
     );
 
     #include "createPhi.H"

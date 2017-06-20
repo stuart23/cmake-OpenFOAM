@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -43,16 +43,8 @@ Foam::ParticleForce<CloudType>::ParticleForce
 {
     if (readCoeffs && (coeffs_.dictName() != forceType))
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "Foam::ParticleForce<CloudType>::ParticleForce"
-            "("
-                "CloudType&, "
-                "const fvMesh&, "
-                "const dictionary&, "
-                "const word&, "
-                "const bool"
-            ")",
             dict
         )   << "Force " << forceType << " must be specified as a dictionary"
             << exit(FatalIOError);
@@ -94,7 +86,7 @@ Foam::forceSuSp Foam::ParticleForce<CloudType>::calcCoupled
 ) const
 {
     forceSuSp value;
-    value.Su() = vector::zero;
+    value.Su() = Zero;
     value.Sp() = 0.0;
 
     return value;
@@ -112,7 +104,7 @@ Foam::forceSuSp Foam::ParticleForce<CloudType>::calcNonCoupled
 ) const
 {
     forceSuSp value;
-    value.Su() = vector::zero;
+    value.Su() = Zero;
     value.Sp() = 0.0;
 
     return value;

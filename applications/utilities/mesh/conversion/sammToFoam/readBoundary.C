@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -116,7 +116,7 @@ void Foam::sammMesh::readBoundary()
         }
         else
         {
-            FatalErrorIn("void sammMesh::readBoundary()")
+            FatalErrorInFunction
                 << "Cannot read file "
                 << boundaryFileName
                 << abort(FatalError);
@@ -139,7 +139,7 @@ void Foam::sammMesh::readBoundary()
 
         IFstream boundaryFile(boundaryFileName);
 
-        for (label faceI=0; faceI<nFaces; faceI++)
+        for (label facei=0; facei<nFaces; facei++)
         {
             boundaryFile >> lineIndex;
 
@@ -172,7 +172,7 @@ void Foam::sammMesh::readBoundary()
             )
             {
                 //Info<< "Converting collapsed quad into triangle"
-                //    << " for face " << faceI
+                //    << " for face " << facei
                 //    << " in Samm boundary " << lineIndex << endl;
 
                 pointLabelsTri[0] = pointLabels[0];
@@ -222,7 +222,7 @@ void Foam::sammMesh::readBoundary()
     }
     else
     {
-        FatalErrorIn("sammMesh::readBoundary()")
+        FatalErrorInFunction
             << "No boundary faces in file "
             << boundaryFileName
             << endl;
@@ -243,13 +243,13 @@ void Foam::sammMesh::readBoundary()
         defaultFacesType_
     );
 
-    forAll(patchDicts, patchI)
+    forAll(patchDicts, patchi)
     {
-        if (patchDicts.set(patchI))
+        if (patchDicts.set(patchi))
         {
-            const dictionary& dict = patchDicts[patchI];
-            dict.readIfPresent("type", patchTypes_[patchI]);
-            dict.readIfPresent("physicalType", patchPhysicalTypes_[patchI]);
+            const dictionary& dict = patchDicts[patchi];
+            dict.readIfPresent("type", patchTypes_[patchi]);
+            dict.readIfPresent("physicalType", patchPhysicalTypes_[patchi]);
         }
     }
 }

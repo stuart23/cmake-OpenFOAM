@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::autoPtr<Foam::HeatTransferModel<CloudType> >
+Foam::autoPtr<Foam::HeatTransferModel<CloudType>>
 Foam::HeatTransferModel<CloudType>::New
 (
     const dictionary& dict,
@@ -44,21 +44,15 @@ Foam::HeatTransferModel<CloudType>::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "HeatTransferModel<CloudType>::New"
-            "("
-                "const dictionary&, "
-                "CloudType&"
-            ")"
-        )   << "Unknown heat transfer model type "
+        FatalErrorInFunction
+            << "Unknown heat transfer model type "
             << modelType << nl << nl
             << "Valid heat transfer model types are:" << nl
             << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 
-    return autoPtr<HeatTransferModel<CloudType> >(cstrIter()(dict, owner));
+    return autoPtr<HeatTransferModel<CloudType>>(cstrIter()(dict, owner));
 }
 
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -129,8 +129,8 @@ class regionSplit
         //- Transfer faceRegion data from one face to the other (or vice versa)
         void transferCoupledFaceRegion
         (
-            const label faceI,
-            const label otherFaceI,
+            const label facei,
+            const label otherFacei,
 
             labelList& faceRegion,
             DynamicList<label>& newChangedFaces

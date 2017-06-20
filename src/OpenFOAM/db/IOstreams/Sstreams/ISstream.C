@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -321,7 +321,7 @@ Foam::Istream& Foam::ISstream::read(token& t)
                     // runaway argument - avoid buffer overflow
                     buf[maxLen-1] = '\0';
 
-                    FatalIOErrorIn("ISstream::read(token&)", *this)
+                    FatalIOErrorInFunction(*this)
                         << "number '" << buf << "...'\n"
                         << "    is too long (max. " << maxLen << " characters)"
                         << exit(FatalIOError);
@@ -440,7 +440,7 @@ Foam::Istream& Foam::ISstream::read(word& str)
         {
             buf[errLen] = '\0';
 
-            FatalIOErrorIn("ISstream::read(word&)", *this)
+            FatalIOErrorInFunction(*this)
                 << "word '" << buf << "...'\n"
                 << "    is too long (max. " << maxLen << " characters)"
                 << exit(FatalIOError);
@@ -454,7 +454,7 @@ Foam::Istream& Foam::ISstream::read(word& str)
     {
         buf[errLen] = buf[nChar] = '\0';
 
-        FatalIOErrorIn("ISstream::read(word&)", *this)
+        FatalIOErrorInFunction(*this)
             << "problem while reading word '" << buf << "...' after "
             << nChar << " characters\n"
             << exit(FatalIOError);
@@ -464,7 +464,7 @@ Foam::Istream& Foam::ISstream::read(word& str)
 
     if (nChar == 0)
     {
-        FatalIOErrorIn("ISstream::read(word&)", *this)
+        FatalIOErrorInFunction(*this)
             << "invalid first character found : " << c
             << exit(FatalIOError);
     }
@@ -488,7 +488,7 @@ Foam::Istream& Foam::ISstream::read(string& str)
 
     if (!get(c))
     {
-        FatalIOErrorIn("ISstream::read(string&)", *this)
+        FatalIOErrorInFunction(*this)
             << "cannot read start of string"
             << exit(FatalIOError);
 
@@ -498,7 +498,7 @@ Foam::Istream& Foam::ISstream::read(string& str)
     // Note, we could also handle single-quoted strings here (if desired)
     if (c != token::BEGIN_STRING)
     {
-        FatalIOErrorIn("ISstream::read(string&)", *this)
+        FatalIOErrorInFunction(*this)
             << "Incorrect start of string character found : " << c
             << exit(FatalIOError);
 
@@ -536,7 +536,7 @@ Foam::Istream& Foam::ISstream::read(string& str)
             {
                 buf[errLen] = buf[nChar] = '\0';
 
-                FatalIOErrorIn("ISstream::read(string&)", *this)
+                FatalIOErrorInFunction(*this)
                     << "found '\\n' while reading string \""
                     << buf << "...\""
                     << exit(FatalIOError);
@@ -558,7 +558,7 @@ Foam::Istream& Foam::ISstream::read(string& str)
         {
             buf[errLen] = '\0';
 
-            FatalIOErrorIn("ISstream::read(string&)", *this)
+            FatalIOErrorInFunction(*this)
                 << "string \"" << buf << "...\"\n"
                 << "    is too long (max. " << maxLen << " characters)"
                 << exit(FatalIOError);
@@ -571,7 +571,7 @@ Foam::Istream& Foam::ISstream::read(string& str)
     // don't worry about a dangling backslash if string terminated prematurely
     buf[errLen] = buf[nChar] = '\0';
 
-    FatalIOErrorIn("ISstream::read(string&)", *this)
+    FatalIOErrorInFunction(*this)
         << "problem while reading string \"" << buf << "...\""
         << exit(FatalIOError);
 
@@ -579,7 +579,6 @@ Foam::Istream& Foam::ISstream::read(string& str)
 }
 
 
-// Special handling of '{' in variables
 Foam::Istream& Foam::ISstream::readVariable(string& str)
 {
     static const int maxLen = 1024;
@@ -592,7 +591,7 @@ Foam::Istream& Foam::ISstream::readVariable(string& str)
 
     if (!get(c) || c != '$')
     {
-        FatalIOErrorIn("ISstream::readVariable(string&)", *this)
+        FatalIOErrorInFunction(*this)
             << "invalid first character found : " << c
             << exit(FatalIOError);
     }
@@ -620,7 +619,7 @@ Foam::Istream& Foam::ISstream::readVariable(string& str)
             {
                 buf[errLen] = '\0';
 
-                FatalIOErrorIn("ISstream::readVariable(string&)", *this)
+                FatalIOErrorInFunction(*this)
                     << "word '" << buf << "...'\n"
                     << "    is too long (max. " << maxLen << " characters)"
                     << exit(FatalIOError);
@@ -656,7 +655,7 @@ Foam::Istream& Foam::ISstream::readVariable(string& str)
             {
                 buf[errLen] = '\0';
 
-                FatalIOErrorIn("ISstream::readVariable(string&)", *this)
+                FatalIOErrorInFunction(*this)
                     << "word '" << buf << "...'\n"
                     << "    is too long (max. " << maxLen << " characters)"
                     << exit(FatalIOError);
@@ -671,7 +670,7 @@ Foam::Istream& Foam::ISstream::readVariable(string& str)
     {
         buf[errLen] = buf[nChar] = '\0';
 
-        FatalIOErrorIn("ISstream::readVariable(string&)", *this)
+        FatalIOErrorInFunction(*this)
             << "problem while reading string '" << buf << "...' after "
             << nChar << " characters\n"
             << exit(FatalIOError);
@@ -681,7 +680,7 @@ Foam::Istream& Foam::ISstream::readVariable(string& str)
 
     if (nChar == 0)
     {
-        FatalIOErrorIn("ISstream::readVariable(string&)", *this)
+        FatalIOErrorInFunction(*this)
             << "invalid first character found : " << c
             << exit(FatalIOError);
     }
@@ -733,7 +732,7 @@ Foam::Istream& Foam::ISstream::readVerbatim(string& str)
         {
             buf[errLen] = '\0';
 
-            FatalIOErrorIn("ISstream::readVerbatim(string&)", *this)
+            FatalIOErrorInFunction(*this)
                 << "string \"" << buf << "...\"\n"
                 << "    is too long (max. " << maxLen << " characters)"
                 << exit(FatalIOError);
@@ -746,7 +745,7 @@ Foam::Istream& Foam::ISstream::readVerbatim(string& str)
     // don't worry about a dangling backslash if string terminated prematurely
     buf[errLen] = buf[nChar] = '\0';
 
-    FatalIOErrorIn("ISstream::readVerbatim(string&)", *this)
+    FatalIOErrorInFunction(*this)
         << "problem while reading string \"" << buf << "...\""
         << exit(FatalIOError);
 
@@ -783,7 +782,7 @@ Foam::Istream& Foam::ISstream::read(char* buf, std::streamsize count)
 {
     if (format() != BINARY)
     {
-        FatalIOErrorIn("ISstream::read(char*, std::streamsize)", *this)
+        FatalIOErrorInFunction(*this)
             << "stream format not binary"
             << exit(FatalIOError);
     }

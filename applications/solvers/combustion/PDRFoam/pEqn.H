@@ -1,9 +1,7 @@
 rho = thermo.rho();
 
 volScalarField rAU(1.0/UEqn.A());
-
-volVectorField HbyA("HbyA", U);
-HbyA = invA & UEqn.H();
+volVectorField HbyA(constrainHbyA(invA & UEqn.H(), U, p));
 
 if (pimple.transonic())
 {
@@ -12,7 +10,7 @@ if (pimple.transonic())
         "phid",
         fvc::interpolate(psi)
        *(
-            (fvc::interpolate(HbyA) & mesh.Sf())
+            fvc::flux(HbyA)
           + fvc::interpolate(rho*rAU)*fvc::ddtCorr(rho, U, phi)
            /fvc::interpolate(rho)
         )
@@ -25,6 +23,8 @@ if (pimple.transonic())
             betav*fvm::ddt(psi, p)
           + fvm::div(phid, p)
           - fvm::laplacian(rho*invA, p)
+         ==
+            betav*fvOptions(psi, p, rho.name())
         );
 
         pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
@@ -41,7 +41,7 @@ else
     (
         "phiHbyA",
         (
-            (fvc::interpolate(rho*HbyA) & mesh.Sf())
+            fvc::flux(rho*HbyA)
           + fvc::interpolate(rho*rAU)*fvc::ddtCorr(rho, U, phi)
         )
     );
@@ -53,6 +53,8 @@ else
             betav*fvm::ddt(psi, p)
           + fvc::div(phiHbyA)
           - fvm::laplacian(rho*invA, p)
+         ==
+            betav*fvOptions(psi, p, rho.name())
         );
 
         pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
@@ -69,6 +71,7 @@ else
 
 U = HbyA - (invA & (betav*fvc::grad(p)));
 U.correctBoundaryConditions();
+fvOptions.correct(U);
 K = 0.5*magSqr(U);
 
 if (thermo.dpdt())

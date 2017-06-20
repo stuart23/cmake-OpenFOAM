@@ -214,7 +214,7 @@ Foam::Map<Foam::label> Foam::refinementIterator::setRefinement
         {
             if (!addedCells.insert(iter.key(), iter()))
             {
-                FatalErrorIn("refinementIterator")
+                FatalErrorInFunction
                     << "Master cell " << iter.key()
                     << " already has been refined" << endl
                     << "Added cell:" << iter() << abort(FatalError);
@@ -272,7 +272,7 @@ Foam::Map<Foam::label> Foam::refinementIterator::setRefinement
 
     if (nRefCells == oldRefCells)
     {
-        WarningIn("refinementIterator")
+        WarningInFunction
             << "stopped refining."
             << "Did not manage to refine a single cell" << endl
             << "Wanted :" << oldRefCells << endl;

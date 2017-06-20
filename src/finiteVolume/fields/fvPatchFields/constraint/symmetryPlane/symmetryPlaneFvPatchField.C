@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -54,20 +54,11 @@ Foam::symmetryPlaneFvPatchField<Type>::symmetryPlaneFvPatchField
 {
     if (!isType<symmetryPlaneFvPatch>(this->patch()))
     {
-        FatalErrorIn
-        (
-            "symmetryPlaneFvPatchField<Type>::symmetryPlaneFvPatchField\n"
-            "(\n"
-            "    const symmetryPlaneFvPatchField<Type>& ptf,\n"
-            "    const fvPatch& p,\n"
-            "    const DimensionedField<Type, volMesh>& iF,\n"
-            "    const fvPatchFieldMapper& mapper\n"
-            ")\n"
-        )   << "\n    patch type '" << p.type()
+        FatalErrorInFunction
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
             << exit(FatalIOError);
     }
 }
@@ -86,20 +77,14 @@ Foam::symmetryPlaneFvPatchField<Type>::symmetryPlaneFvPatchField
 {
     if (!isType<symmetryPlaneFvPatch>(p))
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "symmetryPlaneFvPatchField<Type>::symmetryPlaneFvPatchField\n"
-            "(\n"
-            "    const fvPatch& p,\n"
-            "    const Field<Type>& field,\n"
-            "    const dictionary& dict\n"
-            ")\n",
             dict
         )   << "\n    patch type '" << p.type()
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
             << exit(FatalIOError);
     }
 }
@@ -131,7 +116,7 @@ Foam::symmetryPlaneFvPatchField<Type>::symmetryPlaneFvPatchField
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::symmetryPlaneFvPatchField<Type>::snGrad() const
 {
     vector nHat(symmetryPlanePatch_.n());
@@ -166,7 +151,7 @@ void Foam::symmetryPlaneFvPatchField<Type>::evaluate(const Pstream::commsTypes)
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::symmetryPlaneFvPatchField<Type>::snGradTransformDiag() const
 {
     vector nHat(symmetryPlanePatch_.n());
@@ -178,7 +163,7 @@ Foam::symmetryPlaneFvPatchField<Type>::snGradTransformDiag() const
         mag(nHat.component(vector::Z))
     );
 
-    return tmp<Field<Type> >
+    return tmp<Field<Type>>
     (
         new Field<Type>
         (

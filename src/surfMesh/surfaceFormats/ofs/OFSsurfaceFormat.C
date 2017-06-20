@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -53,10 +53,7 @@ bool Foam::fileFormats::OFSsurfaceFormat<Face>::read
     IFstream is(filename);
     if (!is.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::OFSsurfaceFormat::read(const fileName&)"
-        )
+        FatalErrorInFunction
             << "Cannot read file " << filename
             << exit(FatalError);
     }
@@ -103,11 +100,7 @@ bool Foam::fileFormats::OFSsurfaceFormat<Face>::read
 {
     if (!is.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::OFSsurfaceFormat::read"
-            "(Istream&, pointField&, List<Face>&, List<surfZone>&)"
-        )
+        FatalErrorInFunction
             << "read error "
             << exit(FatalError);
     }
@@ -155,11 +148,7 @@ bool Foam::fileFormats::OFSsurfaceFormat<Face>::read
 
     if (!is.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::OFSsurfaceFormat::read"
-            "(Istream&, MeshedSurface<Face>&)"
-        )
+        FatalErrorInFunction
             << "read error "
             << exit(FatalError);
     }
@@ -210,11 +199,7 @@ void Foam::fileFormats::OFSsurfaceFormat<Face>::write
     OFstream os(filename);
     if (!os.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::OFSsurfaceFormat::write"
-            "(const fileName&, const MeshedSurfaceProxy<Face>&)"
-        )
+        FatalErrorInFunction
             << "Cannot open file for writing " << filename
             << exit(FatalError);
     }
@@ -230,15 +215,15 @@ void Foam::fileFormats::OFSsurfaceFormat<Face>::write
         os  << "\n// faces:"  << nl
             << faceLst.size() << token::BEGIN_LIST << nl;
 
-        label faceI = 0;
+        label facei = 0;
         forAll(zones, zoneI)
         {
             // Print all faces belonging to this zone
             const surfZone& zone = zones[zoneI];
 
-            forAll(zone, localFaceI)
+            forAll(zone, localFacei)
             {
-                os << faceLst[faceMap[faceI++]] << nl;
+                os << faceLst[faceMap[facei++]] << nl;
             }
         }
         os << token::END_LIST << nl;

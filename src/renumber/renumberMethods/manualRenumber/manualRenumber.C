@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -80,10 +80,8 @@ Foam::labelList Foam::manualRenumber::renumber
 
     if (newToOld.size() != points.size())
     {
-        FatalErrorIn
-        (
-            "manualRenumber::renumber(const pointField&, const scalarField&)"
-        )   << "Size of renumber list does not correspond "
+        FatalErrorInFunction
+            << "Size of renumber list does not correspond "
             << "to the number of points.  Size: "
             << newToOld.size() << " Number of points: "
             << points.size()
@@ -96,34 +94,28 @@ Foam::labelList Foam::manualRenumber::renumber
     labelList oldToNew(points.size(), -1);
     forAll(newToOld, i)
     {
-        label origCellI = newToOld[i];
+        label origCelli = newToOld[i];
 
-        if (origCellI < 0 || origCellI >= points.size())
+        if (origCelli < 0 || origCelli >= points.size())
         {
-            FatalErrorIn
-            (
-                "manualRenumber::renumber(const pointField&"
-                ", const scalarField&)"
-            )   << "Renumbering is not one-to-one. Index "
-                << i << " maps onto original cell " << origCellI
+            FatalErrorInFunction
+                << "Renumbering is not one-to-one. Index "
+                << i << " maps onto original cell " << origCelli
                 << ".\n" << "Manual renumbering data read from file "
                 << dataFile_ << "." << endl
                 << exit(FatalError);
         }
 
-        if (oldToNew[origCellI] == -1)
+        if (oldToNew[origCelli] == -1)
         {
-            oldToNew[origCellI] = i;
+            oldToNew[origCelli] = i;
         }
         else
         {
-            FatalErrorIn
-            (
-                "manualRenumber::renumber(const pointField&"
-                ", const scalarField&)"
-            )   << "Renumbering is not one-to-one. Both index "
-                << oldToNew[origCellI]
-                << " and " << i << " map onto " << origCellI
+            FatalErrorInFunction
+                << "Renumbering is not one-to-one. Both index "
+                << oldToNew[origCelli]
+                << " and " << i << " map onto " << origCelli
                 << ".\n" << "Manual renumbering data read from file "
                 << dataFile_ << "." << endl
                 << exit(FatalError);

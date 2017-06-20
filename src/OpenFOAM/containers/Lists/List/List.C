@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,7 +25,6 @@ License
 
 #include "List.H"
 #include "ListLoopM.H"
-
 #include "FixedList.H"
 #include "PtrList.H"
 #include "SLList.H"
@@ -34,11 +33,8 @@ License
 #include "BiIndirectList.H"
 #include "contiguous.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-// Construct with length specified
 template<class T>
 Foam::List<T>::List(const label s)
 :
@@ -46,7 +42,7 @@ Foam::List<T>::List(const label s)
 {
     if (this->size_ < 0)
     {
-        FatalErrorIn("List<T>::List(const label size)")
+        FatalErrorInFunction
             << "bad size " << this->size_
             << abort(FatalError);
     }
@@ -58,7 +54,6 @@ Foam::List<T>::List(const label s)
 }
 
 
-// Construct with length and single value specified
 template<class T>
 Foam::List<T>::List(const label s, const T& a)
 :
@@ -66,7 +61,7 @@ Foam::List<T>::List(const label s, const T& a)
 {
     if (this->size_ < 0)
     {
-        FatalErrorIn("List<T>::List(const label size, const T&)")
+        FatalErrorInFunction
             << "bad size " << this->size_
             << abort(FatalError);
     }
@@ -83,7 +78,30 @@ Foam::List<T>::List(const label s, const T& a)
 }
 
 
-// Construct as copy
+template<class T>
+Foam::List<T>::List(const label s, const zero)
+:
+    UList<T>(NULL, s)
+{
+    if (this->size_ < 0)
+    {
+        FatalErrorInFunction
+            << "bad size " << this->size_
+            << abort(FatalError);
+    }
+
+    if (this->size_)
+    {
+        this->v_ = new T[this->size_];
+
+        List_ACCESS(T, (*this), vp);
+        List_FOR_ALL((*this), i)
+            List_ELEM((*this), vp, i) = Zero;
+        List_END_FOR_ALL
+    }
+}
+
+
 template<class T>
 Foam::List<T>::List(const List<T>& a)
 :
@@ -93,13 +111,13 @@ Foam::List<T>::List(const List<T>& a)
     {
         this->v_ = new T[this->size_];
 
-#       ifdef USEMEMCPY
+        #ifdef USEMEMCPY
         if (contiguous<T>())
         {
             memcpy(this->v_, a.v_, this->byteSize());
         }
         else
-#       endif
+        #endif
         {
             List_ACCESS(T, (*this), vp);
             List_CONST_ACCESS(T, a, ap);
@@ -111,21 +129,19 @@ Foam::List<T>::List(const List<T>& a)
 }
 
 
-// Construct by transferring the parameter contents
 template<class T>
-Foam::List<T>::List(const Xfer<List<T> >& lst)
+Foam::List<T>::List(const Xfer<List<T>>& lst)
 {
     transfer(lst());
 }
 
 
-// Construct as copy or re-use as specified.
 template<class T>
-Foam::List<T>::List(List<T>& a, bool reUse)
+Foam::List<T>::List(List<T>& a, bool reuse)
 :
     UList<T>(NULL, a.size_)
 {
-    if (reUse)
+    if (reuse)
     {
         this->v_ = a.v_;
         a.v_ = 0;
@@ -135,13 +151,13 @@ Foam::List<T>::List(List<T>& a, bool reUse)
     {
         this->v_ = new T[this->size_];
 
-#       ifdef USEMEMCPY
+        #ifdef USEMEMCPY
         if (contiguous<T>())
         {
             memcpy(this->v_, a.v_, this->byteSize());
         }
         else
-#       endif
+        #endif
         {
             List_ACCESS(T, (*this), vp);
             List_CONST_ACCESS(T, a, ap);
@@ -153,7 +169,6 @@ Foam::List<T>::List(List<T>& a, bool reUse)
 }
 
 
-// Construct as subset
 template<class T>
 Foam::List<T>::List(const UList<T>& a, const labelUList& map)
 :
@@ -173,39 +188,6 @@ Foam::List<T>::List(const UList<T>& a, const labelUList& map)
 }
 
 
-// Construct given start and end iterators.
-template<class T>
-template<class InputIterator>
-Foam::List<T>::List(InputIterator first, InputIterator last)
-{
-    label s = 0;
-    for
-    (
-        InputIterator iter = first;
-        iter != last;
-        ++iter
-    )
-    {
-        s++;
-    }
-
-    setSize(s);
-
-    s = 0;
-
-    for
-    (
-        InputIterator iter = first;
-        iter != last;
-        ++iter
-    )
-    {
-        this->operator[](s++) = *iter;
-    }
-}
-
-
-// Construct as copy of FixedList<T, Size>
 template<class T>
 template<unsigned Size>
 Foam::List<T>::List(const FixedList<T, Size>& lst)
@@ -224,7 +206,6 @@ Foam::List<T>::List(const FixedList<T, Size>& lst)
 }
 
 
-// Construct as copy of PtrList<T>
 template<class T>
 Foam::List<T>::List(const PtrList<T>& lst)
 :
@@ -242,7 +223,6 @@ Foam::List<T>::List(const PtrList<T>& lst)
 }
 
 
-// Construct as copy of SLList<T>
 template<class T>
 Foam::List<T>::List(const SLList<T>& lst)
 :
@@ -266,7 +246,6 @@ Foam::List<T>::List(const SLList<T>& lst)
 }
 
 
-// Construct as copy of UIndirectList<T>
 template<class T>
 Foam::List<T>::List(const UIndirectList<T>& lst)
 :
@@ -284,7 +263,6 @@ Foam::List<T>::List(const UIndirectList<T>& lst)
 }
 
 
-// Construct as copy of BiIndirectList<T>
 template<class T>
 Foam::List<T>::List(const BiIndirectList<T>& lst)
 :
@@ -304,7 +282,6 @@ Foam::List<T>::List(const BiIndirectList<T>& lst)
 
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
 
-// Destroy list elements
 template<class T>
 Foam::List<T>::~List()
 {
@@ -319,7 +296,7 @@ void Foam::List<T>::setSize(const label newSize)
 {
     if (newSize < 0)
     {
-        FatalErrorIn("List<T>::setSize(const label)")
+        FatalErrorInFunction
             << "bad set size " << newSize
             << abort(FatalError);
     }
@@ -334,13 +311,13 @@ void Foam::List<T>::setSize(const label newSize)
             {
                 label i = min(this->size_, newSize);
 
-#               ifdef USEMEMCPY
+                #ifdef USEMEMCPY
                 if (contiguous<T>())
                 {
                     memcpy(nv, this->v_, i*sizeof(T));
                 }
                 else
-#               endif
+                #endif
                 {
                     T* vv = &this->v_[i];
                     T* av = &nv[i];
@@ -384,8 +361,6 @@ void Foam::List<T>::clear()
 }
 
 
-// Transfer the contents of the argument List into this List
-// and annul the argument list
 template<class T>
 void Foam::List<T>::transfer(List<T>& a)
 {
@@ -398,25 +373,21 @@ void Foam::List<T>::transfer(List<T>& a)
 }
 
 
-// Transfer the contents of the argument DynamicList into this List
-// and annul the argument list
 template<class T>
 template<unsigned SizeInc, unsigned SizeMult, unsigned SizeDiv>
 void Foam::List<T>::transfer(DynamicList<T, SizeInc, SizeMult, SizeDiv>& a)
 {
-    // shrink the allocated space to the number of elements used
+    // Shrink the allocated space to the number of elements used
     a.shrink();
     transfer(static_cast<List<T>&>(a));
     a.clearStorage();
 }
 
 
-// Transfer the contents of the argument SortableList into this List
-// and annul the argument list
 template<class T>
 void Foam::List<T>::transfer(SortableList<T>& a)
 {
-    // shrink away the sort indices
+    // Shrink away the sort indices
     a.shrink();
     transfer(static_cast<List<T>&>(a));
 }
@@ -424,7 +395,6 @@ void Foam::List<T>::transfer(SortableList<T>& a)
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
-// Assignment to UList operator. Takes linear time.
 template<class T>
 void Foam::List<T>::operator=(const UList<T>& a)
 {
@@ -438,13 +408,13 @@ void Foam::List<T>::operator=(const UList<T>& a)
 
     if (this->size_)
     {
-#       ifdef USEMEMCPY
+        #ifdef USEMEMCPY
         if (contiguous<T>())
         {
             memcpy(this->v_, a.v_, this->byteSize());
         }
         else
-#       endif
+        #endif
         {
             List_ACCESS(T, (*this), vp);
             List_CONST_ACCESS(T, a, ap);
@@ -456,13 +426,12 @@ void Foam::List<T>::operator=(const UList<T>& a)
 }
 
 
-// Assignment operator. Takes linear time.
 template<class T>
 void Foam::List<T>::operator=(const List<T>& a)
 {
     if (this == &a)
     {
-        FatalErrorIn("List<T>::operator=(const List<T>&)")
+        FatalErrorInFunction
             << "attempted assignment to self"
             << abort(FatalError);
     }
@@ -471,7 +440,6 @@ void Foam::List<T>::operator=(const List<T>& a)
 }
 
 
-// Assignment operator. Takes linear time.
 template<class T>
 void Foam::List<T>::operator=(const SLList<T>& lst)
 {
@@ -499,7 +467,6 @@ void Foam::List<T>::operator=(const SLList<T>& lst)
 }
 
 
-// Assignment operator. Takes linear time.
 template<class T>
 void Foam::List<T>::operator=(const UIndirectList<T>& lst)
 {
@@ -518,7 +485,6 @@ void Foam::List<T>::operator=(const UIndirectList<T>& lst)
 }
 
 
-// Assignment operator. Takes linear time.
 template<class T>
 void Foam::List<T>::operator=(const BiIndirectList<T>& lst)
 {
@@ -535,6 +501,7 @@ void Foam::List<T>::operator=(const BiIndirectList<T>& lst)
         this->operator[](i) = lst[i];
     }
 }
+
 
 // * * * * * * * * * * * * * * * *  IOStream operators * * * * * * * * * * * //
 

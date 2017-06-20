@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -122,18 +122,18 @@ void faceSet::sync(const polyMesh& mesh)
 
     label nAdded = 0;
 
-    forAll(set, faceI)
+    forAll(set, facei)
     {
-        if (set[faceI])
+        if (set[facei])
         {
-            if (insert(faceI))
+            if (insert(facei))
             {
                 nAdded++;
             }
         }
-        else if (found(faceI))
+        else if (found(facei))
         {
-            FatalErrorIn("faceSet::sync(const polyMesh&)")
+            FatalErrorInFunction
                 << "Problem : syncing removed faces from set."
                 << abort(FatalError);
         }

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -57,13 +57,8 @@ Foam::surfacePatchIOList::surfacePatchIOList
     {
         if (readOpt() == IOobject::MUST_READ_IF_MODIFIED)
         {
-            WarningIn
-            (
-                "surfacePatchIOList::surfacePatchIOList\n"
-                "(\n"
-                "    const IOobject&\n"
-                ")"
-            )   << "Specified IOobject::MUST_READ_IF_MODIFIED but class"
+            WarningInFunction
+                << "Specified IOobject::MUST_READ_IF_MODIFIED but class"
                 << " does not support automatic rereading."
                 << endl;
         }
@@ -77,37 +72,37 @@ Foam::surfacePatchIOList::surfacePatchIOList
         PtrList<entry> patchEntries(is);
         patches.setSize(patchEntries.size());
 
-        label faceI = 0;
+        label facei = 0;
 
-        forAll(patches, patchI)
+        forAll(patches, patchi)
         {
-            const dictionary& dict = patchEntries[patchI].dict();
+            const dictionary& dict = patchEntries[patchi].dict();
 
             label patchSize = readLabel(dict.lookup("nFaces"));
-            label startFaceI = readLabel(dict.lookup("startFace"));
+            label startFacei = readLabel(dict.lookup("startFace"));
 
-            patches[patchI] =
+            patches[patchi] =
                 surfacePatch
                 (
                     word(dict.lookup("geometricType")),
-                    patchEntries[patchI].keyword(),
+                    patchEntries[patchi].keyword(),
                     patchSize,
-                    startFaceI,
-                    patchI
+                    startFacei,
+                    patchi
                 );
 
 
-            if (startFaceI != faceI)
+            if (startFacei != facei)
             {
-                FatalErrorIn(functionName)
-                    << "Patches are not ordered. Start of patch " << patchI
+                FatalErrorInFunction
+                    << "Patches are not ordered. Start of patch " << patchi
                     << " does not correspond to sum of preceding patches."
                     << endl
                     << "while reading " << io.objectPath()
                     << exit(FatalError);
             }
 
-            faceI += patchSize;
+            facei += patchSize;
         }
 
         // Check state of IOstream
@@ -152,9 +147,9 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const surfacePatchIOList& patches)
 {
     os  << patches.size() << nl << token::BEGIN_LIST;
 
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        patches[patchI].writeDict(os);
+        patches[patchi].writeDict(os);
     }
 
     os  << token::END_LIST;

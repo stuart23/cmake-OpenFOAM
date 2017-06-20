@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -81,13 +81,13 @@ void writeVTK
 
         faceList setFaces(currentSet.size());
         labelList faceValues(currentSet.size());
-        label setFaceI = 0;
+        label setFacei = 0;
 
         forAllConstIter(topoSet, currentSet, iter)
         {
-            setFaces[setFaceI] = mesh.faces()[iter.key()];
-            faceValues[setFaceI] = iter.key();
-            setFaceI++;
+            setFaces[setFacei] = mesh.faces()[iter.key()];
+            faceValues[setFacei] = iter.key();
+            setFacei++;
         }
 
         primitiveFacePatch fp(setFaces, mesh.points());
@@ -110,44 +110,44 @@ void writeVTK
 
         forAllConstIter(cellSet, currentSet, iter)
         {
-            label cellI = iter.key();
+            label celli = iter.key();
 
-            const cell& cFaces = mesh.cells()[cellI];
+            const cell& cFaces = mesh.cells()[celli];
 
             forAll(cFaces, i)
             {
-                label faceI = cFaces[i];
+                label facei = cFaces[i];
 
-                if (mesh.isInternalFace(faceI))
+                if (mesh.isInternalFace(facei))
                 {
-                    label otherCellI = mesh.faceOwner()[faceI];
+                    label otherCelli = mesh.faceOwner()[facei];
 
-                    if (otherCellI == cellI)
+                    if (otherCelli == celli)
                     {
-                        otherCellI = mesh.faceNeighbour()[faceI];
+                        otherCelli = mesh.faceNeighbour()[facei];
                     }
 
-                    if (!currentSet.found(otherCellI))
+                    if (!currentSet.found(otherCelli))
                     {
-                        cellFaces.insert(faceI, cellI);
+                        cellFaces.insert(facei, celli);
                     }
                 }
                 else
                 {
-                    cellFaces.insert(faceI, cellI);
+                    cellFaces.insert(facei, celli);
                 }
             }
         }
 
         faceList setFaces(cellFaces.size());
         labelList faceValues(cellFaces.size());
-        label setFaceI = 0;
+        label setFacei = 0;
 
         forAllConstIter(Map<label>, cellFaces, iter)
         {
-            setFaces[setFaceI] = mesh.faces()[iter.key()];
-            faceValues[setFaceI] = iter();              // Cell ID
-            setFaceI++;
+            setFaces[setFacei] = mesh.faces()[iter.key()];
+            faceValues[setFacei] = iter();              // Cell ID
+            setFacei++;
         }
 
         primitiveFacePatch fp(setFaces, mesh.points());
@@ -174,12 +174,8 @@ void writeVTK
     }
     else
     {
-        WarningIn
-        (
-            "void writeVTK"
-            "(const polyMesh& mesh, const topoSet& currentSet,"
-            "const fileName& vtkName)"
-        )   << "Don't know how to handle set of type " << currentSet.type()
+        WarningInFunction
+            << "Don't know how to handle set of type " << currentSet.type()
             << endl;
     }
 }
@@ -690,7 +686,7 @@ polyMesh::readUpdateState meshReadUpdate(polyMesh& mesh)
         }
         default:
         {
-            FatalErrorIn("meshReadUpdate(polyMesh&)")
+            FatalErrorInFunction
                 << "Illegal mesh update state "
                 << stat  << abort(FatalError);
             break;
@@ -770,11 +766,8 @@ commandStatus parseType
     }
     else
     {
-        SeriousErrorIn
-        (
-            "commandStatus parseType(Time&, polyMesh&, const word&"
-            ", IStringStream&)"
-        )   << "Illegal command " << setType << endl
+        SeriousErrorInFunction
+            << "Illegal command " << setType << endl
             << "Should be one of 'help', 'list', 'time' or a set type :"
             << " 'cellSet', 'faceSet', 'pointSet', 'faceZoneSet'"
             << endl;
@@ -839,7 +832,7 @@ int main(int argc, char *argv[])
 
     if (loop && !batch)
     {
-        FatalErrorIn(args.executable())
+        FatalErrorInFunction
             << "Can only loop in batch mode."
             << exit(FatalError);
     }
@@ -854,12 +847,12 @@ int main(int argc, char *argv[])
     printAllSets(mesh, Info);
 
     // Read history if interactive
-#   ifdef HAS_READLINE
+    #ifdef HAS_READLINE
     if (!batch && !read_history((runTime.path()/historyFile).c_str()))
     {
         Info<< "Successfully read history from " << historyFile << endl;
     }
-#   endif
+    #endif
 
 
     // Exit status
@@ -889,7 +882,7 @@ int main(int argc, char *argv[])
             // we cannot handle .gz files
             if (!isFile(batchFile, false))
             {
-                FatalErrorIn(args.executable())
+                FatalErrorInFunction
                     << "Cannot open file " << batchFile << exit(FatalError);
             }
 
@@ -936,7 +929,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-#               ifdef HAS_READLINE
+                #ifdef HAS_READLINE
                 {
                     char* linePtr = readline("readline>");
 
@@ -957,7 +950,7 @@ int main(int argc, char *argv[])
                         break;
                     }
                 }
-#               else
+                #else
                 {
                     if (!std::cin.good())
                     {
@@ -968,7 +961,7 @@ int main(int argc, char *argv[])
                     Info<< "Command>" << flush;
                     std::getline(std::cin, rawLine);
                 }
-#               endif
+                #endif
             }
 
             // Strip off anything after #
@@ -1036,7 +1029,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    Info<< "\nEnd\n" << endl;
+    Info<< "End\n" << endl;
 
     return status;
 }

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -36,12 +36,140 @@ InClass
 #include "minData.H"
 #include "FaceCellWave.H"
 
+#include "preserveBafflesConstraint.H"
+#include "preservePatchesConstraint.H"
+#include "preserveFaceZonesConstraint.H"
+#include "singleProcessorFaceSetsConstraint.H"
+
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
     defineTypeNameAndDebug(decompositionMethod, 0);
     defineRunTimeSelectionTable(decompositionMethod, dictionary);
+}
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::decompositionMethod::decompositionMethod
+(
+    const dictionary& decompositionDict
+)
+:
+    decompositionDict_(decompositionDict),
+    nProcessors_
+    (
+        readLabel(decompositionDict.lookup("numberOfSubdomains"))
+    )
+{
+    // Read any constraints
+    wordList constraintTypes_;
+    if (decompositionDict_.found("constraints"))
+    {
+        //PtrList<dictionary> constraintsList
+        //(
+        //    decompositionDict_.lookup("constraints")
+        //);
+        //forAll(constraintsList, i)
+        //{
+        //    const dictionary& dict = constraintsList[i];
+        const dictionary& constraintsList = decompositionDict_.subDict
+        (
+            "constraints"
+        );
+        forAllConstIter(dictionary, constraintsList, iter)
+        {
+            const dictionary& dict = iter().dict();
+
+            constraintTypes_.append(dict.lookup("type"));
+
+            constraints_.append
+            (
+                decompositionConstraint::New
+                (
+                    dict,
+                    constraintTypes_.last()
+                )
+            );
+        }
+    }
+
+    // Backwards compatibility
+    if
+    (
+        decompositionDict_.found("preserveBaffles")
+     && findIndex
+        (
+            constraintTypes_,
+            decompositionConstraints::preserveBafflesConstraint::typeName
+        ) == -1
+    )
+    {
+        constraints_.append
+        (
+            new decompositionConstraints::preserveBafflesConstraint()
+        );
+    }
+
+    if
+    (
+        decompositionDict_.found("preservePatches")
+     && findIndex
+        (
+            constraintTypes_,
+            decompositionConstraints::preservePatchesConstraint::typeName
+        ) == -1
+    )
+    {
+        const wordReList pNames(decompositionDict_.lookup("preservePatches"));
+
+        constraints_.append
+        (
+            new decompositionConstraints::preservePatchesConstraint(pNames)
+        );
+    }
+
+    if
+    (
+        decompositionDict_.found("preserveFaceZones")
+     && findIndex
+        (
+            constraintTypes_,
+            decompositionConstraints::preserveFaceZonesConstraint::typeName
+        ) == -1
+    )
+    {
+        const wordReList zNames(decompositionDict_.lookup("preserveFaceZones"));
+
+        constraints_.append
+        (
+            new decompositionConstraints::preserveFaceZonesConstraint(zNames)
+        );
+    }
+
+    if
+    (
+        decompositionDict_.found("singleProcessorFaceSets")
+     && findIndex
+        (
+            constraintTypes_,
+            decompositionConstraints::preserveFaceZonesConstraint::typeName
+        ) == -1
+    )
+    {
+        const List<Tuple2<word, label>> zNameAndProcs
+        (
+            decompositionDict_.lookup("singleProcessorFaceSets")
+        );
+
+        constraints_.append
+        (
+            new decompositionConstraints::singleProcessorFaceSetsConstraint
+            (
+                zNameAndProcs
+            )
+        );
+    }
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -53,12 +181,6 @@ Foam::autoPtr<Foam::decompositionMethod> Foam::decompositionMethod::New
 {
     word methodType(decompositionDict.lookup("method"));
 
-    if (methodType == "scotch" && Pstream::parRun())
-    {
-        methodType = "ptscotch";
-    }
-
-
     Info<< "Selecting decompositionMethod " << methodType << endl;
 
     dictionaryConstructorTable::iterator cstrIter =
@@ -66,11 +188,8 @@ Foam::autoPtr<Foam::decompositionMethod> Foam::decompositionMethod::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "decompositionMethod::New"
-            "(const dictionary& decompositionDict)"
-        )   << "Unknown decompositionMethod "
+        FatalErrorInFunction
+            << "Unknown decompositionMethod "
             << methodType << nl << nl
             << "Valid decompositionMethods are : " << endl
             << dictionaryConstructorTablePtr_->sortedToc()
@@ -196,9 +315,215 @@ void Foam::decompositionMethod::calcCellCells
 
     labelList globalNeighbour(mesh.nFaces()-mesh.nInternalFaces());
 
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        const polyPatch& pp = patches[patchI];
+        const polyPatch& pp = patches[patchi];
+
+        if (pp.coupled() && (parallel || !isA<processorPolyPatch>(pp)))
+        {
+            label facei = pp.start();
+            label bFacei = pp.start() - mesh.nInternalFaces();
+
+            forAll(pp, i)
+            {
+                globalNeighbour[bFacei] = globalAgglom.toGlobal
+                (
+                    agglom[faceOwner[facei]]
+                );
+
+                bFacei++;
+                facei++;
+            }
+        }
+    }
+
+    // Get the cell on the other side of coupled patches
+    syncTools::swapBoundaryFaceList(mesh, globalNeighbour);
+
+
+    // Count number of faces (internal + coupled)
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    // Number of faces per coarse cell
+    labelList nFacesPerCell(nLocalCoarse, 0);
+
+    for (label facei = 0; facei < mesh.nInternalFaces(); facei++)
+    {
+        label own = agglom[faceOwner[facei]];
+        label nei = agglom[faceNeighbour[facei]];
+
+        nFacesPerCell[own]++;
+        nFacesPerCell[nei]++;
+    }
+
+    forAll(patches, patchi)
+    {
+        const polyPatch& pp = patches[patchi];
+
+        if (pp.coupled() && (parallel || !isA<processorPolyPatch>(pp)))
+        {
+            label facei = pp.start();
+            label bFacei = pp.start()-mesh.nInternalFaces();
+
+            forAll(pp, i)
+            {
+                label own = agglom[faceOwner[facei]];
+
+                label globalNei = globalNeighbour[bFacei];
+                if
+                (
+                   !globalAgglom.isLocal(globalNei)
+                 || globalAgglom.toLocal(globalNei) != own
+                )
+                {
+                    nFacesPerCell[own]++;
+                }
+
+                facei++;
+                bFacei++;
+            }
+        }
+    }
+
+
+    // Fill in offset and data
+    // ~~~~~~~~~~~~~~~~~~~~~~~
+
+    cellCells.setSize(nFacesPerCell);
+
+    nFacesPerCell = 0;
+
+    labelList& m = cellCells.m();
+    const labelList& offsets = cellCells.offsets();
+
+    // For internal faces is just offsetted owner and neighbour
+    for (label facei = 0; facei < mesh.nInternalFaces(); facei++)
+    {
+        label own = agglom[faceOwner[facei]];
+        label nei = agglom[faceNeighbour[facei]];
+
+        m[offsets[own] + nFacesPerCell[own]++] = globalAgglom.toGlobal(nei);
+        m[offsets[nei] + nFacesPerCell[nei]++] = globalAgglom.toGlobal(own);
+    }
+
+    // For boundary faces is offsetted coupled neighbour
+    forAll(patches, patchi)
+    {
+        const polyPatch& pp = patches[patchi];
+
+        if (pp.coupled() && (parallel || !isA<processorPolyPatch>(pp)))
+        {
+            label facei = pp.start();
+            label bFacei = pp.start()-mesh.nInternalFaces();
+
+            forAll(pp, i)
+            {
+                label own = agglom[faceOwner[facei]];
+
+                label globalNei = globalNeighbour[bFacei];
+
+                if
+                (
+                   !globalAgglom.isLocal(globalNei)
+                 || globalAgglom.toLocal(globalNei) != own
+                )
+                {
+                    m[offsets[own] + nFacesPerCell[own]++] = globalNei;
+                }
+
+                facei++;
+                bFacei++;
+            }
+        }
+    }
+
+
+    // Check for duplicates connections between cells
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Done as postprocessing step since we now have cellCells.
+    label newIndex = 0;
+    labelHashSet nbrCells;
+
+
+    if (cellCells.size() == 0)
+    {
+        return;
+    }
+
+    label startIndex = cellCells.offsets()[0];
+
+    forAll(cellCells, celli)
+    {
+        nbrCells.clear();
+        nbrCells.insert(globalAgglom.toGlobal(celli));
+
+        label endIndex = cellCells.offsets()[celli+1];
+
+        for (label i = startIndex; i < endIndex; i++)
+        {
+            if (nbrCells.insert(cellCells.m()[i]))
+            {
+                cellCells.m()[newIndex++] = cellCells.m()[i];
+            }
+        }
+        startIndex = endIndex;
+        cellCells.offsets()[celli+1] = newIndex;
+    }
+
+    cellCells.m().setSize(newIndex);
+
+    //forAll(cellCells, celli)
+    //{
+    //    Pout<< "Original: Coarse cell " << celli << endl;
+    //    forAll(mesh.cellCells()[celli], i)
+    //    {
+    //        Pout<< "    nbr:" << mesh.cellCells()[celli][i] << endl;
+    //    }
+    //    Pout<< "Compacted: Coarse cell " << celli << endl;
+    //    const labelUList cCells = cellCells[celli];
+    //    forAll(cCells, i)
+    //    {
+    //        Pout<< "    nbr:" << cCells[i] << endl;
+    //    }
+    //}
+}
+
+
+void Foam::decompositionMethod::calcCellCells
+(
+    const polyMesh& mesh,
+    const labelList& agglom,
+    const label nLocalCoarse,
+    const bool parallel,
+    CompactListList<label>& cellCells,
+    CompactListList<scalar>& cellCellWeights
+)
+{
+    const labelList& faceOwner = mesh.faceOwner();
+    const labelList& faceNeighbour = mesh.faceNeighbour();
+    const polyBoundaryMesh& patches = mesh.boundaryMesh();
+
+
+    // Create global cell numbers
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    globalIndex globalAgglom
+    (
+        nLocalCoarse,
+        Pstream::msgType(),
+        Pstream::worldComm,
+        parallel
+    );
+
+
+    // Get agglomerate owner on other side of coupled faces
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    labelList globalNeighbour(mesh.nFaces()-mesh.nInternalFaces());
+
+    forAll(patches, patchi)
+    {
+        const polyPatch& pp = patches[patchi];
 
         if (pp.coupled() && (parallel || !isA<processorPolyPatch>(pp)))
         {
@@ -237,9 +562,9 @@ void Foam::decompositionMethod::calcCellCells
         nFacesPerCell[nei]++;
     }
 
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        const polyPatch& pp = patches[patchI];
+        const polyPatch& pp = patches[patchi];
 
         if (pp.coupled() && (parallel || !isA<processorPolyPatch>(pp)))
         {
@@ -271,10 +596,12 @@ void Foam::decompositionMethod::calcCellCells
     // ~~~~~~~~~~~~~~~~~~~~~~~
 
     cellCells.setSize(nFacesPerCell);
+    cellCellWeights.setSize(nFacesPerCell);
 
     nFacesPerCell = 0;
 
     labelList& m = cellCells.m();
+    scalarList& w = cellCellWeights.m();
     const labelList& offsets = cellCells.offsets();
 
     // For internal faces is just offsetted owner and neighbour
@@ -283,14 +610,19 @@ void Foam::decompositionMethod::calcCellCells
         label own = agglom[faceOwner[faceI]];
         label nei = agglom[faceNeighbour[faceI]];
 
-        m[offsets[own] + nFacesPerCell[own]++] = globalAgglom.toGlobal(nei);
-        m[offsets[nei] + nFacesPerCell[nei]++] = globalAgglom.toGlobal(own);
+        label ownIndex = offsets[own] + nFacesPerCell[own]++;
+        label neiIndex = offsets[nei] + nFacesPerCell[nei]++;
+
+        m[ownIndex] = globalAgglom.toGlobal(nei);
+        w[ownIndex] = mag(mesh.faceAreas()[faceI]);
+        m[neiIndex] = globalAgglom.toGlobal(own);
+        w[ownIndex] = mag(mesh.faceAreas()[faceI]);
     }
 
     // For boundary faces is offsetted coupled neighbour
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        const polyPatch& pp = patches[patchI];
+        const polyPatch& pp = patches[patchi];
 
         if (pp.coupled() && (parallel || !isA<processorPolyPatch>(pp)))
         {
@@ -309,7 +641,9 @@ void Foam::decompositionMethod::calcCellCells
                  || globalAgglom.toLocal(globalNei) != own
                 )
                 {
-                    m[offsets[own] + nFacesPerCell[own]++] = globalNei;
+                    label ownIndex = offsets[own] + nFacesPerCell[own]++;
+                    m[ownIndex] = globalNei;
+                    w[ownIndex] = mag(mesh.faceAreas()[faceI]);
                 }
 
                 faceI++;
@@ -344,29 +678,18 @@ void Foam::decompositionMethod::calcCellCells
         {
             if (nbrCells.insert(cellCells.m()[i]))
             {
-                cellCells.m()[newIndex++] = cellCells.m()[i];
+                cellCells.m()[newIndex] = cellCells.m()[i];
+                cellCellWeights.m()[newIndex] = cellCellWeights.m()[i];
+                newIndex++;
             }
         }
         startIndex = endIndex;
         cellCells.offsets()[cellI+1] = newIndex;
+        cellCellWeights.offsets()[cellI+1] = newIndex;
     }
 
     cellCells.m().setSize(newIndex);
-
-    //forAll(cellCells, cellI)
-    //{
-    //    Pout<< "Original: Coarse cell " << cellI << endl;
-    //    forAll(mesh.cellCells()[cellI], i)
-    //    {
-    //        Pout<< "    nbr:" << mesh.cellCells()[cellI][i] << endl;
-    //    }
-    //    Pout<< "Compacted: Coarse cell " << cellI << endl;
-    //    const labelUList cCells = cellCells[cellI];
-    //    forAll(cCells, i)
-    //    {
-    //        Pout<< "    nbr:" << cCells[i] << endl;
-    //    }
-    //}
+    cellCellWeights.m().setSize(newIndex);
 }
 
 
@@ -403,24 +726,24 @@ void Foam::decompositionMethod::calcCellCells
 //
 //    labelList globalNeighbour(mesh.nFaces()-mesh.nInternalFaces());
 //
-//    forAll(patches, patchI)
+//    forAll(patches, patchi)
 //    {
-//        const polyPatch& pp = patches[patchI];
+//        const polyPatch& pp = patches[patchi];
 //
 //        if (pp.coupled() && (parallel || !isA<processorPolyPatch>(pp)))
 //        {
-//            label faceI = pp.start();
-//            label bFaceI = pp.start() - mesh.nInternalFaces();
+//            label facei = pp.start();
+//            label bFacei = pp.start() - mesh.nInternalFaces();
 //
 //            forAll(pp, i)
 //            {
-//                globalNeighbour[bFaceI] = globalAgglom.toGlobal
+//                globalNeighbour[bFacei] = globalAgglom.toGlobal
 //                (
-//                    agglom[faceOwner[faceI]]
+//                    agglom[faceOwner[facei]]
 //                );
 //
-//                bFaceI++;
-//                faceI++;
+//                bFacei++;
+//                facei++;
 //            }
 //        }
 //    }
@@ -436,12 +759,12 @@ void Foam::decompositionMethod::calcCellCells
 //    labelList nFacesPerCell(nLocalCoarse, 0);
 //
 //    // 1. Internal faces
-//    for (label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
+//    for (label facei = 0; facei < mesh.nInternalFaces(); facei++)
 //    {
-//        if (!blockedFace[faceI])
+//        if (!blockedFace[facei])
 //        {
-//            label own = agglom[faceOwner[faceI]];
-//            label nei = agglom[faceNeighbour[faceI]];
+//            label own = agglom[faceOwner[facei]];
+//            label nei = agglom[faceNeighbour[facei]];
 //
 //            nFacesPerCell[own]++;
 //            nFacesPerCell[nei]++;
@@ -449,22 +772,22 @@ void Foam::decompositionMethod::calcCellCells
 //    }
 //
 //    // 2. Coupled faces
-//    forAll(patches, patchI)
+//    forAll(patches, patchi)
 //    {
-//        const polyPatch& pp = patches[patchI];
+//        const polyPatch& pp = patches[patchi];
 //
 //        if (pp.coupled() && (parallel || !isA<processorPolyPatch>(pp)))
 //        {
-//            label faceI = pp.start();
-//            label bFaceI = pp.start()-mesh.nInternalFaces();
+//            label facei = pp.start();
+//            label bFacei = pp.start()-mesh.nInternalFaces();
 //
 //            forAll(pp, i)
 //            {
-//                if (!blockedFace[faceI])
+//                if (!blockedFace[facei])
 //                {
-//                    label own = agglom[faceOwner[faceI]];
+//                    label own = agglom[faceOwner[facei]];
 //
-//                    label globalNei = globalNeighbour[bFaceI];
+//                    label globalNei = globalNeighbour[bFacei];
 //                    if
 //                    (
 //                       !globalAgglom.isLocal(globalNei)
@@ -474,8 +797,8 @@ void Foam::decompositionMethod::calcCellCells
 //                        nFacesPerCell[own]++;
 //                    }
 //
-//                    faceI++;
-//                    bFaceI++;
+//                    facei++;
+//                    bFacei++;
 //                }
 //            }
 //        }
@@ -563,12 +886,12 @@ void Foam::decompositionMethod::calcCellCells
 //    const labelList& offsets = cellCells.offsets();
 //
 //    // 1. For internal faces is just offsetted owner and neighbour
-//    for (label faceI = 0; faceI < mesh.nInternalFaces(); faceI++)
+//    for (label facei = 0; facei < mesh.nInternalFaces(); facei++)
 //    {
-//        if (!blockedFace[faceI])
+//        if (!blockedFace[facei])
 //        {
-//            label own = agglom[faceOwner[faceI]];
-//            label nei = agglom[faceNeighbour[faceI]];
+//            label own = agglom[faceOwner[facei]];
+//            label nei = agglom[faceNeighbour[facei]];
 //
 //            m[offsets[own] + nFacesPerCell[own]++] =
 //              globalAgglom.toGlobal(nei);
@@ -578,22 +901,22 @@ void Foam::decompositionMethod::calcCellCells
 //    }
 //
 //    // 2. For boundary faces is offsetted coupled neighbour
-//    forAll(patches, patchI)
+//    forAll(patches, patchi)
 //    {
-//        const polyPatch& pp = patches[patchI];
+//        const polyPatch& pp = patches[patchi];
 //
 //        if (pp.coupled() && (parallel || !isA<processorPolyPatch>(pp)))
 //        {
-//            label faceI = pp.start();
-//            label bFaceI = pp.start()-mesh.nInternalFaces();
+//            label facei = pp.start();
+//            label bFacei = pp.start()-mesh.nInternalFaces();
 //
 //            forAll(pp, i)
 //            {
-//                if (!blockedFace[faceI])
+//                if (!blockedFace[facei])
 //                {
-//                    label own = agglom[faceOwner[faceI]];
+//                    label own = agglom[faceOwner[facei]];
 //
-//                    label globalNei = globalNeighbour[bFaceI];
+//                    label globalNei = globalNeighbour[bFacei];
 //
 //                    if
 //                    (
@@ -604,8 +927,8 @@ void Foam::decompositionMethod::calcCellCells
 //                        m[offsets[own] + nFacesPerCell[own]++] = globalNei;
 //                    }
 //
-//                    faceI++;
-//                    bFaceI++;
+//                    facei++;
+//                    bFacei++;
 //                }
 //            }
 //        }
@@ -708,12 +1031,12 @@ void Foam::decompositionMethod::calcCellCells
 //
 //    label startIndex = cellCells.offsets()[0];
 //
-//    forAll(cellCells, cellI)
+//    forAll(cellCells, celli)
 //    {
 //        nbrCells.clear();
-//        nbrCells.insert(globalAgglom.toGlobal(cellI));
+//        nbrCells.insert(globalAgglom.toGlobal(celli));
 //
-//        label endIndex = cellCells.offsets()[cellI+1];
+//        label endIndex = cellCells.offsets()[celli+1];
 //
 //        for (label i = startIndex; i < endIndex; i++)
 //        {
@@ -723,20 +1046,20 @@ void Foam::decompositionMethod::calcCellCells
 //            }
 //        }
 //        startIndex = endIndex;
-//        cellCells.offsets()[cellI+1] = newIndex;
+//        cellCells.offsets()[celli+1] = newIndex;
 //    }
 //
 //    cellCells.m().setSize(newIndex);
 //
-//    //forAll(cellCells, cellI)
+//    //forAll(cellCells, celli)
 //    //{
-//    //    Pout<< "Original: Coarse cell " << cellI << endl;
-//    //    forAll(mesh.cellCells()[cellI], i)
+//    //    Pout<< "Original: Coarse cell " << celli << endl;
+//    //    forAll(mesh.cellCells()[celli], i)
 //    //    {
-//    //        Pout<< "    nbr:" << mesh.cellCells()[cellI][i] << endl;
+//    //        Pout<< "    nbr:" << mesh.cellCells()[celli][i] << endl;
 //    //    }
-//    //    Pout<< "Compacted: Coarse cell " << cellI << endl;
-//    //    const labelUList cCells = cellCells[cellI];
+//    //    Pout<< "Compacted: Coarse cell " << celli << endl;
+//    //    const labelUList cCells = cellCells[celli];
 //    //    forAll(cCells, i)
 //    //    {
 //    //        Pout<< "    nbr:" << cCells[i] << endl;
@@ -768,17 +1091,8 @@ Foam::labelList Foam::decompositionMethod::decompose
 
     if (nWeights > 0 && cellWeights.size() != mesh.nCells())
     {
-        FatalErrorIn
-        (
-            "decompositionMethod::decompose\n"
-            "(\n"
-            "   const polyMesh&,\n"
-            "   const scalarField&,\n"
-            "   const boolList&,\n"
-            "   const PtrList<labelList>&,\n"
-            "   const labelList&,\n"
-            "   const List<labelPair>&\n"
-        )   << "Number of weights " << cellWeights.size()
+        FatalErrorInFunction
+            << "Number of weights " << cellWeights.size()
             << " differs from number of cells " << mesh.nCells()
             << exit(FatalError);
     }
@@ -801,9 +1115,9 @@ Foam::labelList Foam::decompositionMethod::decompose
 
     // Any faces not blocked?
     label nUnblocked = 0;
-    forAll(blockedFace, faceI)
+    forAll(blockedFace, facei)
     {
-        if (!blockedFace[faceI])
+        if (!blockedFace[facei])
         {
             nUnblocked++;
         }
@@ -870,13 +1184,13 @@ Foam::labelList Foam::decompositionMethod::decompose
 
         pointField regionCentres(localRegion.nLocalRegions(), point::max);
 
-        forAll(localRegion, cellI)
+        forAll(localRegion, celli)
         {
-            label regionI = localRegion[cellI];
+            label regionI = localRegion[celli];
 
             if (regionCentres[regionI] == point::max)
             {
-                regionCentres[regionI] = mesh.cellCentres()[cellI];
+                regionCentres[regionI] = mesh.cellCentres()[celli];
             }
         }
 
@@ -887,18 +1201,18 @@ Foam::labelList Foam::decompositionMethod::decompose
 
         if (nWeights > 0)
         {
-            forAll(localRegion, cellI)
+            forAll(localRegion, celli)
             {
-                label regionI = localRegion[cellI];
+                label regionI = localRegion[celli];
 
-                regionWeights[regionI] += cellWeights[cellI];
+                regionWeights[regionI] += cellWeights[celli];
             }
         }
         else
         {
-            forAll(localRegion, cellI)
+            forAll(localRegion, celli)
             {
-                label regionI = localRegion[cellI];
+                label regionI = localRegion[celli];
 
                 regionWeights[regionI] += 1.0;
             }
@@ -928,28 +1242,18 @@ Foam::labelList Foam::decompositionMethod::decompose
                 // different processor? So for now just push owner side
                 // proc
 
-                const label procI = finalDecomp[mesh.faceOwner()[f0]];
+                const label proci = finalDecomp[mesh.faceOwner()[f0]];
 
-                finalDecomp[mesh.faceOwner()[f1]] = procI;
+                finalDecomp[mesh.faceOwner()[f1]] = proci;
                 if (mesh.isInternalFace(f1))
                 {
-                    finalDecomp[mesh.faceNeighbour()[f1]] = procI;
+                    finalDecomp[mesh.faceNeighbour()[f1]] = proci;
                 }
             }
             else if (blockedFace[f0] != blockedFace[f1])
             {
-                FatalErrorIn
-                (
-                    "labelList decompose\n"
-                    "(\n"
-                    "    const polyMesh&,\n"
-                    "    const scalarField&,\n"
-                    "    const boolList&,\n"
-                    "    const PtrList<labelList>&,\n"
-                    "    const labelList&,\n"
-                    "    const List<labelPair>&\n"
-                    ")"
-                )   << "On explicit connection between faces " << f0
+                FatalErrorInFunction
+                    << "On explicit connection between faces " << f0
                     << " and " << f1
                     << " the two blockedFace status are not equal : "
                     << blockedFace[f0] << " and " << blockedFace[f1]
@@ -973,11 +1277,11 @@ Foam::labelList Foam::decompositionMethod::decompose
             // Take over blockedFaces by seeding a negative number
             // (so is always less than the decomposition)
             label nUnblocked = 0;
-            forAll(blockedFace, faceI)
+            forAll(blockedFace, facei)
             {
-                if (blockedFace[faceI])
+                if (blockedFace[facei])
                 {
-                    faceData[faceI] = minData(-123);
+                    faceData[facei] = minData(-123);
                 }
                 else
                 {
@@ -990,12 +1294,12 @@ Foam::labelList Foam::decompositionMethod::decompose
             List<minData> seedData(nUnblocked);
             nUnblocked = 0;
 
-            forAll(blockedFace, faceI)
+            forAll(blockedFace, facei)
             {
-                if (!blockedFace[faceI])
+                if (!blockedFace[facei])
                 {
-                    label own = mesh.faceOwner()[faceI];
-                    seedFaces[nUnblocked] = faceI;
+                    label own = mesh.faceOwner()[facei];
+                    seedFaces[nUnblocked] = facei;
                     seedData[nUnblocked] = minData(finalDecomp[own]);
                     nUnblocked++;
                 }
@@ -1014,11 +1318,11 @@ Foam::labelList Foam::decompositionMethod::decompose
             );
 
             // And extract
-            forAll(finalDecomp, cellI)
+            forAll(finalDecomp, celli)
             {
-                if (cellData[cellI].valid(deltaCalc.data()))
+                if (cellData[celli].valid(deltaCalc.data()))
                 {
-                    finalDecomp[cellI] = cellData[cellI].data();
+                    finalDecomp[celli] = cellData[celli].data();
                 }
             }
         }
@@ -1041,12 +1345,12 @@ Foam::labelList Foam::decompositionMethod::decompose
         {
             const labelList& set = specifiedProcessorFaces[setI];
 
-            label procI = specifiedProcessor[setI];
-            if (procI == -1)
+            label proci = specifiedProcessor[setI];
+            if (proci == -1)
             {
                 // If no processor specified use the one from the
                 // 0th element
-                procI = finalDecomp[mesh.faceOwner()[set[0]]];
+                proci = finalDecomp[mesh.faceOwner()[set[0]]];
             }
 
             forAll(set, fI)
@@ -1057,12 +1361,12 @@ Foam::labelList Foam::decompositionMethod::decompose
                     const labelList& pFaces = mesh.pointFaces()[f[fp]];
                     forAll(pFaces, i)
                     {
-                        label faceI = pFaces[i];
+                        label facei = pFaces[i];
 
-                        finalDecomp[mesh.faceOwner()[faceI]] = procI;
-                        if (mesh.isInternalFace(faceI))
+                        finalDecomp[mesh.faceOwner()[facei]] = proci;
+                        if (mesh.isInternalFace(facei))
                         {
-                            finalDecomp[mesh.faceNeighbour()[faceI]] = procI;
+                            finalDecomp[mesh.faceNeighbour()[facei]] = proci;
                         }
                     }
                 }
@@ -1076,27 +1380,27 @@ Foam::labelList Foam::decompositionMethod::decompose
             syncTools::swapBoundaryCellList(mesh, finalDecomp, nbrDecomp);
 
             const polyBoundaryMesh& patches = mesh.boundaryMesh();
-            forAll(patches, patchI)
+            forAll(patches, patchi)
             {
-                const polyPatch& pp = patches[patchI];
+                const polyPatch& pp = patches[patchi];
                 if (pp.coupled())
                 {
                     forAll(pp, i)
                     {
-                        label faceI = pp.start()+i;
-                        label own = mesh.faceOwner()[faceI];
-                        label bFaceI = faceI-mesh.nInternalFaces();
+                        label facei = pp.start()+i;
+                        label own = mesh.faceOwner()[facei];
+                        label bFacei = facei-mesh.nInternalFaces();
 
-                        if (!blockedFace[faceI])
+                        if (!blockedFace[facei])
                         {
                             label ownProc = finalDecomp[own];
-                            label nbrProc = nbrDecomp[bFaceI];
+                            label nbrProc = nbrDecomp[bFacei];
                             if (ownProc != nbrProc)
                             {
-                                FatalErrorIn("decompositionMethod::decompose()")
+                                FatalErrorInFunction
                                     << "patch:" << pp.name()
-                                    << " face:" << faceI
-                                    << " at:" << mesh.faceCentres()[faceI]
+                                    << " face:" << facei
+                                    << " at:" << mesh.faceCentres()[facei]
                                     << " ownProc:" << ownProc
                                     << " nbrProc:" << nbrProc
                                     << exit(FatalError);
@@ -1123,172 +1427,45 @@ void Foam::decompositionMethod::setConstraints
 {
     blockedFace.setSize(mesh.nFaces());
     blockedFace = true;
-    //label nUnblocked = 0;
 
     specifiedProcessorFaces.clear();
     explicitConnections.clear();
 
-
-    if (decompositionDict_.found("preservePatches"))
+    forAll(constraints_, constraintI)
     {
-        wordList pNames(decompositionDict_.lookup("preservePatches"));
-
-        Info<< nl
-            << "Keeping owner of faces in patches " << pNames
-            << " on same processor. This only makes sense for cyclics." << endl;
-
-        const polyBoundaryMesh& patches = mesh.boundaryMesh();
-
-        forAll(pNames, i)
-        {
-            const label patchI = patches.findPatchID(pNames[i]);
-
-            if (patchI == -1)
-            {
-                FatalErrorIn("decompositionMethod::decompose(const polyMesh&)")
-                    << "Unknown preservePatch " << pNames[i]
-                    << endl << "Valid patches are " << patches.names()
-                    << exit(FatalError);
-            }
-
-            const polyPatch& pp = patches[patchI];
-
-            forAll(pp, i)
-            {
-                if (blockedFace[pp.start() + i])
-                {
-                    blockedFace[pp.start() + i] = false;
-                    //nUnblocked++;
-                }
-            }
-        }
-    }
-    if (decompositionDict_.found("preserveFaceZones"))
-    {
-        wordList zNames(decompositionDict_.lookup("preserveFaceZones"));
-
-        Info<< nl
-            << "Keeping owner and neighbour of faces in zones " << zNames
-            << " on same processor" << endl;
-
-        const faceZoneMesh& fZones = mesh.faceZones();
-
-        forAll(zNames, i)
-        {
-            label zoneI = fZones.findZoneID(zNames[i]);
-
-            if (zoneI == -1)
-            {
-                FatalErrorIn("decompositionMethod::decompose(const polyMesh&)")
-                    << "Unknown preserveFaceZone " << zNames[i]
-                    << endl << "Valid faceZones are " << fZones.names()
-                    << exit(FatalError);
-            }
-
-            const faceZone& fz = fZones[zoneI];
-
-            forAll(fz, i)
-            {
-                if (blockedFace[fz[i]])
-                {
-                    blockedFace[fz[i]] = false;
-                    //nUnblocked++;
-                }
-            }
-        }
-    }
-
-    bool preserveBaffles = decompositionDict_.lookupOrDefault
-    (
-        "preserveBaffles",
-        false
-    );
-    if (preserveBaffles)
-    {
-        Info<< nl
-            << "Keeping owner of faces in baffles "
-            << " on same processor." << endl;
-
-        explicitConnections = localPointRegion::findDuplicateFacePairs(mesh);
-        forAll(explicitConnections, i)
-        {
-            blockedFace[explicitConnections[i].first()] = false;
-            blockedFace[explicitConnections[i].second()] = false;
-        }
-    }
-
-    if
-    (
-        decompositionDict_.found("preservePatches")
-     || decompositionDict_.found("preserveFaceZones")
-     || preserveBaffles
-    )
-    {
-        syncTools::syncFaceList(mesh, blockedFace, andEqOp<bool>());
-        //reduce(nUnblocked, sumOp<label>());
-    }
-
-
-
-    // Specified processor for group of cells connected to faces
-
-    label nProcSets = 0;
-    if (decompositionDict_.found("singleProcessorFaceSets"))
-    {
-        List<Tuple2<word, label> > zNameAndProcs
+        constraints_[constraintI].add
         (
-            decompositionDict_.lookup("singleProcessorFaceSets")
+            mesh,
+            blockedFace,
+            specifiedProcessorFaces,
+            specifiedProcessor,
+            explicitConnections
         );
-
-        specifiedProcessorFaces.setSize(zNameAndProcs.size());
-        specifiedProcessor.setSize(zNameAndProcs.size());
-
-        forAll(zNameAndProcs, setI)
-        {
-            Info<< "Keeping all cells connected to faceSet "
-                << zNameAndProcs[setI].first()
-                << " on processor " << zNameAndProcs[setI].second() << endl;
-
-            // Read faceSet
-            faceSet fz(mesh, zNameAndProcs[setI].first());
-
-            specifiedProcessorFaces.set(setI, new labelList(fz.sortedToc()));
-            specifiedProcessor[setI] = zNameAndProcs[setI].second();
-            nProcSets += fz.size();
-        }
-        reduce(nProcSets, sumOp<label>());
+    }
+}
 
 
-        // Unblock all point connected faces
-        // 1. Mark all points on specifiedProcessorFaces
-        boolList procFacePoint(mesh.nPoints(), false);
-        forAll(specifiedProcessorFaces, setI)
-        {
-            const labelList& set = specifiedProcessorFaces[setI];
-            forAll(set, fI)
-            {
-                const face& f = mesh.faces()[set[fI]];
-                forAll(f, fp)
-                {
-                    procFacePoint[f[fp]] = true;
-                }
-            }
-        }
-        syncTools::syncPointList(mesh, procFacePoint, orEqOp<bool>(), false);
-
-        // 2. Unblock all faces on procFacePoint
-        forAll(procFacePoint, pointI)
-        {
-            if (procFacePoint[pointI])
-            {
-                const labelList& pFaces = mesh.pointFaces()[pointI];
-                forAll(pFaces, i)
-                {
-                    blockedFace[pFaces[i]] = false;
-                }
-            }
-        }
-        syncTools::syncFaceList(mesh, blockedFace, andEqOp<bool>());
+void Foam::decompositionMethod::applyConstraints
+(
+    const polyMesh& mesh,
+    const boolList& blockedFace,
+    const PtrList<labelList>& specifiedProcessorFaces,
+    const labelList& specifiedProcessor,
+    const List<labelPair>& explicitConnections,
+    labelList& decomposition
+)
+{
+    forAll(constraints_, constraintI)
+    {
+        constraints_[constraintI].apply
+        (
+            mesh,
+            blockedFace,
+            specifiedProcessorFaces,
+            specifiedProcessor,
+            explicitConnections,
+            decomposition
+        );
     }
 }
 
@@ -1299,6 +1476,8 @@ Foam::labelList Foam::decompositionMethod::decompose
     const scalarField& cellWeights
 )
 {
+    // Collect all constraints
+
     boolList blockedFace;
     PtrList<labelList> specifiedProcessorFaces;
     labelList specifiedProcessor;
@@ -1324,6 +1503,19 @@ Foam::labelList Foam::decompositionMethod::decompose
         specifiedProcessorFaces,// any whole cluster of cells to be kept
         specifiedProcessor,
         explicitConnections     // baffles
+    );
+
+
+    // Give any constraint the option of modifying the decomposition
+
+    applyConstraints
+    (
+        mesh,
+        blockedFace,
+        specifiedProcessorFaces,
+        specifiedProcessor,
+        explicitConnections,
+        finalDecomp
     );
 
     return finalDecomp;

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,8 +30,7 @@ Group
 Description
     This boundary condition sets the patch-normal component to a fixed value.
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         fixedValue   | fixed value             | yes         |
@@ -39,14 +38,14 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            fixedNormalSlip;
         fixedValue      uniform 0;     // example entry for a scalar field
     }
     \endverbatim
 
-SeeAlso
+See also
     Foam::transformFvPatchField
 
 SourceFiles
@@ -119,9 +118,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchField<Type>> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new fixedNormalSlipFvPatchField<Type>(*this)
             );
@@ -135,12 +134,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchField<Type>> clone
         (
             const DimensionedField<Type, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new fixedNormalSlipFvPatchField<Type>(*this, iF)
             );
@@ -148,6 +147,15 @@ public:
 
 
     // Member functions
+
+        // Access
+
+            //- Return false: this patch field is not altered by assignment
+            virtual bool assignable() const
+            {
+                return false;
+            }
+
 
         // Mapping functions
 
@@ -181,7 +189,7 @@ public:
         // Evaluation functions
 
             //- Return gradient at boundary
-            virtual tmp<Field<Type> > snGrad() const;
+            virtual tmp<Field<Type>> snGrad() const;
 
             //- Evaluate the patch field
             virtual void evaluate
@@ -190,7 +198,7 @@ public:
             );
 
             //- Return face-gradient transform diagonal
-            virtual tmp<Field<Type> > snGradTransformDiag() const;
+            virtual tmp<Field<Type>> snGradTransformDiag() const;
 
 
         //- Write
@@ -228,7 +236,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "fixedNormalSlipFvPatchField.C"
+    #include "fixedNormalSlipFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

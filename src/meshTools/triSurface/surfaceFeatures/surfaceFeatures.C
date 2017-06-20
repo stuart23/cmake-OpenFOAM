@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -39,15 +39,14 @@ License
 
 namespace Foam
 {
-defineTypeNameAndDebug(surfaceFeatures, 0);
+    defineTypeNameAndDebug(surfaceFeatures, 0);
 
-const scalar surfaceFeatures::parallelTolerance = sin(degToRad(1.0));
+    const scalar surfaceFeatures::parallelTolerance = sin(degToRad(1.0));
 }
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-//- Get nearest point on edge and classify position on edge.
 Foam::pointIndexHit Foam::surfaceFeatures::edgeNearest
 (
     const point& start,
@@ -193,9 +192,9 @@ void Foam::surfaceFeatures::calcFeatPoints
     const edgeList& edges = surf_.edges();
     const pointField& localPoints = surf_.localPoints();
 
-    forAll(pointEdges, pointI)
+    forAll(pointEdges, pointi)
     {
-        const labelList& pEdges = pointEdges[pointI];
+        const labelList& pEdges = pointEdges[pointi];
 
         label nFeatEdges = 0;
 
@@ -209,7 +208,7 @@ void Foam::surfaceFeatures::calcFeatPoints
 
         if (nFeatEdges > 2)
         {
-            featurePoints.append(pointI);
+            featurePoints.append(pointi);
         }
         else if (nFeatEdges == 2)
         {
@@ -229,7 +228,7 @@ void Foam::surfaceFeatures::calcFeatPoints
 
             if (mag(edgeVecs[0] & edgeVecs[1]) < minCos)
             {
-                featurePoints.append(pointI);
+                featurePoints.append(pointi);
             }
         }
     }
@@ -300,7 +299,7 @@ void Foam::surfaceFeatures::classifyFeatureAngles
 }
 
 
-// Returns next feature edge connected to pointI with correct value.
+// Returns next feature edge connected to pointi with correct value.
 Foam::label Foam::surfaceFeatures::nextFeatEdge
 (
     const List<edgeStatus>& edgeStat,
@@ -342,7 +341,7 @@ Foam::label Foam::surfaceFeatures::nextFeatEdge
 
 
 // Finds connected feature edges by walking from prevEdgeI in direction of
-// prevPointI. Marks feature edges visited in featVisited by assigning them
+// prevPointi. Marks feature edges visited in featVisited by assigning them
 // the current feature line number. Returns cumulative length of edges walked.
 // Works in one of two modes:
 // - mark : step to edges with featVisited = -1.
@@ -354,20 +353,20 @@ Foam::surfaceFeatures::labelScalar Foam::surfaceFeatures::walkSegment
     const bool mark,
     const List<edgeStatus>& edgeStat,
     const label startEdgeI,
-    const label startPointI,
+    const label startPointi,
     const label currentFeatI,
     labelList& featVisited
 )
 {
     label edgeI = startEdgeI;
 
-    label vertI = startPointI;
+    label vertI = startPointi;
 
     scalar visitedLength = 0.0;
 
     label nVisited = 0;
 
-    if (findIndex(featurePoints_, startPointI) >= 0)
+    if (findIndex(featurePoints_, startPointi) >= 0)
     {
         // Do not walk across feature points
 
@@ -431,7 +430,7 @@ Foam::surfaceFeatures::labelScalar Foam::surfaceFeatures::walkSegment
         {
             Warning<< "walkSegment : reached iteration limit in walking "
                 << "feature edges on surface from edge:" << startEdgeI
-                << " vertex:" << startPointI << nl
+                << " vertex:" << startPointi << nl
                 << "Returning with large length" << endl;
 
             return labelScalar(nVisited, GREAT);
@@ -498,7 +497,6 @@ Foam::surfaceFeatures::surfaceFeatures
 }
 
 
-//- Construct from dictionary
 Foam::surfaceFeatures::surfaceFeatures
 (
     const triSurface& surf,
@@ -513,7 +511,6 @@ Foam::surfaceFeatures::surfaceFeatures
 {}
 
 
-//- Construct from file
 Foam::surfaceFeatures::surfaceFeatures
 (
     const triSurface& surf,
@@ -618,7 +615,6 @@ Foam::surfaceFeatures::surfaceFeatures
 }
 
 
-//- Construct as copy
 Foam::surfaceFeatures::surfaceFeatures(const surfaceFeatures& sf)
 :
     surf_(sf.surface()),
@@ -901,9 +897,9 @@ void Foam::surfaceFeatures::writeObj(const fileName& prefix) const
 
     forAll(featurePoints_, i)
     {
-        label pointI = featurePoints_[i];
+        label pointi = featurePoints_[i];
 
-        meshTools::writeOBJ(pointStr, surf_.localPoints()[pointI]);
+        meshTools::writeOBJ(pointStr, surf_.localPoints()[pointi]);
     }
 }
 
@@ -937,9 +933,9 @@ Foam::Map<Foam::label> Foam::surfaceFeatures::nearestSamples
 
     forAll(pointLabels, i)
     {
-        label surfPointI = pointLabels[i];
+        label surfPointi = pointLabels[i];
 
-        const point& surfPt = surfPoints[surfPointI];
+        const point& surfPt = surfPoints[surfPointi];
 
         pointIndexHit info = ppTree.findNearest
         (
@@ -949,9 +945,9 @@ Foam::Map<Foam::label> Foam::surfaceFeatures::nearestSamples
 
         if (!info.hit())
         {
-            FatalErrorIn("surfaceFeatures::nearestSamples")
+            FatalErrorInFunction
                 << "Problem for point "
-                << surfPointI << " in tree " << ppTree.bb()
+                << surfPointi << " in tree " << ppTree.bb()
                 << abort(FatalError);
         }
 
@@ -959,7 +955,7 @@ Foam::Map<Foam::label> Foam::surfaceFeatures::nearestSamples
 
         if (magSqr(samples[sampleI] - surfPt) < maxDistSqr[sampleI])
         {
-            nearest.insert(sampleI, surfPointI);
+            nearest.insert(sampleI, surfPointi);
         }
     }
 
@@ -1484,19 +1480,15 @@ void Foam::surfaceFeatures::operator=(const surfaceFeatures& rhs)
     // Check for assignment to self
     if (this == &rhs)
     {
-        FatalErrorIn
-        (
-            "Foam::surfaceFeatures::operator=(const Foam::surfaceFeatures&)"
-        )   << "Attempted assignment to self"
+        FatalErrorInFunction
+            << "Attempted assignment to self"
             << abort(FatalError);
     }
 
     if (&surf_ != &rhs.surface())
     {
-        FatalErrorIn
-        (
-            "Foam::surfaceFeatures::operator=(const Foam::surfaceFeatures&)"
-        )   << "Operating on different surfaces"
+        FatalErrorInFunction
+            << "Operating on different surfaces"
             << abort(FatalError);
     }
 

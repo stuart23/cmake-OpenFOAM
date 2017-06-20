@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -42,7 +42,7 @@ namespace fv
 // * * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * //
 
 template<class Type>
-tmp<d2dt2Scheme<Type> > d2dt2Scheme<Type>::New
+tmp<d2dt2Scheme<Type>> d2dt2Scheme<Type>::New
 (
     const fvMesh& mesh,
     Istream& schemeData
@@ -50,16 +50,13 @@ tmp<d2dt2Scheme<Type> > d2dt2Scheme<Type>::New
 {
     if (fv::debug)
     {
-        Info<< "d2dt2Scheme<Type>::New(const fvMesh&, Istream&) : "
-               "constructing d2dt2Scheme<Type>"
-            << endl;
+        InfoInFunction << "Constructing d2dt2Scheme<Type>" << endl;
     }
 
     if (schemeData.eof())
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "d2dt2Scheme<Type>::New(const fvMesh&, Istream&)",
             schemeData
         )   << "D2dt2 scheme not specified" << endl << endl
             << "Valid d2dt2 schemes are :" << endl
@@ -74,9 +71,8 @@ tmp<d2dt2Scheme<Type> > d2dt2Scheme<Type>::New
 
     if (cstrIter == IstreamConstructorTablePtr_->end())
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "d2dt2Scheme<Type>::New(const fvMesh&, Istream&)",
             schemeData
         )   << "Unknown d2dt2 scheme " << schemeName << nl << nl
             << "Valid d2dt2 schemes are :" << endl

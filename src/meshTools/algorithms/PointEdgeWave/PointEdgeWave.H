@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -168,7 +168,7 @@ class PointEdgeWave
         //  statistics.
         bool updatePoint
         (
-            const label pointI,
+            const label pointi,
             const label neighbourEdgeI,
             const Type& neighbourInfo,
             Type& pointInfo
@@ -178,7 +178,7 @@ class PointEdgeWave
         //  statistics.
         bool updatePoint
         (
-            const label pointI,
+            const label pointi,
             const Type& neighbourInfo,
             Type& pointInfo
         );
@@ -188,7 +188,7 @@ class PointEdgeWave
         bool updateEdge
         (
             const label edgeI,
-            const label neighbourPointI,
+            const label neighbourPointi,
             const Type& neighbourInfo,
             Type& edgeInfo
         );
@@ -357,7 +357,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "PointEdgeWave.C"
+    #include "PointEdgeWave.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

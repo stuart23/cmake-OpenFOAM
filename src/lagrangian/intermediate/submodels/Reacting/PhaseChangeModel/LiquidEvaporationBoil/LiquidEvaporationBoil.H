@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -81,8 +81,8 @@ protected:
         //- Sherwood number as a function of Reynolds and Schmidt numbers
         scalar Sh(const scalar Re, const scalar Sc) const;
 
-        //- Calculate the carrier phase component volume fractions at cellI
-        tmp<scalarField> calcXc(const label cellI) const;
+        //- Calculate the carrier phase component volume fractions at celli
+        tmp<scalarField> calcXc(const label celli) const;
 
 
 public:
@@ -100,9 +100,9 @@ public:
         LiquidEvaporationBoil(const LiquidEvaporationBoil<CloudType>& pcm);
 
         //- Construct and return a clone
-        virtual autoPtr<PhaseChangeModel<CloudType> > clone() const
+        virtual autoPtr<PhaseChangeModel<CloudType>> clone() const
         {
-            return autoPtr<PhaseChangeModel<CloudType> >
+            return autoPtr<PhaseChangeModel<CloudType>>
             (
                 new LiquidEvaporationBoil<CloudType>(*this)
             );
@@ -119,7 +119,7 @@ public:
         virtual void calculate
         (
             const scalar dt,
-            const label cellI,
+            const label celli,
             const scalar Re,
             const scalar Pr,
             const scalar d,
@@ -156,7 +156,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "LiquidEvaporationBoil.C"
+    #include "LiquidEvaporationBoil.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

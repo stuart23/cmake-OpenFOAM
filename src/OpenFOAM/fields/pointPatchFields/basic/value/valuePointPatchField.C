@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,10 +33,8 @@ void Foam::valuePointPatchField<Type>::checkFieldSize() const
 {
     if (this->size() != this->patch().size())
     {
-        FatalErrorIn
-        (
-            "void valuePointPatchField<Type>::checkField() const"
-        )   << "field does not correspond to patch. " << endl
+        FatalErrorInFunction
+            << "field does not correspond to patch. " << endl
             << "Field size: " << size() << " patch size: "
             << this->patch().size()
             << abort(FatalError);
@@ -79,19 +77,12 @@ Foam::valuePointPatchField<Type>::valuePointPatchField
     }
     else if (!valueRequired)
     {
-        Field<Type>::operator=(pTraits<Type>::zero);
+        Field<Type>::operator=(Zero);
     }
     else
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "pointPatchField<Type>::pointPatchField"
-            "("
-            "const fvPatch& p,"
-            "const DimensionedField<Type, pointMesh>& iF,"
-            "const dictionary& dict,"
-            "const bool valueRequired"
-            ")",
             dict
         )   << "Essential entry 'value' missing"
             << exit(FatalIOError);
@@ -146,7 +137,7 @@ void Foam::valuePointPatchField<Type>::rmap
 {
     Field<Type>::rmap
     (
-        refCast<const valuePointPatchField<Type> >
+        refCast<const valuePointPatchField<Type>>
         (
             ptf
         ),
@@ -164,7 +155,7 @@ void Foam::valuePointPatchField<Type>::updateCoeffs()
     }
 
     // Get internal field to insert values into
-    Field<Type>& iF = const_cast<Field<Type>&>(this->internalField());
+    Field<Type>& iF = const_cast<Field<Type>&>(this->primitiveField());
 
     this->setInInternalField(iF, *this);
 
@@ -176,7 +167,7 @@ template<class Type>
 void Foam::valuePointPatchField<Type>::evaluate(const Pstream::commsTypes)
 {
     // Get internal field to insert values into
-    Field<Type>& iF = const_cast<Field<Type>&>(this->internalField());
+    Field<Type>& iF = const_cast<Field<Type>&>(this->primitiveField());
 
     this->setInInternalField(iF, *this);
 
@@ -210,7 +201,7 @@ void Foam::valuePointPatchField<Type>::operator=
     const pointPatchField<Type>& ptf
 )
 {
-    Field<Type>::operator=(ptf.patchInternalField());
+    Field<Type>::operator=(this->patchInternalField());
 }
 
 
@@ -234,7 +225,6 @@ void Foam::valuePointPatchField<Type>::operator=
 }
 
 
-// Force an assignment
 template<class Type>
 void Foam::valuePointPatchField<Type>::operator==
 (
@@ -251,7 +241,7 @@ void Foam::valuePointPatchField<Type>::operator==
     const pointPatchField<Type>& ptf
 )
 {
-    Field<Type>::operator=(ptf.patchInternalField());
+    Field<Type>::operator=(this->patchInternalField());
 }
 
 

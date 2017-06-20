@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::autoPtr<Foam::CompositionModel<CloudType> >
+Foam::autoPtr<Foam::CompositionModel<CloudType>>
 Foam::CompositionModel<CloudType>::New
 (
     const dictionary& dict,
@@ -44,21 +44,15 @@ Foam::CompositionModel<CloudType>::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "CompositionModel<CloudType>::New"
-            "("
-                "const dictionary&, "
-                "CloudType&"
-            ")"
-        )   << "Unknown composition model type "
+        FatalErrorInFunction
+            << "Unknown composition model type "
             << modelType << nl << nl
             << "Valid composition model types are:" << nl
             << dictionaryConstructorTablePtr_->sortedToc() << nl
             << exit(FatalError);
     }
 
-    return autoPtr<CompositionModel<CloudType> >(cstrIter()(dict, owner));
+    return autoPtr<CompositionModel<CloudType>>(cstrIter()(dict, owner));
 }
 
 

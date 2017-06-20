@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -121,10 +121,7 @@ bool Foam::fileFormats::STARCDsurfaceFormat<Face>::read
     IFstream is(baseName + ".cel");
     if (!is.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::STARCDsurfaceFormat::read(const fileName&)"
-        )
+        FatalErrorInFunction
             << "Cannot read file " << is.name()
             << exit(FatalError);
     }
@@ -210,14 +207,14 @@ bool Foam::fileFormats::STARCDsurfaceFormat<Face>::read
                 label nTri = 0;
                 f.triangles(this->points(), nTri, triFaces);
 
-                forAll(triFaces, faceI)
+                forAll(triFaces, facei)
                 {
                     // a triangular face, but not yet a triFace
                     dynFaces.append
                     (
                         triFace
                         (
-                            static_cast<labelUList&>(triFaces[faceI])
+                            static_cast<labelUList&>(triFaces[facei])
                         )
                     );
                     dynZones.append(zoneI);
@@ -276,7 +273,7 @@ void Foam::fileFormats::STARCDsurfaceFormat<Face>::write
 
         if (useFaceMap)
         {
-            forAll(zone, localFaceI)
+            forAll(zone, localFacei)
             {
                 const Face& f = faceLst[faceMap[faceIndex++]];
                 writeShell(os, f, faceIndex, zoneI + 1);
@@ -284,7 +281,7 @@ void Foam::fileFormats::STARCDsurfaceFormat<Face>::write
         }
         else
         {
-            forAll(zone, localFaceI)
+            forAll(zone, localFacei)
             {
                 const Face& f = faceLst[faceIndex++];
                 writeShell(os, f, faceIndex, zoneI + 1);

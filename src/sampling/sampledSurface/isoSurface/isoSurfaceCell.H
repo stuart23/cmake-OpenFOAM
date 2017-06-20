@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -139,17 +139,21 @@ class isoSurfaceCell
             const scalarField& pointValues
         );
 
+        //- Return the two common points between two triangles
         static labelPair findCommonPoints
         (
             const labelledTri&,
             const labelledTri&
         );
 
+        //- Caculate centre of surface.
         static point calcCentre(const triSurface&);
 
+        //- Replace surface (localPoints, localTris) with single point.
+        //  Returns point.  Destroys arguments.
         pointIndexHit collapseSurface
         (
-            const label cellI,
+            const label celli,
             pointField& localPoints,
             DynamicList<labelledTri, 64>& localTris
         ) const;
@@ -165,24 +169,24 @@ class isoSurfaceCell
             labelList& snappedCc
         ) const;
 
-        //- Generate triangles for face connected to pointI
+        //- Generate triangles for face connected to pointi
         void genPointTris
         (
             const scalarField& cellValues,
             const scalarField& pointValues,
-            const label pointI,
-            const label faceI,
-            const label cellI,
+            const label pointi,
+            const label facei,
+            const label celli,
             DynamicList<point, 64>& localTriPoints
         ) const;
 
-        //- Generate triangles for tet connected to pointI
+        //- Generate triangles for tet connected to pointi
         void genPointTris
         (
             const scalarField& pointValues,
-            const label pointI,
-            const label faceI,
-            const label cellI,
+            const label pointi,
+            const label facei,
+            const label celli,
             DynamicList<point, 64>& localTriPoints
         ) const;
 
@@ -214,19 +218,15 @@ class isoSurfaceCell
         void generateTriPoints
         (
             const DynamicList<Type>& snapped,
-            const scalar isoVal0,
             const scalar s0,
             const Type& p0,
             const label p0Index,
-            const scalar isoVal1,
             const scalar s1,
             const Type& p1,
             const label p1Index,
-            const scalar isoVal2,
             const scalar s2,
             const Type& p2,
             const label p2Index,
-            const scalar isoVal3,
             const scalar s3,
             const Type& p3,
             const label p3Index,
@@ -265,32 +265,11 @@ class isoSurfaceCell
         void calcAddressing
         (
             const triSurface& surf,
-            List<FixedList<label, 3> >& faceEdges,
+            List<FixedList<label, 3>>& faceEdges,
             labelList& edgeFace0,
             labelList& edgeFace1,
             Map<labelList>& edgeFacesRest
         ) const;
-
-        ////- Determine orientation
-        //static void walkOrientation
-        //(
-        //    const triSurface& surf,
-        //    const List<FixedList<label, 3> >& faceEdges,
-        //    const labelList& edgeFace0,
-        //    const labelList& edgeFace1,
-        //    const label seedTriI,
-        //    labelList& flipState
-        //);
-
-        ////- Orient surface
-        //static void orientSurface
-        //(
-        //    triSurface&,
-        //    const List<FixedList<label, 3> >& faceEdges,
-        //    const labelList& edgeFace0,
-        //    const labelList& edgeFace1,
-        //    const Map<labelList>& edgeFacesRest
-        //);
 
         //- Is triangle (given by 3 edges) not fully connected?
         static bool danglingTriangle
@@ -302,7 +281,7 @@ class isoSurfaceCell
         //- Mark all non-fully connected triangles
         static label markDanglingTriangles
         (
-            const List<FixedList<label, 3> >& faceEdges,
+            const List<FixedList<label, 3>>& faceEdges,
             const labelList& edgeFace0,
             const labelList& edgeFace1,
             const Map<labelList>& edgeFacesRest,
@@ -317,8 +296,6 @@ class isoSurfaceCell
             labelList& newToOldPoints
         );
 
-        //- Combine all triangles inside a cell into a minimal triangulation
-        void combineCellTriangles();
 
 public:
 
@@ -348,27 +325,9 @@ public:
             return meshCells_;
         }
 
-        //- For every unmerged triangle point the point in the triSurface
-        const labelList triPointMergeMap() const
-        {
-            return triPointMergeMap_;
-        }
-
-
-        //- Interpolates cCoords,pCoords. Takes the original fields
-        //  used to create the iso surface.
-        template<class Type>
-        tmp<Field<Type> > interpolate
-        (
-            const scalarField& cVals,
-            const scalarField& pVals,
-            const Field<Type>& cCoords,
-            const Field<Type>& pCoords
-        ) const;
-
         //- Interpolates cCoords,pCoords.
         template<class Type>
-        tmp<Field<Type> > interpolate
+        tmp<Field<Type>> interpolate
         (
             const Field<Type>& cCoords,
             const Field<Type>& pCoords
@@ -383,7 +342,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "isoSurfaceCellTemplates.C"
+    #include "isoSurfaceCellTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

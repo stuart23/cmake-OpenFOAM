@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -45,7 +45,7 @@ tmp<scalarField> nutUWallFunctionFvPatchScalarField::calcNut() const
         IOobject::groupName
         (
             turbulenceModel::propertiesName,
-            dimensionedInternalField().group()
+            internalField().group()
         )
     );
     const fvPatchVectorField& Uw = turbModel.U().boundaryField()[patchi];
@@ -54,10 +54,10 @@ tmp<scalarField> nutUWallFunctionFvPatchScalarField::calcNut() const
     const scalarField& nuw = tnuw();
 
     tmp<scalarField> tyPlus = calcYPlus(magUp);
-    scalarField& yPlus = tyPlus();
+    scalarField& yPlus = tyPlus.ref();
 
     tmp<scalarField> tnutw(new scalarField(patch().size(), 0.0));
-    scalarField& nutw = tnutw();
+    scalarField& nutw = tnutw.ref();
 
     forAll(yPlus, facei)
     {
@@ -84,7 +84,7 @@ tmp<scalarField> nutUWallFunctionFvPatchScalarField::calcYPlus
         IOobject::groupName
         (
             turbulenceModel::propertiesName,
-            dimensionedInternalField().group()
+            internalField().group()
         )
     );
     const scalarField& y = turbModel.y()[patchi];
@@ -92,7 +92,7 @@ tmp<scalarField> nutUWallFunctionFvPatchScalarField::calcYPlus
     const scalarField& nuw = tnuw();
 
     tmp<scalarField> tyPlus(new scalarField(patch().size(), 0.0));
-    scalarField& yPlus = tyPlus();
+    scalarField& yPlus = tyPlus.ref();
 
     forAll(yPlus, facei)
     {
@@ -182,7 +182,7 @@ tmp<scalarField> nutUWallFunctionFvPatchScalarField::yPlus() const
         IOobject::groupName
         (
             turbulenceModel::propertiesName,
-            dimensionedInternalField().group()
+            internalField().group()
         )
     );
     const fvPatchVectorField& Uw = turbModel.U().boundaryField()[patchi];

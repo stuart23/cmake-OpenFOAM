@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -92,7 +92,7 @@ public:
         DispersionRASModel(const DispersionRASModel<CloudType>& dm);
 
         //- Construct and return a clone
-        virtual autoPtr<DispersionModel<CloudType> > clone() const = 0;
+        virtual autoPtr<DispersionModel<CloudType>> clone() const = 0;
 
 
     //- Destructor
@@ -105,7 +105,7 @@ public:
         virtual vector update
         (
             const scalar dt,
-            const label cellI,
+            const label celli,
             const vector& U,
             const vector& Uc,
             vector& UTurb,
@@ -130,7 +130,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "DispersionRASModel.C"
+    #include "DispersionRASModel.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

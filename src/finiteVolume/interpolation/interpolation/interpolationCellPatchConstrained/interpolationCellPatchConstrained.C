@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,15 +26,10 @@ License
 #include "interpolationCellPatchConstrained.H"
 #include "volFields.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructor * * * * * * * * * * * * * * * //
 
 template<class Type>
-interpolationCellPatchConstrained<Type>::interpolationCellPatchConstrained
+Foam::interpolationCellPatchConstrained<Type>::interpolationCellPatchConstrained
 (
     const GeometricField<Type, fvPatchField, volMesh>& psi
 )
@@ -46,31 +41,27 @@ interpolationCellPatchConstrained<Type>::interpolationCellPatchConstrained
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Type interpolationCellPatchConstrained<Type>::interpolate
+Type Foam::interpolationCellPatchConstrained<Type>::interpolate
 (
     const vector& pt,
-    const label cellI,
-    const label faceI
+    const label celli,
+    const label facei
 ) const
 {
-    if (faceI >= 0 && faceI >= this->psi_.mesh().nInternalFaces())
+    if (facei >= 0 && facei >= this->psi_.mesh().nInternalFaces())
     {
         // Use boundary value
         const polyBoundaryMesh& pbm = this->psi_.mesh().boundaryMesh();
-        label patchI = pbm.patchID()[faceI-this->psi_.mesh().nInternalFaces()];
-        label patchFaceI = pbm[patchI].whichFace(faceI);
+        label patchi = pbm.patchID()[facei-this->psi_.mesh().nInternalFaces()];
+        label patchFacei = pbm[patchi].whichFace(facei);
 
-        return this->psi_.boundaryField()[patchI][patchFaceI];
+        return this->psi_.boundaryField()[patchi][patchFacei];
     }
     else
     {
-        return this->psi_[cellI];
+        return this->psi_[celli];
     }
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -59,9 +59,9 @@ void Foam::intersectedSurface::writeOBJ
     Ostream& os
 )
 {
-    forAll(points, pointI)
+    forAll(points, pointi)
     {
-        const point& pt = points[pointI];
+        const point& pt = points[pointi];
 
         os << "v " << pt.x() << ' ' << pt.y() << ' ' << pt.z() << nl;
     }
@@ -83,9 +83,9 @@ void Foam::intersectedSurface::writeOBJ
     Ostream& os
 )
 {
-    forAll(points, pointI)
+    forAll(points, pointi)
     {
-        const point& pt = points[pointI];
+        const point& pt = points[pointi];
 
         os << "v " << pt.x() << ' ' << pt.y() << ' ' << pt.z() << nl;
     }
@@ -119,15 +119,15 @@ void Foam::intersectedSurface::writeLocalOBJ
 
         forAll(e, i)
         {
-            label pointI = e[i];
+            label pointi = e[i];
 
-            if (pointMap[pointI] == -1)
+            if (pointMap[pointi] == -1)
             {
-                const point& pt = points[pointI];
+                const point& pt = points[pointi];
 
                 os << "v " << pt.x() << ' ' << pt.y() << ' ' << pt.z() << nl;
 
-                pointMap[pointI] = maxVertI++;
+                pointMap[pointi] = maxVertI++;
             }
         }
     }
@@ -150,9 +150,9 @@ void Foam::intersectedSurface::writeOBJ
     Ostream& os
 )
 {
-    forAll(points, pointI)
+    forAll(points, pointi)
     {
-        const point& pt = points[pointI];
+        const point& pt = points[pointi];
 
         os << "v " << pt.x() << ' ' << pt.y() << ' ' << pt.z() << nl;
     }
@@ -242,7 +242,7 @@ bool Foam::intersectedSurface::sameEdgeOrder
             }
             else
             {
-                FatalErrorIn("intersectedSurface::sameEdgeOrder")
+                FatalErrorInFunction
                     << "Triangle:" << fA << " and triangle:" << fB
                     << " share a point but not an edge"
                     << abort(FatalError);
@@ -250,7 +250,7 @@ bool Foam::intersectedSurface::sameEdgeOrder
         }
     }
 
-    FatalErrorIn("intersectedSurface::sameEdgeOrder")
+    FatalErrorInFunction
         << "Triangle:" << fA << " and triangle:" << fB
         << " do not share an edge"
         << abort(FatalError);
@@ -282,19 +282,19 @@ void Foam::intersectedSurface::incCount
 // Calculate point to edge addressing for the face given by the edge
 // subset faceEdges. Constructs facePointEdges which for every point
 // gives a list of edge labels connected to it.
-Foam::Map<Foam::DynamicList<Foam::label> >
+Foam::Map<Foam::DynamicList<Foam::label>>
 Foam::intersectedSurface::calcPointEdgeAddressing
 (
     const edgeSurface& eSurf,
-    const label faceI
+    const label facei
 )
 {
     const pointField& points = eSurf.points();
     const edgeList& edges = eSurf.edges();
 
-    const labelList& fEdges = eSurf.faceEdges()[faceI];
+    const labelList& fEdges = eSurf.faceEdges()[facei];
 
-    Map<DynamicList<label> > facePointEdges(4*fEdges.size());
+    Map<DynamicList<label>> facePointEdges(4*fEdges.size());
 
     forAll(fEdges, i)
     {
@@ -303,7 +303,7 @@ Foam::intersectedSurface::calcPointEdgeAddressing
         const edge& e = edges[edgeI];
 
         // Add e.start to point-edges
-        Map<DynamicList<label> >::iterator iter =
+        Map<DynamicList<label>>::iterator iter =
             facePointEdges.find(e.start());
 
         if (iter == facePointEdges.end())
@@ -318,7 +318,7 @@ Foam::intersectedSurface::calcPointEdgeAddressing
         }
 
         // Add e.end to point-edges
-        Map<DynamicList<label> >::iterator iter2 =
+        Map<DynamicList<label>>::iterator iter2 =
             facePointEdges.find(e.end());
 
         if (iter2 == facePointEdges.end())
@@ -334,18 +334,15 @@ Foam::intersectedSurface::calcPointEdgeAddressing
     }
 
     // Shrink it
-    forAllIter(Map< DynamicList<label> >, facePointEdges, iter)
+    forAllIter(Map<DynamicList<label>>, facePointEdges, iter)
     {
         iter().shrink();
 
         // Check on dangling points.
         if (iter().empty())
         {
-            FatalErrorIn
-            (
-                "intersectedSurface::calcPointEdgeAddressing"
-                "(const edgeSurface&, const label)"
-            )   << "Point:" << iter.key() << " used by too few edges:"
+            FatalErrorInFunction
+                << "Point:" << iter.key() << " used by too few edges:"
                 << iter() << abort(FatalError);
         }
     }
@@ -364,7 +361,7 @@ Foam::intersectedSurface::calcPointEdgeAddressing
         }
 
         Pout<< "    Constructed point-edge adressing:" << endl;
-        forAllConstIter(Map< DynamicList<label> >, facePointEdges, iter)
+        forAllConstIter(Map<DynamicList<label>>, facePointEdges, iter)
         {
             Pout<< "    vertex " << iter.key() << " is connected to edges "
                 << iter() << endl;
@@ -384,16 +381,16 @@ Foam::label Foam::intersectedSurface::nextEdge
 (
     const edgeSurface& eSurf,
     const Map<label>& visited,
-    const label faceI,
+    const label facei,
     const vector& n,
-    const Map<DynamicList<label> >& facePointEdges,
+    const Map<DynamicList<label>>& facePointEdges,
     const label prevEdgeI,
     const label prevVertI
 )
 {
     const pointField& points = eSurf.points();
     const edgeList& edges = eSurf.edges();
-    const labelList& fEdges = eSurf.faceEdges()[faceI];
+    const labelList& fEdges = eSurf.faceEdges()[facei];
 
 
     // Edges connected to prevVertI
@@ -403,7 +400,7 @@ Foam::label Foam::intersectedSurface::nextEdge
     {
         // Problem. Point not connected.
         {
-            Pout<< "Writing face:" << faceI << " to face.obj" << endl;
+            Pout<< "Writing face:" << facei << " to face.obj" << endl;
             OFstream str("face.obj");
             writeOBJ(points, edges, fEdges, str);
 
@@ -411,12 +408,8 @@ Foam::label Foam::intersectedSurface::nextEdge
             writeLocalOBJ(points, edges, connectedEdges, "faceEdges.obj");
         }
 
-        FatalErrorIn
-        (
-            "intersectedSurface::nextEdge(const pointField&, const edgeList&"
-            ", const vector&, Map<DynamicList<label> >, const label"
-            ", const label)"
-        )   << "Problem: prevVertI:" << prevVertI << " on edge " << prevEdgeI
+        FatalErrorInFunction
+            << "Problem: prevVertI:" << prevVertI << " on edge " << prevEdgeI
             << " has less than 2 connected edges."
             << " connectedEdges:" << connectedEdges << abort(FatalError);
 
@@ -463,7 +456,7 @@ Foam::label Foam::intersectedSurface::nextEdge
     if (mag(mag(e1) - 1) > SMALL)
     {
         {
-            Pout<< "Writing face:" << faceI << " to face.obj" << endl;
+            Pout<< "Writing face:" << facei << " to face.obj" << endl;
             OFstream str("face.obj");
             writeOBJ(points, edges, fEdges, str);
 
@@ -471,7 +464,7 @@ Foam::label Foam::intersectedSurface::nextEdge
             writeLocalOBJ(points, edges, connectedEdges, "faceEdges.obj");
         }
 
-        FatalErrorIn("intersectedSurface::nextEdge")
+        FatalErrorInFunction
             << "Unnormalized normal e1:" << e1
             << " formed from cross product of e0:" << e0 << " n:" << n
             << abort(FatalError);
@@ -531,7 +524,7 @@ Foam::label Foam::intersectedSurface::nextEdge
     {
         // No unvisited edge found
         {
-            Pout<< "Writing face:" << faceI << " to face.obj" << endl;
+            Pout<< "Writing face:" << facei << " to face.obj" << endl;
             OFstream str("face.obj");
             writeOBJ(points, edges, fEdges, str);
 
@@ -539,13 +532,8 @@ Foam::label Foam::intersectedSurface::nextEdge
             writeLocalOBJ(points, edges, connectedEdges, "faceEdges.obj");
         }
 
-        FatalErrorIn
-        (
-            "intersectedSurface::nextEdge(const pointField&, const edgeList&"
-            ", const Map<label>&, const vector&"
-            ", const Map<DynamicList<label> >&"
-            ", const label, const label"
-        )   << "Trying to step from edge " << edges[prevEdgeI]
+        FatalErrorInFunction
+            << "Trying to step from edge " << edges[prevEdgeI]
             << ", vertex " << prevVertI
             << " but cannot find 'unvisited' edges among candidates:"
             << connectedEdges
@@ -571,9 +559,9 @@ Foam::label Foam::intersectedSurface::nextEdge
 Foam::face Foam::intersectedSurface::walkFace
 (
     const edgeSurface& eSurf,
-    const label faceI,
+    const label facei,
     const vector& n,
-    const Map<DynamicList<label> >& facePointEdges,
+    const Map<DynamicList<label>>& facePointEdges,
 
     const label startEdgeI,
     const label startVertI,
@@ -585,7 +573,7 @@ Foam::face Foam::intersectedSurface::walkFace
     const edgeList& edges = eSurf.edges();
 
     // Overestimate size of face
-    face f(eSurf.faceEdges()[faceI].size());
+    face f(eSurf.faceEdges()[facei].size());
 
     label fp = 0;
 
@@ -631,7 +619,7 @@ Foam::face Foam::intersectedSurface::walkFace
         (
             eSurf,
             visited,
-            faceI,
+            facei,
             n,
             facePointEdges,
             edgeI,
@@ -648,11 +636,11 @@ Foam::face Foam::intersectedSurface::walkFace
 void Foam::intersectedSurface::findNearestVisited
 (
     const edgeSurface& eSurf,
-    const label faceI,
-    const Map<DynamicList<label> >& facePointEdges,
+    const label facei,
+    const Map<DynamicList<label>>& facePointEdges,
     const Map<label>& pointVisited,
     const point& pt,
-    const label excludePointI,
+    const label excludePointi,
 
     label& minVertI,
     scalar& minDist
@@ -663,21 +651,21 @@ void Foam::intersectedSurface::findNearestVisited
 
     forAllConstIter(Map<label>, pointVisited, iter)
     {
-        label pointI = iter.key();
+        label pointi = iter.key();
 
-        if (pointI != excludePointI)
+        if (pointi != excludePointi)
         {
             label nVisits = iter();
 
-            if (nVisits == 2*facePointEdges[pointI].size())
+            if (nVisits == 2*facePointEdges[pointi].size())
             {
                 // Fully visited (i.e. both sides of all edges)
-                scalar dist = mag(eSurf.points()[pointI] - pt);
+                scalar dist = mag(eSurf.points()[pointi] - pt);
 
                 if (dist < minDist)
                 {
                     minDist = dist;
-                    minVertI = pointI;
+                    minVertI = pointi;
                 }
             }
         }
@@ -685,14 +673,14 @@ void Foam::intersectedSurface::findNearestVisited
 
     if (minVertI == -1)
     {
-        const labelList& fEdges = eSurf.faceEdges()[faceI];
+        const labelList& fEdges = eSurf.faceEdges()[facei];
 
-        SeriousErrorIn("intersectedSurface::findNearestVisited")
+        SeriousErrorInFunction
             << "Dumping face edges to faceEdges.obj" << endl;
 
         writeLocalOBJ(eSurf.points(), eSurf.edges(), fEdges, "faceEdges.obj");
 
-        FatalErrorIn("intersectedSurface::findNearestVisited")
+        FatalErrorInFunction
             << "No fully visited edge found for pt " << pt
             << abort(FatalError);
     }
@@ -710,17 +698,17 @@ void Foam::intersectedSurface::findNearestVisited
 Foam::faceList Foam::intersectedSurface::resplitFace
 (
     const triSurface& surf,
-    const label faceI,
-    const Map<DynamicList<label> >& facePointEdges,
+    const label facei,
+    const Map<DynamicList<label>>& facePointEdges,
     const Map<label>& visited,
     edgeSurface& eSurf
 )
 {
     {
         // Dump face for debugging.
-        Pout<< "Writing face:" << faceI << " to face.obj" << endl;
+        Pout<< "Writing face:" << facei << " to face.obj" << endl;
         OFstream str("face.obj");
-        writeOBJ(eSurf.points(), eSurf.edges(), eSurf.faceEdges()[faceI], str);
+        writeOBJ(eSurf.points(), eSurf.edges(), eSurf.faceEdges()[facei], str);
     }
 
 
@@ -733,9 +721,9 @@ Foam::faceList Foam::intersectedSurface::resplitFace
         OFstream str0("visitedNone.obj");
         OFstream str1("visitedOnce.obj");
         OFstream str2("visitedTwice.obj");
-        forAll(eSurf.points(), pointI)
+        forAll(eSurf.points(), pointi)
         {
-            const point& pt = eSurf.points()[pointI];
+            const point& pt = eSurf.points()[pointi];
 
             str0 << "v " << pt.x() << ' ' << pt.y() << ' ' << pt.z() << nl;
             str1 << "v " << pt.x() << ' ' << pt.y() << ' ' << pt.z() << nl;
@@ -779,12 +767,12 @@ Foam::faceList Foam::intersectedSurface::resplitFace
     {
         forAllConstIter(Map<label>, pointVisited, iter)
         {
-            label pointI = iter.key();
+            label pointi = iter.key();
 
             label nVisits = iter();
 
-            Pout<< "point:" << pointI << "  nVisited:" << nVisits
-                << "  pointEdges:" << facePointEdges[pointI].size() << endl;
+            Pout<< "point:" << pointi << "  nVisited:" << nVisits
+                << "  pointEdges:" << facePointEdges[pointi].size() << endl;
         }
     }
 
@@ -798,11 +786,11 @@ Foam::faceList Foam::intersectedSurface::resplitFace
     {
         scalar minDist = GREAT;
 
-        forAllConstIter(Map<DynamicList<label> >, facePointEdges, iter)
+        forAllConstIter(Map<DynamicList<label>>, facePointEdges, iter)
         {
-            label pointI = iter.key();
+            label pointi = iter.key();
 
-            label nVisits = pointVisited[pointI];
+            label nVisits = pointVisited[pointi];
 
             const DynamicList<label>& pEdges = iter();
 
@@ -816,10 +804,10 @@ Foam::faceList Foam::intersectedSurface::resplitFace
                 findNearestVisited
                 (
                     eSurf,
-                    faceI,
+                    facei,
                     facePointEdges,
                     pointVisited,
-                    eSurf.points()[pointI],
+                    eSurf.points()[pointi],
                     -1,                         // Do not exclude vertex
                     nearVertI,
                     nearDist
@@ -830,7 +818,7 @@ Foam::faceList Foam::intersectedSurface::resplitFace
                 {
                     minDist = nearDist;
                     visitedVert0 = nearVertI;
-                    unvisitedVert0 = pointI;
+                    unvisitedVert0 = pointi;
                 }
             }
         }
@@ -843,13 +831,13 @@ Foam::faceList Foam::intersectedSurface::resplitFace
     {
         scalar minDist = GREAT;
 
-        forAllConstIter(Map<DynamicList<label> >, facePointEdges, iter)
+        forAllConstIter(Map<DynamicList<label>>, facePointEdges, iter)
         {
-            label pointI = iter.key();
+            label pointi = iter.key();
 
-            if (pointI != unvisitedVert0)
+            if (pointi != unvisitedVert0)
             {
-                label nVisits = pointVisited[pointI];
+                label nVisits = pointVisited[pointi];
 
                 const DynamicList<label>& pEdges = iter();
 
@@ -863,10 +851,10 @@ Foam::faceList Foam::intersectedSurface::resplitFace
                     findNearestVisited
                     (
                         eSurf,
-                        faceI,
+                        facei,
                         facePointEdges,
                         pointVisited,
-                        eSurf.points()[pointI],
+                        eSurf.points()[pointi],
                         visitedVert0,           // vertex to exclude
                         nearVertI,
                         nearDist
@@ -877,7 +865,7 @@ Foam::faceList Foam::intersectedSurface::resplitFace
                     {
                         minDist = nearDist;
                         visitedVert1 = nearVertI;
-                        unvisitedVert1 = pointI;
+                        unvisitedVert1 = pointi;
                     }
                 }
             }
@@ -900,42 +888,42 @@ Foam::faceList Foam::intersectedSurface::resplitFace
     edgeList additionalEdges(1);
     additionalEdges[0] = edge(visitedVert0, unvisitedVert0);
 
-    eSurf.addIntersectionEdges(faceI, additionalEdges);
+    eSurf.addIntersectionEdges(facei, additionalEdges);
 
-    fileName newFName("face_" + Foam::name(faceI) + "_newEdges.obj");
-    Pout<< "Dumping face:" << faceI << " to " << newFName << endl;
+    fileName newFName("face_" + Foam::name(facei) + "_newEdges.obj");
+    Pout<< "Dumping face:" << facei << " to " << newFName << endl;
     writeLocalOBJ
     (
         eSurf.points(),
         eSurf.edges(),
-        eSurf.faceEdges()[faceI],
+        eSurf.faceEdges()[facei],
         newFName
     );
 
     // Retry splitFace. Use recursion since is rare situation.
-    return splitFace(surf, faceI, eSurf);
+    return splitFace(surf, facei, eSurf);
 }
 
 
 Foam::faceList Foam::intersectedSurface::splitFace
 (
     const triSurface& surf,
-    const label faceI,
+    const label facei,
     edgeSurface& eSurf
 )
 {
     // Alias
     const pointField& points = eSurf.points();
     const edgeList& edges = eSurf.edges();
-    const labelList& fEdges = eSurf.faceEdges()[faceI];
+    const labelList& fEdges = eSurf.faceEdges()[facei];
 
     // Create local (for the face only) point-edge connectivity.
-    Map<DynamicList<label> > facePointEdges
+    Map<DynamicList<label>> facePointEdges
     (
         calcPointEdgeAddressing
         (
             eSurf,
-            faceI
+            facei
         )
     );
 
@@ -956,11 +944,11 @@ Foam::faceList Foam::intersectedSurface::splitFace
 
             if
             (
-                owner == faceI
+                owner == facei
              || sameEdgeOrder
                 (
                     surf.localFaces()[owner],
-                    surf.localFaces()[faceI]
+                    surf.localFaces()[facei]
                 )
             )
             {
@@ -1037,7 +1025,7 @@ Foam::faceList Foam::intersectedSurface::splitFace
         //printVisit(eSurf.edges(), fEdges, visited);
 
         //{
-        //    Pout<< "Writing face:" << faceI << " to face.obj" << endl;
+        //    Pout<< "Writing face:" << facei << " to face.obj" << endl;
         //    OFstream str("face.obj");
         //    writeOBJ(eSurf.points(), eSurf.edges(), fEdges, str);
         //}
@@ -1047,8 +1035,8 @@ Foam::faceList Foam::intersectedSurface::splitFace
             walkFace
             (
                 eSurf,
-                faceI,
-                surf.faceNormals()[faceI],
+                facei,
+                surf.faceNormals()[facei],
                 facePointEdges,
 
                 startEdgeI,
@@ -1069,14 +1057,14 @@ Foam::faceList Foam::intersectedSurface::splitFace
 
         if (eSurf.isSurfaceEdge(edgeI) && stat != BOTH)
         {
-            SeriousErrorIn("Foam::intersectedSurface::splitFace")
+            SeriousErrorInFunction
                 << "Dumping face edges to faceEdges.obj" << endl;
 
             writeLocalOBJ(points, edges, fEdges, "faceEdges.obj");
 
-            FatalErrorIn("intersectedSurface::splitFace")
+            FatalErrorInFunction
                << "Problem: edge " << edgeI << " vertices "
-                << edges[edgeI] << " on face " << faceI
+                << edges[edgeI] << " on face " << facei
                 << " has visited status " << stat << " from a "
                  << "righthanded walk along all"
                 << " of the triangle edges. Are the original surfaces"
@@ -1104,7 +1092,7 @@ Foam::faceList Foam::intersectedSurface::splitFace
             return resplitFace
             (
                 surf,
-                faceI,
+                facei,
                 facePointEdges,
                 visited,
                 eSurf
@@ -1118,7 +1106,7 @@ Foam::faceList Foam::intersectedSurface::splitFace
 
     vector n = faces[0].normal(eSurf.points());
 
-    if ((n & surf.faceNormals()[faceI]) < 0)
+    if ((n & surf.faceNormals()[facei]) < 0)
     {
         forAll(faces, i)
         {
@@ -1173,9 +1161,9 @@ Foam::intersectedSurface::intersectedSurface
         // Identity for face map
         faceMap_.setSize(size());
 
-        forAll(faceMap_, faceI)
+        forAll(faceMap_, facei)
         {
-            faceMap_[faceI] = faceI;
+            faceMap_[facei] = facei;
         }
         return;
     }
@@ -1197,11 +1185,11 @@ Foam::intersectedSurface::intersectedSurface
     // Start in newTris for decomposed face.
     labelList startTriI(surf.size(), 0);
 
-    forAll(surf, faceI)
+    forAll(surf, facei)
     {
-        startTriI[faceI] = newTris.size();
+        startTriI[facei] = newTris.size();
 
-        if (eSurf.faceEdges()[faceI].size() != surf.faceEdges()[faceI].size())
+        if (eSurf.faceEdges()[facei].size() != surf.faceEdges()[facei].size())
         {
             // Face has been cut by intersection.
             // Cut face into multiple subfaces. Use faceEdge information
@@ -1212,26 +1200,26 @@ Foam::intersectedSurface::intersectedSurface
                 splitFace
                 (
                     surf,
-                    faceI,              // current triangle
+                    facei,              // current triangle
                     eSurf               // face-edge description of surface
                                         // + intersection
                 )
             );
-            forAll(newFaces, newFaceI)
+            forAll(newFaces, newFacei)
             {
-                const face& newF = newFaces[newFaceI];
+                const face& newF = newFaces[newFacei];
 
 //                {
 //                    fileName fName
 //                    (
 //                        "face_"
-//                      + Foam::name(faceI)
+//                      + Foam::name(facei)
 //                      + "_subFace_"
-//                      + Foam::name(newFaceI)
+//                      + Foam::name(newFacei)
 //                      + ".obj"
 //                    );
-//                    Pout<< "Writing original face:" << faceI << " subFace:"
-//                        << newFaceI << " to " << fName << endl;
+//                    Pout<< "Writing original face:" << facei << " subFace:"
+//                        << newFacei << " to " << fName << endl;
 //
 //                    OFstream str(fName);
 //
@@ -1248,8 +1236,8 @@ Foam::intersectedSurface::intersectedSurface
 //                }
 
 
-                const vector& n = surf.faceNormals()[faceI];
-                const label region = surf[faceI].region();
+                const vector& n = surf.faceNormals()[facei];
+                const label region = surf[facei].region();
 
                 faceTriangulation tris(eSurf.points(), newF, n);
 
@@ -1261,10 +1249,8 @@ Foam::intersectedSurface::intersectedSurface
                     {
                         if (t[i] < 0 || t[i] >= eSurf.points().size())
                         {
-                            FatalErrorIn
-                            (
-                                "intersectedSurface::intersectedSurface"
-                            )   << "Face triangulation of face " << faceI
+                            FatalErrorInFunction
+                                << "Face triangulation of face " << facei
                                 << " uses points outside range 0.."
                                 << eSurf.points().size()-1 << endl
                                 << "Triangulation:"
@@ -1280,7 +1266,7 @@ Foam::intersectedSurface::intersectedSurface
         {
             // Face has not been cut at all. No need to renumber vertices since
             // eSurf keeps surface vertices first.
-            newTris.append(surf.localFaces()[faceI]);
+            newTris.append(surf.localFaces()[facei]);
         }
     }
 
@@ -1302,11 +1288,11 @@ Foam::intersectedSurface::intersectedSurface
     // Construct mapping back into original surface
     faceMap_.setSize(size());
 
-    for (label faceI = 0; faceI < surf.size()-1; faceI++)
+    for (label facei = 0; facei < surf.size()-1; facei++)
     {
-        for (label triI = startTriI[faceI]; triI < startTriI[faceI+1]; triI++)
+        for (label triI = startTriI[facei]; triI < startTriI[facei+1]; triI++)
         {
-            faceMap_[triI] = faceI;
+            faceMap_[triI] = facei;
         }
     }
     for (label triI = startTriI[surf.size()-1]; triI < size(); triI++)
@@ -1359,7 +1345,7 @@ Foam::intersectedSurface::intersectedSurface
         }
         else
         {
-            FatalErrorIn("intersectedSurface::intersectedSurface")
+            FatalErrorInFunction
                 << "Cannot find edge among candidates " << pEdges
                 << " which uses points " << surfStartI
                 << " and " << surfEndI

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -54,9 +54,9 @@ Foam::cellMatcher::cellMatcher
     cellModelName_(cellModelName),
     cellModelPtr_(NULL)
 {
-    forAll(localFaces_, faceI)
+    forAll(localFaces_, facei)
     {
-        face& f = localFaces_[faceI];
+        face& f = localFaces_[facei];
 
         f.setSize(maxVertPerFace);
     }
@@ -70,7 +70,6 @@ Foam::cellMatcher::cellMatcher
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Create localFaces_ , pointMap_ , faceMap_
 Foam::label Foam::cellMatcher::calcLocalFaces
 (
     const faceList& faces,
@@ -82,15 +81,15 @@ Foam::label Foam::cellMatcher::calcLocalFaces
 
     // Renumber face vertices and insert directly into localFaces_
     label newVertI = 0;
-    forAll(myFaces, myFaceI)
+    forAll(myFaces, myFacei)
     {
-        label faceI = myFaces[myFaceI];
+        label facei = myFaces[myFacei];
 
-        const face& f = faces[faceI];
-        face& localFace = localFaces_[myFaceI];
+        const face& f = faces[facei];
+        face& localFace = localFaces_[myFacei];
 
         // Size of localFace
-        faceSize_[myFaceI] = f.size();
+        faceSize_[myFacei] = f.size();
 
         forAll(f, localVertI)
         {
@@ -119,7 +118,7 @@ Foam::label Foam::cellMatcher::calcLocalFaces
         }
 
         // Create face from localvertex labels
-        faceMap_[myFaceI] = faceI;
+        faceMap_[myFacei] = facei;
     }
 
     // Create local to global vertex mapping
@@ -136,21 +135,20 @@ Foam::label Foam::cellMatcher::calcLocalFaces
 }
 
 
-// Create edgeFaces_ : map from edge to two localFaces for single cell.
 void Foam::cellMatcher::calcEdgeAddressing(const label numVert)
 {
     edgeFaces_ = -1;
 
-    forAll(localFaces_, localFaceI)
+    forAll(localFaces_, localFacei)
     {
-        const face& f = localFaces_[localFaceI];
+        const face& f = localFaces_[localFacei];
 
-        label prevVertI = faceSize_[localFaceI] - 1;
+        label prevVertI = faceSize_[localFacei] - 1;
         //forAll(f, fp)
         for
         (
             label fp = 0;
-            fp < faceSize_[localFaceI];
+            fp < faceSize_[localFacei];
             fp++
         )
         {
@@ -163,22 +161,19 @@ void Foam::cellMatcher::calcEdgeAddressing(const label numVert)
             if (edgeFaces_[key1] == -1)
             {
                 // Entry key1 unoccupied. Store both permutations.
-                edgeFaces_[key1] = localFaceI;
-                edgeFaces_[key2] = localFaceI;
+                edgeFaces_[key1] = localFacei;
+                edgeFaces_[key2] = localFacei;
             }
             else if (edgeFaces_[key1+1] == -1)
             {
                 // Entry key1+1 unoccupied
-                edgeFaces_[key1+1] = localFaceI;
-                edgeFaces_[key2+1] = localFaceI;
+                edgeFaces_[key1+1] = localFacei;
+                edgeFaces_[key2+1] = localFacei;
             }
             else
             {
-                FatalErrorIn
-                (
-                    "calcEdgeAddressing"
-                    "(const faceList&, const label)"
-                )   << "edgeFaces_ full at entry:" << key1
+                FatalErrorInFunction
+                    << "edgeFaces_ full at entry:" << key1
                     << " for edge " << start << " " << end
                     << abort(FatalError);
             }
@@ -189,7 +184,6 @@ void Foam::cellMatcher::calcEdgeAddressing(const label numVert)
 }
 
 
-// Create pointFaceIndex_ : map from vertI, faceI to index of vertI on faceI.
 void Foam::cellMatcher::calcPointFaceIndex()
 {
     // Fill pointFaceIndex_ with -1
@@ -200,51 +194,46 @@ void Foam::cellMatcher::calcPointFaceIndex()
         faceIndices = -1;
     }
 
-    forAll(localFaces_, localFaceI)
+    forAll(localFaces_, localFacei)
     {
-        const face& f = localFaces_[localFaceI];
+        const face& f = localFaces_[localFacei];
 
         for
         (
             label fp = 0;
-            fp < faceSize_[localFaceI];
+            fp < faceSize_[localFacei];
             fp++
         )
         {
             label vert = f[fp];
-            pointFaceIndex_[vert][localFaceI] = fp;
+            pointFaceIndex_[vert][localFacei] = fp;
         }
     }
 }
 
 
-// Given edge(v0,v1) and (local)faceI return the other face
 Foam::label Foam::cellMatcher::otherFace
 (
     const label numVert,
     const label v0,
     const label v1,
-    const label localFaceI
+    const label localFacei
 ) const
 {
     label key = edgeKey(numVert, v0, v1);
 
-    if (edgeFaces_[key] == localFaceI)
+    if (edgeFaces_[key] == localFacei)
     {
         return edgeFaces_[key+1];
     }
-    else if (edgeFaces_[key+1] == localFaceI)
+    else if (edgeFaces_[key+1] == localFacei)
     {
         return edgeFaces_[key];
     }
     else
     {
-        FatalErrorIn
-        (
-            "otherFace"
-            "(const label, const labelList&, const label, const label, "
-            "const label)"
-        )   << "edgeFaces_ does not contain:" << localFaceI
+        FatalErrorInFunction
+            << "edgeFaces_ does not contain:" << localFacei
             << " for edge " << v0 << " " << v1 << " at key " << key
             << " edgeFaces_[key, key+1]:" <<  edgeFaces_[key]
             << " , " << edgeFaces_[key+1]
@@ -259,13 +248,13 @@ void Foam::cellMatcher::write(Foam::Ostream& os) const
 {
     os  << "Faces:" << endl;
 
-    forAll(localFaces_, faceI)
+    forAll(localFaces_, facei)
     {
         os  << "    ";
 
-        for (label fp = 0; fp < faceSize_[faceI]; fp++)
+        for (label fp = 0; fp < faceSize_[facei]; fp++)
         {
-            os  << ' ' << localFaces_[faceI][fp];
+            os  << ' ' << localFaces_[facei][fp];
         }
         os  << endl;
     }

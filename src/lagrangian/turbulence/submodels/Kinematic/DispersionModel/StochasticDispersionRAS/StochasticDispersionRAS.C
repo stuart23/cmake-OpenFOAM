@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -64,7 +64,7 @@ template<class CloudType>
 Foam::vector Foam::StochasticDispersionRAS<CloudType>::update
 (
     const scalar dt,
-    const label cellI,
+    const label celli,
     const vector& U,
     const vector& Uc,
     vector& UTurb,
@@ -75,9 +75,9 @@ Foam::vector Foam::StochasticDispersionRAS<CloudType>::update
 
     const scalar cps = 0.16432;
 
-    const scalar k = this->kPtr_->internalField()[cellI];
+    const scalar k = this->kPtr_->primitiveField()[celli];
     const scalar epsilon =
-        this->epsilonPtr_->internalField()[cellI] + ROOTVSMALL;
+        this->epsilonPtr_->primitiveField()[celli] + ROOTVSMALL;
 
     const scalar UrelMag = mag(U - Uc - UTurb);
 
@@ -111,7 +111,7 @@ Foam::vector Foam::StochasticDispersionRAS<CloudType>::update
     else
     {
         tTurb = GREAT;
-        UTurb = vector::zero;
+        UTurb = Zero;
     }
 
     return Uc + UTurb;

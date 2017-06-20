@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,8 +25,8 @@ Application
     reactingParcelFilmFoam
 
 Description
-    Transient PIMPLE solver for compressible, laminar or turbulent flow with
-    reacting Lagrangian parcels, and surface film modelling.
+    Transient solver for compressible, turbulent flow with a reacting,
+    multiphase particle cloud, and surface film modelling.
 
 \*---------------------------------------------------------------------------*/
 
@@ -37,31 +37,27 @@ Description
 #include "psiCombustionModel.H"
 #include "radiationModel.H"
 #include "SLGThermo.H"
-#include "fvIOoptionList.H"
+#include "fvOptions.H"
 #include "pimpleControl.H"
-#include "fixedFluxPressureFvPatchScalarField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCase.H"
+    #include "postProcess.H"
 
+    #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
-
-    pimpleControl pimple(mesh);
-
-    #include "createFields.H"
-    #include "createMRF.H"
-    #include "createFvOptions.H"
-    #include "createClouds.H"
-    #include "createRadiationModel.H"
-    #include "createSurfaceFilmModel.H"
-    #include "initContinuityErrs.H"
+    #include "createControl.H"
     #include "createTimeControls.H"
+    #include "createFields.H"
+    #include "createFvOptions.H"
     #include "compressibleCourantNo.H"
     #include "setInitialDeltaT.H"
+    #include "initContinuityErrs.H"
+
+    turbulence->validate();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -69,7 +65,7 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-        #include "createTimeControls.H"
+        #include "readTimeControls.H"
         #include "compressibleCourantNo.H"
         #include "setMultiRegionDeltaT.H"
         #include "setDeltaT.H"

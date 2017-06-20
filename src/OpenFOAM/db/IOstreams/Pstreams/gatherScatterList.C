@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -53,15 +53,12 @@ void Pstream::gatherList
     const label comm
 )
 {
-    if (UPstream::nProcs(comm) > 1)
+    if (UPstream::parRun() && UPstream::nProcs(comm) > 1)
     {
         if (Values.size() != UPstream::nProcs(comm))
         {
-            FatalErrorIn
-            (
-                "UPstream::gatherList(const List<UPstream::commsStruct>&"
-                ", List<T>)"
-            )   << "Size of list:" << Values.size()
+            FatalErrorInFunction
+                << "Size of list:" << Values.size()
                 << " does not equal the number of processors:"
                 << UPstream::nProcs(comm)
                 << Foam::abort(FatalError);
@@ -189,7 +186,7 @@ void Pstream::gatherList
 }
 
 
-template <class T>
+template<class T>
 void Pstream::gatherList(List<T>& Values, const int tag, const label comm)
 {
     if (UPstream::nProcs(comm) < UPstream::nProcsSimpleSum)
@@ -212,15 +209,12 @@ void Pstream::scatterList
     const label comm
 )
 {
-    if (UPstream::nProcs(comm) > 1)
+    if (UPstream::parRun() && UPstream::nProcs(comm) > 1)
     {
         if (Values.size() != UPstream::nProcs(comm))
         {
-            FatalErrorIn
-            (
-                "UPstream::scatterList(const List<UPstream::commsStruct>&"
-                ", List<T>)"
-            )   << "Size of list:" << Values.size()
+            FatalErrorInFunction
+                << "Size of list:" << Values.size()
                 << " does not equal the number of processors:"
                 << UPstream::nProcs(comm)
                 << Foam::abort(FatalError);
@@ -280,7 +274,7 @@ void Pstream::scatterList
         }
 
         // Send to my downstairs neighbours
-        forAll(myComm.below(), belowI)
+        forAllReverse(myComm.below(), belowI)
         {
             label belowID = myComm.below()[belowI];
             const labelList& notBelowLeaves = comms[belowID].allNotBelow();
@@ -327,7 +321,7 @@ void Pstream::scatterList
 }
 
 
-template <class T>
+template<class T>
 void Pstream::scatterList(List<T>& Values, const int tag, const label comm)
 {
     if (UPstream::nProcs(comm) < UPstream::nProcsSimpleSum)

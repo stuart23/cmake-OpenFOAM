@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -133,11 +133,11 @@ wordList addProcessorPatches
 
     const polyBoundaryMesh& pbm = meshTarget.boundaryMesh();
 
-    forAll(pbm, patchI)
+    forAll(pbm, patchi)
     {
-        if (isA<processorPolyPatch>(pbm[patchI]))
+        if (isA<processorPolyPatch>(pbm[patchi]))
         {
-            const word& patchName = pbm[patchI].name();
+            const word& patchName = pbm[patchi].name();
             cuttingPatchTable.insert(patchName);
         }
     }
@@ -263,11 +263,11 @@ int main(int argc, char *argv[])
 
     if (!consistent)
     {
-        IOdictionary mapFieldsParDict
+        IOdictionary mapFieldsDict
         (
             IOobject
             (
-                "mapFieldsParDict",
+                "mapFieldsDict",
                 runTimeTarget.system(),
                 runTimeTarget,
                 IOobject::MUST_READ_IF_MODIFIED,
@@ -276,8 +276,8 @@ int main(int argc, char *argv[])
             )
         );
 
-        mapFieldsParDict.lookup("patchMap") >> patchMap;
-        mapFieldsParDict.lookup("cuttingPatches") >>  cuttingPatches;
+        mapFieldsDict.lookup("patchMap") >> patchMap;
+        mapFieldsDict.lookup("cuttingPatches") >>  cuttingPatches;
     }
 
     #include "setTimeIndex.H"
@@ -326,7 +326,7 @@ int main(int argc, char *argv[])
             meshSource,
             meshTarget,
             patchMap,
-            addProcessorPatches(meshTarget, cuttingPatches),
+            cuttingPatches,
             mapMethod,
             subtract,
             selectedFields,

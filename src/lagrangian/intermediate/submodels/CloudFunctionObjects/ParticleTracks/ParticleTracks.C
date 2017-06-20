@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -46,8 +46,7 @@ void Foam::ParticleTracks<CloudType>::write()
     {
         if (debug)
         {
-            Info<< "void Foam::ParticleTracks<CloudType>::write()" << nl
-                << "cloupPtr invalid" << endl;
+            InfoInFunction << "cloupPtr invalid" << endl;
         }
     }
 }
@@ -125,14 +124,8 @@ void Foam::ParticleTracks<CloudType>::postFace
     {
         if (!cloudPtr_.valid())
         {
-            FatalErrorIn
-            (
-                "Foam::ParticleTracks<CloudType>::postFace"
-                "("
-                    "const parcelType&, "
-                    "const label"
-                ")"
-            )<< "Cloud storage not allocated" << abort(FatalError);
+            FatalErrorInFunction
+             << "Cloud storage not allocated" << abort(FatalError);
         }
 
         hitTableType::iterator iter =

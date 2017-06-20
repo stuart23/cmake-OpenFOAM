@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -152,25 +152,25 @@ void Foam::totalFlowRateAdvectiveDiffusiveFvPatchScalarField::updateCoeffs()
         return;
     }
 
-    const label patchI = patch().index();
+    const label patchi = patch().index();
 
-    const LESModel<EddyDiffusivity<compressible::turbulenceModel> >& turbModel =
+    const LESModel<EddyDiffusivity<compressible::turbulenceModel>>& turbModel =
         db().lookupObject
         <
-            LESModel<EddyDiffusivity<compressible::turbulenceModel> >
+            LESModel<EddyDiffusivity<compressible::turbulenceModel>>
         >
         (
             IOobject::groupName
             (
                 turbulenceModel::propertiesName,
-                dimensionedInternalField().group()
+                internalField().group()
             )
         );
 
     const fvsPatchField<scalar>& phip =
         patch().lookupPatchField<surfaceScalarField, scalar>(phiName_);
 
-    const scalarField alphap(turbModel.alphaEff(patchI));
+    const scalarField alphap(turbModel.alphaEff(patchi));
 
     refValue() = massFluxFraction_;
     refGrad() = 0.0;
@@ -191,7 +191,7 @@ void Foam::totalFlowRateAdvectiveDiffusiveFvPatchScalarField::updateCoeffs()
 
         Info<< patch().boundaryMesh().mesh().name() << ':'
             << patch().name() << ':'
-            << this->dimensionedInternalField().name() << " :"
+            << this->internalField().name() << " :"
             << " mass flux[Kg/s]:" << phi
             << endl;
     }

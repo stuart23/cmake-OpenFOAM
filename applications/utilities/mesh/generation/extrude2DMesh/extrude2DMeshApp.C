@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -78,28 +78,28 @@ static const NamedEnum<ExtrudeMode, 2> ExtrudeModeNames;
 //    pointField layer1Points(fMesh.nPoints());
 //    pointField displacement(fMesh.nPoints());
 
-//    forAll(layer0Points, pointI)
+//    forAll(layer0Points, pointi)
 //    {
 //        const labelList& meshPoints = fMesh.meshPoints();
-//        label meshPointI = meshPoints[pointI];
+//        label meshPointi = meshPoints[pointi];
 
-//        layer0Points[meshPointI] = model
+//        layer0Points[meshPointi] = model
 //        (
-//            fMesh.points()[meshPointI],
-//            fMesh.pointNormals()[pointI],
+//            fMesh.points()[meshPointi],
+//            fMesh.pointNormals()[pointi],
 //            0
 //        );
 
-//        layer1Points[meshPointI] = model
+//        layer1Points[meshPointi] = model
 //        (
-//            fMesh.points()[meshPointI],
-//            fMesh.pointNormals()[pointI],
+//            fMesh.points()[meshPointi],
+//            fMesh.pointNormals()[pointi],
 //            1
 //        );
 
-//        displacement[pointI] =
-//            layer1Points[meshPointI]
-//          - layer0Points[meshPointI];
+//        displacement[pointi] =
+//            layer1Points[meshPointi]
+//          - layer0Points[meshPointi];
 //    }
 
 //    fMesh.movePoints(layer0Points);
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     // Point generator
     autoPtr<extrudeModel> model(extrudeModel::New(extrude2DMeshDict));
 
-    autoPtr<MeshedSurface<face> > fMesh;
+    autoPtr<MeshedSurface<face>> fMesh;
 
     autoPtr<polyMesh> mesh;
 
@@ -208,14 +208,14 @@ int main(int argc, char *argv[])
         Info<< "Constructing patches." << endl;
         List<polyPatch*> patches(poly2DMesh.patchNames().size());
 
-        forAll(patches, patchI)
+        forAll(patches, patchi)
         {
-            patches[patchI] = new polyPatch
+            patches[patchi] = new polyPatch
             (
-                poly2DMesh.patchNames()[patchI],
-                poly2DMesh.patchSizes()[patchI],
-                poly2DMesh.patchStarts()[patchI],
-                patchI,
+                poly2DMesh.patchNames()[patchi],
+                poly2DMesh.patchSizes()[patchi],
+                poly2DMesh.patchStarts()[patchi],
+                patchi,
                 mesh().boundaryMesh(),
                 polyPatch::typeName
             );

@@ -25,7 +25,6 @@ surfaceFormats/surfaceFormatsCore.C
 
 surfaceFormats/ac3d/AC3DsurfaceFormatCore.C
 surfaceFormats/ac3d/AC3DsurfaceFormatRunTime.C
-surfaceFormats/ftr/FTRsurfaceFormatRunTime.C
 surfaceFormats/gts/GTSsurfaceFormatRunTime.C
 surfaceFormats/nas/NASsurfaceFormatRunTime.C
 surfaceFormats/obj/OBJsurfaceFormatRunTime.C

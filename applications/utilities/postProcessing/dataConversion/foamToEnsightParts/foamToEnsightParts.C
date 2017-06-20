@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -29,28 +29,28 @@ Description
     An Ensight part is created for each cellZone and patch.
 
 Usage
-    - foamToEnsightParts [OPTION] \n
-    Translates OpenFOAM data to Ensight format
+    \b foamToEnsightParts [OPTION]
 
-    \param -ascii \n
-    Write Ensight data in ASCII format instead of "C Binary"
+    Options:
+      - \par -ascii
+        Write Ensight data in ASCII format instead of "C Binary"
 
-    \parm -name \<subdir\>\n
-    define sub-directory name to use for Ensight data (default: "Ensight")
+      - \par -name \<subdir\>
+        Define sub-directory name to use for Ensight data (default: "Ensight")
 
-    \param -noZero \n
-    Exclude the often incomplete initial conditions.
+      - \par -noZero
+        Exclude the often incomplete initial conditions.
 
-    \param -index \<start\>\n
-    Ignore the time index contained in the time file and use a
-    simple indexing when creating the \c Ensight/data/######## files.
+      - \par -index \<start\>
+        Ignore the time index contained in the time file and use a
+        simple indexing when creating the \c Ensight/data/######## files.
 
-    \param -noMesh \n
-    Suppress writing the geometry. Can be useful for converting partial
-    results for a static geometry.
+      - \par -noMesh
+        Suppress writing the geometry. Can be useful for converting partial
+        results for a static geometry.
 
-    \param -width \<n\>\n
-    width of Ensight data subdir
+      - \par -width \<n\>
+        Width of Ensight data subdir
 
 Note
     - no parallel data.
@@ -220,10 +220,10 @@ int main(int argc, char *argv[])
     DynamicList<label> fieldTimesUsed;
 
     // Track the time indices used by each cloud
-    HashTable<DynamicList<label> > cloudTimesUsed;
+    HashTable<DynamicList<label>> cloudTimesUsed;
 
     // Create a new DynamicList for each cloud
-    forAllConstIter(HashTable<HashTable<word> >, cloudFields, cloudIter)
+    forAllConstIter(HashTable<HashTable<word>>, cloudFields, cloudIter)
     {
         cloudTimesUsed.insert(cloudIter.key(), DynamicList<label>());
     }
@@ -356,7 +356,7 @@ int main(int argc, char *argv[])
         Info<< " )" << endl;
 
         // check for clouds
-        forAllConstIter(HashTable<HashTable<word> >, cloudFields, cloudIter)
+        forAllConstIter(HashTable<HashTable<word>>, cloudFields, cloudIter)
         {
             const word& cloudName = cloudIter.key();
 

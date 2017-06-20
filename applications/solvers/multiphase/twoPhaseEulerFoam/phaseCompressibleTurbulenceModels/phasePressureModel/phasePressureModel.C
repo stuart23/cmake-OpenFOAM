@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -45,7 +45,7 @@ Foam::RASModels::phasePressureModel::phasePressureModel
         RASModel<EddyDiffusivity<ThermalDiffusivity
         <
             PhaseCompressibleTurbulenceModel<phaseModel>
-        > > >
+        >>>
     >
     (
         type,
@@ -96,7 +96,7 @@ bool Foam::RASModels::phasePressureModel::read()
             RASModel<EddyDiffusivity<ThermalDiffusivity
             <
                 PhaseCompressibleTurbulenceModel<phaseModel>
-            > > >
+            >>>
         >::read()
     )
     {
@@ -117,7 +117,7 @@ bool Foam::RASModels::phasePressureModel::read()
 Foam::tmp<Foam::volScalarField>
 Foam::RASModels::phasePressureModel::k() const
 {
-    notImplemented("phasePressureModel::k()");
+    NotImplemented;
     return nut_;
 }
 
@@ -125,7 +125,7 @@ Foam::RASModels::phasePressureModel::k() const
 Foam::tmp<Foam::volScalarField>
 Foam::RASModels::phasePressureModel::epsilon() const
 {
-    notImplemented("phasePressureModel::epsilon()");
+    NotImplemented;
     return nut_;
 }
 
@@ -150,7 +150,7 @@ Foam::RASModels::phasePressureModel::R() const
             (
                 "R",
                 dimensionSet(0, 2, -2, 0, 0),
-                symmTensor::zero
+                Zero
             )
         )
     );
@@ -170,7 +170,8 @@ Foam::RASModels::phasePressureModel::pPrime() const
         )
     );
 
-    volScalarField::GeometricBoundaryField& bpPrime = tpPrime().boundaryField();
+    volScalarField::Boundary& bpPrime =
+        tpPrime.ref().boundaryFieldRef();
 
     forAll(bpPrime, patchi)
     {
@@ -197,8 +198,8 @@ Foam::RASModels::phasePressureModel::pPrimef() const
         )
     );
 
-   surfaceScalarField::GeometricBoundaryField& bpPrime =
-       tpPrime().boundaryField();
+   surfaceScalarField::Boundary& bpPrime =
+       tpPrime.ref().boundaryFieldRef();
 
     forAll(bpPrime, patchi)
     {
@@ -232,7 +233,7 @@ Foam::RASModels::phasePressureModel::devRhoReff() const
             (
                 "R",
                 rho_.dimensions()*dimensionSet(0, 2, -2, 0, 0),
-                symmTensor::zero
+                Zero
             )
         )
     );

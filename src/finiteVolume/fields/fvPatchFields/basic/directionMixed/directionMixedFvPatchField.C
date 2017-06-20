@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -58,16 +58,8 @@ Foam::directionMixedFvPatchField<Type>::directionMixedFvPatchField
 {
     if (notNull(iF) && mapper.hasUnmapped())
     {
-        WarningIn
-        (
-            "directionMixedFvPatchField<Type>::directionMixedFvPatchField\n"
-            "(\n"
-            "    const directionMixedFvPatchField<Type>&,\n"
-            "    const fvPatch&,\n"
-            "    const DimensionedField<Type, volMesh>&,\n"
-            "    const fvPatchFieldMapper&\n"
-            ")\n"
-        )   << "On field " << iF.name() << " patch " << p.name()
+        WarningInFunction
+            << "On field " << iF.name() << " patch " << p.name()
             << " patchField " << this->type()
             << " : mapper does not map all values." << nl
             << "    To avoid this warning fully specify the mapping in derived"
@@ -132,7 +124,7 @@ void Foam::directionMixedFvPatchField<Type>::rmap
     transformFvPatchField<Type>::rmap(ptf, addr);
 
     const directionMixedFvPatchField<Type>& dmptf =
-        refCast<const directionMixedFvPatchField<Type> >(ptf);
+        refCast<const directionMixedFvPatchField<Type>>(ptf);
 
     refValue_.rmap(dmptf.refValue_, addr);
     refGrad_.rmap(dmptf.refGrad_, addr);
@@ -141,16 +133,16 @@ void Foam::directionMixedFvPatchField<Type>::rmap
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::directionMixedFvPatchField<Type>::snGrad() const
 {
     const Field<Type> pif(this->patchInternalField());
 
-    tmp<Field<Type> > normalValue = transform(valueFraction_, refValue_);
+    tmp<Field<Type>> normalValue = transform(valueFraction_, refValue_);
 
-    tmp<Field<Type> > gradValue = pif + refGrad_/this->patch().deltaCoeffs();
+    tmp<Field<Type>> gradValue = pif + refGrad_/this->patch().deltaCoeffs();
 
-    tmp<Field<Type> > transformGradValue =
+    tmp<Field<Type>> transformGradValue =
         transform(I - valueFraction_, gradValue);
 
     return
@@ -167,12 +159,12 @@ void Foam::directionMixedFvPatchField<Type>::evaluate(const Pstream::commsTypes)
         this->updateCoeffs();
     }
 
-    tmp<Field<Type> > normalValue = transform(valueFraction_, refValue_);
+    tmp<Field<Type>> normalValue = transform(valueFraction_, refValue_);
 
-    tmp<Field<Type> > gradValue =
+    tmp<Field<Type>> gradValue =
         this->patchInternalField() + refGrad_/this->patch().deltaCoeffs();
 
-    tmp<Field<Type> > transformGradValue =
+    tmp<Field<Type>> transformGradValue =
         transform(I - valueFraction_, gradValue);
 
     Field<Type>::operator=(normalValue + transformGradValue);
@@ -182,7 +174,7 @@ void Foam::directionMixedFvPatchField<Type>::evaluate(const Pstream::commsTypes)
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::directionMixedFvPatchField<Type>::snGradTransformDiag() const
 {
     vectorField diag(valueFraction_.size());

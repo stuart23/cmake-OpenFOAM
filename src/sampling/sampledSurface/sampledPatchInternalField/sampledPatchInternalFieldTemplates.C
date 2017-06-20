@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,20 +30,20 @@ License
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::sampledPatchInternalField::sampleField
 (
     const GeometricField<Type, fvPatchField, volMesh>& vField
 ) const
 {
     // One value per face
-    tmp<Field<Type> > tvalues(new Field<Type>(patchFaceLabels().size()));
-    Field<Type>& values = tvalues();
+    tmp<Field<Type>> tvalues(new Field<Type>(patchFaceLabels().size()));
+    Field<Type>& values = tvalues.ref();
 
     forAll(patchStart(), i)
     {
         // Get patchface wise data by sampling internal field
-        Field<Type> interpVals = vField.internalField();
+        Field<Type> interpVals = vField.primitiveField();
         mappers_[i].map().distribute(interpVals);
 
         // Store at correct position in values
@@ -65,7 +65,7 @@ Foam::sampledPatchInternalField::sampleField
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::sampledPatchInternalField::interpolateField
 (
     const interpolation<Type>& interpolator
@@ -93,14 +93,14 @@ Foam::sampledPatchInternalField::interpolateField
 
         Field<Type> patchVals(mesh().nCells());
 
-        forAll(samples, cellI)
+        forAll(samples, celli)
         {
-            if (samples[cellI] != point::max)
+            if (samples[celli] != point::max)
             {
-                patchVals[cellI] = interpolator.interpolate
+                patchVals[celli] = interpolator.interpolate
                 (
-                    samples[cellI],
-                    cellI
+                    samples[celli],
+                    celli
                 );
             }
         }
@@ -109,7 +109,7 @@ Foam::sampledPatchInternalField::interpolateField
 
         // Now patchVals holds the interpolated data in patch face order.
         // Collect.
-        SubList<Type>(allPatchVals, patchVals.size(), sz).assign(patchVals);
+        SubList<Type>(allPatchVals, patchVals.size(), sz) = patchVals;
         sz += patchVals.size();
     }
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -63,18 +63,18 @@ Foam::vector Foam::targetCoeffTrim::calcCoeffs
 
     scalar coeff1 = alpha_*sqr(rotor_.omega())*mathematical::pi;
 
-    vector cf(vector::zero);
+    vector cf(Zero);
     forAll(cells, i)
     {
-        label cellI = cells[i];
+        label celli = cells[i];
 
-        vector fc = force[cellI];
-        vector mc = fc^(C[cellI] - origin);
+        vector fc = force[celli];
+        vector mc = fc^(C[celli] - origin);
 
         if (useCoeffs_)
         {
             scalar radius = x[i].x();
-            scalar coeff2 = rho[cellI]*coeff1*pow4(radius);
+            scalar coeff2 = rho[celli]*coeff1*pow4(radius);
 
             // add to coefficient vector
             cf[0] += (fc & yawAxis)/(coeff2 + ROOTVSMALL);
@@ -119,9 +119,9 @@ void Foam::targetCoeffTrim::correctTrim
         // iterate to find new pitch angles to achieve target force
         scalar err = GREAT;
         label iter = 0;
-        tensor J(tensor::zero);
+        tensor J(Zero);
 
-        vector old = vector::zero;
+        vector old = Zero;
         while ((err > tol_) && (iter < nIter_))
         {
             // cache initial theta vector
@@ -199,8 +199,8 @@ Foam::targetCoeffTrim::targetCoeffTrim
     trimModel(rotor, dict, typeName),
     calcFrequency_(-1),
     useCoeffs_(true),
-    target_(vector::zero),
-    theta_(vector::zero),
+    target_(Zero),
+    theta_(Zero),
     nIter_(50),
     tol_(1e-8),
     relax_(1.0),
@@ -260,7 +260,7 @@ Foam::tmp<Foam::scalarField> Foam::targetCoeffTrim::thetag() const
     const List<vector>& x = rotor_.x();
 
     tmp<scalarField> ttheta(new scalarField(x.size()));
-    scalarField& t = ttheta();
+    scalarField& t = ttheta.ref();
 
     forAll(t, i)
     {

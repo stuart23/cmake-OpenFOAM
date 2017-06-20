@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -31,7 +31,7 @@ Description
     This boundary condition provides an advective outflow condition, based on
     solving DDt(psi, U) = 0 at the boundary.
 
-    The standard (Euler, backward, CrankNicolson) time schemes are
+    The standard (Euler, backward, CrankNicolson, localEuler) time schemes are
     supported.  Additionally an optional mechanism to relax the value at
     the boundary to a specified far-field value is provided which is
     switched on by specifying the relaxation length-scale \c lInf and the
@@ -48,8 +48,7 @@ Description
     the flow-speed plus the acoustic wave speed creating an acoustic wave
     transmissive boundary condition.
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         phi          | flux field name         | no          | phi
@@ -60,7 +59,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            advective;
         phi             phi;
@@ -153,9 +152,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchField<Type>> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new advectiveFvPatchField<Type>(*this)
             );
@@ -169,12 +168,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchField<Type>> clone
         (
             const DimensionedField<Type, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new advectiveFvPatchField<Type>(*this, iF)
             );
@@ -232,7 +231,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "advectiveFvPatchField.C"
+    #include "advectiveFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

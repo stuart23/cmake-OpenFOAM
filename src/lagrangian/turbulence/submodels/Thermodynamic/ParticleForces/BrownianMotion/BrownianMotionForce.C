@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -71,11 +71,7 @@ Foam::BrownianMotionForce<CloudType>::kModel() const
     }
     else
     {
-        FatalErrorIn
-        (
-            "Foam::tmp<Foam::volScalarField>"
-            "Foam::DispersionRASModel<CloudType>::kModel() const"
-        )
+        FatalErrorInFunction
             << "Turbulence model not found in mesh database" << nl
             << "Database objects include: " << obr.sortedToc()
             << abort(FatalError);
@@ -143,7 +139,7 @@ void Foam::BrownianMotionForce<CloudType>::cacheFields(const bool store)
             }
             else
             {
-                kPtr_ = tk.operator->();
+                kPtr_ = &tk();
                 ownK_ = false;
             }
         }
@@ -169,7 +165,7 @@ Foam::forceSuSp Foam::BrownianMotionForce<CloudType>::calcCoupled
     const scalar muc
 ) const
 {
-    forceSuSp value(vector::zero, 0.0);
+    forceSuSp value(Zero, 0.0);
 
     const scalar dp = p.d();
     const scalar Tc = p.Tc();
@@ -183,17 +179,16 @@ Foam::forceSuSp Foam::BrownianMotionForce<CloudType>::calcCoupled
     scalar f = 0.0;
     if (turbulence_)
     {
-        const label cellI = p.cell();
+        const label celli = p.cell();
         const volScalarField& k = *kPtr_;
-        const scalar kc = k[cellI];
+        const scalar kc = k[celli];
         const scalar Dp = sigma*Tc*cc/(3*mathematical::pi*muc*dp);
         f = eta/mass*sqrt(2.0*sqr(kc)*sqr(Tc)/(Dp*dt));
     }
     else
     {
-        const scalar rhoRatio = p.rho()/p.rhoc();
         const scalar s0 =
-            216*muc*sigma*Tc/(sqr(mathematical::pi)*pow5(dp)*(rhoRatio)*cc);
+            216*muc*sigma*Tc/(sqr(mathematical::pi)*pow5(dp)*sqr(p.rho())*cc);
         f = eta*sqrt(mathematical::pi*s0/dt);
     }
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,7 +33,7 @@ void Foam::CollidingCloud<CloudType>::setModels()
 {
     collisionModel_.reset
     (
-        CollisionModel<CollidingCloud<CloudType> >::New
+        CollisionModel<CollidingCloud<CloudType>>::New
         (
             this->subModelProperties(),
             *this
@@ -97,18 +97,8 @@ Foam::CollidingCloud<CloudType>::CollidingCloud
 {
     if (this->solution().steadyState())
     {
-        FatalErrorIn
-        (
-            "Foam::CollidingCloud<CloudType>::CollidingCloud"
-            "("
-                "const word&, "
-                "const volScalarField&, "
-                "const volVectorField&, "
-                "const volScalarField&, "
-                "const dimensionedVector&, "
-                "bool"
-            ")"
-        )   << "Collision modelling not currently available for steady state "
+        FatalErrorInFunction
+            << "Collision modelling not currently available for steady state "
             << "calculations" << exit(FatalError);
     }
 
@@ -192,7 +182,7 @@ void Foam::CollidingCloud<CloudType>::evolve()
     if (this->solution().canEvolve())
     {
         typename parcelType::template
-            TrackingData<CollidingCloud<CloudType> > td(*this);
+            TrackingData<CollidingCloud<CloudType>> td(*this);
 
         this->solve(td);
     }

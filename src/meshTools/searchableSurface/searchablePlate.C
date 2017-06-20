@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -31,10 +31,8 @@ License
 
 namespace Foam
 {
-
-defineTypeNameAndDebug(searchablePlate, 0);
-addToRunTimeSelectionTable(searchableSurface, searchablePlate, dict);
-
+    defineTypeNameAndDebug(searchablePlate, 0);
+    addToRunTimeSelectionTable(searchableSurface, searchablePlate, dict);
 }
 
 
@@ -48,7 +46,7 @@ Foam::direction Foam::searchablePlate::calcNormal(const point& span)
     {
         if (span[dir] < 0)
         {
-            FatalErrorIn("searchablePlate::calcNormal()")
+            FatalErrorInFunction
                 << "Span should have two positive and one zero entry. Now:"
                 << span << exit(FatalError);
         }
@@ -69,7 +67,7 @@ Foam::direction Foam::searchablePlate::calcNormal(const point& span)
 
     if (normalDir == 3)
     {
-        FatalErrorIn("searchablePlate::calcNormal()")
+        FatalErrorInFunction
             << "Span should have two positive and one zero entry. Now:"
             << span << exit(FatalError);
     }
@@ -134,7 +132,7 @@ Foam::pointIndexHit Foam::searchablePlate::findLine
     pointIndexHit info
     (
         true,
-        vector::zero,
+        Zero,
         0
     );
 
@@ -190,7 +188,7 @@ Foam::pointIndexHit Foam::searchablePlate::findLine
 
         if (!bb.contains(info.hitPoint()))
         {
-            FatalErrorIn("searchablePlate::findLine(..)")
+            FatalErrorInFunction
                 << "bb:" << bb << endl
                 << "origin_:" << origin_ << endl
                 << "span_:" << span_ << endl
@@ -220,7 +218,7 @@ Foam::searchablePlate::searchablePlate
 {
     if (debug)
     {
-        Info<< "searchablePlate::searchablePlate :"
+        InfoInFunction
             << " origin:" << origin_
             << " origin+span:" << origin_+span_
             << " normal:" << vector::componentNames[normalDir_]
@@ -244,7 +242,7 @@ Foam::searchablePlate::searchablePlate
 {
     if (debug)
     {
-        Info<< "searchablePlate::searchablePlate :"
+        InfoInFunction
             << " origin:" << origin_
             << " origin+span:" << origin_+span_
             << " normal:" << vector::componentNames[normalDir_]
@@ -300,7 +298,7 @@ void Foam::searchablePlate::boundingSpheres
 Foam::tmp<Foam::pointField> Foam::searchablePlate::points() const
 {
     tmp<pointField> tPts(new pointField(4));
-    pointField& pts = tPts();
+    pointField& pts = tPts.ref();
 
     pts[0] = origin_;
     pts[2] = origin_ + span_;
@@ -386,23 +384,23 @@ void Foam::searchablePlate::findLineAll
 (
     const pointField& start,
     const pointField& end,
-    List<List<pointIndexHit> >& info
+    List<List<pointIndexHit>>& info
 ) const
 {
     List<pointIndexHit> nearestInfo;
     findLine(start, end, nearestInfo);
 
     info.setSize(start.size());
-    forAll(info, pointI)
+    forAll(info, pointi)
     {
-        if (nearestInfo[pointI].hit())
+        if (nearestInfo[pointi].hit())
         {
-            info[pointI].setSize(1);
-            info[pointI][0] = nearestInfo[pointI];
+            info[pointi].setSize(1);
+            info[pointi][0] = nearestInfo[pointi];
         }
         else
         {
-            info[pointI].clear();
+            info[pointi].clear();
         }
     }
 }
@@ -426,7 +424,7 @@ void Foam::searchablePlate::getNormal
 ) const
 {
     normal.setSize(info.size());
-    normal = vector::zero;
+    normal = Zero;
     forAll(normal, i)
     {
         normal[i][normalDir_] = 1.0;
@@ -440,11 +438,8 @@ void Foam::searchablePlate::getVolumeType
     List<volumeType>& volType
 ) const
 {
-    FatalErrorIn
-    (
-        "searchableCollection::getVolumeType(const pointField&"
-        ", List<volumeType>&) const"
-    )   << "Volume type not supported for plate."
+    FatalErrorInFunction
+        << "Volume type not supported for plate."
         << exit(FatalError);
 }
 

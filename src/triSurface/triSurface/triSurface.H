@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -50,6 +50,14 @@ namespace Foam
 
 class Time;
 class IFstream;
+
+
+// Forward declaration of friend functions and operators
+
+class triSurface;
+
+Ostream& operator<<(Ostream&, const triSurface&);
+
 
 /*---------------------------------------------------------------------------*\
                            Class triSurface Declaration
@@ -259,15 +267,15 @@ public:
             List<labelledTri>&,
             const geometricSurfacePatchList&,
             pointField&,
-            const bool reUse
+            const bool reuse
         );
 
         //- Construct from triangles, patches, points.
         triSurface
         (
-            const Xfer<List<labelledTri> >&,
+            const Xfer<List<labelledTri>>&,
             const geometricSurfacePatchList&,
-            const Xfer<List<point> >&
+            const Xfer<List<point>>&
         );
 
         //- Construct from triangles, points. Set patchnames to default.
@@ -345,12 +353,12 @@ public:
             void cleanup(const bool verbose);
 
             //- Fill faceZone with currentZone for every face reachable
-            //  from faceI without crossing edge marked in borderEdge.
+            //  from facei without crossing edge marked in borderEdge.
             //  Note: faceZone has to be sized nFaces before calling this fun.
             void markZone
             (
                 const boolList& borderEdge,
-                const label faceI,
+                const label facei,
                 const label currentZone,
                 labelList& faceZone
             ) const;

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,21 +28,23 @@ Description
     Abstract base class for coordinate rotation
 
     \verbatim
-        coordinateRotation
-        {
-            type        axesRotation
-            e1          (1 0 0);
-            e2          (0 1 0);
-        }
+    coordinateRotation
+    {
+        type        axesRotation
+        e1          (1 0 0);
+        e2          (0 1 0);
+    }
     \endverbatim
 
     Types of coordinateRotation:
-    1) axesRotation
-    2) STARCDRotation
-    3) cylindrical
-    4) EulerCoordinateRotation
+      -# axesRotation
+      -# STARCDRotation
+      -# cylindrical
+      -# EulerCoordinateRotation
 
-
+SourceFiles
+    coordinateRotation.C
+    coordinateRotationNew.C
 
 \*---------------------------------------------------------------------------*/
 

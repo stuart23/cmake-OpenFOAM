@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -268,7 +268,7 @@ void Foam::searchableSphere::findLineAll
 (
     const pointField& start,
     const pointField& end,
-    List<List<pointIndexHit> >& info
+    List<List<pointIndexHit>>& info
 ) const
 {
     info.setSize(start.size());
@@ -326,7 +326,7 @@ void Foam::searchableSphere::getNormal
 ) const
 {
     normal.setSize(info.size());
-    normal = vector::zero;
+    normal = Zero;
 
     forAll(info, i)
     {
@@ -353,17 +353,17 @@ void Foam::searchableSphere::getVolumeType
     volType.setSize(points.size());
     volType = volumeType::INSIDE;
 
-    forAll(points, pointI)
+    forAll(points, pointi)
     {
-        const point& pt = points[pointI];
+        const point& pt = points[pointi];
 
         if (magSqr(pt - centre_) <= sqr(radius_))
         {
-            volType[pointI] = volumeType::INSIDE;
+            volType[pointi] = volumeType::INSIDE;
         }
         else
         {
-            volType[pointI] = volumeType::OUTSIDE;
+            volType[pointi] = volumeType::OUTSIDE;
         }
     }
 }

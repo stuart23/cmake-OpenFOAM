@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -77,15 +77,12 @@ Foam::solidBodyMotionFvMesh::solidBodyMotionFvMesh(const IOobject& io)
     ),
     pointIDs_(),
     moveAllCells_(false),
-    UName_(dynamicMeshCoeffs_.lookupOrDefault<word>("UName", "U"))
+    UName_(dynamicMeshCoeffs_.lookupOrDefault<word>("U", "U"))
 {
     if (undisplacedPoints_.size() != nPoints())
     {
-        FatalIOErrorIn
-        (
-            "solidBodyMotionFvMesh::solidBodyMotionFvMesh(const IOobject&)",
-            dynamicMeshCoeffs_
-        )   << "Read " << undisplacedPoints_.size()
+        FatalIOErrorInFunction(dynamicMeshCoeffs_)
+            << "Read " << undisplacedPoints_.size()
             << " undisplaced points from " << undisplacedPoints_.objectPath()
             << " but the current mesh has " << nPoints()
             << exit(FatalIOError);
@@ -99,11 +96,7 @@ Foam::solidBodyMotionFvMesh::solidBodyMotionFvMesh(const IOobject& io)
 
     if ((cellZoneName != "none") && (cellSetName != "none"))
     {
-        FatalIOErrorIn
-        (
-            "solidBodyMotionFvMesh::solidBodyMotionFvMesh(const IOobject&)",
-            dynamicMeshCoeffs_
-        )
+        FatalIOErrorInFunction(dynamicMeshCoeffs_)
             << "Either cellZone OR cellSet can be supplied, but not both. "
             << "If neither is supplied, all cells will be included"
             << exit(FatalIOError);
@@ -120,10 +113,8 @@ Foam::solidBodyMotionFvMesh::solidBodyMotionFvMesh(const IOobject& io)
 
         if (zoneID == -1)
         {
-            FatalErrorIn
-            (
-                "solidBodyMotionFvMesh::solidBodyMotionFvMesh(const IOobject&)"
-            )   << "Unable to find cellZone " << cellZoneName
+            FatalErrorInFunction
+                << "Unable to find cellZone " << cellZoneName
                 << ".  Valid cellZones are:"
                 << cellZones().names()
                 << exit(FatalError);
@@ -157,15 +148,15 @@ Foam::solidBodyMotionFvMesh::solidBodyMotionFvMesh(const IOobject& io)
 
         forAll(cellIDs, i)
         {
-            label cellI = cellIDs[i];
-            const cell& c = cells()[cellI];
+            label celli = cellIDs[i];
+            const cell& c = cells()[celli];
             forAll(c, j)
             {
                 const face& f = faces()[c[j]];
                 forAll(f, k)
                 {
-                    label pointI = f[k];
-                    movePts[pointI] = true;
+                    label pointi = f[k];
+                    movePts[pointi] = true;
                 }
             }
         }
@@ -202,7 +193,7 @@ bool Foam::solidBodyMotionFvMesh::update()
     {
         fvMesh::movePoints
         (
-            transform
+            transformPoints
             (
                 SBMFPtr_().transformation(),
                 undisplacedPoints_
@@ -214,7 +205,7 @@ bool Foam::solidBodyMotionFvMesh::update()
         pointField transformedPts(undisplacedPoints_);
 
         UIndirectList<point>(transformedPts, pointIDs_) =
-            transform
+            transformPoints
             (
                 SBMFPtr_().transformation(),
                 pointField(transformedPts, pointIDs_)
@@ -234,7 +225,7 @@ bool Foam::solidBodyMotionFvMesh::update()
     {
         hasWarned = true;
 
-        WarningIn("solidBodyMotionFvMesh::update()")
+        WarningInFunction
             << "Did not find volVectorField " << UName_
             << " Not updating " << UName_ << "boundary conditions."
             << endl;

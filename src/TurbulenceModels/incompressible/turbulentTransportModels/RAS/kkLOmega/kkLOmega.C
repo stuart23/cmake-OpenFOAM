@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -213,7 +213,7 @@ void kkLOmega::correctNut()
 {
     // Currently this function is not implemented due to the complexity of
     // evaluating nut.  Better calculate nut at the end of correct()
-    notImplemented("kkLOmega::correctNut()");
+    NotImplemented;
 }
 
 
@@ -593,6 +593,10 @@ bool kkLOmega::read()
 }
 
 
+void kkLOmega::validate()
+{}
+
+
 void kkLOmega::correct()
 {
     eddyViscosity<incompressible::RASModel>::correct();
@@ -673,7 +677,7 @@ void kkLOmega::correct()
     );
 
 
-    omega_.boundaryField().updateCoeffs();
+    omega_.boundaryFieldRef().updateCoeffs();
 
     // Turbulence specific dissipation rate equation
     tmp<fvScalarMatrix> omegaEqn
@@ -691,11 +695,11 @@ void kkLOmega::correct()
       - fvm::Sp(Cw2_*sqr(fw)*omega_, omega_)
       + (
             Cw3_*fOmega(lambdaEff, lambdaT)*alphaTEff*sqr(fw)*sqrt(kt_)
-        )().dimensionedInternalField()/pow3(y_.dimensionedInternalField())
+        )()()/pow3(y_())
     );
 
-    omegaEqn().relax();
-    omegaEqn().boundaryManipulate(omega_.boundaryField());
+    omegaEqn.ref().relax();
+    omegaEqn.ref().boundaryManipulate(omega_.boundaryFieldRef());
 
     solve(omegaEqn);
     bound(omega_, omegaMin_);
@@ -714,8 +718,8 @@ void kkLOmega::correct()
       - fvm::Sp(Rbp + Rnat + Dl/(kl_ + kMin_), kl_)
     );
 
-    klEqn().relax();
-    klEqn().boundaryManipulate(kl_.boundaryField());
+    klEqn.ref().relax();
+    klEqn.ref().boundaryManipulate(kl_.boundaryFieldRef());
 
     solve(klEqn);
     bound(kl_, kMin_);
@@ -735,8 +739,8 @@ void kkLOmega::correct()
       - fvm::Sp(omega_ + Dt/(kt_+ kMin_), kt_)
     );
 
-    ktEqn().relax();
-    ktEqn().boundaryManipulate(kt_.boundaryField());
+    ktEqn.ref().relax();
+    ktEqn.ref().boundaryManipulate(kt_.boundaryFieldRef());
 
     solve(ktEqn);
     bound(kt_, kMin_);

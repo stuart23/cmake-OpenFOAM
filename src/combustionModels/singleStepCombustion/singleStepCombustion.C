@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -58,7 +58,7 @@ singleStepCombustion<CombThermoType, ThermoType>::singleStepCombustion
     ),
     semiImplicit_(readBool(this->coeffs_.lookup("semiImplicit")))
 {
-    if (isA<singleStepReactingMixture<ThermoType> >(this->thermo()))
+    if (isA<singleStepReactingMixture<ThermoType>>(this->thermo()))
     {
         singleMixturePtr_ =
             &dynamic_cast<singleStepReactingMixture<ThermoType>&>
@@ -68,16 +68,7 @@ singleStepCombustion<CombThermoType, ThermoType>::singleStepCombustion
     }
     else
     {
-        FatalErrorIn
-        (
-            "singleStepCombustion<CombThermoType, ThermoType>::"
-            "singleStepCombustion"
-            "("
-                "const word&, "
-                "const fvMesh& "
-                "const word&"
-            ")"
-        )
+        FatalErrorInFunction
             << "Inconsistent thermo package for " << this->type() << " model:\n"
             << "    " << this->thermo().type() << nl << nl
             << "Please select a thermo package based on "
@@ -163,15 +154,14 @@ singleStepCombustion<CombThermoType, ThermoType>::dQ() const
                 false
             ),
             this->mesh_,
-            dimensionedScalar("dQ", dimEnergy/dimTime, 0.0),
-            zeroGradientFvPatchScalarField::typeName
+            dimensionedScalar("dQ", dimEnergy/dimTime, 0.0)
         )
     );
 
     if (this->active())
     {
-        volScalarField& dQ = tdQ();
-        dQ.dimensionedInternalField() = this->mesh().V()*Sh()();
+        volScalarField& dQ = tdQ.ref();
+        dQ.ref() = this->mesh().V()*Sh()();
     }
     return tdQ;
 }

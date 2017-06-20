@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -37,14 +37,10 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
 :
     calculatedFvPatchField<Type>(p, iF)
 {
-    FatalErrorIn
-    (
-        "genericFvPatchField<Type>::genericFvPatchField"
-        "(const fvPatch& p, const DimensionedField<Type, volMesh>& iF)"
-    )   << "Not Implemented\n    "
+    FatalErrorInFunction
         << "Trying to construct an genericFvPatchField on patch "
         << this->patch().name()
-        << " of field " << this->dimensionedInternalField().name()
+        << " of field " << this->internalField().name()
         << abort(FatalError);
 }
 
@@ -63,15 +59,13 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
 {
     if (!dict.found("value"))
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "genericFvPatchField<Type>::genericFvPatchField"
-            "(const fvPatch&, const Field<Type>&, const dictionary&)",
             dict
         )   << "\n    Cannot find 'value' entry"
             << " on patch " << this->patch().name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
             << nl
             << "    which is required to set the"
                " values of the generic patch field." << nl
@@ -120,32 +114,29 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                         }
                         else
                         {
-                            FatalIOErrorIn
+                            FatalIOErrorInFunction
                             (
-                                "genericFvPatchField<Type>::genericFvPatchField"
-                                "(const fvPatch&, const Field<Type>&, "
-                                "const dictionary&)",
                                 dict
                             )   << "\n    token following 'nonuniform' "
                                   "is not a compound"
                                 << "\n    on patch " << this->patch().name()
                                 << " of field "
-                                << this->dimensionedInternalField().name()
+                                << this->internalField().name()
                                 << " in file "
-                                << this->dimensionedInternalField().objectPath()
+                                << this->internalField().objectPath()
                             << exit(FatalIOError);
                         }
                     }
                     else if
                     (
                         fieldToken.compoundToken().type()
-                     == token::Compound<List<scalar> >::typeName
+                     == token::Compound<List<scalar>>::typeName
                     )
                     {
                         scalarField* fPtr = new scalarField;
                         fPtr->transfer
                         (
-                            dynamicCast<token::Compound<List<scalar> > >
+                            dynamicCast<token::Compound<List<scalar>>>
                             (
                                 fieldToken.transferCompoundToken(is)
                             )
@@ -153,11 +144,8 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
 
                         if (fPtr->size() != this->size())
                         {
-                            FatalIOErrorIn
+                            FatalIOErrorInFunction
                             (
-                                "genericFvPatchField<Type>::genericFvPatchField"
-                                "(const fvPatch&, const Field<Type>&, "
-                                "const dictionary&)",
                                 dict
                             )   << "\n    size of field " << iter().keyword()
                                 << " (" << fPtr->size() << ')'
@@ -165,9 +153,9 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                                 << this->size() << ')'
                                 << "\n    on patch " << this->patch().name()
                                 << " of field "
-                                << this->dimensionedInternalField().name()
+                                << this->internalField().name()
                                 << " in file "
-                                << this->dimensionedInternalField().objectPath()
+                                << this->internalField().objectPath()
                                 << exit(FatalIOError);
                         }
 
@@ -176,13 +164,13 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                     else if
                     (
                         fieldToken.compoundToken().type()
-                     == token::Compound<List<vector> >::typeName
+                     == token::Compound<List<vector>>::typeName
                     )
                     {
                         vectorField* fPtr = new vectorField;
                         fPtr->transfer
                         (
-                            dynamicCast<token::Compound<List<vector> > >
+                            dynamicCast<token::Compound<List<vector>>>
                             (
                                 fieldToken.transferCompoundToken(is)
                             )
@@ -190,11 +178,8 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
 
                         if (fPtr->size() != this->size())
                         {
-                            FatalIOErrorIn
+                            FatalIOErrorInFunction
                             (
-                                "genericFvPatchField<Type>::genericFvPatchField"
-                                "(const fvPatch&, const Field<Type>&, "
-                                "const dictionary&)",
                                 dict
                             )   << "\n    size of field " << iter().keyword()
                                 << " (" << fPtr->size() << ')'
@@ -202,9 +187,9 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                                 << this->size() << ')'
                                 << "\n    on patch " << this->patch().name()
                                 << " of field "
-                                << this->dimensionedInternalField().name()
+                                << this->internalField().name()
                                 << " in file "
-                                << this->dimensionedInternalField().objectPath()
+                                << this->internalField().objectPath()
                                 << exit(FatalIOError);
                         }
 
@@ -213,7 +198,7 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                     else if
                     (
                         fieldToken.compoundToken().type()
-                     == token::Compound<List<sphericalTensor> >::typeName
+                     == token::Compound<List<sphericalTensor>>::typeName
                     )
                     {
                         sphericalTensorField* fPtr = new sphericalTensorField;
@@ -221,7 +206,7 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                         (
                             dynamicCast
                             <
-                                token::Compound<List<sphericalTensor> >
+                                token::Compound<List<sphericalTensor>>
                             >
                             (
                                 fieldToken.transferCompoundToken(is)
@@ -230,11 +215,8 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
 
                         if (fPtr->size() != this->size())
                         {
-                            FatalIOErrorIn
+                            FatalIOErrorInFunction
                             (
-                                "genericFvPatchField<Type>::genericFvPatchField"
-                                "(const fvPatch&, const Field<Type>&, "
-                                "const dictionary&)",
                                 dict
                             )   << "\n    size of field " << iter().keyword()
                                 << " (" << fPtr->size() << ')'
@@ -242,9 +224,9 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                                 << this->size() << ')'
                                 << "\n    on patch " << this->patch().name()
                                 << " of field "
-                                << this->dimensionedInternalField().name()
+                                << this->internalField().name()
                                 << " in file "
-                                << this->dimensionedInternalField().objectPath()
+                                << this->internalField().objectPath()
                                 << exit(FatalIOError);
                         }
 
@@ -253,7 +235,7 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                     else if
                     (
                         fieldToken.compoundToken().type()
-                     == token::Compound<List<symmTensor> >::typeName
+                     == token::Compound<List<symmTensor>>::typeName
                     )
                     {
                         symmTensorField* fPtr = new symmTensorField;
@@ -261,7 +243,7 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                         (
                             dynamicCast
                             <
-                                token::Compound<List<symmTensor> >
+                                token::Compound<List<symmTensor>>
                             >
                             (
                                 fieldToken.transferCompoundToken(is)
@@ -270,11 +252,8 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
 
                         if (fPtr->size() != this->size())
                         {
-                            FatalIOErrorIn
+                            FatalIOErrorInFunction
                             (
-                                "genericFvPatchField<Type>::genericFvPatchField"
-                                "(const fvPatch&, const Field<Type>&, "
-                                "const dictionary&)",
                                 dict
                             )   << "\n    size of field " << iter().keyword()
                                 << " (" << fPtr->size() << ')'
@@ -282,9 +261,9 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                                 << this->size() << ')'
                                 << "\n    on patch " << this->patch().name()
                                 << " of field "
-                                << this->dimensionedInternalField().name()
+                                << this->internalField().name()
                                 << " in file "
-                                << this->dimensionedInternalField().objectPath()
+                                << this->internalField().objectPath()
                                 << exit(FatalIOError);
                         }
 
@@ -293,13 +272,13 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                     else if
                     (
                         fieldToken.compoundToken().type()
-                     == token::Compound<List<tensor> >::typeName
+                     == token::Compound<List<tensor>>::typeName
                     )
                     {
                         tensorField* fPtr = new tensorField;
                         fPtr->transfer
                         (
-                            dynamicCast<token::Compound<List<tensor> > >
+                            dynamicCast<token::Compound<List<tensor>>>
                             (
                                 fieldToken.transferCompoundToken(is)
                             )
@@ -307,11 +286,8 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
 
                         if (fPtr->size() != this->size())
                         {
-                            FatalIOErrorIn
+                            FatalIOErrorInFunction
                             (
-                                "genericFvPatchField<Type>::genericFvPatchField"
-                                "(const fvPatch&, const Field<Type>&, "
-                                "const dictionary&)",
                                 dict
                             )   << "\n    size of field " << iter().keyword()
                                 << " (" << fPtr->size() << ')'
@@ -319,9 +295,9 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                                 << this->size() << ')'
                                 << "\n    on patch " << this->patch().name()
                                 << " of field "
-                                << this->dimensionedInternalField().name()
+                                << this->internalField().name()
                                 << " in file "
-                                << this->dimensionedInternalField().objectPath()
+                                << this->internalField().objectPath()
                                 << exit(FatalIOError);
                         }
 
@@ -329,19 +305,16 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                     }
                     else
                     {
-                        FatalIOErrorIn
+                        FatalIOErrorInFunction
                         (
-                            "genericFvPatchField<Type>::genericFvPatchField"
-                            "(const fvPatch&, const Field<Type>&, "
-                            "const dictionary&)",
                             dict
                         )   << "\n    compound " << fieldToken.compoundToken()
                             << " not supported"
                             << "\n    on patch " << this->patch().name()
                             << " of field "
-                            << this->dimensionedInternalField().name()
+                            << this->internalField().name()
                             << " in file "
-                            << this->dimensionedInternalField().objectPath()
+                            << this->internalField().objectPath()
                             << exit(FatalIOError);
                     }
                 }
@@ -419,18 +392,15 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
                         }
                         else
                         {
-                            FatalIOErrorIn
+                            FatalIOErrorInFunction
                             (
-                                "genericFvPatchField<Type>::genericFvPatchField"
-                                "(const fvPatch&, const Field<Type>&, "
-                                "const dictionary&)",
                                 dict
                             )   << "\n    unrecognised native type " << l
                                 << "\n    on patch " << this->patch().name()
                                 << " of field "
-                                << this->dimensionedInternalField().name()
+                                << this->internalField().name()
                                 << " in file "
-                                << this->dimensionedInternalField().objectPath()
+                                << this->internalField().objectPath()
                                 << exit(FatalIOError);
                         }
                     }
@@ -633,7 +603,7 @@ void Foam::genericFvPatchField<Type>::rmap
     calculatedFvPatchField<Type>::rmap(ptf, addr);
 
     const genericFvPatchField<Type>& dptf =
-        refCast<const genericFvPatchField<Type> >(ptf);
+        refCast<const genericFvPatchField<Type>>(ptf);
 
     forAllIter
     (
@@ -718,93 +688,77 @@ void Foam::genericFvPatchField<Type>::rmap
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::genericFvPatchField<Type>::valueInternalCoeffs
 (
     const tmp<scalarField>&
 ) const
 {
-    FatalErrorIn
-    (
-        "genericFvPatchField<Type>::"
-        "valueInternalCoeffs(const tmp<scalarField>&) const"
-    )   << "\n    "
-           "valueInternalCoeffs cannot be called for a genericFvPatchField"
+    FatalErrorInFunction
+        << "cannot be called for a genericFvPatchField"
            " (actual type " << actualTypeName_ << ")"
         << "\n    on patch " << this->patch().name()
-        << " of field " << this->dimensionedInternalField().name()
-        << " in file " << this->dimensionedInternalField().objectPath()
+        << " of field " << this->internalField().name()
+        << " in file " << this->internalField().objectPath()
         << "\n    You are probably trying to solve for a field with a "
            "generic boundary condition."
-        << exit(FatalError);
+        << abort(FatalError);
 
     return *this;
 }
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::genericFvPatchField<Type>::valueBoundaryCoeffs
 (
     const tmp<scalarField>&
 ) const
 {
-    FatalErrorIn
-    (
-        "genericFvPatchField<Type>::"
-        "valueBoundaryCoeffs(const tmp<scalarField>&) const"
-    )   << "\n    "
-           "valueBoundaryCoeffs cannot be called for a genericFvPatchField"
+    FatalErrorInFunction
+        << "cannot be called for a genericFvPatchField"
            " (actual type " << actualTypeName_ << ")"
         << "\n    on patch " << this->patch().name()
-        << " of field " << this->dimensionedInternalField().name()
-        << " in file " << this->dimensionedInternalField().objectPath()
+        << " of field " << this->internalField().name()
+        << " in file " << this->internalField().objectPath()
         << "\n    You are probably trying to solve for a field with a "
            "generic boundary condition."
-        << exit(FatalError);
+        << abort(FatalError);
 
     return *this;
 }
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::genericFvPatchField<Type>::gradientInternalCoeffs() const
 {
-    FatalErrorIn
-    (
-        "genericFvPatchField<Type>::"
-        "gradientInternalCoeffs() const"
-    )   << "\n    "
-           "gradientInternalCoeffs cannot be called for a genericFvPatchField"
+    FatalErrorInFunction
+        << "cannot be called for a genericFvPatchField"
            " (actual type " << actualTypeName_ << ")"
         << "\n    on patch " << this->patch().name()
-        << " of field " << this->dimensionedInternalField().name()
-        << " in file " << this->dimensionedInternalField().objectPath()
+        << " of field " << this->internalField().name()
+        << " in file " << this->internalField().objectPath()
         << "\n    You are probably trying to solve for a field with a "
            "generic boundary condition."
-        << exit(FatalError);
+        << abort(FatalError);
 
     return *this;
 }
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::genericFvPatchField<Type>::gradientBoundaryCoeffs() const
 {
-    FatalErrorIn
-    (
-        "genericFvPatchField<Type>::"
-        "gradientBoundaryCoeffs() const"
-    )   << "\n    "
-           "gradientBoundaryCoeffs cannot be called for a genericFvPatchField"
+    FatalErrorInFunction
+        << "cannot be called for a genericFvPatchField"
            " (actual type " << actualTypeName_ << ")"
         << "\n    on patch " << this->patch().name()
-        << " of field " << this->dimensionedInternalField().name()
-        << " in file " << this->dimensionedInternalField().objectPath()
+        << " of field " << this->internalField().name()
+        << " in file " << this->internalField().objectPath()
         << "\n    You are probably trying to solve for a field with a "
            "generic boundary condition."
-        << exit(FatalError);
+        << abort(FatalError);
 
     return *this;
 }

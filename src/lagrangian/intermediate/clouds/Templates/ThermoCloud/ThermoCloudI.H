@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -75,7 +75,7 @@ inline const Foam::volScalarField& Foam::ThermoCloud<CloudType>::p() const
 
 
 template<class CloudType>
-inline const Foam::HeatTransferModel<Foam::ThermoCloud<CloudType> >&
+inline const Foam::HeatTransferModel<Foam::ThermoCloud<CloudType>>&
 Foam::ThermoCloud<CloudType>::heatTransfer() const
 {
     return heatTransferModel_;
@@ -103,11 +103,8 @@ Foam::ThermoCloud<CloudType>::radAreaP()
 {
     if (!radiation_)
     {
-        FatalErrorIn
-        (
-            "inline Foam::DimensionedField<Foam::scalar, Foam::volMesh> "
-            "Foam::ThermoCloud<CloudType>::radAreaP()"
-        )   << "Radiation field requested, but radiation model not active"
+        FatalErrorInFunction
+            << "Radiation field requested, but radiation model not active"
             << abort(FatalError);
     }
 
@@ -121,11 +118,8 @@ Foam::ThermoCloud<CloudType>::radAreaP() const
 {
     if (!radiation_)
     {
-        FatalErrorIn
-        (
-            "inline Foam::DimensionedField<Foam::scalar, Foam::volMesh> "
-            "Foam::ThermoCloud<CloudType>::radAreaP()"
-        )   << "Radiation field requested, but radiation model not active"
+        FatalErrorInFunction
+            << "Radiation field requested, but radiation model not active"
             << abort(FatalError);
     }
 
@@ -139,11 +133,8 @@ Foam::ThermoCloud<CloudType>::radT4()
 {
     if (!radiation_)
     {
-        FatalErrorIn
-        (
-            "inline Foam::DimensionedField<Foam::scalar, Foam::volMesh> "
-            "Foam::ThermoCloud<CloudType>::radT4()"
-        )   << "Radiation field requested, but radiation model not active"
+        FatalErrorInFunction
+            << "Radiation field requested, but radiation model not active"
             << abort(FatalError);
     }
 
@@ -157,11 +148,8 @@ Foam::ThermoCloud<CloudType>::radT4() const
 {
     if (!radiation_)
     {
-        FatalErrorIn
-        (
-            "inline Foam::DimensionedField<Foam::scalar, Foam::volMesh> "
-            "Foam::ThermoCloud<CloudType>::radT4()"
-        )   << "Radiation field requested, but radiation model not active"
+        FatalErrorInFunction
+            << "Radiation field requested, but radiation model not active"
             << abort(FatalError);
     }
 
@@ -175,11 +163,8 @@ Foam::ThermoCloud<CloudType>::radAreaPT4()
 {
     if (!radiation_)
     {
-        FatalErrorIn
-        (
-            "inline Foam::DimensionedField<Foam::scalar, Foam::volMesh> "
-            "Foam::ThermoCloud<CloudType>::radAreaPT4()"
-        )   << "Radiation field requested, but radiation model not active"
+        FatalErrorInFunction
+            << "Radiation field requested, but radiation model not active"
             << abort(FatalError);
     }
 
@@ -193,11 +178,8 @@ Foam::ThermoCloud<CloudType>::radAreaPT4() const
 {
     if (!radiation_)
     {
-        FatalErrorIn
-        (
-            "inline Foam::DimensionedField<Foam::scalar, Foam::volMesh> "
-            "Foam::ThermoCloud<CloudType>::radAreaPT4()"
-        )   << "Radiation field requested, but radiation model not active"
+        FatalErrorInFunction
+            << "Radiation field requested, but radiation model not active"
             << abort(FatalError);
     }
 
@@ -265,7 +247,7 @@ Foam::ThermoCloud<CloudType>::Sh(volScalarField& hs) const
         else
         {
             tmp<fvScalarMatrix> tfvm(new fvScalarMatrix(hs, dimEnergy/dimTime));
-            fvScalarMatrix& fvm = tfvm();
+            fvScalarMatrix& fvm = tfvm.ref();
 
             fvm.source() = -hsTrans()/(this->db().time().deltaT());
 
@@ -300,7 +282,7 @@ inline Foam::tmp<Foam::volScalarField> Foam::ThermoCloud<CloudType>::Ep() const
 
     if (radiation_)
     {
-        scalarField& Ep = tEp().internalField();
+        scalarField& Ep = tEp.ref().primitiveFieldRef();
         const scalar dt = this->db().time().deltaTValue();
         const scalarField& V = this->mesh().V();
         const scalar epsilon = constProps_.epsilon0();
@@ -336,7 +318,7 @@ inline Foam::tmp<Foam::volScalarField> Foam::ThermoCloud<CloudType>::ap() const
 
     if (radiation_)
     {
-        scalarField& ap = tap().internalField();
+        scalarField& ap = tap.ref().primitiveFieldRef();
         const scalar dt = this->db().time().deltaTValue();
         const scalarField& V = this->mesh().V();
         const scalar epsilon = constProps_.epsilon0();
@@ -373,7 +355,7 @@ Foam::ThermoCloud<CloudType>::sigmap() const
 
     if (radiation_)
     {
-        scalarField& sigmap = tsigmap().internalField();
+        scalarField& sigmap = tsigmap.ref().primitiveFieldRef();
         const scalar dt = this->db().time().deltaTValue();
         const scalarField& V = this->mesh().V();
         const scalar epsilon = constProps_.epsilon0();

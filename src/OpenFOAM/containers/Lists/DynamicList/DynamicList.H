@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -44,7 +44,7 @@ SourceFiles
 #define DynamicList_H
 
 #include "List.H"
-#include "StaticAssert.H"
+#include <type_traits>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -79,8 +79,11 @@ class DynamicList
 :
     public List<T>
 {
-    //- Avoid invalid sizing parameters
-    StaticAssert((SizeInc || SizeMult) && SizeDiv);
+    static_assert
+    (
+        (SizeInc || SizeMult) && SizeDiv,
+        "Invalid sizing parameters"
+    );
 
     // Private data
 
@@ -104,6 +107,9 @@ public:
         //- Construct given size.
         explicit inline DynamicList(const label);
 
+        //- Construct with given size and value for all elements.
+        inline DynamicList(const label, const T&);
+
         //- Construct copy.
         inline DynamicList(const DynamicList<T, SizeInc, SizeMult, SizeDiv>&);
 
@@ -115,7 +121,7 @@ public:
         explicit inline DynamicList(const UIndirectList<T>&);
 
         //- Construct by transferring the parameter contents
-        explicit inline DynamicList(const Xfer<List<T> >&);
+        explicit inline DynamicList(const Xfer<List<T>>&);
 
         //- Construct from Istream. Size set to size of list read.
         explicit DynamicList(Istream&);
@@ -178,7 +184,7 @@ public:
             inline void transfer(DynamicList<T, SizeInc, SizeMult, SizeDiv>&);
 
             //- Transfer contents to the Xfer container as a plain List
-            inline Xfer<List<T> > xfer();
+            inline Xfer<List<T>> xfer();
 
 
         // Member Operators
@@ -224,6 +230,12 @@ public:
             inline void operator=(const UIndirectList<T>&);
 
 
+        // STL member functions
+
+            //- Erase an element, move the remaining elements to fill the gap
+            //  and resize the List
+            typename UList<T>::iterator erase(typename UList<T>::iterator);
+
 
         // IOstream operators
 
@@ -254,7 +266,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "DynamicList.C"
+    #include "DynamicList.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

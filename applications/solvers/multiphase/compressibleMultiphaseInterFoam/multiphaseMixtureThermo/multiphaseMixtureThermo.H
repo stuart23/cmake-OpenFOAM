@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -170,7 +170,7 @@ private:
         (
             const phaseModel& alpha1,
             const phaseModel& alpha2,
-            surfaceVectorField::GeometricBoundaryField& nHatb
+            surfaceVectorField::Boundary& nHatb
         ) const;
 
         tmp<volScalarField> K
@@ -253,14 +253,14 @@ public:
             //  Non-const access allowed for transport equations
             virtual volScalarField& he()
             {
-                notImplemented("multiphaseMixtureThermo::he()");
+                NotImplemented;
                 return phases_[0].thermo().he();
             }
 
             //- Enthalpy/Internal energy [J/kg]
             virtual const volScalarField& he() const
             {
-                notImplemented("multiphaseMixtureThermo::he() const");
+                NotImplemented;
                 return phases_[0].thermo().he();
             }
 

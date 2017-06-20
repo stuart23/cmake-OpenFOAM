@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2014-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2014-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,6 +28,7 @@ License
 #include "basicThermo.H"
 #include "uniformDimensionedFields.H"
 #include "zeroGradientFvPatchFields.H"
+#include "extrapolatedCalculatedFvPatchFields.H"
 #include "addToRunTimeSelectionTable.H"
 #include "geometricOneField.H"
 
@@ -103,7 +104,7 @@ Foam::fv::solidificationMeltingSource::Cp() const
                             dimEnergy/dimMass/dimTemperature,
                             CpRef
                         ),
-                        zeroGradientFvPatchScalarField::typeName
+                        extrapolatedCalculatedFvPatchScalarField::typeName
                     )
                 );
             }
@@ -116,11 +117,7 @@ Foam::fv::solidificationMeltingSource::Cp() const
         }
         default:
         {
-            FatalErrorIn
-            (
-                "Foam::tmp<Foam::volScalarField> "
-                "Foam::fv::solidificationMeltingSource::Cp() const"
-            )
+            FatalErrorInFunction
                 << "Unhandled thermo mode: " << thermoModeTypeNames_[mode_]
                 << abort(FatalError);
         }
@@ -164,13 +161,13 @@ void Foam::fv::solidificationMeltingSource::update(const volScalarField& Cp)
 
     forAll(cells_, i)
     {
-        label cellI = cells_[i];
+        label celli = cells_[i];
 
-        scalar Tc = T[cellI];
-        scalar Cpc = Cp[cellI];
-        scalar alpha1New = alpha1_[cellI] + relax_*Cpc*(Tc - Tmelt_)/L_;
+        scalar Tc = T[celli];
+        scalar Cpc = Cp[celli];
+        scalar alpha1New = alpha1_[celli] + relax_*Cpc*(Tc - Tmelt_)/L_;
 
-        alpha1_[cellI] = max(0, min(alpha1New, 1));
+        alpha1_[celli] = max(0, min(alpha1New, 1));
         deltaT_[i] = Tc - Tmelt_;
     }
 
@@ -196,10 +193,10 @@ Foam::fv::solidificationMeltingSource::solidificationMeltingSource
     relax_(coeffs_.lookupOrDefault("relax", 0.9)),
     mode_(thermoModeTypeNames_.read(coeffs_.lookup("thermoMode"))),
     rhoRef_(readScalar(coeffs_.lookup("rhoRef"))),
-    TName_(coeffs_.lookupOrDefault<word>("TName", "T")),
-    CpName_(coeffs_.lookupOrDefault<word>("CpName", "Cp")),
-    UName_(coeffs_.lookupOrDefault<word>("UName", "U")),
-    phiName_(coeffs_.lookupOrDefault<word>("phiName", "phi")),
+    TName_(coeffs_.lookupOrDefault<word>("T", "T")),
+    CpName_(coeffs_.lookupOrDefault<word>("Cp", "Cp")),
+    UName_(coeffs_.lookupOrDefault<word>("U", "U")),
+    phiName_(coeffs_.lookupOrDefault<word>("phi", "phi")),
     Cu_(coeffs_.lookupOrDefault<scalar>("Cu", 100000)),
     q_(coeffs_.lookupOrDefault("q", 0.001)),
     beta_(readScalar(coeffs_.lookup("beta"))),
@@ -240,10 +237,8 @@ Foam::fv::solidificationMeltingSource::solidificationMeltingSource
         }
         default:
         {
-            FatalErrorIn
-            (
-                "fv::solidificationMeltingSource::solidificationMeltingSource"
-            )   << "Unhandled thermo mode: " << thermoModeTypeNames_[mode_]
+            FatalErrorInFunction
+                << "Unhandled thermo mode: " << thermoModeTypeNames_[mode_]
                 << abort(FatalError);
         }
     }
@@ -257,7 +252,7 @@ Foam::fv::solidificationMeltingSource::solidificationMeltingSource
 void Foam::fv::solidificationMeltingSource::addSup
 (
     fvMatrix<scalar>& eqn,
-    const label fieldI
+    const label fieldi
 )
 {
     apply(geometricOneField(), eqn);
@@ -268,7 +263,7 @@ void Foam::fv::solidificationMeltingSource::addSup
 (
     const volScalarField& rho,
     fvMatrix<scalar>& eqn,
-    const label fieldI
+    const label fieldi
 )
 {
     apply(rho, eqn);
@@ -278,7 +273,7 @@ void Foam::fv::solidificationMeltingSource::addSup
 void Foam::fv::solidificationMeltingSource::addSup
 (
     fvMatrix<vector>& eqn,
-    const label fieldI
+    const label fieldi
 )
 {
     if (debug)
@@ -298,16 +293,16 @@ void Foam::fv::solidificationMeltingSource::addSup
 
     forAll(cells_, i)
     {
-        label cellI = cells_[i];
+        label celli = cells_[i];
 
-        scalar Vc = V[cellI];
-        scalar alpha1c = alpha1_[cellI];
+        scalar Vc = V[celli];
+        scalar alpha1c = alpha1_[celli];
 
         scalar S = -Cu_*sqr(1.0 - alpha1c)/(pow3(alpha1c) + q_);
         vector Sb = rhoRef_*g*beta_*deltaT_[i];
 
-        Sp[cellI] += Vc*S;
-        Su[cellI] += Vc*Sb;
+        Sp[celli] += Vc*S;
+        Su[celli] += Vc*Sb;
     }
 }
 
@@ -316,11 +311,11 @@ void Foam::fv::solidificationMeltingSource::addSup
 (
     const volScalarField& rho,
     fvMatrix<vector>& eqn,
-    const label fieldI
+    const label fieldi
 )
 {
     // Momentum source uses a Boussinesq approximation - redirect
-    addSup(eqn, fieldI);
+    addSup(eqn, fieldi);
 }
 
 

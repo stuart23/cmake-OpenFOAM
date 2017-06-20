@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
     // this is not actually stringent enough:
     if (args.options().empty())
     {
-        FatalErrorIn(args.executable())
+        FatalErrorInFunction
             << "No options supplied, please use one or more of "
                "-translate, -rotate or -scale options."
             << exit(FatalError);
@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
         // Convert to radians
         v *= pi/180.0;
 
-        quaternion R(v.x(), v.y(), v.z());
+        quaternion R(quaternion::rotationSequence::XYZ, v);
 
         Info<< "Rotating points by quaternion " << R << endl;
         points = transform(R, points);
@@ -307,6 +307,8 @@ int main(int argc, char *argv[])
 
     Info<< "Writing points into directory " << points.path() << nl << endl;
     points.write();
+
+    Info<< "End\n" << endl;
 
     return 0;
 }

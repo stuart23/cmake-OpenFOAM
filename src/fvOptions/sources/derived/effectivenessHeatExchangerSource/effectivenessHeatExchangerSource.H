@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -59,8 +59,7 @@ Description
         T_{ref} | min or max(T) in cell zone depending on the sign of Q_t [K]
     \endvartable
 
-    \heading Source usage
-
+Usage
     Example usage:
     \verbatim
     effectivenessHeatExchangerSource1
@@ -169,7 +168,7 @@ protected:
 
         //- 2D look up table efficiency = function of primary and secondary
         // mass flow rates [kg/s]
-        autoPtr<interpolation2DTable<scalar> > eTable_;
+        autoPtr<interpolation2DTable<scalar>> eTable_;
 
         //- Name of velocity field; default = U
         word UName_;
@@ -251,14 +250,10 @@ public:
             virtual void addSup
             (
                 fvMatrix<scalar>& eqn,
-                const label fieldI
+                const label fieldi
             )
             {
-                notImplemented
-                (
-                    "effectivenessHeatExchangerSource::addSup(eqn, fieldI): "
-                    "only compressible solvers supported."
-                );
+                NotImplemented;
             }
 
 
@@ -269,7 +264,7 @@ public:
             (
                 const volScalarField& rho,
                 fvMatrix<scalar>& eqn,
-                const label fieldI
+                const label fieldi
             );
 
 

@@ -27,7 +27,7 @@ Class
 Description
     A constant alphaContactAngle scalar boundary condition.
 
-SeeAlso
+See also
     Foam::alphaContactAngleFvPatchScalarField
     Foam::temperatureDependentAlphaContactAngleFvPatchScalarField
 

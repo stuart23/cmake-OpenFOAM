@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -56,20 +56,11 @@ Foam::wedgeFvPatchField<Type>::wedgeFvPatchField
 {
     if (!isType<wedgeFvPatch>(this->patch()))
     {
-        FatalErrorIn
-        (
-            "wedgeFvPatchField<Type>::wedgeFvPatchField\n"
-            "(\n"
-            "    const wedgeFvPatchField<Type>& ptf,\n"
-            "    const fvPatch& p,\n"
-            "    const DimensionedField<Type, volMesh>& iF,\n"
-            "    const fvPatchFieldMapper& mapper\n"
-            ")\n"
-        )   << "\n    patch type '" << p.type()
+        FatalErrorInFunction
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
             << exit(FatalIOError);
     }
 }
@@ -87,20 +78,14 @@ Foam::wedgeFvPatchField<Type>::wedgeFvPatchField
 {
     if (!isType<wedgeFvPatch>(p))
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "wedgeFvPatchField<Type>::wedgeFvPatchField\n"
-            "(\n"
-            "    const fvPatch& p,\n"
-            "    const Field<Type>& field,\n"
-            "    dictionary& dict\n"
-            ")\n",
             dict
         )   << "\n    patch type '" << p.type()
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
             << exit(FatalIOError);
     }
 
@@ -132,7 +117,7 @@ Foam::wedgeFvPatchField<Type>::wedgeFvPatchField
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> > Foam::wedgeFvPatchField<Type>::snGrad() const
+Foam::tmp<Foam::Field<Type>> Foam::wedgeFvPatchField<Type>::snGrad() const
 {
     const Field<Type> pif(this->patchInternalField());
 
@@ -163,7 +148,7 @@ void Foam::wedgeFvPatchField<Type>::evaluate(const Pstream::commsTypes)
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::wedgeFvPatchField<Type>::snGradTransformDiag() const
 {
     const diagTensor diagT =
@@ -171,7 +156,7 @@ Foam::wedgeFvPatchField<Type>::snGradTransformDiag() const
 
     const vector diagV(diagT.xx(), diagT.yy(), diagT.zz());
 
-    return tmp<Field<Type> >
+    return tmp<Field<Type>>
     (
         new Field<Type>
         (

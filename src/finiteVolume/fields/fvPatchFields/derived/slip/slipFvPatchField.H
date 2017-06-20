@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,11 +30,10 @@ Group
 Description
     This boundary condition provides a slip constraint.
 
-    \heading Patch usage
-
+Usage
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            slip;
     }
@@ -104,9 +103,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchField<Type>> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new slipFvPatchField<Type>(*this)
             );
@@ -120,16 +119,50 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchField<Type>> clone
         (
             const DimensionedField<Type, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new slipFvPatchField<Type>(*this, iF)
             );
         }
+
+
+    // Member functions
+
+        // Attributes
+
+            //- Return false: this patch field is not altered by assignment
+            virtual bool assignable() const
+            {
+                return false;
+            }
+
+
+    // Member operators
+
+        // virtual void operator=(const UList<Type>&) {}
+
+        // virtual void operator=(const fvPatchField<Type>&) {}
+        // virtual void operator+=(const fvPatchField<Type>&) {}
+        // virtual void operator-=(const fvPatchField<Type>&) {}
+        // virtual void operator*=(const fvPatchField<scalar>&) {}
+        // virtual void operator/=(const fvPatchField<scalar>&) {}
+
+        // virtual void operator+=(const Field<Type>&) {}
+        // virtual void operator-=(const Field<Type>&) {}
+
+        // virtual void operator*=(const Field<scalar>&) {}
+        // virtual void operator/=(const Field<scalar>&) {}
+
+        // virtual void operator=(const Type&) {}
+        // virtual void operator+=(const Type&) {}
+        // virtual void operator-=(const Type&) {}
+        // virtual void operator*=(const scalar) {}
+        // virtual void operator/=(const scalar) {}
 };
 
 
@@ -140,7 +173,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "slipFvPatchField.C"
+    #include "slipFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

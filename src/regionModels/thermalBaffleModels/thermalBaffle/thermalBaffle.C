@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -68,7 +68,7 @@ void thermalBaffle::solveEnergy()
 {
     if (debug)
     {
-        Info<< "thermalBaffle::solveEnergy()" << endl;
+        InfoInFunction << endl;
     }
 
     const polyBoundaryMesh& rbm = regionMesh().boundaryMesh();
@@ -91,7 +91,7 @@ void thermalBaffle::solveEnergy()
         )
     );
 
-    volScalarField& Q = tQ();
+    volScalarField& Q = tQ.ref();
 
     volScalarField rho("rho", thermo_->rho());
     volScalarField alpha("alpha", thermo_->alpha());
@@ -101,23 +101,23 @@ void thermalBaffle::solveEnergy()
     if (oneD_ && !constantThickness_)
     {
         // Scale K and rhoCp and fill Q in the internal baffle region.
-        const label patchI = intCoupledPatchIDs_[0];
-        const polyPatch& ppCoupled = rbm[patchI];
+        const label patchi = intCoupledPatchIDs_[0];
+        const polyPatch& ppCoupled = rbm[patchi];
 
-        forAll(ppCoupled, localFaceI)
+        forAll(ppCoupled, localFacei)
         {
-            const labelList& cells = boundaryFaceCells_[localFaceI];
+            const labelList& cells = boundaryFaceCells_[localFacei];
             forAll(cells, i)
             {
                 const label cellId = cells[i];
 
                 Q[cellId] =
-                    Qs_.boundaryField()[patchI][localFaceI]
-                   /thickness_[localFaceI];
+                    Qs_.boundaryField()[patchi][localFacei]
+                   /thickness_[localFacei];
 
-                rho[cellId] *= delta_.value()/thickness_[localFaceI];
+                rho[cellId] *= delta_.value()/thickness_[localFacei];
 
-                alpha[cellId] *= delta_.value()/thickness_[localFaceI];
+                alpha[cellId] *= delta_.value()/thickness_[localFacei];
             }
         }
     }
@@ -182,7 +182,7 @@ thermalBaffle::thermalBaffle
         (
             "zero",
             dimEnergy/dimArea/dimTime,
-            pTraits<scalar>::zero
+            Zero
         )
     ),
     Q_
@@ -200,7 +200,7 @@ thermalBaffle::thermalBaffle
         (
             "zero",
             dimEnergy/dimVolume/dimTime,
-            pTraits<scalar>::zero
+            Zero
         )
     ),
     radiation_
@@ -242,7 +242,7 @@ thermalBaffle::thermalBaffle
         (
             "zero",
             dimEnergy/dimArea/dimTime,
-            pTraits<scalar>::zero
+            Zero
         )
     ),
     Q_
@@ -260,7 +260,7 @@ thermalBaffle::thermalBaffle
         (
             "zero",
             dimEnergy/dimVolume/dimTime,
-            pTraits<scalar>::zero
+            Zero
         )
     ),
     radiation_
@@ -288,12 +288,12 @@ void thermalBaffle::init()
 {
     if (oneD_ && !constantThickness_)
     {
-        label patchI = intCoupledPatchIDs_[0];
-        const label Qsb = Qs_.boundaryField()[patchI].size();
+        label patchi = intCoupledPatchIDs_[0];
+        const label Qsb = Qs_.boundaryField()[patchi].size();
 
         if (Qsb!= thickness_.size())
         {
-            FatalErrorIn("thermalBaffle::init()")
+            FatalErrorInFunction
                 << "the boundary field of Qs is "
                 << Qsb << " and " << nl
                 << "the field 'thickness' is " << thickness_.size() << nl
@@ -358,15 +358,15 @@ void thermalBaffle::info()
 
     forAll(coupledPatches, i)
     {
-        const label patchI = coupledPatches[i];
-        const fvPatchScalarField& ph = h_.boundaryField()[patchI];
-        const word patchName = regionMesh().boundary()[patchI].name();
+        const label patchi = coupledPatches[i];
+        const fvPatchScalarField& ph = h_.boundaryField()[patchi];
+        const word patchName = regionMesh().boundary()[patchi].name();
         Info<< indent << "Q : " << patchName << indent <<
             gSum
             (
-                mag(regionMesh().Sf().boundaryField()[patchI])
+                mag(regionMesh().Sf().boundaryField()[patchi])
               * ph.snGrad()
-              * thermo_->alpha().boundaryField()[patchI]
+              * thermo_->alpha().boundaryField()[patchi]
             ) << endl;
     }
 }

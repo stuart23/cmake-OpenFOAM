@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -91,10 +91,10 @@ Foam::mapPolyMesh::mapPolyMesh
     oldCellVolumesPtr_(oldCellVolumesPtr)
 {
     // Calculate old patch sizes
-    for (label patchI = 0; patchI < oldPatchStarts_.size() - 1; patchI++)
+    for (label patchi = 0; patchi < oldPatchStarts_.size() - 1; patchi++)
     {
-        oldPatchSizes_[patchI] =
-            oldPatchStarts_[patchI + 1] - oldPatchStarts_[patchI];
+        oldPatchSizes_[patchi] =
+            oldPatchStarts_[patchi + 1] - oldPatchStarts_[patchi];
     }
 
     // Set the last one by hand
@@ -106,8 +106,7 @@ Foam::mapPolyMesh::mapPolyMesh
     {
         if (min(oldPatchSizes_) < 0)
         {
-            FatalErrorIn("mapPolyMesh::mapPolyMesh(...)")
-                << "Calculated negative old patch size.  Error in mapping data"
+            FatalErrorInFunction
                 << abort(FatalError);
         }
     }
@@ -144,46 +143,46 @@ Foam::mapPolyMesh::mapPolyMesh
     labelList& oldPatchStarts,
     labelList& oldPatchNMeshPoints,
     autoPtr<scalarField>& oldCellVolumesPtr,
-    const bool reUse
+    const bool reuse
 )
 :
     mesh_(mesh),
     nOldPoints_(nOldPoints),
     nOldFaces_(nOldFaces),
     nOldCells_(nOldCells),
-    pointMap_(pointMap, reUse),
-    pointsFromPointsMap_(pointsFromPoints, reUse),
-    faceMap_(faceMap, reUse),
-    facesFromPointsMap_(facesFromPoints, reUse),
-    facesFromEdgesMap_(facesFromEdges, reUse),
-    facesFromFacesMap_(facesFromFaces, reUse),
-    cellMap_(cellMap, reUse),
-    cellsFromPointsMap_(cellsFromPoints, reUse),
-    cellsFromEdgesMap_(cellsFromEdges, reUse),
-    cellsFromFacesMap_(cellsFromFaces, reUse),
-    cellsFromCellsMap_(cellsFromCells, reUse),
-    reversePointMap_(reversePointMap, reUse),
-    reverseFaceMap_(reverseFaceMap, reUse),
-    reverseCellMap_(reverseCellMap, reUse),
+    pointMap_(pointMap, reuse),
+    pointsFromPointsMap_(pointsFromPoints, reuse),
+    faceMap_(faceMap, reuse),
+    facesFromPointsMap_(facesFromPoints, reuse),
+    facesFromEdgesMap_(facesFromEdges, reuse),
+    facesFromFacesMap_(facesFromFaces, reuse),
+    cellMap_(cellMap, reuse),
+    cellsFromPointsMap_(cellsFromPoints, reuse),
+    cellsFromEdgesMap_(cellsFromEdges, reuse),
+    cellsFromFacesMap_(cellsFromFaces, reuse),
+    cellsFromCellsMap_(cellsFromCells, reuse),
+    reversePointMap_(reversePointMap, reuse),
+    reverseFaceMap_(reverseFaceMap, reuse),
+    reverseCellMap_(reverseCellMap, reuse),
     flipFaceFlux_(flipFaceFlux),
-    patchPointMap_(patchPointMap, reUse),
-    pointZoneMap_(pointZoneMap, reUse),
-    faceZonePointMap_(faceZonePointMap, reUse),
-    faceZoneFaceMap_(faceZoneFaceMap, reUse),
-    cellZoneMap_(cellZoneMap, reUse),
-    preMotionPoints_(preMotionPoints, reUse),
+    patchPointMap_(patchPointMap, reuse),
+    pointZoneMap_(pointZoneMap, reuse),
+    faceZonePointMap_(faceZonePointMap, reuse),
+    faceZoneFaceMap_(faceZoneFaceMap, reuse),
+    cellZoneMap_(cellZoneMap, reuse),
+    preMotionPoints_(preMotionPoints, reuse),
     oldPatchSizes_(oldPatchStarts.size()),
-    oldPatchStarts_(oldPatchStarts, reUse),
-    oldPatchNMeshPoints_(oldPatchNMeshPoints, reUse),
-    oldCellVolumesPtr_(oldCellVolumesPtr, reUse)
+    oldPatchStarts_(oldPatchStarts, reuse),
+    oldPatchNMeshPoints_(oldPatchNMeshPoints, reuse),
+    oldCellVolumesPtr_(oldCellVolumesPtr, reuse)
 {
     if (oldPatchStarts_.size() > 0)
     {
         // Calculate old patch sizes
-        for (label patchI = 0; patchI < oldPatchStarts_.size() - 1; patchI++)
+        for (label patchi = 0; patchi < oldPatchStarts_.size() - 1; patchi++)
         {
-            oldPatchSizes_[patchI] =
-                oldPatchStarts_[patchI + 1] - oldPatchStarts_[patchI];
+            oldPatchSizes_[patchi] =
+                oldPatchStarts_[patchi + 1] - oldPatchStarts_[patchi];
         }
 
         // Set the last one by hand
@@ -195,7 +194,7 @@ Foam::mapPolyMesh::mapPolyMesh
         {
             if (min(oldPatchSizes_) < 0)
             {
-                FatalErrorIn("mapPolyMesh::mapPolyMesh(...)")
+                FatalErrorInFunction
                     << "Calculated negative old patch size."
                     << "  Error in mapping data"
                     << abort(FatalError);

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -101,11 +101,11 @@ private:
 
     // Private Member Functions
 
-        //- Create an edgeList of edges in faceI which have both their points
+        //- Create an edgeList of edges in facei which have both their points
         //  in pointLabels
         labelList edgesFromPoints
         (
-            const label& faceI,
+            const label& facei,
             const labelList& pointLabels
         ) const;
 
@@ -113,7 +113,7 @@ private:
         //  locations for points that will move as a result of the collapse
         void collapseToEdge
         (
-            const label faceI,
+            const label facei,
             const pointField& pts,
             const labelList& pointPriority,
             const vector& collapseAxis,
@@ -131,7 +131,7 @@ private:
         //  locations for points that will move as a result of the collapse
         void collapseToPoint
         (
-            const label& faceI,
+            const label& facei,
             const pointField& pts,
             const labelList& pointPriority,
             const point& fC,
@@ -159,7 +159,7 @@ private:
         (
             const labelList& pointPriority,
             const face& f,
-            const label faceI,
+            const label facei,
             const scalar targetFaceSize,
             PackedBoolList& collapseEdge,
             Map<point>& collapsePointToLocation,
@@ -173,8 +173,8 @@ private:
         //- Decides which points in an edge to collapse, based on their priority
         void checkBoundaryPointMergeEdges
         (
-            const label pointI,
-            const label otherPointI,
+            const label pointi,
+            const label otherPointi,
             const labelList& pointPriority,
             Map<point>& collapsePointToLocation
         ) const;
@@ -231,7 +231,7 @@ private:
         //- Renumber f with new vertices. Removes consecutive duplicates
         void filterFace
         (
-            const Map<DynamicList<label> >& collapseStrings,
+            const Map<DynamicList<label>>& collapseStrings,
             const List<pointEdgeCollapse>& allPointInfo,
             face& f
         ) const;

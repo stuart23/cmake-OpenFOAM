@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -42,15 +42,8 @@ void Foam::enrichedPatch::calcEnrichedFaces
 {
     if (enrichedFacesPtr_)
     {
-        FatalErrorIn
-        (
-            "void enrichedPatch::calcEnrichedFaces\n"
-            "(\n"
-            "    const labelListList& pointsIntoMasterEdges,\n"
-            "    const labelListList& pointsIntoSlaveEdges,\n"
-            "    const pointField& projectedSlavePoints\n"
-            ")"
-        )   << "Enriched faces already calculated."
+        FatalErrorInFunction
+            << "Enriched faces already calculated."
             << abort(FatalError);
     }
 
@@ -84,12 +77,12 @@ void Foam::enrichedPatch::calcEnrichedFaces
 
     // Add slave faces into the enriched faces list
 
-    forAll(slavePatch_, faceI)
+    forAll(slavePatch_, facei)
     {
-        const face oldFace = slavePatch_[faceI];
-        const face oldLocalFace = slaveLocalFaces[faceI];
-//         Info<< "old slave face " << faceI << ": " << oldFace << endl;
-        const labelList& curEdges = slaveFaceEdges[faceI];
+        const face oldFace = slavePatch_[facei];
+        const face oldLocalFace = slaveLocalFaces[facei];
+//         Info<< "old slave face " << facei << ": " << oldFace << endl;
+        const labelList& curEdges = slaveFaceEdges[facei];
 
         DynamicList<label> newFace(oldFace.size()*enrichedFaceRatio_);
 
@@ -155,28 +148,21 @@ void Foam::enrichedPatch::calcEnrichedFaces
                 }
                 else
                 {
-                    FatalErrorIn
-                    (
-                        "void enrichedPatch::calcEnrichedFaces\n"
-                        "(\n"
-                        "    const labelListList& pointsIntoMasterEdges,\n"
-                        "    const labelListList& pointsIntoSlaveEdges,\n"
-                        "    const pointField& projectedSlavePoints\n"
-                        ")"
-                    )   << "Zero length edge in slave patch for face " << i
+                    FatalErrorInFunction
+                        << "Zero length edge in slave patch for face " << i
                         << ".  This is not allowed."
                         << abort(FatalError);
                 }
 
                 pointField slavePosOnEdge(slavePointsOnEdge.size());
 
-                forAll(slavePointsOnEdge, edgePointI)
+                forAll(slavePointsOnEdge, edgePointi)
                 {
-                    slavePosOnEdge[edgePointI] =
-                        pointMap().find(slavePointsOnEdge[edgePointI])();
+                    slavePosOnEdge[edgePointi] =
+                        pointMap().find(slavePointsOnEdge[edgePointi])();
 
-                    edgePointWeights[edgePointI] =
-                        (e & (slavePosOnEdge[edgePointI] - startPoint));
+                    edgePointWeights[edgePointi] =
+                        (e & (slavePosOnEdge[edgePointi] - startPoint));
                 }
 
                 if (debug)
@@ -184,17 +170,9 @@ void Foam::enrichedPatch::calcEnrichedFaces
                     // Check weights: all new points should be on the edge
                     if (min(edgePointWeights) < 0 || max(edgePointWeights) > 1)
                     {
-                        FatalErrorIn
-                        (
-                            "void enrichedPatch::calcEnrichedFaces\n"
-                            "(\n"
-                            "    const labelListList& pointsIntoMasterEdges,\n"
-                            "    const labelListList& pointsIntoSlaveEdges,\n"
-                            "    const pointField& projectedSlavePoints\n"
-                            ")"
-                        )   << "Invalid point edge weights.  Some of points are"
+                        FatalErrorInFunction
                             << " not on the edge for edge " << curEdges[i]
-                            << " of face " << faceI << " in slave patch." << nl
+                            << " of face " << facei << " in slave patch." << nl
                             << "Min weight: " << min(edgePointWeights)
                             << " Max weight: " << max(edgePointWeights)
                             << abort(FatalError);
@@ -234,7 +212,7 @@ void Foam::enrichedPatch::calcEnrichedFaces
                 }
             }
         }
-        // Info<< "New slave face " << faceI << ": " << newFace << endl;
+        // Info<< "New slave face " << facei << ": " << newFace << endl;
 
         // Add the new face to the list
         enrichedFaces[nEnrichedFaces].transfer(newFace);
@@ -243,12 +221,12 @@ void Foam::enrichedPatch::calcEnrichedFaces
 
     // Add master faces into the enriched faces list
 
-    forAll(masterPatch_, faceI)
+    forAll(masterPatch_, facei)
     {
-        const face& oldFace = masterPatch_[faceI];
-        const face& oldLocalFace = masterLocalFaces[faceI];
+        const face& oldFace = masterPatch_[facei];
+        const face& oldLocalFace = masterLocalFaces[facei];
 //         Info<< "old master face: " << oldFace << endl;
-        const labelList& curEdges = masterFaceEdges[faceI];
+        const labelList& curEdges = masterFaceEdges[facei];
 
         DynamicList<label> newFace(oldFace.size()*enrichedFaceRatio_);
 
@@ -306,28 +284,21 @@ void Foam::enrichedPatch::calcEnrichedFaces
                 }
                 else
                 {
-                    FatalErrorIn
-                    (
-                        "void enrichedPatch::calcEnrichedFaces\n"
-                        "(\n"
-                        "    const labelListList& pointsIntoMasterEdges,\n"
-                        "    const labelListList& pointsIntoSlaveEdges,\n"
-                        "    const pointField& projectedSlavePoints\n"
-                        ")"
-                    )   << "Zero length edge in master patch for face " << i
+                    FatalErrorInFunction
+                        << "Zero length edge in master patch for face " << i
                         << ".  This is not allowed."
                         << abort(FatalError);
                 }
 
                 pointField masterPosOnEdge(masterPointsOnEdge.size());
 
-                forAll(masterPointsOnEdge, edgePointI)
+                forAll(masterPointsOnEdge, edgePointi)
                 {
-                    masterPosOnEdge[edgePointI] =
-                        pointMap().find(masterPointsOnEdge[edgePointI])();
+                    masterPosOnEdge[edgePointi] =
+                        pointMap().find(masterPointsOnEdge[edgePointi])();
 
-                    edgePointWeights[edgePointI] =
-                        (e & (masterPosOnEdge[edgePointI] - startPoint));
+                    edgePointWeights[edgePointi] =
+                        (e & (masterPosOnEdge[edgePointi] - startPoint));
                 }
 
                 if (debug)
@@ -335,17 +306,9 @@ void Foam::enrichedPatch::calcEnrichedFaces
                     // Check weights: all new points should be on the edge
                     if (min(edgePointWeights) < 0 || max(edgePointWeights) > 1)
                     {
-                        FatalErrorIn
-                        (
-                            "void enrichedPatch::calcEnrichedFaces\n"
-                            "(\n"
-                            "    const labelListList& pointsIntoMasterEdges,\n"
-                            "    const labelListList& pointsIntoSlaveEdges,\n"
-                            "    const pointField& projectedSlavePoints\n"
-                            ")"
-                        )   << "Invalid point edge weights.  Some of points are"
+                        FatalErrorInFunction
                             << " not on the edge for edge " << curEdges[i]
-                            << " of face " << faceI << " in master patch." << nl
+                            << " of face " << facei << " in master patch." << nl
                             << "Min weight: " << min(edgePointWeights)
                             << " Max weight: " << max(edgePointWeights)
                             << abort(FatalError);
@@ -403,15 +366,8 @@ void Foam::enrichedPatch::calcEnrichedFaces
         }
         else
         {
-            FatalErrorIn
-            (
-                "void enrichedPatch::calcEnrichedFaces\n"
-                "(\n"
-                "    const labelListList& pointsIntoMasterEdges,\n"
-                "    const labelListList& pointsIntoSlaveEdges,\n"
-                "    const pointField& projectedSlavePoints\n"
-                ")"
-            )   << "Error in enriched patch support"
+            FatalErrorInFunction
+                << "Error in enriched patch support"
                 << abort(FatalError);
         }
     }
@@ -424,8 +380,7 @@ const Foam::faceList& Foam::enrichedPatch::enrichedFaces() const
 {
     if (!enrichedFacesPtr_)
     {
-        FatalErrorIn("const faceList& enrichedPatch::enrichedFaces() const")
-            << "Enriched faces not available yet.  Please use "
+        FatalErrorInFunction
             << "void enrichedPatch::calcEnrichedFaces\n"
             << "(\n"
             << "    const labelListList& pointsIntoMasterEdges,\n"

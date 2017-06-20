@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -100,7 +100,7 @@ Foam::scalar Foam::pairPotential::force(const scalar r) const
 
     if (k < 0)
     {
-        FatalErrorIn("pairPotential::force(const scalar) const")
+        FatalErrorInFunction
             << "r less than rMin in pair potential " << name_ << nl
             << abort(FatalError);
     }
@@ -113,10 +113,10 @@ Foam::scalar Foam::pairPotential::force(const scalar r) const
 }
 
 
-Foam::List< Foam::Pair< Foam::scalar > >
+Foam::List<Foam::Pair<Foam::scalar>>
 Foam::pairPotential::forceTable() const
 {
-    List<Pair<scalar> > forceTab(forceLookup_.size());
+    List<Pair<scalar>> forceTab(forceLookup_.size());
 
     forAll(forceLookup_,k)
     {
@@ -137,7 +137,7 @@ Foam::scalar Foam::pairPotential::energy(const scalar r) const
 
     if (k < 0)
     {
-        FatalErrorIn("pairPotential::energy(const scalar) const")
+        FatalErrorInFunction
             << "r less than rMin in pair potential " << name_ << nl
             << abort(FatalError);
     }
@@ -150,10 +150,10 @@ Foam::scalar Foam::pairPotential::energy(const scalar r) const
 }
 
 
-Foam::List< Foam::Pair< Foam::scalar > >
+Foam::List<Foam::Pair<Foam::scalar>>
     Foam::pairPotential::energyTable() const
 {
-    List<Pair<scalar> > energyTab(energyLookup_.size());
+    List<Pair<scalar>> energyTab(energyLookup_.size());
 
     forAll(energyLookup_,k)
     {

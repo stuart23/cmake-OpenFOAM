@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -39,18 +39,14 @@ void Foam::pairPatchAgglomeration::restrictField
 
     if (ff.size() != fineToCoarse.size())
     {
-        FatalErrorIn
-        (
-            "void pairPatchAgglomeration::restrictField"
-            "(Field<Type>& cf, const Field<Type>& ff, "
-            "const label fineLevelIndex) const"
-        )   << "field does not correspond to level " << fineLevelIndex
+        FatalErrorInFunction
+            << "field does not correspond to level " << fineLevelIndex
             << " sizes: field = " << ff.size()
             << " level = " << fineToCoarse.size()
             << abort(FatalError);
     }
 
-    cf = pTraits<Type>::zero;
+    cf = Zero;
 
     forAll(ff, i)
     {

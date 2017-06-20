@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -52,20 +52,20 @@ void processField
     if (fieldObjbjects.lookup(fieldName) != NULL)
     {
         fieldType vtf(*fieldObjbjects.lookup(fieldName), mesh);
-        const typename fieldType::GeometricBoundaryField& bf =
+        const typename fieldType::Boundary& bf =
             vtf.boundaryField();
 
-        forAll(bf, patchI)
+        forAll(bf, patchi)
         {
-            if (isA<externalCoupledMixedFvPatchField<Type> >(bf[patchI]))
+            if (isA<externalCoupledMixedFvPatchField<Type>>(bf[patchi]))
             {
                 Info<< "Generating external coupled geometry for field "
                     << fieldName << endl;
 
                 const externalCoupledMixedFvPatchField<Type>& pf =
-                    refCast<const externalCoupledMixedFvPatchField<Type> >
+                    refCast<const externalCoupledMixedFvPatchField<Type>>
                     (
-                        bf[patchI]
+                        bf[patchi]
                     );
 
                 pf.writeGeometry();

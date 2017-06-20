@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -66,10 +66,10 @@ polynomialSolidTransport
 
 
 template<class Thermo, int PolySize>
-inline Foam::autoPtr<Foam::polynomialSolidTransport<Thermo, PolySize> >
+inline Foam::autoPtr<Foam::polynomialSolidTransport<Thermo, PolySize>>
 Foam::polynomialSolidTransport<Thermo, PolySize>::clone() const
 {
-    return autoPtr<polynomialSolidTransport<Thermo, PolySize> >
+    return autoPtr<polynomialSolidTransport<Thermo, PolySize>>
     (
         new polynomialSolidTransport<Thermo, PolySize>(*this)
     );
@@ -77,10 +77,10 @@ Foam::polynomialSolidTransport<Thermo, PolySize>::clone() const
 
 
 template<class Thermo, int PolySize>
-inline Foam::autoPtr<Foam::polynomialSolidTransport<Thermo, PolySize> >
+inline Foam::autoPtr<Foam::polynomialSolidTransport<Thermo, PolySize>>
 Foam::polynomialSolidTransport<Thermo, PolySize>::New(Istream& is)
 {
-    return autoPtr<polynomialSolidTransport<Thermo, PolySize> >
+    return autoPtr<polynomialSolidTransport<Thermo, PolySize>>
     (
         new polynomialSolidTransport<Thermo, PolySize>(is)
     );
@@ -88,10 +88,10 @@ Foam::polynomialSolidTransport<Thermo, PolySize>::New(Istream& is)
 
 
 template<class Thermo, int PolySize>
-inline Foam::autoPtr<Foam::polynomialSolidTransport<Thermo, PolySize> >
+inline Foam::autoPtr<Foam::polynomialSolidTransport<Thermo, PolySize>>
 Foam::polynomialSolidTransport<Thermo, PolySize>::New(const dictionary& dict)
 {
-    return autoPtr<polynomialSolidTransport<Thermo, PolySize> >
+    return autoPtr<polynomialSolidTransport<Thermo, PolySize>>
     (
         new polynomialSolidTransport<Thermo, PolySize>(dict)
     );
@@ -107,13 +107,7 @@ inline Foam::scalar Foam::polynomialSolidTransport<Thermo, PolySize>::mu
     const scalar T
 ) const
 {
-    notImplemented
-    (
-        "Foam::scalar Foam::polynomialSolidTransport<thermo, PolySize>mu::"
-        "("
-        "    const scalar p, const scalar T"
-        ") const"
-    );
+    NotImplemented;
     return scalar(0);
 }
 
@@ -147,15 +141,14 @@ inline Foam::scalar Foam::polynomialSolidTransport<Thermo, PolySize>::alphah
     const scalar p, const scalar T
 ) const
 {
-    return kappa(p, T)/this->Cpv(p, T);
+    return kappa(p, T)/this->Cp(p, T);
 }
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class Thermo, int PolySize>
-inline Foam::polynomialSolidTransport<Thermo, PolySize>&
-Foam::polynomialSolidTransport<Thermo, PolySize>::operator=
+inline void Foam::polynomialSolidTransport<Thermo, PolySize>::operator=
 (
     const polynomialSolidTransport<Thermo, PolySize>& pt
 )
@@ -163,8 +156,6 @@ Foam::polynomialSolidTransport<Thermo, PolySize>::operator=
     Thermo::operator=(pt);
 
     kappaCoeffs_ = pt.kappaCoeffs_;
-
-    return *this;
 }
 
 

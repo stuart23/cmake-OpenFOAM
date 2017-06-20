@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -37,6 +37,8 @@ Description
 namespace Foam
 {
 
+class mapDistributeBase;
+
 /*---------------------------------------------------------------------------*\
                            Class FieldMapper Declaration
 \*---------------------------------------------------------------------------*/
@@ -64,13 +66,26 @@ public:
 
         virtual bool direct() const = 0;
 
+        virtual bool distributed() const
+        {
+            return false;
+        }
+
+        virtual const mapDistributeBase& distributeMap() const
+        {
+            FatalErrorInFunction
+                << "attempt to access null distributeMap"
+                << abort(FatalError);
+            return *reinterpret_cast<mapDistributeBase*>(NULL);
+        }
+
         //- Are there unmapped values? I.e. do all size() elements get
         //  get value
         virtual bool hasUnmapped() const = 0;
 
         virtual const labelUList& directAddressing() const
         {
-            FatalErrorIn("FieldMapper::directAddressing() const")
+            FatalErrorInFunction
                 << "attempt to access null direct addressing"
                 << abort(FatalError);
 
@@ -79,7 +94,7 @@ public:
 
         virtual const labelListList& addressing() const
         {
-            FatalErrorIn("FieldMapper::addressing() const")
+            FatalErrorInFunction
                 << "attempt to access null interpolation addressing"
                 << abort(FatalError);
 
@@ -88,7 +103,7 @@ public:
 
         virtual const scalarListList& weights() const
         {
-            FatalErrorIn("FieldMapper::weights() const")
+            FatalErrorInFunction
                 << "attempt to access null interpolation weights"
                 << abort(FatalError);
 
@@ -99,9 +114,9 @@ public:
     // Member Operators
 
         template<class Type>
-        tmp<Field<Type> > operator()(const Field<Type>& f) const
+        tmp<Field<Type>> operator()(const Field<Type>& f) const
         {
-            return tmp<Field<Type> >(new Field<Type>(f, *this));
+            return tmp<Field<Type>>(new Field<Type>(f, *this));
         }
 };
 

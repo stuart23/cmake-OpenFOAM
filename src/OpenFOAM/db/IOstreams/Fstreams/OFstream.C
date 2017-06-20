@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -31,7 +31,7 @@ License
 
 namespace Foam
 {
-defineTypeNameAndDebug(OFstream, 0);
+    defineTypeNameAndDebug(OFstream, 0);
 }
 
 
@@ -49,8 +49,7 @@ Foam::OFstreamAllocator::OFstreamAllocator
     {
         if (OFstream::debug)
         {
-            Info<< "OFstreamAllocator::OFstreamAllocator(const fileName&) : "
-                   "cannot open null file " << endl;
+            InfoInFunction << "Cannot open null file " << endl;
         }
     }
 
@@ -104,9 +103,8 @@ Foam::OFstream::OFstream
     {
         if (debug)
         {
-            Info<< "OFstream::OFstream(const fileName&,"
-                   "streamFormat, versionNumber, compressionType) : "
-                   "could not open file " << pathname
+            InfoInFunction
+                << "Could not open file " << pathname
                 << "for input\n"
                    "in stream " << info() << Foam::endl;
         }
@@ -134,7 +132,7 @@ std::ostream& Foam::OFstream::stdStream()
 {
     if (!ofPtr_)
     {
-        FatalErrorIn("OFstream::stdStream()")
+        FatalErrorInFunction
             << "No stream allocated." << abort(FatalError);
     }
     return *ofPtr_;
@@ -145,7 +143,7 @@ const std::ostream& Foam::OFstream::stdStream() const
 {
     if (!ofPtr_)
     {
-        FatalErrorIn("OFstreamAllocator::stdStream() const")
+        FatalErrorInFunction
             << "No stream allocated." << abort(FatalError);
     }
     return *ofPtr_;

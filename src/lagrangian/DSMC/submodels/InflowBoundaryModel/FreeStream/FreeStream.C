@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -75,7 +75,7 @@ Foam::FreeStream<CloudType>::FreeStream
     {
         const polyPatch& patch = cloud.mesh().boundaryMesh()[patches_[p]];
 
-        particleFluxAccumulators_[p] = List<Field<scalar> >
+        particleFluxAccumulators_[p] = List<Field<scalar>>
         (
             molecules.size(),
             Field<scalar>(patch.size(), 0.0)
@@ -97,14 +97,8 @@ Foam::FreeStream<CloudType>::FreeStream
 
         if (moleculeTypeIds_[i] == -1)
         {
-            FatalErrorIn
-            (
-                "Foam::FreeStream<CloudType>::FreeStream"
-                "("
-                    "const dictionary&, "
-                    "CloudType&"
-                ")"
-            )   << "typeId " << molecules[i] << "not defined in cloud." << nl
+            FatalErrorInFunction
+                << "typeId " << molecules[i] << "not defined in cloud." << nl
                 << abort(FatalError);
         }
     }
@@ -134,7 +128,7 @@ void Foam::FreeStream<CloudType>::autoMap(const mapPolyMesh& mapper)
         label patchi = patches_[p];
 
         const polyPatch& patch = mesh.boundaryMesh()[patchi];
-        List<Field<scalar> >& pFA = particleFluxAccumulators_[p];
+        List<Field<scalar>>& pFA = particleFluxAccumulators_[p];
 
         forAll(pFA, facei)
         {
@@ -159,12 +153,12 @@ void Foam::FreeStream<CloudType>::inflow()
 
     label particlesInserted = 0;
 
-    const volScalarField::GeometricBoundaryField& boundaryT
+    const volScalarField::Boundary& boundaryT
     (
         cloud.boundaryT().boundaryField()
     );
 
-    const volVectorField::GeometricBoundaryField& boundaryU
+    const volVectorField::Boundary& boundaryU
     (
         cloud.boundaryU().boundaryField()
     );
@@ -180,7 +174,7 @@ void Foam::FreeStream<CloudType>::inflow()
         // velocity to point flux into the domain.
 
         // Take a reference to the particleFluxAccumulator for this patch
-        List<Field<scalar> >& pFA = particleFluxAccumulators_[p];
+        List<Field<scalar>>& pFA = particleFluxAccumulators_[p];
 
         forAll(pFA, i)
         {
@@ -190,7 +184,7 @@ void Foam::FreeStream<CloudType>::inflow()
 
             if (min(boundaryT[patchi]) < SMALL)
             {
-                FatalErrorIn ("Foam::FreeStream<CloudType>::inflow()")
+                FatalErrorInFunction
                     << "Zero boundary temperature detected, check boundaryT "
                     << "condition." << nl
                     << nl << abort(FatalError);
@@ -236,7 +230,7 @@ void Foam::FreeStream<CloudType>::inflow()
 
             label globalFaceIndex = pFI + patch.start();
 
-            label cellI = mesh.faceOwner()[globalFaceIndex];
+            label celli = mesh.faceOwner()[globalFaceIndex];
 
             const vector& fC = patch.faceCentres()[pFI];
 
@@ -246,7 +240,7 @@ void Foam::FreeStream<CloudType>::inflow()
             (
                 mesh,
                 globalFaceIndex,
-                cellI
+                celli
             );
 
             // Cumulative triangle area fractions
@@ -414,7 +408,7 @@ void Foam::FreeStream<CloudType>::inflow()
                         p,
                         U,
                         Ei,
-                        cellI,
+                        celli,
                         globalFaceIndex,
                         faceTetIs.tetPt(),
                         typeId

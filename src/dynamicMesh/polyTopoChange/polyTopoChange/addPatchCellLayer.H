@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -186,7 +186,7 @@ class addPatchCellLayer
         (
             const labelListList& edgeFaces,
             const label edgeI,
-            const label faceI
+            const label facei
         );
 
         //- Add vertex to face if unique.
@@ -197,8 +197,8 @@ class addPatchCellLayer
             const indirectPrimitivePatch& pp,
             const labelListList& globalEdgeFaces,
             const boolList& doneEdge,
-            const label thisGlobalFaceI,
-            const label nbrGlobalFaceI,
+            const label thisGlobalFacei,
+            const label nbrGlobalFacei,
             const label edgeI
         ) const;
 
@@ -207,8 +207,8 @@ class addPatchCellLayer
             const indirectPrimitivePatch& pp,
             const labelListList& globalEdgeFaces,
             const boolList& doneEdge,
-            const label patchFaceI,
-            const label globalFaceI
+            const label patchFacei,
+            const label globalFacei
         ) const;
 
 
@@ -221,8 +221,8 @@ class addPatchCellLayer
             const face& newFace,
             const label newPatchID,
 
-            const label ownFaceI,
-            const label nbrFaceI,
+            const label ownFacei,
+            const label nbrFacei,
             const label meshEdgeI,
             const label layerI,
             const label numEdgeFaces,
@@ -305,7 +305,7 @@ public:
 
             //- Boundary edges get extruded into boundary faces. Determine patch
             //  for these faces. This might be a to-be-created processor patch
-            //  (patchI >= mesh.boundaryMesh().size()) in which case the
+            //  (patchi >= mesh.boundaryMesh().size()) in which case the
             //  nbrProcToPatch, patchToNbrProc give the correspondence. nPatches
             //  is the new number of patches.
             static void calcSidePatch

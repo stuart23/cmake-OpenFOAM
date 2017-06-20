@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,7 +33,7 @@ Description
     This boundary condition provides a fixed density inlet condition for
     compressible solvers, where the density of calculated using:
 
-    \f{
+    \f[
         \rho = \psi p
     \f]
 
@@ -44,17 +44,16 @@ Description
     \endvartable
 
 
-    \heading Patch usage
-
+Usage
     \table
-        Property     | Description             | Required    | Default value
-        pName        | Pressure field name     | no          | p
-        psiName      | Compressibility field name | no       | thermo:psi
+        Property     | Description                | Required    | Default value
+        p            | Pressure field name        | no          | p
+        psi          | Compressibility field name | no          | thermo:psi
     \endtable
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            fixedRho;
     }

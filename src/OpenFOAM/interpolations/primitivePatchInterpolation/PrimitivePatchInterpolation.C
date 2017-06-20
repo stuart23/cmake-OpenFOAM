@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -52,10 +52,8 @@ void PrimitivePatchInterpolation<Patch>::makeFaceToPointWeights() const
 {
     if (faceToPointWeightsPtr_)
     {
-        FatalErrorIn
-        (
-            "PrimitivePatchInterpolation<Patch>::makeFaceToPointWeights() const"
-        )   << "Face-to-edge weights already calculated"
+        FatalErrorInFunction
+            << "Face-to-edge weights already calculated"
             << abort(FatalError);
     }
 
@@ -110,10 +108,8 @@ void PrimitivePatchInterpolation<Patch>::makeFaceToEdgeWeights() const
 {
     if (faceToEdgeWeightsPtr_)
     {
-        FatalErrorIn
-        (
-            "PrimitivePatchInterpolation<Patch>::makeFaceToEdgeWeights() const"
-        )   << "Face-to-edge weights already calculated"
+        FatalErrorInFunction
+            << "Face-to-edge weights already calculated"
             << abort(FatalError);
     }
 
@@ -174,7 +170,7 @@ PrimitivePatchInterpolation<Patch>::~PrimitivePatchInterpolation()
 
 template<class Patch>
 template<class Type>
-tmp<Field<Type> > PrimitivePatchInterpolation<Patch>::faceToPointInterpolate
+tmp<Field<Type>> PrimitivePatchInterpolation<Patch>::faceToPointInterpolate
 (
     const Field<Type>& ff
 ) const
@@ -182,24 +178,21 @@ tmp<Field<Type> > PrimitivePatchInterpolation<Patch>::faceToPointInterpolate
     // Check size of the given field
     if (ff.size() != patch_.size())
     {
-        FatalErrorIn
-        (
-            "tmp<Field<Type> > PrimitivePatchInterpolation::"
-            "faceToPointInterpolate(const Field<Type> ff)"
-        )   << "given field does not correspond to patch. Patch size: "
+        FatalErrorInFunction
+            << "given field does not correspond to patch. Patch size: "
             << patch_.size() << " field size: " << ff.size()
             << abort(FatalError);
     }
 
-    tmp<Field<Type> > tresult
+    tmp<Field<Type>> tresult
     (
         new Field<Type>
         (
-            patch_.nPoints(), pTraits<Type>::zero
+            patch_.nPoints(), Zero
         )
     );
 
-    Field<Type>& result = tresult();
+    Field<Type>& result = tresult.ref();
 
     const labelListList& pointFaces = patch_.pointFaces();
     const scalarListList& weights = faceToPointWeights();
@@ -221,12 +214,12 @@ tmp<Field<Type> > PrimitivePatchInterpolation<Patch>::faceToPointInterpolate
 
 template<class Patch>
 template<class Type>
-tmp<Field<Type> > PrimitivePatchInterpolation<Patch>::faceToPointInterpolate
+tmp<Field<Type>> PrimitivePatchInterpolation<Patch>::faceToPointInterpolate
 (
-    const tmp<Field<Type> >& tff
+    const tmp<Field<Type>>& tff
 ) const
 {
-    tmp<Field<Type> > tint = faceToPointInterpolate(tff());
+    tmp<Field<Type>> tint = faceToPointInterpolate(tff());
     tff.clear();
     return tint;
 }
@@ -234,32 +227,29 @@ tmp<Field<Type> > PrimitivePatchInterpolation<Patch>::faceToPointInterpolate
 
 template<class Patch>
 template<class Type>
-tmp<Field<Type> > PrimitivePatchInterpolation<Patch>::pointToFaceInterpolate
+tmp<Field<Type>> PrimitivePatchInterpolation<Patch>::pointToFaceInterpolate
 (
     const Field<Type>& pf
 ) const
 {
     if (pf.size() != patch_.nPoints())
     {
-        FatalErrorIn
-        (
-            "tmp<Field<Type> > PrimitivePatchInterpolation::"
-            "pointToFaceInterpolate(const Field<Type> pf)"
-        )   << "given field does not correspond to patch. Patch size: "
+        FatalErrorInFunction
+            << "given field does not correspond to patch. Patch size: "
             << patch_.nPoints() << " field size: " << pf.size()
             << abort(FatalError);
     }
 
-    tmp<Field<Type> > tresult
+    tmp<Field<Type>> tresult
     (
         new Field<Type>
         (
             patch_.size(),
-            pTraits<Type>::zero
+            Zero
         )
     );
 
-    Field<Type>& result = tresult();
+    Field<Type>& result = tresult.ref();
 
     const List<typename Patch::FaceType>& localFaces = patch_.localFaces();
 
@@ -281,12 +271,12 @@ tmp<Field<Type> > PrimitivePatchInterpolation<Patch>::pointToFaceInterpolate
 
 template<class Patch>
 template<class Type>
-tmp<Field<Type> > PrimitivePatchInterpolation<Patch>::pointToFaceInterpolate
+tmp<Field<Type>> PrimitivePatchInterpolation<Patch>::pointToFaceInterpolate
 (
-    const tmp<Field<Type> >& tpf
+    const tmp<Field<Type>>& tpf
 ) const
 {
-    tmp<Field<Type> > tint = pointToFaceInterpolate(tpf());
+    tmp<Field<Type>> tint = pointToFaceInterpolate(tpf());
     tpf.clear();
     return tint;
 }
@@ -294,7 +284,7 @@ tmp<Field<Type> > PrimitivePatchInterpolation<Patch>::pointToFaceInterpolate
 
 template<class Patch>
 template<class Type>
-tmp<Field<Type> > PrimitivePatchInterpolation<Patch>::faceToEdgeInterpolate
+tmp<Field<Type>> PrimitivePatchInterpolation<Patch>::faceToEdgeInterpolate
 (
     const Field<Type>& pf
 ) const
@@ -302,21 +292,18 @@ tmp<Field<Type> > PrimitivePatchInterpolation<Patch>::faceToEdgeInterpolate
     // Check size of the given field
     if (pf.size() != patch_.size())
     {
-        FatalErrorIn
-        (
-            "tmp<Field<Type> > PrimitivePatchInterpolation::"
-            "faceToEdgeInterpolate(const Field<Type> ff)"
-        )   << "given field does not correspond to patch. Patch size: "
+        FatalErrorInFunction
+            << "given field does not correspond to patch. Patch size: "
             << patch_.size() << " field size: " << pf.size()
             << abort(FatalError);
     }
 
-    tmp<Field<Type> > tresult
+    tmp<Field<Type>> tresult
     (
-        new Field<Type>(patch_.nEdges(), pTraits<Type>::zero)
+        new Field<Type>(patch_.nEdges(), Zero)
     );
 
-    Field<Type>& result = tresult();
+    Field<Type>& result = tresult.ref();
 
     const edgeList& edges = patch_.edges();
     const labelListList& edgeFaces = patch_.edgeFaces();
@@ -341,12 +328,12 @@ tmp<Field<Type> > PrimitivePatchInterpolation<Patch>::faceToEdgeInterpolate
 
 template<class Patch>
 template<class Type>
-tmp<Field<Type> > PrimitivePatchInterpolation<Patch>::faceToEdgeInterpolate
+tmp<Field<Type>> PrimitivePatchInterpolation<Patch>::faceToEdgeInterpolate
 (
-    const tmp<Field<Type> >& tpf
+    const tmp<Field<Type>>& tpf
 ) const
 {
-    tmp<Field<Type> > tint = faceToEdgeInterpolate(tpf());
+    tmp<Field<Type>> tint = faceToEdgeInterpolate(tpf());
     tpf.clear();
     return tint;
 }

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -36,7 +36,7 @@ Note
     gcc 2.95.2 so it has to be instantiated for T when an instantiation of
     DictionaryBase is requested
 
-See Also
+See also
     Dictionary and UDictionary
 
 SourceFiles
@@ -128,6 +128,9 @@ public:
             //- Return the table of contents
             wordList toc() const;
 
+            //- Return the table of contents as a sorted list
+            wordList sortedToc() const;
+
 
         // Editing
 
@@ -183,7 +186,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "DictionaryBase.C"
+    #include "DictionaryBase.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

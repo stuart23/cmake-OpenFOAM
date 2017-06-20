@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -64,15 +64,15 @@ inline Foam::CollidingParcel<ParcelType>::CollidingParcel
 (
     const polyMesh& owner,
     const vector& position,
-    const label cellI,
-    const label tetFaceI,
+    const label celli,
+    const label tetFacei,
     const label tetPtI
 )
 :
-    ParcelType(owner, position, cellI, tetFaceI, tetPtI),
-    f_(vector::zero),
-    angularMomentum_(vector::zero),
-    torque_(vector::zero),
+    ParcelType(owner, position, celli, tetFacei, tetPtI),
+    f_(Zero),
+    angularMomentum_(Zero),
+    torque_(Zero),
     collisionRecords_()
 {}
 
@@ -82,8 +82,8 @@ inline Foam::CollidingParcel<ParcelType>::CollidingParcel
 (
     const polyMesh& owner,
     const vector& position,
-    const label cellI,
-    const label tetFaceI,
+    const label celli,
+    const label tetFacei,
     const label tetPtI,
     const label typeId,
     const scalar nParticle0,
@@ -100,8 +100,8 @@ inline Foam::CollidingParcel<ParcelType>::CollidingParcel
     (
         owner,
         position,
-        cellI,
-        tetFaceI,
+        celli,
+        tetFacei,
         tetPtI,
         typeId,
         nParticle0,

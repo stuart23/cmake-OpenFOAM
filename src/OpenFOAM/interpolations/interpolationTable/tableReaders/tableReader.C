@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,7 @@ License
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::autoPtr<Foam::tableReader<Type> > Foam::tableReader<Type>::New
+Foam::autoPtr<Foam::tableReader<Type>> Foam::tableReader<Type>::New
 (
     const dictionary& spec
 )
@@ -45,17 +45,15 @@ Foam::autoPtr<Foam::tableReader<Type> > Foam::tableReader<Type>::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "tableReader::New(const dictionary&)"
-        )   << "Unknown reader type " << readerType
+        FatalErrorInFunction
+            << "Unknown reader type " << readerType
             << nl << nl
             << "Valid reader types : " << nl
             << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 
-    return autoPtr<tableReader<Type> >(cstrIter()(spec));
+    return autoPtr<tableReader<Type>>(cstrIter()(spec));
 }
 
 

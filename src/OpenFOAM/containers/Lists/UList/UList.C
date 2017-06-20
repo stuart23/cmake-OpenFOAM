@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,8 +23,6 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
-
 #include "UList.H"
 #include "ListLoopM.H"
 #include "contiguous.H"
@@ -34,11 +32,11 @@ License
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class T>
-void Foam::UList<T>::assign(const UList<T>& a)
+void Foam::UList<T>::deepCopy(const UList<T>& a)
 {
     if (a.size_ != this->size_)
     {
-        FatalErrorIn("UList<T>::assign(const UList<T>&)")
+        FatalErrorInFunction
             << "ULists have different sizes: "
             << this->size_ << " " << a.size_
             << abort(FatalError);
@@ -76,6 +74,16 @@ void Foam::UList<T>::operator=(const T& t)
 }
 
 
+template<class T>
+void Foam::UList<T>::operator=(const zero)
+{
+    List_ACCESS(T, (*this), vp);
+    List_FOR_ALL((*this), i)
+        List_ELEM((*this), vp, i) = Zero;
+    List_END_FOR_ALL
+}
+
+
 // * * * * * * * * * * * * * * STL Member Functions  * * * * * * * * * * * * //
 
 template<class T>
@@ -93,7 +101,7 @@ std::streamsize Foam::UList<T>::byteSize() const
 {
     if (!contiguous<T>())
     {
-        FatalErrorIn("UList<T>::byteSize()")
+        FatalErrorInFunction
             << "Cannot return the binary size of a list of "
                "non-primitive elements"
             << abort(FatalError);

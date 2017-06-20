@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,6 +30,7 @@ License
 #include "regionSplit.H"
 #include "Tuple2.H"
 #include "faceSet.H"
+#include "decompositionModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -39,15 +40,12 @@ void Foam::domainDecomposition::distributeCells()
 
     cpuTime decompositionTime;
 
-    autoPtr<decompositionMethod> decomposePtr = decompositionMethod::New
-    (
-        decompositionDict_
-    );
+    const decompositionModel& method = decompositionModel::New(*this);
 
     scalarField cellWeights;
-    if (decompositionDict_.found("weightField"))
+    if (method.found("weightField"))
     {
-        word weightName = decompositionDict_.lookup("weightField");
+        word weightName = method.lookup("weightField");
 
         volScalarField weights
         (
@@ -61,10 +59,10 @@ void Foam::domainDecomposition::distributeCells()
             ),
             *this
         );
-        cellWeights = weights.internalField();
+        cellWeights = weights.primitiveField();
     }
 
-    cellToProc_ = decomposePtr().decompose(*this, cellWeights);
+    cellToProc_ = method.decomposer().decompose(*this, cellWeights);
 
     Info<< "\nFinished decomposition in "
         << decompositionTime.elapsedCpuTime()

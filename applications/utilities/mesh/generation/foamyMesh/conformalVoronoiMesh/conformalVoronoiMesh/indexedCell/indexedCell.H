@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -63,7 +63,7 @@ class Ostream;
 template<class Gt, class Cb> Ostream& operator<<
 (
     Ostream&,
-    const Foam::InfoProxy<CGAL::indexedCell<Gt, Cb> >&
+    const Foam::InfoProxy<CGAL::indexedCell<Gt, Cb>>&
 );
 }
 
@@ -119,7 +119,7 @@ public:
     typedef typename Cb::Vertex_handle                   Vertex_handle;
     typedef typename Cb::Cell_handle                     Cell_handle;
 
-    template<typename TDS2>
+    template<class TDS2>
     struct Rebind_TDS
     {
         typedef typename Cb::template Rebind_TDS<TDS2>::Other Cb2;
@@ -243,7 +243,7 @@ public:
 
         //- Return info proxy.
         //  Used to print indexedCell information to a stream
-        Foam::InfoProxy<indexedCell<Gt, Cb> > info() const
+        Foam::InfoProxy<indexedCell<Gt, Cb>> info() const
         {
             return *this;
         }
@@ -251,7 +251,7 @@ public:
         friend Foam::Ostream& Foam::operator<< <Gt, Cb>
         (
             Foam::Ostream&,
-            const Foam::InfoProxy<indexedCell<Gt, Cb> >&
+            const Foam::InfoProxy<indexedCell<Gt, Cb>>&
         );
 
 };

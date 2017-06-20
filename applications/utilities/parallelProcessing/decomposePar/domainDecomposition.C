@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -31,14 +31,14 @@ License
 #include "fvMesh.H"
 #include "OSspecific.H"
 #include "Map.H"
-#include "globalMeshData.H"
 #include "DynamicList.H"
 #include "fvFieldDecomposer.H"
 #include "IOobjectList.H"
 #include "cellSet.H"
 #include "faceSet.H"
 #include "pointSet.H"
-#include "uniformDimensionedFields.H"
+#include "decompositionModel.H"
+#include "hexRef8Data.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -90,18 +90,16 @@ Foam::domainDecomposition::domainDecomposition(const IOobject& io)
         )
       : NULL
     ),
-    decompositionDict_
+    nProcs_
     (
-        IOobject
+        readInt
         (
-            "decomposeParDict",
-            time().system(),
-            *this,
-            IOobject::MUST_READ_IF_MODIFIED,
-            IOobject::NO_WRITE
+            decompositionModel::New
+            (
+                *this
+            ).lookup("numberOfSubdomains")
         )
     ),
-    nProcs_(readInt(decompositionDict_.lookup("numberOfSubdomains"))),
     distributed_(false),
     cellToProc_(nCells()),
     procPointAddressing_(nProcs_),
@@ -115,7 +113,10 @@ Foam::domainDecomposition::domainDecomposition(const IOobject& io)
     procProcessorPatchSubPatchIDs_(nProcs_),
     procProcessorPatchSubPatchStarts_(nProcs_)
 {
-    decompositionDict_.readIfPresent("distributed", distributed_);
+    decompositionModel::New
+    (
+        *this
+    ).readIfPresent("distributed", distributed_);
 }
 
 
@@ -195,57 +196,20 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
     }
 
 
-    autoPtr<labelIOList> cellLevelPtr;
-    {
-        IOobject io
+    // Load refinement data (if any)
+    hexRef8Data baseMeshData
+    (
+        IOobject
         (
-            "cellLevel",
+            "dummy",
             facesInstance(),
             polyMesh::meshSubDir,
             *this,
-            IOobject::MUST_READ,
-            IOobject::NO_WRITE
-        );
-        if (io.headerOk())
-        {
-            Info<< "Reading hexRef8 data : " << io.name() << endl;
-            cellLevelPtr.reset(new labelIOList(io));
-        }
-    }
-    autoPtr<labelIOList> pointLevelPtr;
-    {
-        IOobject io
-        (
-            "pointLevel",
-            facesInstance(),
-            polyMesh::meshSubDir,
-            *this,
-            IOobject::MUST_READ,
-            IOobject::NO_WRITE
-        );
-        if (io.headerOk())
-        {
-            Info<< "Reading hexRef8 data : " << io.name() << endl;
-            pointLevelPtr.reset(new labelIOList(io));
-        }
-    }
-    autoPtr<uniformDimensionedScalarField> level0EdgePtr;
-    {
-        IOobject io
-        (
-            "level0Edge",
-            facesInstance(),
-            polyMesh::meshSubDir,
-            *this,
-            IOobject::MUST_READ,
-            IOobject::NO_WRITE
-        );
-        if (io.headerOk())
-        {
-            Info<< "Reading hexRef8 data : " << io.name() << endl;
-            level0EdgePtr.reset(new uniformDimensionedScalarField(io));
-        }
-    }
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE,
+            false
+        )
+    );
 
 
 
@@ -257,10 +221,10 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
 
 
     // Write out the meshes
-    for (label procI = 0; procI < nProcs_; procI++)
+    for (label proci = 0; proci < nProcs_; proci++)
     {
         // Create processor points
-        const labelList& curPointLabels = procPointAddressing_[procI];
+        const labelList& curPointLabels = procPointAddressing_[proci];
 
         const pointField& meshPoints = points();
 
@@ -276,7 +240,7 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
         }
 
         // Create processor faces
-        const labelList& curFaceLabels = procFaceAddressing_[procI];
+        const labelList& curFaceLabels = procFaceAddressing_[proci];
 
         const faceList& meshFaces = faces();
 
@@ -318,7 +282,7 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
         }
 
         // Create processor cells
-        const labelList& curCellLabels = procCellAddressing_[procI];
+        const labelList& curCellLabels = procCellAddressing_[proci];
 
         const cellList& meshCells = cells();
 
@@ -332,9 +296,9 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
 
             curCell.setSize(origCellLabels.size());
 
-            forAll(origCellLabels, cellFaceI)
+            forAll(origCellLabels, cellFacei)
             {
-                curCell[cellFaceI] = faceLookup[origCellLabels[cellFaceI]];
+                curCell[cellFacei] = faceLookup[origCellLabels[cellFacei]];
             }
         }
 
@@ -342,7 +306,7 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
 
         fileName processorCasePath
         (
-            time().caseName()/fileName(word("processor") + Foam::name(procI))
+            time().caseName()/fileName(word("processor") + Foam::name(proci))
         );
 
         // make the processor directory
@@ -418,55 +382,38 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
 
 
         // Create processor boundary patches
-        const labelList& curPatchSizes = procPatchSize_[procI];
+        const labelList& curPatchSizes = procPatchSize_[proci];
 
-        const labelList& curPatchStarts = procPatchStartIndex_[procI];
+        const labelList& curPatchStarts = procPatchStartIndex_[proci];
 
         const labelList& curNeighbourProcessors =
-            procNeighbourProcessors_[procI];
+            procNeighbourProcessors_[proci];
 
         const labelList& curProcessorPatchSizes =
-            procProcessorPatchSize_[procI];
+            procProcessorPatchSize_[proci];
 
         const labelList& curProcessorPatchStarts =
-            procProcessorPatchStartIndex_[procI];
+            procProcessorPatchStartIndex_[proci];
 
         const labelListList& curSubPatchIDs =
-            procProcessorPatchSubPatchIDs_[procI];
+            procProcessorPatchSubPatchIDs_[proci];
 
         const labelListList& curSubStarts =
-            procProcessorPatchSubPatchStarts_[procI];
+            procProcessorPatchSubPatchStarts_[proci];
 
         const polyPatchList& meshPatches = boundaryMesh();
 
 
         // Count the number of inter-proc patches
         label nInterProcPatches = 0;
-        forAll(curSubPatchIDs, procPatchI)
+        forAll(curSubPatchIDs, procPatchi)
         {
-            //Info<< "For processor " << procI
-            //    << " have to destination processor "
-            //    << curNeighbourProcessors[procPatchI] << endl;
-            //
-            //forAll(curSubPatchIDs[procPatchI], i)
-            //{
-            //    Info<< "    from patch:" << curSubPatchIDs[procPatchI][i]
-            //        << " starting at:" << curSubStarts[procPatchI][i]
-            //        << endl;
-            //}
-
-            nInterProcPatches += curSubPatchIDs[procPatchI].size();
+            nInterProcPatches += curSubPatchIDs[procPatchi].size();
         }
-
-        //Info<< "For processor " << procI
-        //    << " have " << nInterProcPatches
-        //    << " patches to neighbouring processors" << endl;
-
 
         List<polyPatch*> procPatches
         (
-            curPatchSizes.size()
-          + nInterProcPatches,          //curProcessorPatchSizes.size(),
+            curPatchSizes.size() + nInterProcPatches,
             reinterpret_cast<polyPatch*>(0)
         );
 
@@ -501,12 +448,12 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
             nPatches++;
         }
 
-        forAll(curProcessorPatchSizes, procPatchI)
+        forAll(curProcessorPatchSizes, procPatchi)
         {
-            const labelList& subPatchID = curSubPatchIDs[procPatchI];
-            const labelList& subStarts = curSubStarts[procPatchI];
+            const labelList& subPatchID = curSubPatchIDs[procPatchi];
+            const labelList& subStarts = curSubStarts[procPatchi];
 
-            label curStart = curProcessorPatchStarts[procPatchI];
+            label curStart = curProcessorPatchStarts[procPatchi];
 
             forAll(subPatchID, i)
             {
@@ -514,15 +461,8 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
                 (
                     i < subPatchID.size()-1
                   ? subStarts[i+1] - subStarts[i]
-                  : curProcessorPatchSizes[procPatchI] - subStarts[i]
+                  : curProcessorPatchSizes[procPatchi] - subStarts[i]
                 );
-
-//                Info<< "From processor:" << procI << endl
-//                    << "  to processor:" << curNeighbourProcessors[procPatchI]
-//                    << endl
-//                    << "    via patch:" << subPatchID[i] << endl
-//                    << "    start    :" << curStart << endl
-//                    << "    size     :" << size << endl;
 
                 if (subPatchID[i] == -1)
                 {
@@ -530,15 +470,12 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
                     procPatches[nPatches] =
                         new processorPolyPatch
                         (
-                            word("procBoundary") + Foam::name(procI)
-                          + "to"
-                          + Foam::name(curNeighbourProcessors[procPatchI]),
                             size,
                             curStart,
                             nPatches,
                             procMesh.boundaryMesh(),
-                            procI,
-                            curNeighbourProcessors[procPatchI]
+                            proci,
+                            curNeighbourProcessors[procPatchi]
                         );
                 }
                 else
@@ -549,24 +486,16 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
                               boundaryMesh()[subPatchID[i]]
                           );
 
-                    // From cyclic
-                    const word& referPatch = pcPatch.name();
-
                     procPatches[nPatches] =
                         new processorCyclicPolyPatch
                         (
-                            word("procBoundary") + Foam::name(procI)
-                          + "to"
-                          + Foam::name(curNeighbourProcessors[procPatchI])
-                          + "through"
-                          + referPatch,
                             size,
                             curStart,
                             nPatches,
                             procMesh.boundaryMesh(),
-                            procI,
-                            curNeighbourProcessors[procPatchI],
-                            referPatch,
+                            proci,
+                            curNeighbourProcessors[procPatchi],
+                            pcPatch.name(),
                             pcPatch.transform()
                         );
                 }
@@ -576,16 +505,6 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
                 nPatches++;
             }
         }
-
-
-        //forAll(procPatches, patchI)
-        //{
-        //    Pout<< "    " << patchI
-        //        << '\t' << "name:" << procPatches[patchI]->name()
-        //        << '\t' << "type:" << procPatches[patchI]->type()
-        //        << '\t' << "size:" << procPatches[patchI]->size()
-        //        << endl;
-        //}
 
         // Add boundary patches
         procMesh.addPatches(procPatches);
@@ -599,7 +518,7 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
             // Go through all the zoned points and find out if they
             // belong to a zone.  If so, add it to the zone as
             // necessary
-            List<DynamicList<label> > zonePoints(pz.size());
+            List<DynamicList<label>> zonePoints(pz.size());
 
             // Estimate size
             forAll(zonePoints, zoneI)
@@ -665,8 +584,8 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
             // Go through all the zoned face and find out if they
             // belong to a zone.  If so, add it to the zone as
             // necessary
-            List<DynamicList<label> > zoneFaces(fz.size());
-            List<DynamicList<bool> > zoneFaceFlips(fz.size());
+            List<DynamicList<label>> zoneFaces(fz.size());
+            List<DynamicList<bool>> zoneFaceFlips(fz.size());
 
             // Estimate size
             forAll(zoneFaces, zoneI)
@@ -759,7 +678,7 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
             // Go through all the zoned cells and find out if they
             // belong to a zone.  If so, add it to the zone as
             // necessary
-            List<DynamicList<label> > zoneCells(cz.size());
+            List<DynamicList<label>> zoneCells(cz.size());
 
             // Estimate size
             forAll(zoneCells, zoneI)
@@ -769,9 +688,9 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
 
             forAll(curCellLabels, celli)
             {
-                label curCellI = curCellLabels[celli];
+                label curCelli = curCellLabels[celli];
 
-                label zoneI = cellToZone[curCellI];
+                label zoneI = cellToZone[curCelli];
 
                 if (zoneI >= 0)
                 {
@@ -783,7 +702,7 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
                     // Multiple zones. Lookup.
                     forAll(cz, zoneI)
                     {
-                        label index = cz[zoneI].whichCell(curCellI);
+                        label index = cz[zoneI].whichCell(curCelli);
 
                         if (index != -1)
                         {
@@ -816,8 +735,8 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
             }
         }
 
-        // Set the precision of the points data to 10
-        IOstream::defaultPrecision(10);
+        // Set the precision of the points data to be min 10
+        IOstream::defaultPrecision(max(10u, IOstream::defaultPrecision()));
 
         procMesh.write();
 
@@ -887,70 +806,29 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
         }
 
 
-        // hexRef8 data
-        if (cellLevelPtr.valid())
-        {
-            labelIOList
+        // Optional hexRef8 data
+        hexRef8Data
+        (
+            IOobject
             (
-                IOobject
-                (
-                    cellLevelPtr().name(),
-                    facesInstance(),
-                    polyMesh::meshSubDir,
-                    procMesh,
-                    IOobject::NO_READ,
-                    IOobject::AUTO_WRITE
-                ),
-                UIndirectList<label>
-                (
-                    cellLevelPtr(),
-                    procCellAddressing_[procI]
-                )()
-            ).write();
-        }
-        if (pointLevelPtr.valid())
-        {
-            labelIOList
-            (
-                IOobject
-                (
-                    pointLevelPtr().name(),
-                    facesInstance(),
-                    polyMesh::meshSubDir,
-                    procMesh,
-                    IOobject::NO_READ,
-                    IOobject::AUTO_WRITE
-                ),
-                UIndirectList<label>
-                (
-                    pointLevelPtr(),
-                    procPointAddressing_[procI]
-                )()
-            ).write();
-        }
-        if (level0EdgePtr.valid())
-        {
-            uniformDimensionedScalarField
-            (
-                IOobject
-                (
-                    level0EdgePtr().name(),
-                    facesInstance(),
-                    polyMesh::meshSubDir,
-                    procMesh,
-                    IOobject::NO_READ,
-                    IOobject::AUTO_WRITE
-                ),
-                level0EdgePtr()
-            ).write();
-        }
-
+                "dummy",
+                facesInstance(),
+                polyMesh::meshSubDir,
+                procMesh,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE,
+                false
+            ),
+            baseMeshData,
+            procCellAddressing_[proci],
+            procPointAddressing_[proci]
+        ).write();
 
 
         // Statistics
 
         Info<< endl
-            << "Processor " << procI << nl
+            << "Processor " << proci << nl
             << "    Number of cells = " << procMesh.nCells()
             << endl;
 
@@ -1003,7 +881,7 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-            procPointAddressing_[procI]
+            procPointAddressing_[proci]
         );
         pointProcAddressing.write();
 
@@ -1018,7 +896,7 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-            procFaceAddressing_[procI]
+            procFaceAddressing_[proci]
         );
         faceProcAddressing.write();
 
@@ -1033,7 +911,7 @@ bool Foam::domainDecomposition::writeDecomposition(const bool decomposeSets)
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-            procCellAddressing_[procI]
+            procCellAddressing_[proci]
         );
         cellProcAddressing.write();
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -49,11 +49,7 @@ Foam::DispersionRASModel<CloudType>::kModel() const
     }
     else
     {
-        FatalErrorIn
-        (
-            "Foam::tmp<Foam::volScalarField>"
-            "Foam::DispersionRASModel<CloudType>::kModel() const"
-        )
+        FatalErrorInFunction
             << "Turbulence model not found in mesh database" << nl
             << "Database objects include: " << obr.sortedToc()
             << abort(FatalError);
@@ -83,11 +79,7 @@ Foam::DispersionRASModel<CloudType>::epsilonModel() const
     }
     else
     {
-        FatalErrorIn
-        (
-            "Foam::tmp<Foam::volScalarField>"
-            "Foam::DispersionRASModel<CloudType>::epsilonModel() const"
-        )
+        FatalErrorInFunction
             << "Turbulence model not found in mesh database" << nl
             << "Database objects include: " << obr.sortedToc()
             << abort(FatalError);
@@ -155,7 +147,7 @@ void Foam::DispersionRASModel<CloudType>::cacheFields(const bool store)
         }
         else
         {
-            kPtr_ = tk.operator->();
+            kPtr_ = &tk();
             ownK_ = false;
         }
 
@@ -167,7 +159,7 @@ void Foam::DispersionRASModel<CloudType>::cacheFields(const bool store)
         }
         else
         {
-            epsilonPtr_ = tepsilon.operator->();
+            epsilonPtr_ = &tepsilon();
             ownEpsilon_ = false;
         }
     }

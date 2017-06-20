@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,7 +30,7 @@ License
 
 namespace Foam
 {
-defineTypeNameAndDebug(treeDataEdge, 0);
+    defineTypeNameAndDebug(treeDataEdge, 0);
 }
 
 
@@ -128,8 +128,6 @@ Foam::pointField Foam::treeDataEdge::shapePoints() const
 }
 
 
-//- Get type (inside,outside,mixed,unknown) of point w.r.t. surface.
-//  Only makes sense for closed surfaces.
 Foam::volumeType Foam::treeDataEdge::getVolumeType
 (
     const indexedOctree<treeDataEdge>& oc,
@@ -140,7 +138,6 @@ Foam::volumeType Foam::treeDataEdge::getVolumeType
 }
 
 
-// Check if any point on shape is inside cubeBb.
 bool Foam::treeDataEdge::overlaps
 (
     const label index,
@@ -158,7 +155,6 @@ bool Foam::treeDataEdge::overlaps
 }
 
 
-// Check if any point on shape is inside sphere.
 bool Foam::treeDataEdge::overlaps
 (
     const label index,
@@ -276,11 +272,7 @@ bool Foam::treeDataEdge::findIntersectOp::operator()
     point& result
 ) const
 {
-    notImplemented
-    (
-        "treeDataEdge::intersects(const label, const point&,"
-        "const point&, point&)"
-    );
+    NotImplemented;
     return false;
 }
 

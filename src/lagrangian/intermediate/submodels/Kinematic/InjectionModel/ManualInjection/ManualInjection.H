@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,13 +25,16 @@ Class
     Foam::ManualInjection
 
 Description
-    Manual injection
-    - User specifies
+    Manual injection.
+
+    User specifies:
       - Total mass to inject
       - Parcel positions in file \c positionsFile
       - Initial parcel velocity
-    - Parcel diameters obtained by distribution model
-    - All parcels introduced at SOI
+
+    Properties:
+      - Parcel diameters obtained by distribution model
+      - All parcels introduced at SOI
 
 SourceFiles
     ManualInjection.C
@@ -109,9 +112,9 @@ public:
         ManualInjection(const ManualInjection<CloudType>& im);
 
         //- Construct and return a clone
-        virtual autoPtr<InjectionModel<CloudType> > clone() const
+        virtual autoPtr<InjectionModel<CloudType>> clone() const
         {
-            return autoPtr<InjectionModel<CloudType> >
+            return autoPtr<InjectionModel<CloudType>>
             (
                 new ManualInjection<CloudType>(*this)
             );
@@ -147,7 +150,7 @@ public:
                 const scalar time,
                 vector& position,
                 label& cellOwner,
-                label& tetFaceI,
+                label& tetFacei,
                 label& tetPtI
             );
 
@@ -176,7 +179,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "ManualInjection.C"
+    #include "ManualInjection.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

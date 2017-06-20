@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -32,11 +32,10 @@ Description
     boundaries, whereby communication between the patches is performed using
     an arbitrary mesh interface (AMI) interpolation.
 
-    \heading Patch usage
-
+Usage
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            cyclicAMI;
     }
@@ -47,7 +46,7 @@ Note
     patch is transformed to the neighbour patch, the outer perimiter of each
     patch should be identical (or very similar).
 
-SeeAlso
+See also
     Foam::AMIInterpolation
 
 SourceFiles
@@ -87,7 +86,7 @@ class cyclicAMIFvPatchField
 
         //- Return neighbour side field given internal fields
         template<class Type2>
-        tmp<Field<Type2> > neighbourSideField
+        tmp<Field<Type2>> neighbourSideField
         (
             const Field<Type2>&
         ) const;
@@ -129,9 +128,9 @@ public:
         cyclicAMIFvPatchField(const cyclicAMIFvPatchField<Type>&);
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchField<Type>> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new cyclicAMIFvPatchField<Type>(*this)
             );
@@ -145,12 +144,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchField<Type>> clone
         (
             const DimensionedField<Type, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new cyclicAMIFvPatchField<Type>(*this, iF)
             );
@@ -175,7 +174,7 @@ public:
             virtual bool coupled() const;
 
             //- Return neighbour coupled internal cell data
-            virtual tmp<Field<Type> > patchNeighbourField() const;
+            virtual tmp<Field<Type>> patchNeighbourField() const;
 
             //- Return reference to neighbour patchField
             const cyclicAMIFvPatchField<Type>& neighbourPatchField() const;
@@ -242,7 +241,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "cyclicAMIFvPatchField.C"
+    #include "cyclicAMIFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

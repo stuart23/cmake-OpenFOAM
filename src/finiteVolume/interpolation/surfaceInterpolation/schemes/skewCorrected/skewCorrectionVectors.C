@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -67,9 +67,7 @@ void Foam::skewCorrectionVectors::calcSkewCorrectionVectors()
 {
     if (debug)
     {
-        Info<< "surfaceInterpolation::calcSkewCorrectionVectors() : "
-            << "Calculating skew correction vectors"
-            << endl;
+        InfoInFunction << "Calculating skew correction vectors" << endl;
     }
 
     // Set local references to mesh data
@@ -92,42 +90,43 @@ void Foam::skewCorrectionVectors::calcSkewCorrectionVectors()
             Cpf - ((Sf[facei] & Cpf)/(Sf[facei] & d))*d;
     }
 
+    surfaceVectorField::Boundary& skewCorrVecsBf =
+        skewCorrectionVectors_.boundaryFieldRef();
 
-    forAll(skewCorrectionVectors_.boundaryField(), patchI)
+    forAll(skewCorrVecsBf, patchi)
     {
-        fvsPatchVectorField& patchSkewCorrVecs =
-            skewCorrectionVectors_.boundaryField()[patchI];
+        fvsPatchVectorField& patchSkewCorrVecs = skewCorrVecsBf[patchi];
 
         if (!patchSkewCorrVecs.coupled())
         {
-            patchSkewCorrVecs = vector::zero;
+            patchSkewCorrVecs = Zero;
         }
         else
         {
             const fvPatch& p = patchSkewCorrVecs.patch();
             const labelUList& faceCells = p.faceCells();
-            const vectorField& patchFaceCentres = Cf.boundaryField()[patchI];
-            const vectorField& patchSf = Sf.boundaryField()[patchI];
+            const vectorField& patchFaceCentres = Cf.boundaryField()[patchi];
+            const vectorField& patchSf = Sf.boundaryField()[patchi];
             const vectorField patchD(p.delta());
 
-            forAll(p, patchFaceI)
+            forAll(p, patchFacei)
             {
                 vector Cpf =
-                    patchFaceCentres[patchFaceI] - C[faceCells[patchFaceI]];
+                    patchFaceCentres[patchFacei] - C[faceCells[patchFacei]];
 
-                patchSkewCorrVecs[patchFaceI] =
+                patchSkewCorrVecs[patchFacei] =
                     Cpf
                   - (
-                        (patchSf[patchFaceI] & Cpf)/
-                        (patchSf[patchFaceI] & patchD[patchFaceI])
-                    )*patchD[patchFaceI];
+                        (patchSf[patchFacei] & Cpf)/
+                        (patchSf[patchFacei] & patchD[patchFacei])
+                    )*patchD[patchFacei];
             }
         }
     }
 
     scalar skewCoeff = 0.0;
 
-    if (Sf.internalField().size())
+    if (Sf.primitiveField().size())
     {
         skewCoeff =
             max(mag(skewCorrectionVectors_)*mesh_.deltaCoeffs()).value();
@@ -135,8 +134,7 @@ void Foam::skewCorrectionVectors::calcSkewCorrectionVectors()
 
     if (debug)
     {
-        Info<< "surfaceInterpolation::calcSkewCorrectionVectors() : "
-            << "skew coefficient = " << skewCoeff << endl;
+        InfoInFunction << "skew coefficient = " << skewCoeff << endl;
     }
 
     if (skewCoeff < 1e-5)
@@ -150,9 +148,7 @@ void Foam::skewCorrectionVectors::calcSkewCorrectionVectors()
 
     if (debug)
     {
-        Info<< "surfaceInterpolation::calcSkewCorrectionVectors() : "
-            << "Finished constructing skew correction vectors"
-            << endl;
+        Info<< "    Finished constructing skew correction vectors" << endl;
     }
 }
 

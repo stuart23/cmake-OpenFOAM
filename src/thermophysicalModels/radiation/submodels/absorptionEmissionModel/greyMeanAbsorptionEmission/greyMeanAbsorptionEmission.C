@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,7 +26,7 @@ License
 #include "greyMeanAbsorptionEmission.H"
 #include "addToRunTimeSelectionTable.H"
 #include "unitConversion.H"
-#include "zeroGradientFvPatchFields.H"
+#include "extrapolatedCalculatedFvPatchFields.H"
 #include "basicSpecieMixture.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -66,14 +66,8 @@ Foam::radiation::greyMeanAbsorptionEmission::greyMeanAbsorptionEmission
 {
     if (!isA<basicSpecieMixture>(thermo_))
     {
-        FatalErrorIn
-        (
-            "radiation::greyMeanAbsorptionEmission::greyMeanAbsorptionEmission"
-            "("
-                "const dictionary&, "
-                "const fvMesh&"
-            ")"
-        )   << "Model requires a multi-component thermo package"
+        FatalErrorInFunction
+            << "Model requires a multi-component thermo package"
             << abort(FatalError);
     }
 
@@ -112,11 +106,8 @@ Foam::radiation::greyMeanAbsorptionEmission::greyMeanAbsorptionEmission
 
             if (!mesh.foundObject<volScalarField>("ft"))
             {
-                FatalErrorIn
-                (
-                    "Foam::radiation::greyMeanAbsorptionEmission(const"
-                    "dictionary& dict, const fvMesh& mesh)"
-                )   << "specie ft is not present to use with "
+                FatalErrorInFunction
+                    << "specie ft is not present to use with "
                     << "lookUpTableFileName " << nl
                     << exit(FatalError);
             }
@@ -154,11 +145,8 @@ Foam::radiation::greyMeanAbsorptionEmission::greyMeanAbsorptionEmission
             }
             else
             {
-                FatalErrorIn
-                (
-                    "Foam::radiation::greyMeanAbsorptionEmission(const"
-                    "dictionary& dict, const fvMesh& mesh)"
-                )   << "specie: " << iter.key()
+                FatalErrorInFunction
+                    << "specie: " << iter.key()
                     << " is neither in look-up table: "
                     << lookUpTablePtr_().tableName()
                     << " nor is being solved" << nl
@@ -179,11 +167,8 @@ Foam::radiation::greyMeanAbsorptionEmission::greyMeanAbsorptionEmission
         }
         else
         {
-            FatalErrorIn
-            (
-                "Foam::radiation::greyMeanAbsorptionEmission(const"
-                "dictionary& dict, const fvMesh& mesh)"
-            )   << " there is not lookup table and the specie" << nl
+            FatalErrorInFunction
+                << " there is not lookup table and the specie" << nl
                 << iter.key() << nl
                 << " is not found " << nl
                 << exit(FatalError);
@@ -224,13 +209,13 @@ Foam::radiation::greyMeanAbsorptionEmission::aCont(const label bandI) const
             ),
             mesh(),
             dimensionedScalar("a", dimless/dimLength, 0.0),
-            zeroGradientFvPatchVectorField::typeName
+            extrapolatedCalculatedFvPatchVectorField::typeName
         )
     );
 
-    scalarField& a = ta().internalField();
+    scalarField& a = ta.ref().primitiveFieldRef();
 
-    forAll(a, cellI)
+    forAll(a, celli)
     {
         forAllConstIter(HashTable<label>, speciesNames_, iter)
         {
@@ -242,33 +227,33 @@ Foam::radiation::greyMeanAbsorptionEmission::aCont(const label bandI) const
                 const volScalarField& ft =
                     mesh_.lookupObject<volScalarField>("ft");
 
-                const List<scalar>& Ynft = lookUpTablePtr_().lookUp(ft[cellI]);
+                const List<scalar>& Ynft = lookUpTablePtr_().lookUp(ft[celli]);
                 //moles x pressure [atm]
-                Xipi = Ynft[specieIndex_[n]]*paToAtm(p[cellI]);
+                Xipi = Ynft[specieIndex_[n]]*paToAtm(p[celli]);
             }
             else
             {
                 scalar invWt = 0.0;
-                forAll (mixture.Y(), s)
+                forAll(mixture.Y(), s)
                 {
-                    invWt += mixture.Y(s)[cellI]/mixture.W(s);
+                    invWt += mixture.Y(s)[celli]/mixture.W(s);
                 }
 
                 label index = mixture.species()[iter.key()];
-                scalar Xk = mixture.Y(index)[cellI]/(mixture.W(index)*invWt);
+                scalar Xk = mixture.Y(index)[celli]/(mixture.W(index)*invWt);
 
-                Xipi = Xk*paToAtm(p[cellI]);
+                Xipi = Xk*paToAtm(p[celli]);
             }
 
-            const absorptionCoeffs::coeffArray& b = coeffs_[n].coeffs(T[cellI]);
+            const absorptionCoeffs::coeffArray& b = coeffs_[n].coeffs(T[celli]);
 
-            scalar Ti = T[cellI];
+            scalar Ti = T[celli];
             // negative temperature exponents
             if (coeffs_[n].invTemp())
             {
-                Ti = 1.0/T[cellI];
+                Ti = 1.0/T[celli];
             }
-            a[cellI] +=
+            a[celli] +=
                 Xipi
                *(
                     ((((b[5]*Ti + b[4])*Ti + b[3])*Ti + b[2])*Ti + b[1])*Ti
@@ -276,7 +261,7 @@ Foam::radiation::greyMeanAbsorptionEmission::aCont(const label bandI) const
                 );
         }
     }
-    ta().correctBoundaryConditions();
+    ta.ref().correctBoundaryConditions();
     return ta;
 }
 
@@ -315,38 +300,25 @@ Foam::radiation::greyMeanAbsorptionEmission::ECont(const label bandI) const
 
         if (dQ.dimensions() == dimEnergy/dimTime)
         {
-            E().internalField() = EhrrCoeff_*dQ/mesh_.V();
+            E.ref().primitiveFieldRef() = EhrrCoeff_*dQ/mesh_.V();
         }
         else if (dQ.dimensions() == dimEnergy/dimTime/dimVolume)
         {
-            E().internalField() = EhrrCoeff_*dQ;
+            E.ref().primitiveFieldRef() = EhrrCoeff_*dQ;
         }
         else
         {
             if (debug)
             {
-                WarningIn
-                (
-                    "tmp<volScalarField>"
-                    "radiation::greyMeanAbsorptionEmission::ECont"
-                    "("
-                        "const label"
-                    ") const"
-                )
+                WarningInFunction
                     << "Incompatible dimensions for dQ field" << endl;
             }
         }
     }
     else
     {
-        WarningIn
-        (
-            "tmp<volScalarField>"
-            "radiation::greyMeanAbsorptionEmission::ECont"
-            "("
-                "const label"
-            ") const"
-        ) << "dQ field not found in mesh" << endl;
+        WarningInFunction
+          << "dQ field not found in mesh" << endl;
     }
 
     return E;

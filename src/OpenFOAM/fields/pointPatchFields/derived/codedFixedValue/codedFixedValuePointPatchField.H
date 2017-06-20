@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,34 +30,34 @@ Description
 
     Example:
     \verbatim
-        movingWall
-        {
-            type            codedFixedValue;
-            value           uniform 0;
-            redirectType    rampedFixedValue;   // name of generated bc
+    movingWall
+    {
+        type            codedFixedValue;
+        value           uniform 0;
+        name    rampedFixedValue;   // name of generated bc
 
-            code
-            #{
-                operator==
-                (
-                    vector(0,0,1)
-                   *min(10, 0.1*this->db().time().value())
-                );
-            #};
+        code
+        #{
+            operator==
+            (
+                vector(0,0,1)
+                *min(10, 0.1*this->db().time().value())
+            );
+        #};
 
-            //codeInclude
-            //#{
-            //    #include "fvCFD.H"
-            //#};
+        //codeInclude
+        //#{
+        //    #include "fvCFD.H"
+        //#};
 
-            //codeOptions
-            //#{
-            //    -I$(LIB_SRC)/finiteVolume/lnInclude
-            //#};
-        }
+        //codeOptions
+        //#{
+        //    -I$(LIB_SRC)/finiteVolume/lnInclude
+        //#};
+    }
     \endverbatim
 
-    A special form is if the 'code' section is not supplied. In this case
+    A special form is if the \c code section is not supplied. In this case
     the code gets read from a (runTimeModifiable!) dictionary system/codeDict
     which would have a corresponding entry
 
@@ -71,7 +71,7 @@ Description
     }
     \endverbatim
 
-SeeAlso
+See also
     codedFixedValueFvPatchField
 
 SourceFiles
@@ -110,9 +110,10 @@ class codedFixedValuePointPatchField
         //- Dictionary contents for the boundary condition
         mutable dictionary dict_;
 
-        const word redirectType_;
+        const word name_;
 
-        mutable autoPtr<pointPatchField<Type> > redirectPatchFieldPtr_;
+        mutable autoPtr<pointPatchField<Type>> redirectPatchFieldPtr_;
+
 
     // Private Member Functions
 
@@ -135,6 +136,7 @@ class codedFixedValuePointPatchField
 
         // Get the dictionary to initialize the codeContext
         virtual const dictionary& codeDict() const;
+
 
 public:
 
@@ -186,9 +188,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual autoPtr<pointPatchField<Type> > clone() const
+        virtual autoPtr<pointPatchField<Type>> clone() const
         {
-            return autoPtr<pointPatchField<Type> >
+            return autoPtr<pointPatchField<Type>>
             (
                 new codedFixedValuePointPatchField<Type>(*this)
             );
@@ -202,12 +204,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual autoPtr<pointPatchField<Type> > clone
+        virtual autoPtr<pointPatchField<Type>> clone
         (
             const DimensionedField<Type, pointMesh>& iF
         ) const
         {
-            return autoPtr<pointPatchField<Type> >
+            return autoPtr<pointPatchField<Type>>
             (
                 new codedFixedValuePointPatchField<Type>
                 (
@@ -216,7 +218,6 @@ public:
                 )
             );
         }
-
 
 
     // Member functions
@@ -245,7 +246,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "codedFixedValuePointPatchField.C"
+    #include "codedFixedValuePointPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -114,7 +114,7 @@ void Foam::pairPatchAgglomeration::setEdgeWeights
     const label nCoarseI =  max(fineToCoarse) + 1;
     labelListList coarseToFine(invertOneToMany(nCoarseI, fineToCoarse));
 
-    HashSet<edge, Hash<edge> > fineFeaturedFaces(coarsePatch.nEdges()/10);
+    HashSet<edge, Hash<edge>> fineFeaturedFaces(coarsePatch.nEdges()/10);
 
     // Map fine faces with featured edge into coarse faces
     forAllConstIter(EdgeMap<scalar>, facePairWeight_, iter)
@@ -254,7 +254,7 @@ void Foam::pairPatchAgglomeration::mapBaseToTopAgglom
 )
 {
     const labelList& fineToCoarse = restrictAddressing_[fineLevelIndex];
-    forAll (restrictTopBottomAddressing_, i)
+    forAll(restrictTopBottomAddressing_, i)
     {
         restrictTopBottomAddressing_[i] =
             fineToCoarse[restrictTopBottomAddressing_[i]];
@@ -271,15 +271,8 @@ bool Foam::pairPatchAgglomeration::agglomeratePatch
 {
     if (min(fineToCoarse) == -1)
     {
-        FatalErrorIn
-        (
-            "pairPatchAgglomeration::agglomeratePatch"
-            "("
-                "const bPatch&, "
-                "const labelList&, "
-                "const label"
-            ")"
-        )   << "min(fineToCoarse) == -1" << exit(FatalError);
+        FatalErrorInFunction
+            << "min(fineToCoarse) == -1" << exit(FatalError);
     }
 
     if (fineToCoarse.size() == 0)
@@ -289,15 +282,8 @@ bool Foam::pairPatchAgglomeration::agglomeratePatch
 
     if (fineToCoarse.size() != patch.size())
     {
-        FatalErrorIn
-        (
-            "pairPatchAgglomeration::agglomeratePatch"
-            "("
-                "const bPatch&, "
-                "const labelList&, "
-                "const label"
-            ")"
-        )   << "restrict map does not correspond to fine level. " << endl
+        FatalErrorInFunction
+            << "restrict map does not correspond to fine level. " << endl
             << " Sizes: restrictMap: " << fineToCoarse.size()
             << " nEqns: " << patch.size()
             << abort(FatalError);
@@ -454,7 +440,7 @@ Foam::tmp<Foam::labelField> Foam::pairPatchAgglomeration::agglomerateOneLevel
     const label nFineFaces = patch.size();
 
     tmp<labelField> tcoarseCellMap(new labelField(nFineFaces, -1));
-    labelField& coarseCellMap = tcoarseCellMap();
+    labelField& coarseCellMap = tcoarseCellMap.ref();
 
     const labelListList& faceFaces = patch.faceFaces();
 
@@ -540,11 +526,8 @@ Foam::tmp<Foam::labelField> Foam::pairPatchAgglomeration::agglomerateOneLevel
     {
         if (coarseCellMap[facei] < 0)
         {
-            FatalErrorIn
-            (
-                "pairPatchAgglomeration::agglomerateOneLevel "
-                "(label&, const bPatch&) "
-            ) << " face " << facei
+            FatalErrorInFunction
+              << " face " << facei
             << " is not part of a cluster"
             << exit(FatalError);
         }

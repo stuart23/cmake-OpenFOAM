@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,7 +30,6 @@ License
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from components
 template<class TransferType>
 Foam::wallDistData<TransferType>::wallDistData
 (
@@ -68,7 +67,6 @@ Foam::wallDistData<TransferType>::~wallDistData()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Correct for mesh geom/topo changes
 template<class TransferType>
 void Foam::wallDistData<TransferType>::correct()
 {
@@ -82,11 +80,14 @@ void Foam::wallDistData<TransferType>::correct()
     labelHashSet wallPatchIDs(getPatchIDs<wallPolyPatch>());
 
     // Collect pointers to data on patches
-    UPtrList<Field<Type> > patchData(mesh.boundaryMesh().size());
+    UPtrList<Field<Type>> patchData(mesh.boundaryMesh().size());
 
-    forAll(field_.boundaryField(), patchI)
+    typename GeometricField<Type, fvPatchField, volMesh>::
+        Boundary& fieldBf = field_.boundaryFieldRef();
+
+    forAll(fieldBf, patchi)
     {
-        patchData.set(patchI, &field_.boundaryField()[patchI]);
+        patchData.set(patchi, &fieldBf[patchi]);
     }
 
     // Do mesh wave
@@ -103,18 +104,19 @@ void Foam::wallDistData<TransferType>::correct()
 
     field_.transfer(wave.cellData());
 
+    typename GeometricField<Type, fvPatchField, volMesh>::
+        Boundary& bf = boundaryFieldRef();
+
     // Transfer values on patches into boundaryField of *this and field_
-    forAll(boundaryField(), patchI)
+    forAll(bf, patchi)
     {
-        scalarField& waveFld = wave.patchDistance()[patchI];
+        scalarField& waveFld = wave.patchDistance()[patchi];
 
-        if (!isA<emptyFvPatchScalarField>(boundaryField()[patchI]))
+        if (!isA<emptyFvPatchScalarField>(boundaryField()[patchi]))
         {
-            boundaryField()[patchI].transfer(waveFld);
-
-            Field<Type>& wavePatchData = wave.patchData()[patchI];
-
-            field_.boundaryField()[patchI].transfer(wavePatchData);
+            bf[patchi].transfer(waveFld);
+            Field<Type>& wavePatchData = wave.patchData()[patchi];
+            fieldBf[patchi].transfer(wavePatchData);
         }
     }
 

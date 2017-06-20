@@ -6,17 +6,7 @@ autoPtr<psiThermo> pThermo
 );
 psiThermo& thermo = pThermo();
 
-volScalarField& p = thermo.p();
 volScalarField& e = thermo.he();
-const volScalarField& T = thermo.T();
-const volScalarField& psi = thermo.psi();
-const volScalarField& mu = thermo.mu();
-
-bool inviscid(true);
-if (max(mu.internalField()) > 0.0)
-{
-    inviscid = false;
-}
 
 Info<< "Reading field U\n" << endl;
 volVectorField U
@@ -95,7 +85,7 @@ surfaceScalarField neg
     dimensionedScalar("neg", dimless, -1.0)
 );
 
-surfaceScalarField phi("phi", mesh.Sf() & fvc::interpolate(rhoU));
+surfaceScalarField phi("phi", fvc::flux(rhoU));
 
 Info<< "Creating turbulence model\n" << endl;
 autoPtr<compressible::turbulenceModel> turbulence

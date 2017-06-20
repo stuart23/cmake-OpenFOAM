@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::autoPtr<Foam::InflowBoundaryModel<CloudType> >
+Foam::autoPtr<Foam::InflowBoundaryModel<CloudType>>
 Foam::InflowBoundaryModel<CloudType>::New
 (
     const dictionary& dict,
@@ -44,18 +44,15 @@ Foam::InflowBoundaryModel<CloudType>::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "InflowBoundaryModel<CloudType>::New"
-            "(const dictionary&, CloudType&)"
-        )   << "Unknown InflowBoundaryModel type "
+        FatalErrorInFunction
+            << "Unknown InflowBoundaryModel type "
             << modelType << nl << nl
             << "Valid InflowBoundaryModel types are:" << nl
             << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 
-    return autoPtr<InflowBoundaryModel<CloudType> >(cstrIter()(dict, owner));
+    return autoPtr<InflowBoundaryModel<CloudType>>(cstrIter()(dict, owner));
 }
 
 

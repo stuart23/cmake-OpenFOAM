@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,22 +26,24 @@ Class
 
 Description
     A local coordinate rotation.
+
     The cell based rotational field can be created in two ways:
+      -# Each rotational tensor is defined with two vectors (\c dir and \c e3)
+         where <tt>dir =  cellC - origin</tt> and \c e3 is the rotation axis.
+          Per each cell an axesRotation type of rotation is created
+          (cylindrical coordinates). For example:
+          \verbatim
+          cylindrical
+          {
+              type        localAxes;
+              e3          (0 0 1);
+          }
+          \endverbatim
 
-    1)  Each rotational tensor is defined with two vectors (dir and e3)
-        where dir =  cellC - origin and e3 is the rotation axis.
-        Per each cell an axesRotation type of rotation is created
-        (cylindrical coordinates)
+      -# The rotational tensor field is provided at construction.
 
-        \verbatim
-            cylindrical
-            {
-                type        localAxes;
-                e3          (0 0 1);
-            }
-        \endverbatim
-
-    2) The rotational tensor field is provided at construction
+SourceFiles
+    cylindrical.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -143,32 +145,32 @@ public:
         //- Return local-to-global transformation tensor
         virtual const tensor& R() const
         {
-            notImplemented("const tensor& cylindrical::R() const");
+            NotImplemented;
             return tensor::zero;
         }
 
         //- Return global-to-local transformation tensor
         virtual const tensor& Rtr() const
         {
-             notImplemented("const tensor& cylindrical::Rtr() const");
+             NotImplemented;
              return tensor::zero;
         }
 
-        //- Return local Cartesian x-axis
+        //- Return local Cartesian x-axis in global coordinates
         virtual const vector e1() const
         {
-            notImplemented("const tensor& cylindrical::e1() const");
+            NotImplemented;
             return vector::zero;
         }
 
-        //- Return local Cartesian y-axis
+        //- Return local Cartesian y-axis in global coordinates
         virtual const vector e2() const
         {
-            notImplemented("const tensor& cylindrical::e2() const");
+            NotImplemented;
             return vector::zero;
         }
 
-        //- Return local Cartesian z-axis
+        //- Return local Cartesian z-axis in global coordinates
         virtual const vector e3() const
         {
             return e3_;

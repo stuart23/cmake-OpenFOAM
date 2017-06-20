@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,24 +30,24 @@ Description
     An Ensight part is created for the internalMesh and for each patch.
 
 Usage
-    - foamToEnsight [OPTION] \n
-    Translates OpenFOAM data to Ensight format
+    \b foamToEnsight [OPTION]
 
-    \param -ascii \n
-    Write Ensight data in ASCII format instead of "C Binary"
+    Options:
+      - \par -ascii
+        Write Ensight data in ASCII format instead of "C Binary"
 
-    \param -patches patchList \n
-    Specify particular patches to write.
-    Specifying an empty list suppresses writing the internalMesh.
+      - \par -patches patchList
+        Specify particular patches to write.
+        Specifying an empty list suppresses writing the internalMesh.
 
-    \param -noPatches \n
-    Suppress writing any patches.
+      - \par -noPatches
+        Suppress writing any patches.
 
-    \param -faceZones zoneList \n
-    Specify faceZones to write, with wildcards
+      - \par -faceZones zoneList
+        Specify faceZones to write, with wildcards
 
-    \param -cellZone zoneName \n
-    Specify single cellZone to write (not lagrangian)
+      - \par -cellZone zoneName
+        Specify single cellZone to write (not lagrangian)
 
 Note
     Parallel support for cloud data is not supported
@@ -328,7 +328,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    HashTable<HashTable<word> > allCloudFields;
+    HashTable<HashTable<word>> allCloudFields;
     forAllConstIter(wordHashSet, allCloudNames, cloudIter)
     {
         // Add the name of the cloud(s) to the case file header
@@ -348,7 +348,7 @@ int main(int argc, char *argv[])
         allCloudFields.insert(cloudIter.key(), HashTable<word>());
 
         // Identify the new cloud in the hash table
-        HashTable<HashTable<word> >::iterator newCloudIter =
+        HashTable<HashTable<word>>::iterator newCloudIter =
             allCloudFields.find(cloudIter.key());
 
         // Loop over all times to build list of fields and field types
@@ -550,7 +550,7 @@ int main(int argc, char *argv[])
         // Cloud field data output
         // ~~~~~~~~~~~~~~~~~~~~~~~
 
-        forAllConstIter(HashTable<HashTable<word> >, allCloudFields, cloudIter)
+        forAllConstIter(HashTable<HashTable<word>>, allCloudFields, cloudIter)
         {
             const word& cloudName = cloudIter.key();
 

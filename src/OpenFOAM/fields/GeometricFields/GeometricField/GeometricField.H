@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,7 +30,7 @@ Description
 SourceFiles
     GeometricFieldI.H
     GeometricField.C
-    GeometricBoundaryField.C
+    Boundary.C
     GeometricFieldFunctions.H
     GeometricFieldFunctions.C
 
@@ -69,7 +69,7 @@ template<class Type, template<class> class PatchField, class GeoMesh>
 Ostream& operator<<
 (
     Ostream&,
-    const tmp<GeometricField<Type, PatchField, GeoMesh> >&
+    const tmp<GeometricField<Type, PatchField, GeoMesh>>&
 );
 
 
@@ -95,15 +95,22 @@ public:
 
     // Public typedefs
 
+        //- Type of mesh on which this GeometricField is instantiated
         typedef typename GeoMesh::Mesh Mesh;
+
+        //- Type of boundary mesh on which this
+        //  GeometricField::Boundary is instantiated
         typedef typename GeoMesh::BoundaryMesh BoundaryMesh;
 
-        typedef DimensionedField<Type, GeoMesh> DimensionedInternalField;
-        typedef Field<Type> InternalField;
-        typedef PatchField<Type> PatchFieldType;
+        //- Type of the internal field from which this GeometricField is derived
+        typedef DimensionedField<Type, GeoMesh> Internal;
+
+        //- Type of the patch field of which the
+        //  GeometricField::Boundary is composed
+        typedef PatchField<Type> Patch;
 
 
-    class GeometricBoundaryField
+    class Boundary
     :
         public FieldField<PatchField, Type>
     {
@@ -118,15 +125,15 @@ public:
         // Constructors
 
             //- Construct from a BoundaryMesh
-            GeometricBoundaryField(const BoundaryMesh&);
+            Boundary(const BoundaryMesh&);
 
             //- Construct from a BoundaryMesh,
             //  reference to the internal field
             //  and a patch type
-            GeometricBoundaryField
+            Boundary
             (
                 const BoundaryMesh&,
-                const DimensionedInternalField&,
+                const Internal&,
                 const word&
             );
 
@@ -134,29 +141,29 @@ public:
             //  reference to the internal field
             //  and a wordList of patch types and optional the actual patch
             //  types (to override constraint patches)
-            GeometricBoundaryField
+            Boundary
             (
                 const BoundaryMesh&,
-                const DimensionedInternalField&,
+                const Internal&,
                 const wordList& wantedPatchTypes,
                 const wordList& actualPatchTypes = wordList()
             );
 
             //- Construct from a BoundaryMesh,
             //  reference to the internal field
-            //  and a PtrList<PatchField<Type> >
-            GeometricBoundaryField
+            //  and a PtrList<PatchField<Type>>
+            Boundary
             (
                 const BoundaryMesh&,
-                const DimensionedInternalField&,
-                const PtrList<PatchField<Type> >&
+                const Internal&,
+                const PtrList<PatchField<Type>>&
             );
 
             //- Construct as copy setting the reference to the internal field
-            GeometricBoundaryField
+            Boundary
             (
-                const DimensionedInternalField&,
-                const GeometricBoundaryField&
+                const Internal&,
+                const Boundary&
             );
 
             //- Construct as copy
@@ -164,16 +171,16 @@ public:
             //  Need new type of BoundaryField, one which is part of a geometric
             //  field for which snGrad etc. may be called and a free standing
             //  BoundaryField for which such operations are unavailable.
-            GeometricBoundaryField
+            Boundary
             (
-                const GeometricBoundaryField&
+                const Boundary&
             );
 
             //- Construct from dictionary
-            GeometricBoundaryField
+            Boundary
             (
                 const BoundaryMesh&,
-                const DimensionedInternalField&,
+                const Internal&,
                 const dictionary&
             );
 
@@ -183,7 +190,7 @@ public:
             //- Read the boundary field
             void readField
             (
-                const DimensionedField<Type, GeoMesh>& field,
+                const Internal& field,
                 const dictionary& dict
             );
 
@@ -198,7 +205,7 @@ public:
 
             //- Return BoundaryField of the cell values neighbouring
             //  the boundary
-            GeometricBoundaryField boundaryInternalField() const;
+            Boundary boundaryInternalField() const;
 
             //- Return a list of pointers for each patch field with only those
             //  pointing to interfaces being set
@@ -215,7 +222,7 @@ public:
         // Member operators
 
             //- Assignment to BoundaryField<Type, PatchField, BoundaryMesh>
-            void operator=(const GeometricBoundaryField&);
+            void operator=(const Boundary&);
 
             //- Assignment to FieldField<PatchField, Type>
             void operator=(const FieldField<PatchField, Type>&);
@@ -226,7 +233,7 @@ public:
 
             //- Forced assignment to
             //  BoundaryField<Type, PatchField, BoundaryMesh>
-            void operator==(const GeometricBoundaryField&);
+            void operator==(const Boundary&);
 
             //- Forced assignment to FieldField<PatchField, Type>
             void operator==(const FieldField<PatchField, Type>&);
@@ -251,7 +258,7 @@ private:
         mutable GeometricField<Type, PatchField, GeoMesh>* fieldPrevIterPtr_;
 
         //- Boundary Type field containing boundary field values
-        GeometricBoundaryField boundaryField_;
+        Boundary boundaryField_;
 
 
     // Private Member Functions
@@ -327,10 +334,18 @@ public:
         GeometricField
         (
             const IOobject&,
+            const Internal&,
+            const PtrList<PatchField<Type>>&
+        );
+
+        //- Constructor from components
+        GeometricField
+        (
+            const IOobject&,
             const Mesh&,
             const dimensionSet&,
             const Field<Type>&,
-            const PtrList<PatchField<Type> >&
+            const PtrList<PatchField<Type>>&
         );
 
         //- Construct and read given IOobject
@@ -358,7 +373,7 @@ public:
         #ifndef NoConstructFromTmp
         GeometricField
         (
-            const tmp<GeometricField<Type, PatchField, GeoMesh> >&
+            const tmp<GeometricField<Type, PatchField, GeoMesh>>&
         );
         #endif
 
@@ -374,7 +389,7 @@ public:
         GeometricField
         (
             const IOobject&,
-            const tmp<GeometricField<Type, PatchField, GeoMesh> >&
+            const tmp<GeometricField<Type, PatchField, GeoMesh>>&
         );
         #endif
 
@@ -390,7 +405,7 @@ public:
         GeometricField
         (
             const word& newName,
-            const tmp<GeometricField<Type, PatchField, GeoMesh> >&
+            const tmp<GeometricField<Type, PatchField, GeoMesh>>&
         );
         #endif
 
@@ -411,6 +426,17 @@ public:
             const wordList& actualPatchTypes = wordList()
         );
 
+        //- Construct as copy resetting IO parameters and boundary types
+        #ifndef NoConstructFromTmp
+        GeometricField
+        (
+            const IOobject&,
+            const tmp<GeometricField<Type, PatchField, GeoMesh>>&,
+            const wordList& patchFieldTypes,
+            const wordList& actualPatchTypes = wordList()
+        );
+        #endif
+
 
     //- Destructor
     virtual ~GeometricField();
@@ -418,23 +444,34 @@ public:
 
     // Member Functions
 
-        //- Return dimensioned internal field
-        DimensionedInternalField& dimensionedInternalField();
+        //- Return a reference to the dimensioned internal field
+        //  Note: this increments the event counter and checks the
+        //  old-time fields; avoid in loops.
+        Internal& ref();
 
-        //- Return dimensioned internal field
-        inline const DimensionedInternalField& dimensionedInternalField() const;
+        //- Return a const-reference to the dimensioned internal field
+        inline const Internal& internalField() const;
 
-        //- Return internal field
-        InternalField& internalField();
+        //- Return a const-reference to the dimensioned internal field
+        //  of a "vol" field.  Useful in the formulation of source-terms
+        //  for FV equations
+        inline const Internal& v() const;
 
-        //- Return internal field
-        inline const InternalField& internalField() const;
+        //- Return a reference to the internal field
+        //  Note: this increments the event counter and checks the
+        //  old-time fields; avoid in loops.
+        typename Internal::FieldType& primitiveFieldRef();
 
-        //- Return reference to GeometricBoundaryField
-        GeometricBoundaryField& boundaryField();
+        //- Return a const-reference to the  internal field
+        inline const typename Internal::FieldType& primitiveField() const;
 
-        //- Return reference to GeometricBoundaryField for const field
-        inline const GeometricBoundaryField& boundaryField() const;
+        //- Return a reference to the boundary field
+        //  Note: this increments the event counter and checks the
+        //  old-time fields; avoid in loops.
+        Boundary& boundaryFieldRef();
+
+        //- Return const-reference to the boundary field
+        inline const Boundary& boundaryField() const;
 
         //- Return the time index of the field
         inline label timeIndex() const;
@@ -471,7 +508,7 @@ public:
         bool needReference() const;
 
         //- Return a component of the field
-        tmp<GeometricField<cmptType, PatchField, GeoMesh> > component
+        tmp<GeometricField<cmptType, PatchField, GeoMesh>> component
         (
             const direction
         ) const;
@@ -480,7 +517,7 @@ public:
         bool writeData(Ostream&) const;
 
         //- Return transpose (only if it is a tensor field)
-        tmp<GeometricField<Type, PatchField, GeoMesh> > T() const;
+        tmp<GeometricField<Type, PatchField, GeoMesh>> T() const;
 
         //- Relax field (for steady-state solution).
         //  alpha = 1 : no relaxation
@@ -547,24 +584,28 @@ public:
 
     // Member operators
 
+        //- Return a const-reference to the dimensioned internal field
+        //  Useful in the formulation of source-terms for FV equations
+        inline const Internal& operator()() const;
+
         void operator=(const GeometricField<Type, PatchField, GeoMesh>&);
-        void operator=(const tmp<GeometricField<Type, PatchField, GeoMesh> >&);
+        void operator=(const tmp<GeometricField<Type, PatchField, GeoMesh>>&);
         void operator=(const dimensioned<Type>&);
 
-        void operator==(const tmp<GeometricField<Type, PatchField, GeoMesh> >&);
+        void operator==(const tmp<GeometricField<Type, PatchField, GeoMesh>>&);
         void operator==(const dimensioned<Type>&);
 
         void operator+=(const GeometricField<Type, PatchField, GeoMesh>&);
-        void operator+=(const tmp<GeometricField<Type, PatchField, GeoMesh> >&);
+        void operator+=(const tmp<GeometricField<Type, PatchField, GeoMesh>>&);
 
         void operator-=(const GeometricField<Type, PatchField, GeoMesh>&);
-        void operator-=(const tmp<GeometricField<Type, PatchField, GeoMesh> >&);
+        void operator-=(const tmp<GeometricField<Type, PatchField, GeoMesh>>&);
 
         void operator*=(const GeometricField<scalar, PatchField, GeoMesh>&);
-        void operator*=(const tmp<GeometricField<scalar,PatchField,GeoMesh> >&);
+        void operator*=(const tmp<GeometricField<scalar,PatchField,GeoMesh>>&);
 
         void operator/=(const GeometricField<scalar, PatchField, GeoMesh>&);
-        void operator/=(const tmp<GeometricField<scalar,PatchField,GeoMesh> >&);
+        void operator/=(const tmp<GeometricField<scalar,PatchField,GeoMesh>>&);
 
         void operator+=(const dimensioned<Type>&);
         void operator-=(const dimensioned<Type>&);
@@ -584,7 +625,7 @@ public:
         friend Ostream& operator<< <Type, PatchField, GeoMesh>
         (
             Ostream&,
-            const tmp<GeometricField<Type, PatchField, GeoMesh> >&
+            const tmp<GeometricField<Type, PatchField, GeoMesh>>&
         );
 };
 
@@ -594,7 +635,7 @@ Ostream& operator<<
 (
     Ostream&,
     const typename GeometricField<Type, PatchField, GeoMesh>::
-    GeometricBoundaryField&
+    Boundary&
 );
 
 
@@ -607,7 +648,7 @@ Ostream& operator<<
 #include "GeometricFieldI.H"
 
 #ifdef NoRepository
-#   include "GeometricField.C"
+    #include "GeometricField.C"
 #endif
 
 #include "GeometricFieldFunctions.H"

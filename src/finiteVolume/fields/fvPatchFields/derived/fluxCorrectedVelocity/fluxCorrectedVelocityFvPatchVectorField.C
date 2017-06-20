@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -124,14 +124,11 @@ void Foam::fluxCorrectedVelocityFvPatchVectorField::evaluate
     }
     else
     {
-        FatalErrorIn
-        (
-            "fluxCorrectedVelocityFvPatchVectorField::evaluate()"
-        )
+        FatalErrorInFunction
             << "dimensions of phi are incorrect\n"
             << "    on patch " << this->patch().name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
             << exit(FatalError);
     }
 }

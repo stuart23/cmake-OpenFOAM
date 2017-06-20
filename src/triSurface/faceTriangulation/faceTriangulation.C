@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -55,7 +55,7 @@ Foam::tmp<Foam::vectorField> Foam::faceTriangulation::calcEdges
 )
 {
     tmp<vectorField> tedges(new vectorField(f.size()));
-    vectorField& edges = tedges();
+    vectorField& edges = tedges.ref();
 
     forAll(f, i)
     {
@@ -169,7 +169,7 @@ bool Foam::faceTriangulation::triangleContainsPoint
     }
     else if ((area01Pt < 0) && (area12Pt < 0) && (area20Pt < 0))
     {
-        FatalErrorIn("triangleContainsPoint") << abort(FatalError);
+        FatalErrorInFunction << abort(FatalError);
         return false;
     }
     else
@@ -218,7 +218,7 @@ void Foam::faceTriangulation::findDiagonal
 
     label faceVertI = f.fcIndex(startIndex);
 
-    pointHit minInter(false, vector::zero, GREAT, true);
+    pointHit minInter(false, Zero, GREAT, true);
     label minIndex = -1;
     scalar minPosOnEdge = GREAT;
 
@@ -249,7 +249,7 @@ void Foam::faceTriangulation::findDiagonal
 
     if (minIndex == -1)
     {
-        //WarningIn("faceTriangulation::findDiagonal")
+        //WarningInFunction
         //    << "Could not find intersection starting from " << f[startIndex]
         //    << " for face " << f << endl;
 
@@ -416,11 +416,8 @@ bool Foam::faceTriangulation::split
 
     if (size <= 2)
     {
-        WarningIn
-        (
-            "split(const bool, const pointField&, const face&"
-            ", const vector&, label&)"
-        )   << "Illegal face:" << f
+        WarningInFunction
+            << "Illegal face:" << f
             << " with points " << UIndirectList<point>(points, f)()
             << endl;
 
@@ -495,11 +492,8 @@ bool Foam::faceTriangulation::split
                     }
                 }
 
-                WarningIn
-                (
-                    "split(const bool, const pointField&, const face&"
-                    ", const vector&, label&)"
-                )   << "Cannot find valid diagonal on face " << f
+                WarningInFunction
+                    << "Cannot find valid diagonal on face " << f
                     << " with points " << UIndirectList<point>(points, f)()
                     << nl
                     << "Returning naive triangulation starting from "
@@ -525,11 +519,8 @@ bool Foam::faceTriangulation::split
             }
             else
             {
-                WarningIn
-                (
-                    "split(const bool, const pointField&, const face&"
-                    ", const vector&, label&)"
-                )   << "Cannot find valid diagonal on face " << f
+                WarningInFunction
+                    << "Cannot find valid diagonal on face " << f
                     << " with points " << UIndirectList<point>(points, f)()
                     << nl
                     << "Returning empty triFaceList" << endl;
@@ -560,11 +551,8 @@ bool Foam::faceTriangulation::split
 
         if (nPoints1 == size || nPoints2 == size)
         {
-            FatalErrorIn
-            (
-                "split(const bool, const pointField&, const face&"
-                ", const vector&, label&)"
-            )   << "Illegal split of face:" << f
+            FatalErrorInFunction
+                << "Illegal split of face:" << f
                 << " with points " << UIndirectList<point>(points, f)()
                 << " at indices " << index1 << " and " << index2
                 << abort(FatalError);

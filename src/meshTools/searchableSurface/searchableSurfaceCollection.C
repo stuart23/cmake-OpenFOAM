@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -78,9 +78,9 @@ void Foam::searchableSurfaceCollection::findNearest
             hitInfo
         );
 
-        forAll(hitInfo, pointI)
+        forAll(hitInfo, pointi)
         {
-            if (hitInfo[pointI].hit())
+            if (hitInfo[pointi].hit())
             {
                 // Rework back into global coordinate sys. Multiply then
                 // transform
@@ -88,24 +88,24 @@ void Foam::searchableSurfaceCollection::findNearest
                 (
                     cmptMultiply
                     (
-                        hitInfo[pointI].rawPoint(),
+                        hitInfo[pointi].rawPoint(),
                         scale_[surfI]
                     )
                 );
 
-                scalar distSqr = magSqr(globalPt - samples[pointI]);
+                scalar distSqr = magSqr(globalPt - samples[pointi]);
 
-                if (distSqr < minDistSqr[pointI])
+                if (distSqr < minDistSqr[pointi])
                 {
-                    minDistSqr[pointI] = distSqr;
-                    nearestInfo[pointI].setPoint(globalPt);
-                    nearestInfo[pointI].setHit();
-                    nearestInfo[pointI].setIndex
+                    minDistSqr[pointi] = distSqr;
+                    nearestInfo[pointi].setPoint(globalPt);
+                    nearestInfo[pointi].setHit();
+                    nearestInfo[pointi].setIndex
                     (
-                        hitInfo[pointI].index()
+                        hitInfo[pointi].index()
                       + indexOffset_[surfI]
                     );
-                    nearestSurf[pointI] = surfI;
+                    nearestSurf[pointi] = surfI;
                 }
             }
         }
@@ -118,18 +118,18 @@ void Foam::searchableSurfaceCollection::findNearest
 void Foam::searchableSurfaceCollection::sortHits
 (
     const List<pointIndexHit>& info,
-    List<List<pointIndexHit> >& surfInfo,
+    List<List<pointIndexHit>>& surfInfo,
     labelListList& infoMap
 ) const
 {
     // Count hits per surface.
     labelList nHits(subGeom_.size(), 0);
 
-    forAll(info, pointI)
+    forAll(info, pointi)
     {
-        if (info[pointI].hit())
+        if (info[pointi].hit())
         {
-            label index = info[pointI].index();
+            label index = info[pointi].index();
             label surfI = findLower(indexOffset_, index+1);
             nHits[surfI]++;
         }
@@ -147,11 +147,11 @@ void Foam::searchableSurfaceCollection::sortHits
     }
     nHits = 0;
 
-    forAll(info, pointI)
+    forAll(info, pointi)
     {
-        if (info[pointI].hit())
+        if (info[pointi].hit())
         {
-            label index = info[pointI].index();
+            label index = info[pointi].index();
             label surfI = findLower(indexOffset_, index+1);
 
             // Store for correct surface and adapt indices back to local
@@ -159,11 +159,11 @@ void Foam::searchableSurfaceCollection::sortHits
             label localI = nHits[surfI]++;
             surfInfo[surfI][localI] = pointIndexHit
             (
-                info[pointI].hit(),
-                info[pointI].rawPoint(),
+                info[pointi].hit(),
+                info[pointi].rawPoint(),
                 index-indexOffset_[surfI]
             );
-            infoMap[surfI][localI] = pointI;
+            infoMap[surfI][localI] = pointi;
         }
     }
 }
@@ -218,11 +218,8 @@ Foam::searchableSurfaceCollection::searchableSurfaceCollection
             // if all indices offset by globalSize() of the local region...
             if (s.size() != s.globalSize())
             {
-                FatalErrorIn
-                (
-                    "searchableSurfaceCollection::searchableSurfaceCollection"
-                    "(const IOobject&, const dictionary&)"
-                )   << "Cannot use a distributed surface in a collection."
+                FatalErrorInFunction
+                    << "Cannot use a distributed surface in a collection."
                     << exit(FatalError);
             }
 
@@ -328,7 +325,7 @@ Foam::tmp<Foam::pointField>
 Foam::searchableSurfaceCollection::coordinates() const
 {
     tmp<pointField> tCtrs = tmp<pointField>(new pointField(size()));
-    pointField& ctrs = tCtrs();
+    pointField& ctrs = tCtrs.ref();
 
     // Append individual coordinates
     label coordI = 0;
@@ -403,7 +400,7 @@ Foam::searchableSurfaceCollection::points() const
     }
 
     tmp<pointField> tPts(new pointField(nPoints));
-    pointField& pts = tPts();
+    pointField& pts = tPts.ref();
 
     // Append individual coordinates
     nPoints = 0;
@@ -489,24 +486,24 @@ void Foam::searchableSurfaceCollection::findLine
 
         subGeom_[surfI].findLine(e0, e1, hitInfo);
 
-        forAll(hitInfo, pointI)
+        forAll(hitInfo, pointi)
         {
-            if (hitInfo[pointI].hit())
+            if (hitInfo[pointi].hit())
             {
                 // Transform back to global coordinate sys.
-                nearest[pointI] = transform_[surfI].globalPosition
+                nearest[pointi] = transform_[surfI].globalPosition
                 (
                     cmptMultiply
                     (
-                        hitInfo[pointI].rawPoint(),
+                        hitInfo[pointi].rawPoint(),
                         scale_[surfI]
                     )
                 );
-                info[pointI] = hitInfo[pointI];
-                info[pointI].rawPoint() = nearest[pointI];
-                info[pointI].setIndex
+                info[pointi] = hitInfo[pointi];
+                info[pointi].rawPoint() = nearest[pointi];
+                info[pointi].setIndex
                 (
-                    hitInfo[pointI].index()
+                    hitInfo[pointi].index()
                   + indexOffset_[surfI]
                 );
             }
@@ -517,29 +514,27 @@ void Foam::searchableSurfaceCollection::findLine
     // Debug check
     if (false)
     {
-        forAll(info, pointI)
+        forAll(info, pointi)
         {
-            if (info[pointI].hit())
+            if (info[pointi].hit())
             {
-                vector n(end[pointI] - start[pointI]);
+                vector n(end[pointi] - start[pointi]);
                 scalar magN = mag(n);
 
                 if (magN > SMALL)
                 {
                     n /= mag(n);
 
-                    scalar s = ((info[pointI].rawPoint()-start[pointI])&n);
+                    scalar s = ((info[pointi].rawPoint()-start[pointi])&n);
 
                     if (s < 0 || s > 1)
                     {
-                        FatalErrorIn
-                        (
-                            "searchableSurfaceCollection::findLine(..)"
-                        )   << "point:" << info[pointI]
+                        FatalErrorInFunction
+                            << "point:" << info[pointi]
                             << " s:" << s
                             << " outside vector "
-                            << " start:" << start[pointI]
-                            << " end:" << end[pointI]
+                            << " start:" << start[pointi]
+                            << " end:" << end[pointi]
                             << abort(FatalError);
                     }
                 }
@@ -565,7 +560,7 @@ void Foam::searchableSurfaceCollection::findLineAll
 (
     const pointField& start,
     const pointField& end,
-    List<List<pointIndexHit> >& info
+    List<List<pointIndexHit>>& info
 ) const
 {
     // To be done. Assume for now only one intersection.
@@ -573,16 +568,16 @@ void Foam::searchableSurfaceCollection::findLineAll
     findLine(start, end, nearestInfo);
 
     info.setSize(start.size());
-    forAll(info, pointI)
+    forAll(info, pointi)
     {
-        if (nearestInfo[pointI].hit())
+        if (nearestInfo[pointi].hit())
         {
-            info[pointI].setSize(1);
-            info[pointI][0] = nearestInfo[pointI];
+            info[pointi].setSize(1);
+            info[pointi][0] = nearestInfo[pointi];
         }
         else
         {
-            info[pointI].clear();
+            info[pointi].clear();
         }
     }
 }
@@ -613,9 +608,9 @@ void Foam::searchableSurfaceCollection::getRegion
         // Multiple surfaces. Sort by surface.
 
         // Per surface the hit
-        List<List<pointIndexHit> > surfInfo;
+        List<List<pointIndexHit>> surfInfo;
         // Per surface the original position
-        List<List<label> > infoMap;
+        List<List<label>> infoMap;
         sortHits(info, surfInfo, infoMap);
 
         region.setSize(info.size());
@@ -670,9 +665,9 @@ void Foam::searchableSurfaceCollection::getNormal
         // Multiple surfaces. Sort by surface.
 
         // Per surface the hit
-        List<List<pointIndexHit> > surfInfo;
+        List<List<pointIndexHit>> surfInfo;
         // Per surface the original position
-        List<List<label> > infoMap;
+        List<List<label>> infoMap;
         sortHits(info, surfInfo, infoMap);
 
         normal.setSize(info.size());
@@ -702,11 +697,8 @@ void Foam::searchableSurfaceCollection::getVolumeType
     List<volumeType>& volType
 ) const
 {
-    FatalErrorIn
-    (
-        "searchableSurfaceCollection::getVolumeType(const pointField&"
-        ", List<volumeType>&) const"
-    )   << "Volume type not supported for collection."
+    FatalErrorInFunction
+        << "Volume type not supported for collection."
         << exit(FatalError);
 }
 
@@ -721,7 +713,7 @@ void Foam::searchableSurfaceCollection::distribute
 {
     forAll(subGeom_, surfI)
     {
-        // Note:Tranform the bounding boxes? Something like
+        // Note:Transform the bounding boxes? Something like
         // pointField bbPoints =
         // cmptDivide
         // (
@@ -782,9 +774,9 @@ void Foam::searchableSurfaceCollection::getField
         // Multiple surfaces. Sort by surface.
 
         // Per surface the hit
-        List<List<pointIndexHit> > surfInfo;
+        List<List<pointIndexHit>> surfInfo;
         // Per surface the original position
-        List<List<label> > infoMap;
+        List<List<label>> infoMap;
         sortHits(info, surfInfo, infoMap);
 
         // Do surface tests

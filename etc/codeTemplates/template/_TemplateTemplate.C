@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -66,10 +66,10 @@ Foam::CLASSNAME<TemplateArgument>::CLASSNAME
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 
 template<TemplateClassArgument>
-Foam::autoPtr<Foam::CLASSNAME<TemplateArgument> >
+Foam::autoPtr<Foam::CLASSNAME<TemplateArgument>>
 Foam::CLASSNAME<TemplateArgument>::New()
 {
-    return autoPtr<CLASSNAME<TemplateArgument> >
+    return autoPtr<CLASSNAME<TemplateArgument>>
     (
         new CLASSNAME<TemplateArgument>
     );
@@ -103,11 +103,8 @@ void Foam::CLASSNAME<TemplateArgument>::operator=
     // Check for assignment to self
     if (this == &rhs)
     {
-        FatalErrorIn
-        (
-            "Foam::CLASSNAME<TemplateArgument>::operator="
-            "(const Foam::CLASSNAME<TemplateArgument>&)"
-        )   << "Attempted assignment to self"
+        FatalErrorInFunction
+            << "Attempted assignment to self"
             << abort(FatalError);
     }
 }

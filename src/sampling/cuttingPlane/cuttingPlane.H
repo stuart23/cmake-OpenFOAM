@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -97,7 +97,7 @@ class cuttingPlane
         (
             const primitiveMesh&,
             const labelUList& edgePoint,
-            const label cellI,
+            const label celli,
             const label startEdgeI,
             DynamicList<label>& faceVerts
         );
@@ -169,10 +169,10 @@ public:
 
         //- Sample the cell field
         template<class Type>
-        tmp<Field<Type> > sample(const Field<Type>&) const;
+        tmp<Field<Type>> sample(const Field<Type>&) const;
 
         template<class Type>
-        tmp<Field<Type> > sample(const tmp<Field<Type> >&) const;
+        tmp<Field<Type>> sample(const tmp<Field<Type>>&) const;
 
 
     // Member Operators
@@ -188,7 +188,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "cuttingPlaneTemplates.C"
+    #include "cuttingPlaneTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

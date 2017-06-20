@@ -9,13 +9,20 @@ multiLevelDecomp/multiLevelDecomp.C
 structuredDecomp/structuredDecomp.C
 noDecomp/noDecomp.C
 
+decompositionConstraints/decompositionConstraint/decompositionConstraint.C
+decompositionConstraints/preserveBaffles/preserveBafflesConstraint.C
+decompositionConstraints/preserveFaceZones/preserveFaceZonesConstraint.C
+decompositionConstraints/preservePatches/preservePatchesConstraint.C
+decompositionConstraints/singleProcessorFaceSets/singleProcessorFaceSetsConstraint.C
+decompositionConstraints/refinementHistory/refinementHistoryConstraint.C
+
 )
 
 ## Define the output
 add_library( decompositionMethods SHARED ${SOURCES} )
 install( TARGETS decompositionMethods DESTINATION lib )
 
-target_link_libraries( decompositionMethods meshTools finiteVolume )
+target_link_libraries( decompositionMethods meshTools dynamicMesh finiteVolume )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

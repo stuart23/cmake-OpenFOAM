@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -71,12 +71,12 @@ void Foam::cyclicAMIFvPatch::makeWeights(scalarField& w) const
 
         const scalarField& nbrDeltas = tnbrDeltas();
 
-        forAll(deltas, faceI)
+        forAll(deltas, facei)
         {
-            scalar di = deltas[faceI];
-            scalar dni = nbrDeltas[faceI];
+            scalar di = deltas[facei];
+            scalar dni = nbrDeltas[facei];
 
-            w[faceI] = dni/(di + dni);
+            w[facei] = dni/(di + dni);
         }
     }
     else
@@ -102,7 +102,7 @@ Foam::tmp<Foam::vectorField> Foam::cyclicAMIFvPatch::delta() const
                 interpolate
                 (
                     nbrPatch.coupledFvPatch::delta(),
-                    vectorField(this->size(), vector::zero)
+                    vectorField(this->size(), Zero)
                 );
         }
         else
@@ -113,27 +113,27 @@ Foam::tmp<Foam::vectorField> Foam::cyclicAMIFvPatch::delta() const
         const vectorField& nbrPatchD = tnbrPatchD();
 
         tmp<vectorField> tpdv(new vectorField(patchD.size()));
-        vectorField& pdv = tpdv();
+        vectorField& pdv = tpdv.ref();
 
         // do the transformation if necessary
         if (parallel())
         {
-            forAll(patchD, faceI)
+            forAll(patchD, facei)
             {
-                const vector& ddi = patchD[faceI];
-                const vector& dni = nbrPatchD[faceI];
+                const vector& ddi = patchD[facei];
+                const vector& dni = nbrPatchD[facei];
 
-                pdv[faceI] = ddi - dni;
+                pdv[facei] = ddi - dni;
             }
         }
         else
         {
-            forAll(patchD, faceI)
+            forAll(patchD, facei)
             {
-                const vector& ddi = patchD[faceI];
-                const vector& dni = nbrPatchD[faceI];
+                const vector& ddi = patchD[facei];
+                const vector& dni = nbrPatchD[facei];
 
-                pdv[faceI] = ddi - transform(forwardT()[0], dni);
+                pdv[facei] = ddi - transform(forwardT()[0], dni);
             }
         }
 

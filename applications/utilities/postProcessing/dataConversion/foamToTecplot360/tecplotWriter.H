@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -120,17 +120,17 @@ public:
 
         //- Get either fvPatchField or patchInternalField
         template<class Type>
-        tmp<Field<Type> > getPatchField
+        tmp<Field<Type>> getPatchField
         (
             const bool nearCellValue,
             const GeometricField<Type, fvPatchField, volMesh>& vfld,
-            const label patchI
+            const label patchi
         ) const;
 
         //- Get mixed field: fvsPatchField for boundary faces and
         //  internalField for internal faces.
         template<class Type>
-        tmp<Field<Type> > getFaceField
+        tmp<Field<Type>> getFaceField
         (
             const GeometricField<Type, fvsPatchField, surfaceMesh>&,
             const labelList& faceLabels

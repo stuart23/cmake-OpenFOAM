@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -106,14 +106,8 @@ void Foam::setAndNormalToFaceZone::applyToSet
 {
     if (!isA<faceZoneSet>(set))
     {
-        WarningIn
-        (
-            "setAndNormalToFaceZone::applyToSet"
-            "("
-                "const topoSetSource::setAction, "
-                "topoSet&"
-            ")"
-        )   << "Operation only allowed on a faceZoneSet." << endl;
+        WarningInFunction
+            << "Operation only allowed on a faceZoneSet." << endl;
     }
     else
     {
@@ -136,13 +130,13 @@ void Foam::setAndNormalToFaceZone::applyToSet
 
             forAllConstIter(faceSet, fSet, iter)
             {
-                label faceI = iter.key();
+                label facei = iter.key();
 
-                if (!fzSet.found(faceI))
+                if (!fzSet.found(facei))
                 {
-                    newAddressing.append(faceI);
+                    newAddressing.append(facei);
 
-                    vector n = faces[faceI].normal(points);
+                    vector n = faces[facei].normal(points);
                     if ((n & normal_) > 0)
                     {
                         newFlipMap.append(false);

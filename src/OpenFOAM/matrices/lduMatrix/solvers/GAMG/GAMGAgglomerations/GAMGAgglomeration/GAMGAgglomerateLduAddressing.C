@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -47,17 +47,14 @@ void Foam::GAMGAgglomeration::agglomerateLduAddressing
 
     if (min(restrictMap) == -1)
     {
-        FatalErrorIn("GAMGAgglomeration::agglomerateLduAddressing")
+        FatalErrorInFunction
             << "min(restrictMap) == -1" << exit(FatalError);
     }
 
     if (restrictMap.size() != fineMeshAddr.size())
     {
-        FatalErrorIn
-        (
-            "GAMGAgglomeration::agglomerateLduAddressing"
-            "(const label fineLevelIndex)"
-        )   << "restrict map does not correspond to fine level. " << endl
+        FatalErrorInFunction
+            << "restrict map does not correspond to fine level. " << endl
             << " Sizes: restrictMap: " << restrictMap.size()
             << " nEqns: " << fineMeshAddr.size()
             << abort(FatalError);
@@ -232,7 +229,7 @@ void Foam::GAMGAgglomeration::agglomerateLduAddressing
             }
             else
             {
-                FatalErrorIn("GAMGAgglomeration::agglomerateLduAddressing(..)")
+                FatalErrorInFunction
                     << "problem."
                     << " fineFacei:" << fineFacei
                     << " rmUpperAddr:" << rmUpperAddr
@@ -509,17 +506,17 @@ void Foam::GAMGAgglomeration::procAgglomerateRestrictAddressing
         nCells_[levelIndex] = coarseCellOffsets.last();
 
         // Renumber consecutively
-        for (label procI = 1; procI < procIDs.size(); procI++)
+        for (label proci = 1; proci < procIDs.size(); proci++)
         {
             SubList<label> procSlot
             (
                 procRestrictAddressing,
-                offsets[procI+1]-offsets[procI],
-                offsets[procI]
+                offsets[proci+1]-offsets[proci],
+                offsets[proci]
             );
             forAll(procSlot, i)
             {
-                procSlot[i] += coarseCellOffsets[procI];
+                procSlot[i] += coarseCellOffsets[proci];
             }
         }
 
@@ -551,15 +548,15 @@ void Foam::GAMGAgglomeration::combineLevels(const label curLevel)
     {
         if (prevFaceResAddr[i] >= 0)
         {
-            label fineFaceI = prevFaceResAddr[i];
-            prevFaceResAddr[i] = curFaceResAddr[fineFaceI];
-            prevFaceFlipMap[i] = curFaceFlipMap[fineFaceI];
+            label fineFacei = prevFaceResAddr[i];
+            prevFaceResAddr[i] = curFaceResAddr[fineFacei];
+            prevFaceFlipMap[i] = curFaceFlipMap[fineFacei];
         }
         else
         {
-            label fineFaceI = -prevFaceResAddr[i] - 1;
-            prevFaceResAddr[i] = -curResAddr[fineFaceI] - 1;
-            prevFaceFlipMap[i] = curFaceFlipMap[fineFaceI];
+            label fineFacei = -prevFaceResAddr[i] - 1;
+            prevFaceResAddr[i] = -curResAddr[fineFacei] - 1;
+            prevFaceFlipMap[i] = curFaceFlipMap[fineFacei];
         }
     }
 
@@ -583,8 +580,8 @@ void Foam::GAMGAgglomeration::combineLevels(const label curLevel)
         labelList& prevResAddr = prevPatchFaceResAddr[inti];
         forAll(prevResAddr, i)
         {
-            label fineFaceI = prevResAddr[i];
-            prevResAddr[i] = curResAddr[fineFaceI];
+            label fineFacei = prevResAddr[i];
+            prevResAddr[i] = curResAddr[fineFacei];
         }
     }
 
@@ -643,7 +640,7 @@ void Foam::GAMGAgglomeration::combineLevels(const label curLevel)
 //    {
 //        vals[0] = myVal;
 //
-//        for (label i = 1; i < procIDs.size(); i++)
+//        for (label i=1; i<procIDs.size(); i++)
 //        {
 //            label& slaveVal = vals[i];
 //            IPstream::read
@@ -683,18 +680,18 @@ void Foam::GAMGAgglomeration::calculateRegionMaster
     // Determine the master processors
     Map<label> agglomToMaster(procAgglomMap.size());
 
-    forAll(procAgglomMap, procI)
+    forAll(procAgglomMap, proci)
     {
-        label coarseI = procAgglomMap[procI];
+        label coarseI = procAgglomMap[proci];
 
         Map<label>::iterator fnd = agglomToMaster.find(coarseI);
         if (fnd == agglomToMaster.end())
         {
-            agglomToMaster.insert(coarseI, procI);
+            agglomToMaster.insert(coarseI, proci);
         }
         else
         {
-            fnd() = min(fnd(), procI);
+            fnd() = min(fnd(), proci);
         }
     }
 

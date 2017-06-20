@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -44,8 +44,8 @@ angularOscillatingDisplacementPointPatchVectorField
 )
 :
     fixedValuePointPatchField<vector>(p, iF),
-    axis_(vector::zero),
-    origin_(vector::zero),
+    axis_(Zero),
+    origin_(Zero),
     angle0_(0.0),
     amplitude_(0.0),
     omega_(0.0),
@@ -155,7 +155,7 @@ void angularOscillatingDisplacementPointPatchVectorField::updateCoeffs()
         return;
     }
 
-    const polyMesh& mesh = this->dimensionedInternalField().mesh()();
+    const polyMesh& mesh = this->internalField().mesh()();
     const Time& t = mesh.time();
 
     scalar angle = angle0_ + amplitude_*sin(omega_*t.value());

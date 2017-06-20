@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -52,14 +52,8 @@ Foam::wedgePointPatchField<Type>::wedgePointPatchField
 {
     if (!isType<wedgePointPatch>(p))
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "wedgePointPatchField<Type>::wedgePointPatchField\n"
-            "(\n"
-            "    const pointPatch& p,\n"
-            "    const Field<Type>& field,\n"
-            "    const dictionary& dict\n"
-            ")\n",
             dict
         )   << "patch " << this->patch().index() << " not wedge type. "
             << "Patch type = " << p.type()
@@ -81,16 +75,8 @@ Foam::wedgePointPatchField<Type>::wedgePointPatchField
 {
     if (!isType<wedgePointPatch>(this->patch()))
     {
-        FatalErrorIn
-        (
-            "wedgePointPatchField<Type>::wedgePointPatchField\n"
-            "(\n"
-            "    const wedgePointPatchField<Type>& ptf,\n"
-            "    const pointPatch& p,\n"
-            "    const DimensionedField<Type, pointMesh>& iF,\n"
-            "    const pointPatchFieldMapper& mapper\n"
-            ")\n"
-        )   << "Field type does not correspond to patch type for patch "
+        FatalErrorInFunction
+            << "Field type does not correspond to patch type for patch "
             << this->patch().index() << "." << endl
             << "Field type: " << typeName << endl
             << "Patch type: " << this->patch().type()
@@ -119,11 +105,11 @@ void Foam::wedgePointPatchField<Type>::evaluate(const Pstream::commsTypes)
     // normal vector from the first point
     const vector& nHat = this->patch().pointNormals()[0];
 
-    tmp<Field<Type> > tvalues =
+    tmp<Field<Type>> tvalues =
         transform(I - nHat*nHat, this->patchInternalField());
 
     // Get internal field to insert values into
-    Field<Type>& iF = const_cast<Field<Type>&>(this->internalField());
+    Field<Type>& iF = const_cast<Field<Type>&>(this->primitiveField());
 
     this->setInInternalField(iF, tvalues());
 }

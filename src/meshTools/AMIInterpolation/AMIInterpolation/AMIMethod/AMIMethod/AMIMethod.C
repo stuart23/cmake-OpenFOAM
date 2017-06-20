@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -54,7 +54,7 @@ void Foam::AMIMethod<SourcePatch, TargetPatch>::checkPatches() const
 
         if (!bbTgtInf.contains(bbSrc))
         {
-            WarningIn("AMIMethod<SourcePatch, TargetPatch>::checkPatches()")
+            WarningInFunction
                 << "Source and target patch bounding boxes are not similar"
                 << nl
                 << "    source box span     : " << bbSrc.span() << nl
@@ -74,8 +74,8 @@ bool Foam::AMIMethod<SourcePatch, TargetPatch>::initialise
     scalarListList& srcWeights,
     labelListList& tgtAddress,
     scalarListList& tgtWeights,
-    label& srcFaceI,
-    label& tgtFaceI
+    label& srcFacei,
+    label& tgtFacei
 )
 {
     checkPatches();
@@ -94,18 +94,7 @@ bool Foam::AMIMethod<SourcePatch, TargetPatch>::initialise
     }
     else if (!tgtPatch_.size())
     {
-        WarningIn
-        (
-            "void Foam::AMIMethod<SourcePatch, TargetPatch>::initialise"
-            "("
-                "labelListList&, "
-                "scalarListList&, "
-                "labelListList&, "
-                "scalarListList&, "
-                "label&, "
-                "label&"
-            ")"
-        )
+        WarningInFunction
             << srcPatch_.size() << " source faces but no target faces" << endl;
 
         return false;
@@ -115,17 +104,17 @@ bool Foam::AMIMethod<SourcePatch, TargetPatch>::initialise
     resetTree();
 
     // find initial face match using brute force/octree search
-    if ((srcFaceI == -1) || (tgtFaceI == -1))
+    if ((srcFacei == -1) || (tgtFacei == -1))
     {
-        srcFaceI = 0;
-        tgtFaceI = 0;
+        srcFacei = 0;
+        tgtFacei = 0;
         bool foundFace = false;
-        forAll(srcPatch_, faceI)
+        forAll(srcPatch_, facei)
         {
-            tgtFaceI = findTargetFace(faceI);
-            if (tgtFaceI >= 0)
+            tgtFacei = findTargetFace(facei);
+            if (tgtFacei >= 0)
             {
-                srcFaceI = faceI;
+                srcFacei = facei;
                 foundFace = true;
                 break;
             }
@@ -135,18 +124,8 @@ bool Foam::AMIMethod<SourcePatch, TargetPatch>::initialise
         {
             if (requireMatch_)
             {
-                FatalErrorIn
-                (
-                    "void Foam::AMIMethod<SourcePatch, TargetPatch>::initialise"
-                    "("
-                        "labelListList&, "
-                        "scalarListList&, "
-                        "labelListList&, "
-                        "scalarListList&, "
-                        "label&, "
-                        "label&"
-                    ")"
-                )   << "Unable to find initial target face"
+                FatalErrorInFunction
+                    << "Unable to find initial target face"
                     << abort(FatalError);
             }
 
@@ -156,7 +135,7 @@ bool Foam::AMIMethod<SourcePatch, TargetPatch>::initialise
 
     if (debug)
     {
-        Pout<< "AMI: initial target face = " << tgtFaceI << endl;
+        Pout<< "AMI: initial target face = " << tgtFacei << endl;
     }
 
     return true;
@@ -221,7 +200,7 @@ void Foam::AMIMethod<SourcePatch, TargetPatch>::resetTree()
     // Clear the old octree
     treePtr_.clear();
 
-    treeBoundBox bb(tgtPatch_.points());
+    treeBoundBox bb(tgtPatch_.points(), tgtPatch_.meshPoints());
     bb.inflate(0.01);
 
     if (!treePtr_.valid())
@@ -249,21 +228,21 @@ void Foam::AMIMethod<SourcePatch, TargetPatch>::resetTree()
 template<class SourcePatch, class TargetPatch>
 Foam::label Foam::AMIMethod<SourcePatch, TargetPatch>::findTargetFace
 (
-    const label srcFaceI
+    const label srcFacei
 ) const
 {
-    label targetFaceI = -1;
+    label targetFacei = -1;
 
     const pointField& srcPts = srcPatch_.points();
-    const face& srcFace = srcPatch_[srcFaceI];
+    const face& srcFace = srcPatch_[srcFacei];
     const point srcPt = srcFace.centre(srcPts);
-    const scalar srcFaceArea = srcMagSf_[srcFaceI];
+    const scalar srcFaceArea = srcMagSf_[srcFacei];
 
     pointIndexHit sample = treePtr_->findNearest(srcPt, 10.0*srcFaceArea);
 
     if (sample.hit())
     {
-        targetFaceI = sample.index();
+        targetFacei = sample.index();
 
         if (debug)
         {
@@ -273,29 +252,29 @@ Foam::label Foam::AMIMethod<SourcePatch, TargetPatch>::findTargetFace
         }
     }
 
-    return targetFaceI;
+    return targetFacei;
 }
 
 
 template<class SourcePatch, class TargetPatch>
 void Foam::AMIMethod<SourcePatch, TargetPatch>::appendNbrFaces
 (
-    const label faceI,
+    const label facei,
     const TargetPatch& patch,
     const DynamicList<label>& visitedFaces,
     DynamicList<label>& faceIDs
 ) const
 {
-    const labelList& nbrFaces = patch.faceFaces()[faceI];
+    const labelList& nbrFaces = patch.faceFaces()[facei];
 
     // filter out faces already visited from face neighbours
     forAll(nbrFaces, i)
     {
-        label nbrFaceI = nbrFaces[i];
+        label nbrFacei = nbrFaces[i];
         bool valid = true;
         forAll(visitedFaces, j)
         {
-            if (nbrFaceI == visitedFaces[j])
+            if (nbrFacei == visitedFaces[j])
             {
                 valid = false;
                 break;
@@ -306,7 +285,7 @@ void Foam::AMIMethod<SourcePatch, TargetPatch>::appendNbrFaces
         {
             forAll(faceIDs, j)
             {
-                if (nbrFaceI == faceIDs[j])
+                if (nbrFacei == faceIDs[j])
                 {
                     valid = false;
                     break;
@@ -317,14 +296,14 @@ void Foam::AMIMethod<SourcePatch, TargetPatch>::appendNbrFaces
         // prevent addition of face if it is not on the same plane-ish
         if (valid)
         {
-            const vector& n1 = patch.faceNormals()[faceI];
-            const vector& n2 = patch.faceNormals()[nbrFaceI];
+            const vector& n1 = patch.faceNormals()[facei];
+            const vector& n2 = patch.faceNormals()[nbrFacei];
 
             scalar cosI = n1 & n2;
 
             if (cosI > Foam::cos(degToRad(89.0)))
             {
-                faceIDs.append(nbrFaceI);
+                faceIDs.append(nbrFacei);
             }
         }
     }

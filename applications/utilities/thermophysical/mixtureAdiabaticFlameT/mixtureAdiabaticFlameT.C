@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -34,6 +34,7 @@ Description
 #include "dictionary.H"
 #include "IFstream.H"
 #include "OSspecific.H"
+#include "etcFiles.H"
 
 #include "specie.H"
 #include "perfectGas.H"
@@ -44,7 +45,7 @@ Description
 
 using namespace Foam;
 
-typedef species::thermo<janafThermo<perfectGas<specie> >, absoluteEnthalpy>
+typedef species::thermo<janafThermo<perfectGas<specie>>, absoluteEnthalpy>
     thermo;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -62,7 +63,7 @@ int main(int argc, char *argv[])
     // Check controlFile stream is OK
     if (!controlFile.good())
     {
-        FatalErrorIn(args.executable())
+        FatalErrorInFunction
             << "Cannot read file " << controlFileName
             << abort(FatalError);
     }
@@ -86,7 +87,7 @@ int main(int argc, char *argv[])
     // Check thermoData stream is OK
     if (!thermoDataFile.good())
     {
-        FatalErrorIn(args.executable())
+        FatalErrorInFunction
             << "Cannot read file " << thermoDataFileName
             << abort(FatalError);
     }

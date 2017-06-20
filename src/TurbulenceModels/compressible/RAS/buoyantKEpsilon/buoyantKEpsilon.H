@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2014-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2014-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -53,7 +53,7 @@ Description
         }
     \endverbatim
 
-SeeAlso
+See also
     Foam::RASModels::kEpsilon
 
 SourceFiles
@@ -86,7 +86,7 @@ class buoyantKEpsilon
 
         // Disallow default bitwise copy construct and assignment
         buoyantKEpsilon(const buoyantKEpsilon&);
-        buoyantKEpsilon& operator=(const buoyantKEpsilon&);
+        void operator=(const buoyantKEpsilon&);
 
 
 protected:
@@ -152,7 +152,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "buoyantKEpsilon.C"
+    #include "buoyantKEpsilon.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

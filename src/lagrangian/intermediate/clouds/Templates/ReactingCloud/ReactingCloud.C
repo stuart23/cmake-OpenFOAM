@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -35,7 +35,7 @@ void Foam::ReactingCloud<CloudType>::setModels()
 {
     compositionModel_.reset
     (
-        CompositionModel<ReactingCloud<CloudType> >::New
+        CompositionModel<ReactingCloud<CloudType>>::New
         (
             this->subModelProperties(),
             *this
@@ -44,7 +44,7 @@ void Foam::ReactingCloud<CloudType>::setModels()
 
     phaseChangeModel_.reset
     (
-        PhaseChangeModel<ReactingCloud<CloudType> >::New
+        PhaseChangeModel<ReactingCloud<CloudType>>::New
         (
             this->subModelProperties(),
             *this
@@ -63,15 +63,8 @@ void Foam::ReactingCloud<CloudType>::checkSuppliedComposition
 {
     if (YSupplied.size() != Y.size())
     {
-        FatalErrorIn
-        (
-            "ReactingCloud<CloudType>::checkSuppliedComposition"
-            "("
-                "const scalarField&, "
-                "const scalarField&, "
-                "const word&"
-            ")"
-        )   << YName << " supplied, but size is not compatible with "
+        FatalErrorInFunction
+            << YName << " supplied, but size is not compatible with "
             << "parcel composition: " << nl << "    "
             << YName << "(" << YSupplied.size() << ") vs required composition "
             << YName << "(" << Y.size() << ")" << nl
@@ -299,10 +292,10 @@ void Foam::ReactingCloud<CloudType>::relaxSources
 
     typedef DimensionedField<scalar, volMesh> dsfType;
 
-    forAll(rhoTrans_, fieldI)
+    forAll(rhoTrans_, fieldi)
     {
-        dsfType& rhoT = rhoTrans_[fieldI];
-        const dsfType& rhoT0 = cloudOldTime.rhoTrans()[fieldI];
+        dsfType& rhoT = rhoTrans_[fieldi];
+        const dsfType& rhoT0 = cloudOldTime.rhoTrans()[fieldi];
         this->relax(rhoT, rhoT0, "rho");
     }
 }
@@ -315,9 +308,9 @@ void Foam::ReactingCloud<CloudType>::scaleSources()
 
     typedef DimensionedField<scalar, volMesh> dsfType;
 
-    forAll(rhoTrans_, fieldI)
+    forAll(rhoTrans_, fieldi)
     {
-        dsfType& rhoT = rhoTrans_[fieldI];
+        dsfType& rhoT = rhoTrans_[fieldi];
         this->scale(rhoT, "rho");
     }
 }
@@ -329,7 +322,7 @@ void Foam::ReactingCloud<CloudType>::evolve()
     if (this->solution().canEvolve())
     {
         typename parcelType::template
-            TrackingData<ReactingCloud<CloudType> > td(*this);
+            TrackingData<ReactingCloud<CloudType>> td(*this);
 
         this->solve(td);
     }
@@ -339,7 +332,7 @@ void Foam::ReactingCloud<CloudType>::evolve()
 template<class CloudType>
 void Foam::ReactingCloud<CloudType>::autoMap(const mapPolyMesh& mapper)
 {
-    typedef typename particle::TrackingData<ReactingCloud<CloudType> > tdType;
+    typedef typename particle::TrackingData<ReactingCloud<CloudType>> tdType;
 
     tdType td(*this);
 

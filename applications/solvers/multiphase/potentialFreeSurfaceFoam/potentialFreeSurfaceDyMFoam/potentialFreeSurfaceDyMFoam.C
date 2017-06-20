@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2014-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2014-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,7 +26,8 @@ Application
 
 Description
     Incompressible Navier-Stokes solver with inclusion of a wave height field
-    to enable single-phase free-surface approximations.
+    to enable single-phase free-surface approximations, with optional mesh
+    motion and mesh topology changes.
 
     Wave height field, zeta, used by pressure boundary conditions.
 
@@ -42,24 +43,23 @@ Description
 #include "singlePhaseTransportModel.H"
 #include "turbulentTransportModel.H"
 #include "pimpleControl.H"
-#include "fvIOoptionList.H"
+#include "fvOptions.H"
 #include "CorrectPhi.H"
-#include "fixedFluxPressureFvPatchScalarField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
+    #include "postProcess.H"
+
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createDynamicFvMesh.H"
     #include "initContinuityErrs.H"
-
-    pimpleControl pimple(mesh);
-
-    #include "createControls.H"
+    #include "createControl.H"
+    #include "createTimeControls.H"
+    #include "createDyMControls.H"
     #include "createFields.H"
-    #include "createMRF.H"
     #include "createFvOptions.H"
 
     volScalarField rAU
@@ -78,6 +78,8 @@ int main(int argc, char *argv[])
 
     #include "correctPhi.H"
     #include "createUf.H"
+
+    turbulence->validate();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

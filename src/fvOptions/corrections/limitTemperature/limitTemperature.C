@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -84,18 +84,18 @@ void Foam::fv::limitTemperature::correct(volScalarField& he)
     scalarField heMin(thermo.he(thermo.p(), Tmin, cells_));
     scalarField heMax(thermo.he(thermo.p(), Tmax, cells_));
 
-    scalarField& hec = he.internalField();
+    scalarField& hec = he.primitiveFieldRef();
 
     forAll(cells_, i)
     {
-        label cellI = cells_[i];
-        hec[cellI]= max(min(hec[cellI], heMax[i]), heMin[i]);
+        label celli = cells_[i];
+        hec[celli]= max(min(hec[celli], heMax[i]), heMin[i]);
     }
 
     // handle boundaries in the case of 'all'
     if (selectionMode_ == smAll)
     {
-        volScalarField::GeometricBoundaryField& bf = he.boundaryField();
+        volScalarField::Boundary& bf = he.boundaryFieldRef();
 
         forAll(bf, patchi)
         {

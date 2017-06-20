@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -301,10 +301,10 @@ public:
             const DimensionedField<scalar, volMesh>& V00() const;
 
             //- Return sub-cycle cell volumes
-            tmp<DimensionedField<scalar, volMesh> > Vsc() const;
+            tmp<DimensionedField<scalar, volMesh>> Vsc() const;
 
             //- Return sub-cycl old-time cell volumes
-            tmp<DimensionedField<scalar, volMesh> > Vsc0() const;
+            tmp<DimensionedField<scalar, volMesh>> Vsc0() const;
 
             //- Return cell face area vectors
             const surfaceVectorField& Sf() const;
@@ -323,6 +323,12 @@ public:
 
             //- Return face deltas as surfaceVectorField
             tmp<surfaceVectorField> delta() const;
+
+            //- Return a labelType of valid component indicators
+            //  1 : valid (solved)
+            // -1 : invalid (not solved)
+            template<class Type>
+            typename pTraits<Type>::labelType validComponents() const;
 
 
         // Edit
@@ -371,6 +377,11 @@ public:
 };
 
 
+template<>
+typename pTraits<sphericalTensor>::labelType
+fvMesh::validComponents<sphericalTensor>() const;
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
@@ -378,7 +389,8 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "fvPatchFvMeshTemplates.C"
+    #include "fvMeshTemplates.C"
+    #include "fvPatchFvMeshTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

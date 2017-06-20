@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -34,7 +34,6 @@ License
 namespace Foam
 {
 
-//- Comparison operator for probes class
 template<class T>
 class isNotEqOp
 {
@@ -79,9 +78,9 @@ void Foam::probes::sampleAndWrite
 
         os  << setw(w) << vField.time().timeToUserTime(vField.time().value());
 
-        forAll(values, probeI)
+        forAll(values, probei)
         {
-            os  << ' ' << setw(w) << values[probeI];
+            os  << ' ' << setw(w) << values[probei];
         }
         os  << endl;
     }
@@ -103,9 +102,9 @@ void Foam::probes::sampleAndWrite
 
         os  << setw(w) << sField.time().timeToUserTime(sField.time().value());
 
-        forAll(values, probeI)
+        forAll(values, probei)
         {
-            os  << ' ' << setw(w) << values[probeI];
+            os  << ' ' << setw(w) << values[probei];
         }
         os  << endl;
     }
@@ -115,7 +114,7 @@ void Foam::probes::sampleAndWrite
 template<class Type>
 void Foam::probes::sampleAndWrite(const fieldGroup<Type>& fields)
 {
-    forAll(fields, fieldI)
+    forAll(fields, fieldi)
     {
         if (loadFromFiles_)
         {
@@ -125,7 +124,7 @@ void Foam::probes::sampleAndWrite(const fieldGroup<Type>& fields)
                 (
                     IOobject
                     (
-                        fields[fieldI],
+                        fields[fieldi],
                         mesh_.time().timeName(),
                         mesh_,
                         IOobject::MUST_READ,
@@ -138,7 +137,7 @@ void Foam::probes::sampleAndWrite(const fieldGroup<Type>& fields)
         }
         else
         {
-            objectRegistry::const_iterator iter = mesh_.find(fields[fieldI]);
+            objectRegistry::const_iterator iter = mesh_.find(fields[fieldi]);
 
             if
             (
@@ -150,9 +149,9 @@ void Foam::probes::sampleAndWrite(const fieldGroup<Type>& fields)
                 sampleAndWrite
                 (
                     mesh_.lookupObject
-                    <GeometricField<Type, fvPatchField, volMesh> >
+                    <GeometricField<Type, fvPatchField, volMesh>>
                     (
-                        fields[fieldI]
+                        fields[fieldi]
                     )
                 );
             }
@@ -164,7 +163,7 @@ void Foam::probes::sampleAndWrite(const fieldGroup<Type>& fields)
 template<class Type>
 void Foam::probes::sampleAndWriteSurfaceFields(const fieldGroup<Type>& fields)
 {
-    forAll(fields, fieldI)
+    forAll(fields, fieldi)
     {
         if (loadFromFiles_)
         {
@@ -174,7 +173,7 @@ void Foam::probes::sampleAndWriteSurfaceFields(const fieldGroup<Type>& fields)
                 (
                     IOobject
                     (
-                        fields[fieldI],
+                        fields[fieldi],
                         mesh_.time().timeName(),
                         mesh_,
                         IOobject::MUST_READ,
@@ -187,7 +186,7 @@ void Foam::probes::sampleAndWriteSurfaceFields(const fieldGroup<Type>& fields)
         }
         else
         {
-            objectRegistry::const_iterator iter = mesh_.find(fields[fieldI]);
+            objectRegistry::const_iterator iter = mesh_.find(fields[fieldi]);
 
             if
             (
@@ -199,9 +198,9 @@ void Foam::probes::sampleAndWriteSurfaceFields(const fieldGroup<Type>& fields)
                 sampleAndWrite
                 (
                     mesh_.lookupObject
-                    <GeometricField<Type, fvsPatchField, surfaceMesh> >
+                    <GeometricField<Type, fvsPatchField, surfaceMesh>>
                     (
-                        fields[fieldI]
+                        fields[fieldi]
                     )
                 );
             }
@@ -212,7 +211,7 @@ void Foam::probes::sampleAndWriteSurfaceFields(const fieldGroup<Type>& fields)
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::probes::sample
 (
     const GeometricField<Type, fvPatchField, volMesh>& vField
@@ -220,30 +219,30 @@ Foam::probes::sample
 {
     const Type unsetVal(-VGREAT*pTraits<Type>::one);
 
-    tmp<Field<Type> > tValues
+    tmp<Field<Type>> tValues
     (
         new Field<Type>(this->size(), unsetVal)
     );
 
-    Field<Type>& values = tValues();
+    Field<Type>& values = tValues.ref();
 
     if (fixedLocations_)
     {
-        autoPtr<interpolation<Type> > interpolator
+        autoPtr<interpolation<Type>> interpolator
         (
             interpolation<Type>::New(interpolationScheme_, vField)
         );
 
-        forAll(*this, probeI)
+        forAll(*this, probei)
         {
-            if (elementList_[probeI] >= 0)
+            if (elementList_[probei] >= 0)
             {
-                const vector& position = operator[](probeI);
+                const vector& position = operator[](probei);
 
-                values[probeI] = interpolator().interpolate
+                values[probei] = interpolator().interpolate
                 (
                     position,
-                    elementList_[probeI],
+                    elementList_[probei],
                     -1
                 );
             }
@@ -251,11 +250,11 @@ Foam::probes::sample
     }
     else
     {
-        forAll(*this, probeI)
+        forAll(*this, probei)
         {
-            if (elementList_[probeI] >= 0)
+            if (elementList_[probei] >= 0)
             {
-                values[probeI] = vField[elementList_[probeI]];
+                values[probei] = vField[elementList_[probei]];
             }
         }
     }
@@ -268,12 +267,12 @@ Foam::probes::sample
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::probes::sample(const word& fieldName) const
 {
     return sample
     (
-        mesh_.lookupObject<GeometricField<Type, fvPatchField, volMesh> >
+        mesh_.lookupObject<GeometricField<Type, fvPatchField, volMesh>>
         (
             fieldName
         )
@@ -282,7 +281,7 @@ Foam::probes::sample(const word& fieldName) const
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::probes::sample
 (
     const GeometricField<Type, fvsPatchField, surfaceMesh>& sField
@@ -290,18 +289,18 @@ Foam::probes::sample
 {
     const Type unsetVal(-VGREAT*pTraits<Type>::one);
 
-    tmp<Field<Type> > tValues
+    tmp<Field<Type>> tValues
     (
         new Field<Type>(this->size(), unsetVal)
     );
 
-    Field<Type>& values = tValues();
+    Field<Type>& values = tValues.ref();
 
-    forAll(*this, probeI)
+    forAll(*this, probei)
     {
-        if (faceList_[probeI] >= 0)
+        if (faceList_[probei] >= 0)
         {
-            values[probeI] = sField[faceList_[probeI]];
+            values[probei] = sField[faceList_[probei]];
         }
     }
 
@@ -313,12 +312,12 @@ Foam::probes::sample
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::probes::sampleSurfaceFields(const word& fieldName) const
 {
     return sample
     (
-        mesh_.lookupObject<GeometricField<Type, fvsPatchField, surfaceMesh> >
+        mesh_.lookupObject<GeometricField<Type, fvsPatchField, surfaceMesh>>
         (
             fieldName
         )

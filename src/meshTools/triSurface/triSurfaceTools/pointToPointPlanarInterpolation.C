@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -37,7 +37,7 @@ License
 
 namespace Foam
 {
-defineTypeNameAndDebug(pointToPointPlanarInterpolation, 0);
+    defineTypeNameAndDebug(pointToPointPlanarInterpolation, 0);
 }
 
 
@@ -51,11 +51,8 @@ Foam::pointToPointPlanarInterpolation::calcCoordinateSystem
 {
     if (points.size() < 3)
     {
-        FatalErrorIn
-        (
-            "pointToPointPlanarInterpolation::calcCoordinateSystem"
-            "(const pointField&)"
-        )   << "Only " << points.size() << " provided." << nl
+        FatalErrorInFunction
+            << "Only " << points.size() << " provided." << nl
             << "Need at least three non-colinear points"
             << " to be able to interpolate."
             << exit(FatalError);
@@ -103,11 +100,8 @@ Foam::pointToPointPlanarInterpolation::calcCoordinateSystem
     }
     if (index2 == -1)
     {
-        FatalErrorIn
-        (
-            "pointToPointPlanarInterpolation::calcCoordinateSystem"
-            "(const pointField&)"
-        )   << "Cannot find points that make valid normal." << nl
+        FatalErrorInFunction
+            << "Cannot find points that make valid normal." << nl
             << "Have so far points " << p0 << " and " << p1
             << "Need at least three points which are not in a line."
             << exit(FatalError);
@@ -118,7 +112,7 @@ Foam::pointToPointPlanarInterpolation::calcCoordinateSystem
 
     if (debug)
     {
-        Info<< "pointToPointPlanarInterpolation::calcCoordinateSystem :"
+        InfoInFunction
             << " Used points " << p0 << ' ' << points[index1]
             << ' ' << points[index2]
             << " to define coordinate system with normal " << n << endl;
@@ -154,7 +148,7 @@ void Foam::pointToPointPlanarInterpolation::calcWeights
 
         if (!fullMatch)
         {
-            FatalErrorIn("pointToPointPlanarInterpolation::calcWeights(..)")
+            FatalErrorInFunction
                 << "Did not find a corresponding sourcePoint for every face"
                 << " centre" << exit(FatalError);
         }
@@ -203,14 +197,14 @@ void Foam::pointToPointPlanarInterpolation::calcWeights
         (
             referenceCS_.localPosition(sourcePoints)
         );
-        vectorField& localVertices = tlocalVertices();
+        vectorField& localVertices = tlocalVertices.ref();
 
         const boundBox bb(localVertices, true);
         const point bbMid(bb.midpoint());
 
         if (debug)
         {
-            Info<< "pointToPointPlanarInterpolation::calcWeights :"
+            InfoInFunction
                 << " Perturbing points with " << perturb_
                 << " fraction of a random position inside " << bb
                 << " to break any ties on regular meshes."
@@ -390,7 +384,7 @@ bool Foam::pointToPointPlanarInterpolation::findTime
 
     if (lo == -1)
     {
-        //FatalErrorIn("findTime(..)")
+        //FatalErrorInFunction
         //    << "Cannot find starting sampling values for current time "
         //    << timeVal << nl
         //    << "Have sampling values for times "

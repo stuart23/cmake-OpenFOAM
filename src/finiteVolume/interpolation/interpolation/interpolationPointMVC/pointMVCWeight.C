@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,7 +30,7 @@ License
 
 namespace Foam
 {
-defineDebugSwitchWithName(pointMVCWeight, "pointMVCWeight", 0);
+    defineDebugSwitchWithName(pointMVCWeight, "pointMVCWeight", 0);
 }
 
 Foam::scalar Foam::pointMVCWeight::tol(SMALL);
@@ -99,10 +99,10 @@ void Foam::pointMVCWeight::calcWeights
 
     forAll(cFaces, iter)
     {
-        label faceI = cFaces[iter];
-        const face& f = mesh.faces()[faceI];
+        label facei = cFaces[iter];
+        const face& f = mesh.faces()[facei];
 
-        //Pout<< "face:" << faceI << " at:"
+        //Pout<< "face:" << facei << " at:"
         //    << pointField(mesh.points(), f)
         //    << endl;
 
@@ -142,14 +142,6 @@ void Foam::pointMVCWeight::calcWeights
 
         scalar vNorm = mag(v);
         v /= vNorm;
-
-        // Make sure v points towards the polygon
-        //if (((v&u[0]) < 0) != (mesh.faceOwner()[faceI] != cellIndex_))
-        //{
-        //    FatalErrorIn("pointMVCWeight::calcWeights(..)")
-        //        << "v:" << v << " u[0]:" << u[0]
-        //        << exit(FatalError);
-        //}
 
         if ((v & u[0]) < 0)
         {

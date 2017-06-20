@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -40,8 +40,8 @@ cylindricalInletVelocityFvPatchVectorField
 )
 :
     fixedValueFvPatchField<vector>(p, iF),
-    centre_(pTraits<vector>::zero),
-    axis_(pTraits<vector>::zero),
+    centre_(Zero),
+    axis_(Zero),
     axialVelocity_(),
     radialVelocity_(),
     rpm_()
@@ -60,9 +60,9 @@ cylindricalInletVelocityFvPatchVectorField
     fixedValueFvPatchField<vector>(ptf, p, iF, mapper),
     centre_(ptf.centre_),
     axis_(ptf.axis_),
-    axialVelocity_(ptf.axialVelocity_().clone().ptr()),
-    radialVelocity_(ptf.radialVelocity_().clone().ptr()),
-    rpm_(ptf.rpm_().clone().ptr())
+    axialVelocity_(ptf.axialVelocity_, false),
+    radialVelocity_(ptf.radialVelocity_, false),
+    rpm_(ptf.rpm_, false)
 {}
 
 
@@ -77,9 +77,9 @@ cylindricalInletVelocityFvPatchVectorField
     fixedValueFvPatchField<vector>(p, iF, dict),
     centre_(dict.lookup("centre")),
     axis_(dict.lookup("axis")),
-    axialVelocity_(DataEntry<scalar>::New("axialVelocity", dict)),
-    radialVelocity_(DataEntry<scalar>::New("radialVelocity", dict)),
-    rpm_(DataEntry<scalar>::New("rpm", dict))
+    axialVelocity_(Function1<scalar>::New("axialVelocity", dict)),
+    radialVelocity_(Function1<scalar>::New("radialVelocity", dict)),
+    rpm_(Function1<scalar>::New("rpm", dict))
 {}
 
 
@@ -92,9 +92,9 @@ cylindricalInletVelocityFvPatchVectorField
     fixedValueFvPatchField<vector>(ptf),
     centre_(ptf.centre_),
     axis_(ptf.axis_),
-    axialVelocity_(ptf.axialVelocity_().clone().ptr()),
-    radialVelocity_(ptf.radialVelocity_().clone().ptr()),
-    rpm_(ptf.rpm_().clone().ptr())
+    axialVelocity_(ptf.axialVelocity_, false),
+    radialVelocity_(ptf.radialVelocity_, false),
+    rpm_(ptf.rpm_, false)
 {}
 
 
@@ -108,9 +108,9 @@ cylindricalInletVelocityFvPatchVectorField
     fixedValueFvPatchField<vector>(ptf, iF),
     centre_(ptf.centre_),
     axis_(ptf.axis_),
-    axialVelocity_(ptf.axialVelocity_().clone().ptr()),
-    radialVelocity_(ptf.radialVelocity_().clone().ptr()),
-    rpm_(ptf.rpm_().clone().ptr())
+    axialVelocity_(ptf.axialVelocity_, false),
+    radialVelocity_(ptf.radialVelocity_, false),
+    rpm_(ptf.rpm_, false)
 {}
 
 

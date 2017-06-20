@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -40,7 +40,7 @@ using namespace Foam;
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-tmp<GeometricField<Type, fvPatchField, volMesh> >
+tmp<GeometricField<Type, fvPatchField, volMesh>>
 volField
 (
     const fvMeshSubset& meshSubsetter,
@@ -49,12 +49,12 @@ volField
 {
     if (meshSubsetter.hasSubMesh())
     {
-        tmp<GeometricField<Type, fvPatchField, volMesh> > tfld
+        tmp<GeometricField<Type, fvPatchField, volMesh>> tfld
         (
             meshSubsetter.interpolate(vf)
         );
-        tfld().checkOut();
-        tfld().rename(vf.name());
+        tfld.ref().checkOut();
+        tfld.ref().rename(vf.name());
         return tfld;
     }
     else
@@ -133,7 +133,7 @@ bool writePatchField
 (
     const Field<Type>& pf,
     const label patchi,
-    const label ensightPatchI,
+    const label ensightPatchi,
     const faceSets& boundaryFaceSet,
     const ensightMesh::nFacePrimitives& nfp,
     ensightStream& ensightFile
@@ -143,7 +143,7 @@ bool writePatchField
     {
         if (Pstream::master())
         {
-            ensightFile.writePartHeader(ensightPatchI);
+            ensightFile.writePartHeader(ensightPatchi);
         }
 
         writeField
@@ -197,7 +197,7 @@ void writePatchField
     const HashTable<ensightMesh::nFacePrimitives>&
         nPatchPrims = eMesh.nPatchPrims();
 
-    label ensightPatchI = eMesh.patchPartOffset();
+    label ensightPatchi = eMesh.patchPartOffset();
 
     label patchi = -1;
 
@@ -208,7 +208,7 @@ void writePatchField
             patchi = i;
             break;
         }
-        ensightPatchI++;
+        ensightPatchi++;
     }
 
 
@@ -265,7 +265,7 @@ void writePatchField
         (
             pf,
             patchi,
-            ensightPatchI,
+            ensightPatchi,
             boundaryFaceSets[patchi],
             nPatchPrims.find(patchName)(),
             ensightFile
@@ -279,7 +279,7 @@ void writePatchField
         (
             Field<Type>(),
             -1,
-            ensightPatchI,
+            ensightPatchi,
             nullFaceSets,
             nPatchPrims.find(patchName)(),
             ensightFile
@@ -418,7 +418,7 @@ void ensightField
         );
     }
 
-    label ensightPatchI = eMesh.patchPartOffset();
+    label ensightPatchi = eMesh.patchPartOffset();
 
     forAll(allPatchNames, patchi)
     {
@@ -434,14 +434,14 @@ void ensightField
                 (
                     vf.boundaryField()[patchi],
                     patchi,
-                    ensightPatchI,
+                    ensightPatchi,
                     boundaryFaceSets[patchi],
                     nPatchPrims.find(patchName)(),
                     ensightFile
                 )
             )
             {
-                ensightPatchI++;
+                ensightPatchi++;
             }
         }
     }
@@ -482,20 +482,20 @@ void ensightField
             label j = 0;
             forAll(fz, i)
             {
-                label faceI = fz[i];
-                if (mesh.isInternalFace(faceI))
+                label facei = fz[i];
+                if (mesh.isInternalFace(facei))
                 {
-                    values[j] = sf[faceI];
+                    values[j] = sf[facei];
                     ++j;
                 }
                 else
                 {
-                    if (eMesh.faceToBeIncluded(faceI))
+                    if (eMesh.faceToBeIncluded(facei))
                     {
-                        label patchI = mesh.boundaryMesh().whichPatch(faceI);
-                        const polyPatch& pp = mesh.boundaryMesh()[patchI];
-                        label patchFaceI = pp.whichFace(faceI);
-                        Type value = sf.boundaryField()[patchI][patchFaceI];
+                        label patchi = mesh.boundaryMesh().whichPatch(facei);
+                        const polyPatch& pp = mesh.boundaryMesh()[patchi];
+                        label patchFacei = pp.whichFace(facei);
+                        Type value = sf.boundaryField()[patchi][patchFacei];
                         values[j] = value;
                         ++j;
                     }
@@ -508,14 +508,14 @@ void ensightField
                 (
                     values,
                     zoneID,
-                    ensightPatchI,
+                    ensightPatchi,
                     faceZoneFaceSets[zoneID],
                     nFaceZonePrims.find(faceZoneName)(),
                     ensightFile
                 )
             )
             {
-                ensightPatchI++;
+                ensightPatchi++;
             }
         }
     }
@@ -603,13 +603,13 @@ void ensightPointField
         writeField
         (
             "coordinates",
-            Field<Type>(pf.internalField(), eMesh.uniquePointMap()),
+            Field<Type>(pf.primitiveField(), eMesh.uniquePointMap()),
             ensightFile
         );
     }
 
 
-    label ensightPatchI = eMesh.patchPartOffset();
+    label ensightPatchi = eMesh.patchPartOffset();
 
     forAll(allPatchNames, patchi)
     {
@@ -640,17 +640,17 @@ void ensightPointField
 
                 if (Pstream::master())
                 {
-                    ensightFile.writePartHeader(ensightPatchI);
+                    ensightFile.writePartHeader(ensightPatchi);
                 }
 
                 writeField
                 (
                     "coordinates",
-                    Field<Type>(pf.internalField(), uniqueMeshPointLabels),
+                    Field<Type>(pf.primitiveField(), uniqueMeshPointLabels),
                     ensightFile
                 );
 
-                ensightPatchI++;
+                ensightPatchi++;
             }
         }
     }
@@ -684,7 +684,7 @@ void ensightPointField
 
                 if (Pstream::master())
                 {
-                    ensightFile.writePartHeader(ensightPatchI);
+                    ensightFile.writePartHeader(ensightPatchi);
                 }
 
                 writeField
@@ -692,13 +692,13 @@ void ensightPointField
                     "coordinates",
                     Field<Type>
                     (
-                        pf.internalField(),
+                        pf.primitiveField(),
                         uniqueMeshPointLabels
                     ),
                     ensightFile
                 );
 
-                ensightPatchI++;
+                ensightPatchi++;
             }
         }
     }
@@ -725,11 +725,11 @@ void ensightField
 {
     if (nodeValues)
     {
-        tmp<GeometricField<Type, pointPatchField, pointMesh> > pfld
+        tmp<GeometricField<Type, pointPatchField, pointMesh>> pfld
         (
             volPointInterpolation::New(vf.mesh()).interpolate(vf)
         );
-        pfld().rename(vf.name());
+        pfld.ref().rename(vf.name());
 
         ensightPointField<Type>
         (

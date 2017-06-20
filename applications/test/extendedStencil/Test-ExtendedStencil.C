@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -161,20 +161,20 @@ int main(int argc, char *argv[])
 //        writeStencilStats(addressing.stencil());
 //
 //        // Collect stencil cell centres
-//        List<List<point> > stencilPoints(mesh.nFaces());
+//        List<List<point>> stencilPoints(mesh.nFaces());
 //        addressing.collectData
 //        (
 //            mesh.C(),
 //            stencilPoints
 //        );
 //
-//        forAll(stencilPoints, faceI)
+//        forAll(stencilPoints, facei)
 //        {
 //            writeStencilOBJ
 //            (
-//                runTime.path()/"faceEdgeCell" + Foam::name(faceI) + ".obj",
-//                mesh.faceCentres()[faceI],
-//                stencilPoints[faceI]
+//                runTime.path()/"faceEdgeCell" + Foam::name(facei) + ".obj",
+//                mesh.faceCentres()[facei],
+//                stencilPoints[facei]
 //            );
 //        }
 //    }
@@ -199,15 +199,15 @@ int main(int argc, char *argv[])
 //        //// Do some interpolation.
 //        //{
 //        //    const labelListList& stencil = addressing.stencil();
-//        //    List<List<scalar> > stencilWeights(stencil.size());
-//        //    forAll(stencil, faceI)
+//        //    List<List<scalar>> stencilWeights(stencil.size());
+//        //    forAll(stencil, facei)
 //        //    {
-//        //        const labelList& fStencil = stencil[faceI];
+//        //        const labelList& fStencil = stencil[facei];
 //        //
 //        //        if (fStencil.size() > 0)
 //        //        {
 //        //            // Uniform weights
-//        //            stencilWeights[faceI] = scalarList
+//        //            stencilWeights[facei] = scalarList
 //        //            (
 //        //                fStencil.size(),
 //        //                1.0/fStencil.size()
@@ -223,22 +223,22 @@ int main(int argc, char *argv[])
 //
 //
 //        // Collect stencil cell centres
-//        List<List<point> > stencilPoints(mesh.nFaces());
+//        List<List<point>> stencilPoints(mesh.nFaces());
 //        addressing.collectData
 //        (
 //            mesh.C(),
 //            stencilPoints
 //        );
 //
-//        forAll(stencilPoints, faceI)
+//        forAll(stencilPoints, facei)
 //        {
-//            if (stencilPoints[faceI].size() >= 15)
+//            if (stencilPoints[facei].size() >= 15)
 //            {
 //                writeStencilOBJ
 //                (
-//                    runTime.path()/"centredFace" + Foam::name(faceI) + ".obj",
-//                    mesh.faceCentres()[faceI],
-//                    stencilPoints[faceI]
+//                    runTime.path()/"centredFace" + Foam::name(facei) + ".obj",
+//                    mesh.faceCentres()[facei],
+//                    stencilPoints[facei]
 //                );
 //            }
 //        }
@@ -260,20 +260,20 @@ int main(int argc, char *argv[])
 //        //
 //        //
 //        //// Collect stencil cell centres
-//        //List<List<point> > stencilPoints(mesh.nFaces());
+//        //List<List<point>> stencilPoints(mesh.nFaces());
 //        //addressing.collectData
 //        //(
 //        //    mesh.C(),
 //        //    stencilPoints
 //        //);
 //        //
-//        //forAll(stencilPoints, faceI)
+//        //forAll(stencilPoints, facei)
 //        //{
 //        //    writeStencilOBJ
 //        //    (
-//        //        runTime.path()/"centredPoint" + Foam::name(faceI) + ".obj",
-//        //        mesh.faceCentres()[faceI],
-//        //        stencilPoints[faceI]
+//        //        runTime.path()/"centredPoint" + Foam::name(facei) + ".obj",
+//        //        mesh.faceCentres()[facei],
+//        //        stencilPoints[facei]
 //        //    );
 //        //}
 //    }
@@ -295,20 +295,20 @@ int main(int argc, char *argv[])
 //        //
 //        //
 //        //// Collect stencil cell centres
-//        //List<List<point> > stencilPoints(mesh.nFaces());
+//        //List<List<point>> stencilPoints(mesh.nFaces());
 //        //addressing.collectData
 //        //(
 //        //    mesh.C(),
 //        //    stencilPoints
 //        //);
 //        //
-//        //forAll(stencilPoints, faceI)
+//        //forAll(stencilPoints, facei)
 //        //{
 //        //    writeStencilOBJ
 //        //    (
-//        //        runTime.path()/"centredEdge" + Foam::name(faceI) + ".obj",
-//        //        mesh.faceCentres()[faceI],
-//        //        stencilPoints[faceI]
+//        //        runTime.path()/"centredEdge" + Foam::name(facei) + ".obj",
+//        //        mesh.faceCentres()[facei],
+//        //        stencilPoints[facei]
 //        //    );
 //        //}
 //    }
@@ -331,7 +331,7 @@ int main(int argc, char *argv[])
     //
     //    {
     //        // Collect stencil cell centres
-    //        List<List<point> > ownPoints(mesh.nFaces());
+    //        List<List<point>> ownPoints(mesh.nFaces());
     //        addressing.collectData
     //        (
     //            addressing.ownMap(),
@@ -340,19 +340,19 @@ int main(int argc, char *argv[])
     //            ownPoints
     //        );
     //
-    //        forAll(ownPoints, faceI)
+    //        forAll(ownPoints, facei)
     //        {
     //            writeStencilOBJ
     //            (
-    //                runTime.path()/"ownFEC" + Foam::name(faceI) + ".obj",
-    //                mesh.faceCentres()[faceI],
-    //                ownPoints[faceI]
+    //                runTime.path()/"ownFEC" + Foam::name(facei) + ".obj",
+    //                mesh.faceCentres()[facei],
+    //                ownPoints[facei]
     //            );
     //        }
     //    }
     //    {
     //        // Collect stencil cell centres
-    //        List<List<point> > neiPoints(mesh.nFaces());
+    //        List<List<point>> neiPoints(mesh.nFaces());
     //        addressing.collectData
     //        (
     //            addressing.neiMap(),
@@ -361,13 +361,13 @@ int main(int argc, char *argv[])
     //            neiPoints
     //        );
     //
-    //        forAll(neiPoints, faceI)
+    //        forAll(neiPoints, facei)
     //        {
     //            writeStencilOBJ
     //            (
-    //                runTime.path()/"neiFEC" + Foam::name(faceI) + ".obj",
-    //                mesh.faceCentres()[faceI],
-    //                neiPoints[faceI]
+    //                runTime.path()/"neiFEC" + Foam::name(facei) + ".obj",
+    //                mesh.faceCentres()[facei],
+    //                neiPoints[facei]
     //            );
     //        }
     //    }
@@ -391,7 +391,7 @@ int main(int argc, char *argv[])
     //
     //    {
     //        // Collect stencil cell centres
-    //        List<List<point> > ownPoints(mesh.nFaces());
+    //        List<List<point>> ownPoints(mesh.nFaces());
     //        addressing.collectData
     //        (
     //            addressing.ownMap(),
@@ -400,19 +400,19 @@ int main(int argc, char *argv[])
     //            ownPoints
     //        );
     //
-    //        forAll(ownPoints, faceI)
+    //        forAll(ownPoints, facei)
     //        {
     //            writeStencilOBJ
     //            (
-    //                runTime.path()/"ownCFC" + Foam::name(faceI) + ".obj",
-    //                mesh.faceCentres()[faceI],
-    //                ownPoints[faceI]
+    //                runTime.path()/"ownCFC" + Foam::name(facei) + ".obj",
+    //                mesh.faceCentres()[facei],
+    //                ownPoints[facei]
     //            );
     //        }
     //    }
     //    {
     //        // Collect stencil cell centres
-    //        List<List<point> > neiPoints(mesh.nFaces());
+    //        List<List<point>> neiPoints(mesh.nFaces());
     //        addressing.collectData
     //        (
     //            addressing.neiMap(),
@@ -421,13 +421,13 @@ int main(int argc, char *argv[])
     //            neiPoints
     //        );
     //
-    //        forAll(neiPoints, faceI)
+    //        forAll(neiPoints, facei)
     //        {
     //            writeStencilOBJ
     //            (
-    //                runTime.path()/"neiCFC" + Foam::name(faceI) + ".obj",
-    //                mesh.faceCentres()[faceI],
-    //                neiPoints[faceI]
+    //                runTime.path()/"neiCFC" + Foam::name(facei) + ".obj",
+    //                mesh.faceCentres()[facei],
+    //                neiPoints[facei]
     //            );
     //        }
     //    }
@@ -451,20 +451,20 @@ int main(int argc, char *argv[])
         writeStencilStats(addressing.stencil());
 
         // Collect stencil cell centres
-        List<List<point> > stencilPoints(mesh.nCells());
+        List<List<point>> stencilPoints(mesh.nCells());
         addressing.collectData
         (
             mesh.C(),
             stencilPoints
         );
 
-        forAll(stencilPoints, cellI)
+        forAll(stencilPoints, celli)
         {
             writeStencilOBJ
             (
-                runTime.path()/"centredCECCell" + Foam::name(cellI) + ".obj",
-                mesh.cellCentres()[cellI],
-                stencilPoints[cellI]
+                runTime.path()/"centredCECCell" + Foam::name(celli) + ".obj",
+                mesh.cellCentres()[celli],
+                stencilPoints[celli]
             );
         }
     }
@@ -479,20 +479,20 @@ int main(int argc, char *argv[])
         writeStencilStats(addressing.stencil());
 
         // Collect stencil cell centres
-        List<List<point> > stencilPoints(mesh.nCells());
+        List<List<point>> stencilPoints(mesh.nCells());
         addressing.collectData
         (
             mesh.C(),
             stencilPoints
         );
 
-        forAll(stencilPoints, cellI)
+        forAll(stencilPoints, celli)
         {
             writeStencilOBJ
             (
-                runTime.path()/"centredCPCCell" + Foam::name(cellI) + ".obj",
-                mesh.cellCentres()[cellI],
-                stencilPoints[cellI]
+                runTime.path()/"centredCPCCell" + Foam::name(celli) + ".obj",
+                mesh.cellCentres()[celli],
+                stencilPoints[celli]
             );
         }
     }
@@ -507,20 +507,20 @@ int main(int argc, char *argv[])
         writeStencilStats(addressing.stencil());
 
         // Collect stencil cell centres
-        List<List<point> > stencilPoints(mesh.nCells());
+        List<List<point>> stencilPoints(mesh.nCells());
         addressing.collectData
         (
             mesh.C(),
             stencilPoints
         );
 
-        forAll(stencilPoints, cellI)
+        forAll(stencilPoints, celli)
         {
             writeStencilOBJ
             (
-                runTime.path()/"centredCFCCell" + Foam::name(cellI) + ".obj",
-                mesh.cellCentres()[cellI],
-                stencilPoints[cellI]
+                runTime.path()/"centredCFCCell" + Foam::name(celli) + ".obj",
+                mesh.cellCentres()[celli],
+                stencilPoints[celli]
             );
         }
     }
@@ -528,7 +528,7 @@ int main(int argc, char *argv[])
 
 //XXXXXX
 //    // Evaluate
-//    List<List<scalar> > stencilData(faceStencils.size());
+//    List<List<scalar>> stencilData(faceStencils.size());
 //    collectStencilData
 //    (
 //        distMap,
@@ -538,12 +538,12 @@ int main(int argc, char *argv[])
 //    );
 //    for (label faci = 0; faci < mesh.nInternalFaces(); faci++)
 //    {
-//        const scalarList& stData = stencilData[faceI];
-//        const scalarList& stWeight = fit[faceI];
+//        const scalarList& stData = stencilData[facei];
+//        const scalarList& stWeight = fit[facei];
 //
 //        forAll(stData, i)
 //        {
-//            sf[faceI] += stWeight[i]*stData[i];
+//            sf[facei] += stWeight[i]*stData[i];
 //        }
 //    }
 //    See finiteVolume/lnInclude/leastSquaresGrad.C

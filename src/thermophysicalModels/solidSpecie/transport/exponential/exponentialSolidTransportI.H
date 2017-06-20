@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -56,13 +56,13 @@ inline Foam::exponentialSolidTransport<Thermo>::exponentialSolidTransport
 
 
 template<class Thermo>
-inline Foam::autoPtr<Foam::exponentialSolidTransport<Thermo> >
+inline Foam::autoPtr<Foam::exponentialSolidTransport<Thermo>>
 Foam::exponentialSolidTransport<Thermo>::New
 (
     const dictionary& dict
 )
 {
-    return autoPtr<exponentialSolidTransport<Thermo> >
+    return autoPtr<exponentialSolidTransport<Thermo>>
     (
         new exponentialSolidTransport<Thermo>(dict)
     );
@@ -95,13 +95,7 @@ template<class Thermo>
 inline Foam::scalar Foam::exponentialSolidTransport<Thermo>::
 mu(const scalar p, const scalar T) const
 {
-    notImplemented
-    (
-        "Foam::scalar Foam::exponentialSolidTransport<Thermo>mu::"
-        "("
-        "    const scalar p, const scalar T"
-        ") const"
-    );
+    NotImplemented;
     return scalar(0);
 }
 
@@ -110,15 +104,14 @@ template<class Thermo>
 inline Foam::scalar Foam::exponentialSolidTransport<Thermo>::
 alphah(const scalar p, const scalar T) const
 {
-    return kappa(p, T)/this->Cpv(p, T);
+    return kappa(p, T)/this->Cp(p, T);
 }
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 
 template<class Thermo>
-inline Foam::exponentialSolidTransport<Thermo>&
-Foam::exponentialSolidTransport<Thermo>::operator=
+inline void Foam::exponentialSolidTransport<Thermo>::operator=
 (
     const exponentialSolidTransport<Thermo>& ct
 )
@@ -126,7 +119,6 @@ Foam::exponentialSolidTransport<Thermo>::operator=
     kappa0_ = ct.kappa0_;
     n0_ = ct.n0_;
     Tref_ = ct.Tref_;
-    return *this;
 }
 
 

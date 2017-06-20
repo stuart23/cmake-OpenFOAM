@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -32,8 +32,7 @@ Description
     condition as a base.  The jump is specified as a time-varying uniform
     value across the patch.
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         patchType    | underlying patch type should be \c cyclic| yes |
@@ -42,7 +41,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            uniformJump;
         patchType       cyclic;
@@ -53,14 +52,15 @@ Description
     The above example shows the use of a fixed jump of '10'.
 
 Note
-    The uniformValue entry is a DataEntry type, able to describe time
+    The uniformValue entry is a Function1 type, able to describe time
     varying functions.  The example above gives the usage for supplying a
     constant value.
 
     The underlying \c patchType should be set to \c cyclic
 
-SeeAlso
+See also
     Foam::fixedJumpFvPatchField
+    Foam::Function1Types
 
 SourceFiles
     uniformJumpFvPatchField.C
@@ -71,7 +71,7 @@ SourceFiles
 #define uniformJumpFvPatchField_H
 
 #include "fixedJumpFvPatchField.H"
-#include "DataEntry.H"
+#include "Function1.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -93,7 +93,7 @@ protected:
     // Protected data
 
         //- "jump" table
-        autoPtr<DataEntry<Type> > jumpTable_;
+        autoPtr<Function1<Type>> jumpTable_;
 
 
 public:
@@ -135,9 +135,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchField<Type>> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new uniformJumpFvPatchField<Type>(*this)
             );
@@ -151,12 +151,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchField<Type>> clone
         (
             const DimensionedField<Type, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new uniformJumpFvPatchField<Type>(*this, iF)
             );
@@ -180,7 +180,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "uniformJumpFvPatchField.C"
+    #include "uniformJumpFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

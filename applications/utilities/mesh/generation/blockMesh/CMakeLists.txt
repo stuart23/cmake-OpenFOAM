@@ -2,7 +2,7 @@ set( EXE_NAME blockMesh_exe )
 
 set( SOURCES
 
-blockMeshApp.C
+blockMesh.C
 
 )
 

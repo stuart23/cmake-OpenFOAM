@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -38,7 +38,7 @@ void Foam::ZoneMesh<ZoneType, MeshType>::calcZoneMap() const
     // if the pointer is already set
     if (zoneMapPtr_)
     {
-        FatalErrorIn("void ZoneMesh<ZoneType>::calcZoneMap() const")
+        FatalErrorInFunction
             << "zone map already calculated"
             << abort(FatalError);
     }
@@ -82,14 +82,8 @@ bool Foam::ZoneMesh<ZoneType, MeshType>::read()
     {
         if (readOpt() == IOobject::MUST_READ_IF_MODIFIED)
         {
-            WarningIn
-            (
-                "ZoneMesh::ZoneMesh\n"
-                "(\n"
-                "    const IOobject&,\n"
-                "    const MeshType&\n"
-                ")"
-            )   << "Specified IOobject::MUST_READ_IF_MODIFIED but class"
+            WarningInFunction
+                << "Specified IOobject::MUST_READ_IF_MODIFIED but class"
                 << " does not support automatic rereading."
                 << endl;
         }
@@ -138,7 +132,6 @@ bool Foam::ZoneMesh<ZoneType, MeshType>::read()
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Read constructor given IOobject and a MeshType reference
 template<class ZoneType, class MeshType>
 Foam::ZoneMesh<ZoneType, MeshType>::ZoneMesh
 (
@@ -155,7 +148,6 @@ Foam::ZoneMesh<ZoneType, MeshType>::ZoneMesh
 }
 
 
-// Construct given size. Zones will be set later
 template<class ZoneType, class MeshType>
 Foam::ZoneMesh<ZoneType, MeshType>::ZoneMesh
 (
@@ -192,7 +184,7 @@ Foam::ZoneMesh<ZoneType, MeshType>::ZoneMesh
         // Nothing read. Use supplied zones
         PtrList<ZoneType>& zones = *this;
         zones.setSize(pzm.size());
-        forAll (zones, zoneI)
+        forAll(zones, zoneI)
         {
             zones.set(zoneI, pzm[zoneI].clone(*this).ptr());
         }
@@ -211,7 +203,6 @@ Foam::ZoneMesh<ZoneType, MeshType>::~ZoneMesh()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Map of zones for quick zone lookup
 template<class ZoneType, class MeshType>
 const Foam::Map<Foam::label>&
 Foam::ZoneMesh<ZoneType, MeshType>::zoneMap() const
@@ -225,8 +216,6 @@ Foam::ZoneMesh<ZoneType, MeshType>::zoneMap() const
 }
 
 
-// Given a global object index, return the zone it is in.
-// If object does not belong to any zones, return -1
 template<class ZoneType, class MeshType>
 Foam::label Foam::ZoneMesh<ZoneType, MeshType>::whichZone
 (
@@ -247,7 +236,6 @@ Foam::label Foam::ZoneMesh<ZoneType, MeshType>::whichZone
 }
 
 
-// Return a list of zone names
 template<class ZoneType, class MeshType>
 Foam::wordList Foam::ZoneMesh<ZoneType, MeshType>::types() const
 {
@@ -264,7 +252,6 @@ Foam::wordList Foam::ZoneMesh<ZoneType, MeshType>::types() const
 }
 
 
-// Return a list of zone names
 template<class ZoneType, class MeshType>
 Foam::wordList Foam::ZoneMesh<ZoneType, MeshType>::names() const
 {
@@ -368,7 +355,7 @@ Foam::label Foam::ZoneMesh<ZoneType, MeshType>::findZoneID
     // Zone not found
     if (debug)
     {
-        Info<< "label ZoneMesh<ZoneType>::findZoneID(const word&) const : "
+        InfoInFunction
             << "Zone named " << zoneName << " not found.  "
             << "List of available zone names: " << names() << endl;
     }
@@ -418,7 +405,6 @@ void Foam::ZoneMesh<ZoneType, MeshType>::clear()
 }
 
 
-// Check zone definition
 template<class ZoneType, class MeshType>
 bool Foam::ZoneMesh<ZoneType, MeshType>::checkDefinition
 (
@@ -466,12 +452,12 @@ bool Foam::ZoneMesh<ZoneType, MeshType>::checkParallelSync
 
     // Have every processor check but only master print error.
 
-    for (label procI = 1; procI < allNames.size(); procI++)
+    for (label proci = 1; proci < allNames.size(); proci++)
     {
         if
         (
-            (allNames[procI] != allNames[0])
-         || (allTypes[procI] != allTypes[0])
+            (allNames[proci] != allNames[0])
+         || (allTypes[proci] != allTypes[0])
         )
         {
             hasError = true;
@@ -481,9 +467,9 @@ bool Foam::ZoneMesh<ZoneType, MeshType>::checkParallelSync
                 Info<< " ***Inconsistent zones across processors, "
                        "processor 0 has zone names:" << allNames[0]
                     << " zone types:" << allTypes[0]
-                    << " processor " << procI << " has zone names:"
-                    << allNames[procI]
-                    << " zone types:" << allTypes[procI]
+                    << " processor " << proci << " has zone names:"
+                    << allNames[proci]
+                    << " zone types:" << allTypes[proci]
                     << endl;
             }
         }
@@ -515,7 +501,6 @@ bool Foam::ZoneMesh<ZoneType, MeshType>::checkParallelSync
 }
 
 
-// Correct zone mesh after moving points
 template<class ZoneType, class MeshType>
 void Foam::ZoneMesh<ZoneType, MeshType>::movePoints(const pointField& p)
 {
@@ -528,13 +513,13 @@ void Foam::ZoneMesh<ZoneType, MeshType>::movePoints(const pointField& p)
 }
 
 
-// writeData member function required by regIOobject
 template<class ZoneType, class MeshType>
 bool Foam::ZoneMesh<ZoneType, MeshType>::writeData(Ostream& os) const
 {
     os  << *this;
     return os.good();
 }
+
 
 // * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
 
@@ -548,10 +533,8 @@ const ZoneType& Foam::ZoneMesh<ZoneType, MeshType>::operator[]
 
     if (zoneI < 0)
     {
-        FatalErrorIn
-        (
-            "ZoneMesh<ZoneType>::operator[](const word&) const"
-        )   << "Zone named " << zoneName << " not found." << nl
+        FatalErrorInFunction
+            << "Zone named " << zoneName << " not found." << nl
             << "Available zone names: " << names() << endl
             << abort(FatalError);
     }
@@ -570,10 +553,8 @@ ZoneType& Foam::ZoneMesh<ZoneType, MeshType>::operator[]
 
     if (zoneI < 0)
     {
-        FatalErrorIn
-        (
-            "ZoneMesh<ZoneType>::operator[](const word&)"
-        )   << "Zone named " << zoneName << " not found." << nl
+        FatalErrorInFunction
+            << "Zone named " << zoneName << " not found." << nl
             << "Available zone names: " << names() << endl
             << abort(FatalError);
     }

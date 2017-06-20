@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -207,13 +207,12 @@ void Foam::Time::readDict()
     }
 
     scalar oldWriteInterval = writeInterval_;
-    scalar oldSecondaryWriteInterval = secondaryWriteInterval_;
 
     if (controlDict_.readIfPresent("writeInterval", writeInterval_))
     {
         if (writeControl_ == wcTimeStep && label(writeInterval_) < 1)
         {
-            FatalIOErrorIn("Time::readDict()", controlDict_)
+            FatalIOErrorInFunction(controlDict_)
                 << "writeInterval < 1 for writeControl timeStep"
                 << exit(FatalIOError);
         }
@@ -224,77 +223,19 @@ void Foam::Time::readDict()
     }
 
 
-    // Additional writing
-    if (controlDict_.found("secondaryWriteControl"))
-    {
-        secondaryWriteControl_ = writeControlNames_.read
-        (
-            controlDict_.lookup("secondaryWriteControl")
-        );
-
-        if
-        (
-            controlDict_.readIfPresent
-            (
-                "secondaryWriteInterval",
-                secondaryWriteInterval_
-            )
-        )
-        {
-            if
-            (
-                secondaryWriteControl_ == wcTimeStep
-             && label(secondaryWriteInterval_) < 1
-            )
-            {
-                FatalIOErrorIn("Time::readDict()", controlDict_)
-                    << "secondaryWriteInterval < 1"
-                    << " for secondaryWriteControl timeStep"
-                    << exit(FatalIOError);
-            }
-        }
-        else
-        {
-            controlDict_.lookup("secondaryWriteFrequency")
-                >> secondaryWriteInterval_;
-        }
-    }
-
-
-
     if (oldWriteInterval != writeInterval_)
     {
         switch (writeControl_)
         {
             case wcRunTime:
             case wcAdjustableRunTime:
-                // Recalculate outputTimeIndex_ to be in units of current
+                // Recalculate writeTimeIndex_ to be in units of current
                 // writeInterval.
-                outputTimeIndex_ = label
+                writeTimeIndex_ = label
                 (
-                    outputTimeIndex_
+                    writeTimeIndex_
                   * oldWriteInterval
                   / writeInterval_
-                );
-            break;
-
-            default:
-            break;
-        }
-    }
-    if (oldSecondaryWriteInterval != secondaryWriteInterval_)
-    {
-        switch (secondaryWriteControl_)
-        {
-            case wcRunTime:
-            case wcAdjustableRunTime:
-                // Recalculate secondaryOutputTimeIndex_ to be in units of
-                // current writeInterval.
-                secondaryOutputTimeIndex_ = label
-                (
-                    secondaryOutputTimeIndex_
-                  * oldSecondaryWriteInterval
-                  / secondaryWriteInterval_
                 );
             break;
 
@@ -307,26 +248,12 @@ void Foam::Time::readDict()
     {
         if (purgeWrite_ < 0)
         {
-            WarningIn("Time::readDict()")
+            WarningInFunction
                 << "invalid value for purgeWrite " << purgeWrite_
                 << ", should be >= 0, setting to 0"
                 << endl;
 
             purgeWrite_ = 0;
-        }
-    }
-
-    if (controlDict_.readIfPresent("secondaryPurgeWrite", secondaryPurgeWrite_))
-    {
-        if (secondaryPurgeWrite_ < 0)
-        {
-            WarningIn("Time::readDict()")
-                << "invalid value for secondaryPurgeWrite "
-                << secondaryPurgeWrite_
-                << ", should be >= 0, setting to 0"
-                << endl;
-
-            secondaryPurgeWrite_ = 0;
         }
     }
 
@@ -348,7 +275,7 @@ void Foam::Time::readDict()
         }
         else
         {
-            WarningIn("Time::readDict()")
+            WarningInFunction
                 << "unsupported time format " << formatName
                 << endl;
         }
@@ -483,6 +410,39 @@ void Foam::Time::readModifiedObjects()
 }
 
 
+bool Foam::Time::writeTimeDict() const
+{
+    const word tmName(timeName());
+
+    IOdictionary timeDict
+    (
+        IOobject
+        (
+            "time",
+            tmName,
+            "uniform",
+            *this,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE,
+            false
+        )
+    );
+
+    timeDict.add("value", timeName(timeToUserTime(value()), maxPrecision_));
+    timeDict.add("name", string(tmName));
+    timeDict.add("index", timeIndex_);
+    timeDict.add("deltaT", timeToUserTime(deltaT_));
+    timeDict.add("deltaT0", timeToUserTime(deltaT0_));
+
+    return timeDict.regIOobject::writeObject
+    (
+        IOstream::ASCII,
+        IOstream::currentVersion,
+        IOstream::UNCOMPRESSED
+    );
+}
+
+
 bool Foam::Time::writeObject
 (
     IOstream::streamFormat fmt,
@@ -490,71 +450,25 @@ bool Foam::Time::writeObject
     IOstream::compressionType cmp
 ) const
 {
-    if (outputTime())
+    if (writeTime())
     {
-        const word tmName(timeName());
-
-        IOdictionary timeDict
-        (
-            IOobject
-            (
-                "time",
-                tmName,
-                "uniform",
-                *this,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            )
-        );
-
-        timeDict.add("value", timeName(timeToUserTime(value()), maxPrecision_));
-        timeDict.add("name", string(tmName));
-        timeDict.add("index", timeIndex_);
-        timeDict.add("deltaT", timeToUserTime(deltaT_));
-        timeDict.add("deltaT0", timeToUserTime(deltaT0_));
-
-        timeDict.regIOobject::writeObject(fmt, ver, cmp);
-        bool writeOK = objectRegistry::writeObject(fmt, ver, cmp);
+        bool writeOK = writeTimeDict();
 
         if (writeOK)
         {
-            // Does primary or secondary time trigger purging?
-            // Note that primary times can only be purged by primary
-            // purging. Secondary times can be purged by either primary
-            // or secondary purging.
-            if (primaryOutputTime_ && purgeWrite_)
-            {
-                previousOutputTimes_.push(tmName);
+            writeOK = objectRegistry::writeObject(fmt, ver, cmp);
+        }
 
-                while (previousOutputTimes_.size() > purgeWrite_)
-                {
-                    rmDir(objectRegistry::path(previousOutputTimes_.pop()));
-                }
-            }
-            if
-            (
-               !primaryOutputTime_
-             && secondaryOutputTime_
-             && secondaryPurgeWrite_
-            )
+        if (writeOK)
+        {
+            // Does the writeTime trigger purging?
+            if (writeTime_ && purgeWrite_)
             {
-                // Writing due to secondary
-                previousSecondaryOutputTimes_.push(tmName);
+                previousWriteTimes_.push(timeName());
 
-                while
-                (
-                    previousSecondaryOutputTimes_.size()
-                  > secondaryPurgeWrite_
-                )
+                while (previousWriteTimes_.size() > purgeWrite_)
                 {
-                    rmDir
-                    (
-                        objectRegistry::path
-                        (
-                            previousSecondaryOutputTimes_.pop()
-                        )
-                    );
+                    rmDir(objectRegistry::path(previousWriteTimes_.pop()));
                 }
             }
         }
@@ -570,8 +484,7 @@ bool Foam::Time::writeObject
 
 bool Foam::Time::writeNow()
 {
-    primaryOutputTime_ = true;
-    outputTime_ = true;
+    writeTime_ = true;
     return write();
 }
 

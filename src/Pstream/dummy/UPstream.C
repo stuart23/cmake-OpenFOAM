@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -34,7 +34,7 @@ void Foam::UPstream::addValidParOptions(HashTable<string>& validParOptions)
 
 bool Foam::UPstream::init(int& argc, char**& argv)
 {
-    FatalErrorIn("UPstream::init(int& argc, char**& argv)")
+    FatalErrorInFunction
         << "Trying to use the dummy Pstream library." << nl
         << "This dummy library cannot be used in parallel mode"
         << Foam::exit(FatalError);
@@ -45,13 +45,13 @@ bool Foam::UPstream::init(int& argc, char**& argv)
 
 void Foam::UPstream::exit(int errnum)
 {
-    notImplemented("UPstream::exit(int errnum)");
+    NotImplemented;
 }
 
 
 void Foam::UPstream::abort()
 {
-    notImplemented("UPstream::abort()");
+    NotImplemented;
 }
 
 
@@ -79,6 +79,17 @@ void Foam::sumReduce
 
 void Foam::reduce(scalar&, const sumOp<scalar>&, const int, const label, label&)
 {}
+
+
+void Foam::UPstream::allToAll
+(
+    const labelUList& sendData,
+    labelUList& recvData,
+    const label communicator
+)
+{
+    recvData.deepCopy(sendData);
+}
 
 
 void Foam::UPstream::allocatePstreamCommunicator
@@ -113,7 +124,7 @@ void Foam::UPstream::waitRequest(const label i)
 
 bool Foam::UPstream::finishedRequest(const label i)
 {
-    notImplemented("UPstream::finishedRequest()");
+    NotImplemented;
     return false;
 }
 

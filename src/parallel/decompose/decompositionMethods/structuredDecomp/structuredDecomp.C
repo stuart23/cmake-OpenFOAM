@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -143,23 +143,23 @@ Foam::labelList Foam::structuredDecomp::decompose
 
     // And extract
     bool haveWarned = false;
-    forAll(finalDecomp, cellI)
+    forAll(finalDecomp, celli)
     {
-        if (!cellData[cellI].valid(deltaCalc.data()))
+        if (!cellData[celli].valid(deltaCalc.data()))
         {
             if (!haveWarned)
             {
-                WarningIn("structuredDecomp::decompose(..)")
-                    << "Did not visit some cells, e.g. cell " << cellI
-                    << " at " << mesh.cellCentres()[cellI] << endl
+                WarningInFunction
+                    << "Did not visit some cells, e.g. cell " << celli
+                    << " at " << mesh.cellCentres()[celli] << endl
                     << "Assigning  these cells to domain 0." << endl;
                 haveWarned = true;
             }
-            finalDecomp[cellI] = 0;
+            finalDecomp[celli] = 0;
         }
         else
         {
-            finalDecomp[cellI] = cellData[cellI].data();
+            finalDecomp[celli] = cellData[celli].data();
         }
     }
 
@@ -174,15 +174,7 @@ Foam::labelList Foam::structuredDecomp::decompose
     const scalarField& pointWeights
 )
 {
-    notImplemented
-    (
-        "structuredDecomp::decompose\n"
-        "(\n"
-        "    const labelListList&,\n"
-        "    const pointField&,\n"
-        "    const scalarField&\n"
-        ")\n"
-    );
+    NotImplemented;
 
     return labelList::null();
 }

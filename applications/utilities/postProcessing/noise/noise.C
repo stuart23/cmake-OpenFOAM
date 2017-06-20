@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -32,8 +32,7 @@ Description
     or user-specified dictionary using the -dict option.  Pressure data is
     read using a CSV reader:
 
-    \heading Usage
-
+Usage
     \verbatim
     pRef        101325;
     N           65536;
@@ -72,7 +71,7 @@ Description
     - one-third-octave-band PFL spectrum
     - one-third-octave-band pressure spectrum
 
-SeeAlso
+See also
     CSV.H
     noiseFFT.H
 
@@ -82,7 +81,7 @@ SeeAlso
 #include "noiseFFT.H"
 #include "argList.H"
 #include "Time.H"
-#include "functionObjectFile.H"
+#include "writeFiles.H"
 #include "CSV.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -107,7 +106,7 @@ Foam::scalar checkUniformTimeStep(const scalarField& t)
 
             if (mag(deltaT - dT) > SMALL)
             {
-                FatalErrorIn("checkUniformTimeStep(const scalarField&)")
+                FatalErrorInFunction
                     << "Unable to process data with a variable time step"
                     << exit(FatalError);
             }
@@ -115,7 +114,7 @@ Foam::scalar checkUniformTimeStep(const scalarField& t)
     }
     else
     {
-        FatalErrorIn("checkUniformTimeStep(const scalarField&)")
+        FatalErrorInFunction
             << "Unable to create FFT with a single value"
             << exit(FatalError);
     }
@@ -135,7 +134,7 @@ int main(int argc, char *argv[])
     #include "createFields.H"
 
     Info<< "Reading data file" << endl;
-    CSV<scalar> pData("pressure", dict, "Data");
+    Function1Types::CSV<scalar> pData("pressure", dict, "Data");
 
     // time history data
     const scalarField t(pData.x());
@@ -145,7 +144,7 @@ int main(int argc, char *argv[])
 
     if (t.size() < N)
     {
-        FatalErrorIn(args.executable())
+        FatalErrorInFunction
             << "Block size N = " << N
             << " is larger than number of data = " << t.size()
             << exit(FatalError);

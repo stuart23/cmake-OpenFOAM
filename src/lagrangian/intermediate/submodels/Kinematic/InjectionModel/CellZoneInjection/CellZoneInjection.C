@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -52,10 +52,10 @@ void Foam::CellZoneInjection<CloudType>::setPositions
 
     forAll(cellZoneCells, i)
     {
-        const label cellI = cellZoneCells[i];
+        const label celli = cellZoneCells[i];
 
         // Calc number of particles to add
-        const scalar newParticles = V[cellI]*numberDensity_;
+        const scalar newParticles = V[celli]*numberDensity_;
         newParticlesTotal += newParticles;
         label addParticles = floor(newParticles);
         addParticlesTotal += addParticles;
@@ -70,14 +70,14 @@ void Foam::CellZoneInjection<CloudType>::setPositions
 
         // Construct cell tet indices
         const List<tetIndices> cellTetIs =
-            polyMeshTetDecomposition::cellTetIndices(mesh, cellI);
+            polyMeshTetDecomposition::cellTetIndices(mesh, celli);
 
         // Construct cell tet volume fractions
         scalarList cTetVFrac(cellTetIs.size(), 0.0);
         for (label tetI = 1; tetI < cellTetIs.size() - 1; tetI++)
         {
             cTetVFrac[tetI] =
-                cTetVFrac[tetI-1] + cellTetIs[tetI].tet(mesh).mag()/V[cellI];
+                cTetVFrac[tetI-1] + cellTetIs[tetI].tet(mesh).mag()/V[celli];
         }
         cTetVFrac.last() = 1.0;
 
@@ -96,7 +96,7 @@ void Foam::CellZoneInjection<CloudType>::setPositions
             }
             positions.append(cellTetIs[tetI].tet(mesh).randomPoint(rnd));
 
-            injectorCells.append(cellI);
+            injectorCells.append(celli);
             injectorTetFaces.append(cellTetIs[tetI].face());
             injectorTetPts.append(cellTetIs[tetI].tetPt());
         }
@@ -115,7 +115,7 @@ void Foam::CellZoneInjection<CloudType>::setPositions
         allPositions,
         globalPositions.localSize(Pstream::myProcNo()),
         globalPositions.offset(Pstream::myProcNo())
-    ).assign(positions);
+    ) = positions;
 
     Pstream::listCombineGather(allPositions, minEqOp<point>());
     Pstream::listCombineScatter(allPositions);
@@ -126,19 +126,19 @@ void Foam::CellZoneInjection<CloudType>::setPositions
         allInjectorCells,
         globalPositions.localSize(Pstream::myProcNo()),
         globalPositions.offset(Pstream::myProcNo())
-    ).assign(injectorCells);
+    ) = injectorCells;
     SubList<label>
     (
         allInjectorTetFaces,
         globalPositions.localSize(Pstream::myProcNo()),
         globalPositions.offset(Pstream::myProcNo())
-    ).assign(injectorTetFaces);
+    ) = injectorTetFaces;
     SubList<label>
     (
         allInjectorTetPts,
         globalPositions.localSize(Pstream::myProcNo()),
         globalPositions.offset(Pstream::myProcNo())
-    ).assign(injectorTetPts);
+    ) = injectorTetPts;
 
     // Transfer data
     positions_.transfer(allPositions);
@@ -226,7 +226,7 @@ void Foam::CellZoneInjection<CloudType>::updateMesh()
 
     if (zoneI < 0)
     {
-        FatalErrorIn("Foam::CellZoneInjection<CloudType>::updateMesh()")
+        FatalErrorInFunction
             << "Unknown cell zone name: " << cellZoneName_
             << ". Valid cell zones are: " << mesh.cellZones().names()
             << nl << exit(FatalError);
@@ -242,7 +242,7 @@ void Foam::CellZoneInjection<CloudType>::updateMesh()
 
     if ((nCellsTotal == 0) || (VCellsTotal*numberDensity_ < 1))
     {
-        WarningIn("Foam::CellZoneInjection<CloudType>::updateMesh()")
+        WarningInFunction
             << "Number of particles to be added to cellZone " << cellZoneName_
             << " is zero" << endl;
     }
@@ -319,13 +319,13 @@ void Foam::CellZoneInjection<CloudType>::setPositionAndCell
     const scalar time,
     vector& position,
     label& cellOwner,
-    label& tetFaceI,
+    label& tetFacei,
     label& tetPtI
 )
 {
     position = positions_[parcelI];
     cellOwner = injectorCells_[parcelI];
-    tetFaceI = injectorTetFaces_[parcelI];
+    tetFacei = injectorTetFaces_[parcelI];
     tetPtI = injectorTetPts_[parcelI];
 }
 

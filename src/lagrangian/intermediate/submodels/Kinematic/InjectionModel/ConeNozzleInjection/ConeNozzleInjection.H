@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,25 +25,33 @@ Class
     Foam::ConeNozzleInjection
 
 Description
-    Cone injection
+    Cone injection.
 
-    - User specifies
+    User specifies:
       - time of start of injection
       - injector position
       - direction (along injection axis)
       - parcel flow rate
       - inner and outer half-cone angles
 
-    - Parcel diameters obtained by size distribution model
+    Properties:
+      - Parcel diameters obtained by size distribution model.
 
-    - Parcel velocity is calculated as:
+      - Parcel velocity is calculated as:
+        - Constant velocity:
+          \verbatim
+          U = \<specified by user\>
+          \endverbatim
 
-        - Constant velocity
-            U = <specified by user>
-        - Pressure driven velocity
-            U = sqrt(2*(Pinj - Pamb)/rho)
-        - Flow rate and discharge
-            U = V_dot/(A*Cd)
+        - Pressure driven velocity:
+          \verbatim
+          U = sqrt(2*(Pinj - Pamb)/rho)
+          \endverbatim
+
+        - Flow rate and discharge:
+          \verbatim
+          U = V_dot/(A*Cd)
+          \endverbatim
 
 SourceFiles
     ConeNozzleInjection.C
@@ -63,7 +71,7 @@ namespace Foam
 // Forward declaration of classes
 
 template<class Type>
-class TimeDataEntry;
+class TimeFunction1;
 
 class distributionModel;
 
@@ -120,7 +128,7 @@ private:
         label injectorCell_;
 
         //- Index of tet face for injector cell
-        label tetFaceI_;
+        label tetFacei_;
 
         //- Index of tet point for injector cell
         label tetPtI_;
@@ -132,13 +140,13 @@ private:
         const label parcelsPerSecond_;
 
         //- Flow rate profile relative to SOI []
-        const TimeDataEntry<scalar> flowRateProfile_;
+        const TimeFunction1<scalar> flowRateProfile_;
 
         //- Inner half-cone angle relative to SOI [deg]
-        const TimeDataEntry<scalar> thetaInner_;
+        const TimeFunction1<scalar> thetaInner_;
 
         //- Outer half-cone angle relative to SOI [deg]
-        const TimeDataEntry<scalar> thetaOuter_;
+        const TimeFunction1<scalar> thetaOuter_;
 
         //- Parcel size PDF model
         const autoPtr<distributionModels::distributionModel> sizeDistribution_;
@@ -162,10 +170,10 @@ private:
             scalar UMag_;
 
             //- Discharge coefficient, relative to SOI [m/s]
-            TimeDataEntry<scalar> Cd_;
+            TimeFunction1<scalar> Cd_;
 
             //- Injection pressure [Pa]
-            TimeDataEntry<scalar> Pinj_;
+            TimeFunction1<scalar> Pinj_;
 
 
     // Private Member Functions
@@ -197,9 +205,9 @@ public:
         ConeNozzleInjection(const ConeNozzleInjection<CloudType>& im);
 
         //- Construct and return a clone
-        virtual autoPtr<InjectionModel<CloudType> > clone() const
+        virtual autoPtr<InjectionModel<CloudType>> clone() const
         {
-            return autoPtr<InjectionModel<CloudType> >
+            return autoPtr<InjectionModel<CloudType>>
             (
                 new ConeNozzleInjection<CloudType>(*this)
             );
@@ -235,7 +243,7 @@ public:
                 const scalar time,
                 vector& position,
                 label& cellOwner,
-                label& tetFaceI,
+                label& tetFacei,
                 label& tetPtI
             );
 
@@ -264,7 +272,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "ConeNozzleInjection.C"
+    #include "ConeNozzleInjection.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

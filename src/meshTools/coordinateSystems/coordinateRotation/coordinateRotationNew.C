@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -47,18 +47,12 @@ Foam::autoPtr<Foam::coordinateRotation> Foam::coordinateRotation::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "coordinateRotation::New"
-            "("
-            "   const dictionary&, "
-            "   const objectRegistry& "
-            ")",
             dict
         )   << "Unknown coordinateRotation type "
             << rotType << nl << nl
             << "Valid coordinateRotation types are :" <<  nl
-            << "[default: axes ]"
             << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
@@ -86,17 +80,12 @@ Foam::autoPtr<Foam::coordinateRotation> Foam::coordinateRotation::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "coordinateRotation::New"
-            "("
-            "   const dictionary&, "
-            ")",
             dict
         )   << "Unknown coordinateRotation type "
             << rotType << nl << nl
             << "Valid coordinateRotation types are :" <<  nl
-            << "[default: axes ]"
             << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }

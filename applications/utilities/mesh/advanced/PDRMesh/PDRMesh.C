@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -68,17 +68,17 @@ void modifyOrAddFace
 (
     polyTopoChange& meshMod,
     const face& f,
-    const label faceI,
+    const label facei,
     const label own,
     const bool flipFaceFlux,
-    const label newPatchI,
+    const label newPatchi,
     const label zoneID,
     const bool zoneFlip,
 
     PackedBoolList& modifiedFace
 )
 {
-    if (!modifiedFace[faceI])
+    if (!modifiedFace[facei])
     {
         // First usage of face. Modify.
         meshMod.setAction
@@ -86,17 +86,17 @@ void modifyOrAddFace
             polyModifyFace
             (
                 f,                          // modified face
-                faceI,                      // label of face
+                facei,                      // label of face
                 own,                        // owner
                 -1,                         // neighbour
                 flipFaceFlux,               // face flip
-                newPatchI,                  // patch for face
+                newPatchi,                  // patch for face
                 false,                      // remove from zone
                 zoneID,                     // zone for face
                 zoneFlip                    // face flip in zone
             )
         );
-        modifiedFace[faceI] = 1;
+        modifiedFace[facei] = 1;
     }
     else
     {
@@ -110,9 +110,9 @@ void modifyOrAddFace
                 -1,                         // neighbour
                 -1,                         // master point
                 -1,                         // master edge
-                faceI,                      // master face
+                facei,                      // master face
                 flipFaceFlux,               // face flip
-                newPatchI,                  // patch for face
+                newPatchi,                  // patch for face
                 zoneID,                     // zone for face
                 zoneFlip                    // face flip in zone
             )
@@ -126,10 +126,10 @@ void subsetVolFields
 (
     const fvMeshSubset& subsetter,
     const IOobjectList& objectsList,
-    const label patchI,
+    const label patchi,
     const Type& exposedValue,
     const word GeomVolType,
-    PtrList<GeometricField<Type, fvPatchField, volMesh> >& subFields
+    PtrList<GeometricField<Type, fvPatchField, volMesh>>& subFields
 )
 {
     const fvMesh& baseMesh = subsetter.baseMesh();
@@ -152,17 +152,17 @@ void subsetVolFields
 
             subFields.set(i, subsetter.interpolate(volField));
 
-            // Explicitly set exposed faces (in patchI) to exposedValue.
-            if (patchI >= 0)
+            // Explicitly set exposed faces (in patchi) to exposedValue.
+            if (patchi >= 0)
             {
                 fvPatchField<Type>& fld =
-                    subFields[i++].boundaryField()[patchI];
+                    subFields[i++].boundaryFieldRef()[patchi];
 
                 label newStart = fld.patch().patch().start();
 
-                label oldPatchI = subsetter.patchMap()[patchI];
+                label oldPatchi = subsetter.patchMap()[patchi];
 
-                if (oldPatchI == -1)
+                if (oldPatchi == -1)
                 {
                     // New patch. Reset whole value.
                     fld = exposedValue;
@@ -171,17 +171,17 @@ void subsetVolFields
                 {
                     // Reset those faces that originate from different patch
                     // or internal faces.
-                    label oldSize = volField.boundaryField()[oldPatchI].size();
+                    label oldSize = volField.boundaryField()[oldPatchi].size();
                     label oldStart = volField.boundaryField()
                     [
-                        oldPatchI
+                        oldPatchi
                     ].patch().patch().start();
 
                     forAll(fld, j)
                     {
-                        label oldFaceI = subsetter.faceMap()[newStart+j];
+                        label oldFacei = subsetter.faceMap()[newStart+j];
 
-                        if (oldFaceI < oldStart || oldFaceI >= oldStart+oldSize)
+                        if (oldFacei < oldStart || oldFacei >= oldStart+oldSize)
                         {
                             fld[j] = exposedValue;
                         }
@@ -198,10 +198,10 @@ void subsetSurfaceFields
 (
     const fvMeshSubset& subsetter,
     const IOobjectList& objectsList,
-    const label patchI,
+    const label patchi,
     const Type& exposedValue,
     const word GeomSurfType,
-    PtrList<GeometricField<Type, fvsPatchField, surfaceMesh> >& subFields
+    PtrList<GeometricField<Type, fvsPatchField, surfaceMesh>>& subFields
 )
 {
     const fvMesh& baseMesh = subsetter.baseMesh();
@@ -225,17 +225,17 @@ void subsetSurfaceFields
             subFields.set(i, subsetter.interpolate(volField));
 
 
-            // Explicitly set exposed faces (in patchI) to exposedValue.
-            if (patchI >= 0)
+            // Explicitly set exposed faces (in patchi) to exposedValue.
+            if (patchi >= 0)
             {
                 fvsPatchField<Type>& fld =
-                    subFields[i++].boundaryField()[patchI];
+                    subFields[i++].boundaryFieldRef()[patchi];
 
                 label newStart = fld.patch().patch().start();
 
-                label oldPatchI = subsetter.patchMap()[patchI];
+                label oldPatchi = subsetter.patchMap()[patchi];
 
-                if (oldPatchI == -1)
+                if (oldPatchi == -1)
                 {
                     // New patch. Reset whole value.
                     fld = exposedValue;
@@ -244,17 +244,17 @@ void subsetSurfaceFields
                 {
                     // Reset those faces that originate from different patch
                     // or internal faces.
-                    label oldSize = volField.boundaryField()[oldPatchI].size();
+                    label oldSize = volField.boundaryField()[oldPatchi].size();
                     label oldStart = volField.boundaryField()
                     [
-                        oldPatchI
+                        oldPatchi
                     ].patch().patch().start();
 
                     forAll(fld, j)
                     {
-                        label oldFaceI = subsetter.faceMap()[newStart+j];
+                        label oldFacei = subsetter.faceMap()[newStart+j];
 
-                        if (oldFaceI < oldStart || oldFaceI >= oldStart+oldSize)
+                        if (oldFacei < oldStart || oldFacei >= oldStart+oldSize)
                         {
                             fld[j] = exposedValue;
                         }
@@ -291,16 +291,19 @@ void initCreatedPatches
     {
         GeoField& field = const_cast<GeoField&>(*fieldIter());
 
-        forAll(field.boundaryField(), patchi)
+        typename GeoField::Boundary& fieldBf =
+            field.boundaryFieldRef();
+
+        forAll(fieldBf, patchi)
         {
             if (map.oldPatchSizes()[patchi] == 0)
             {
                 // Not mapped.
-                field.boundaryField()[patchi] = initValue;
+                fieldBf[patchi] = initValue;
 
-                if (field.boundaryField()[patchi].fixesValue())
+                if (fieldBf[patchi].fixesValue())
                 {
-                    field.boundaryField()[patchi] == initValue;
+                    fieldBf[patchi] == initValue;
                 }
             }
         }
@@ -318,18 +321,18 @@ void createCoupledBaffles
 {
     const faceZoneMesh& faceZones = mesh.faceZones();
 
-    forAll(coupledWantedPatch, faceI)
+    forAll(coupledWantedPatch, facei)
     {
-        if (coupledWantedPatch[faceI] != -1)
+        if (coupledWantedPatch[facei] != -1)
         {
-            const face& f = mesh.faces()[faceI];
-            label zoneID = faceZones.whichZone(faceI);
+            const face& f = mesh.faces()[facei];
+            label zoneID = faceZones.whichZone(facei);
             bool zoneFlip = false;
 
             if (zoneID >= 0)
             {
                 const faceZone& fZone = faceZones[zoneID];
-                zoneFlip = fZone.flipMap()[fZone.whichFace(faceI)];
+                zoneFlip = fZone.flipMap()[fZone.whichFace(facei)];
             }
 
             // Use owner side of face
@@ -337,34 +340,34 @@ void createCoupledBaffles
             (
                 meshMod,
                 f,                          // modified face
-                faceI,                      // label of face
-                mesh.faceOwner()[faceI],    // owner
+                facei,                      // label of face
+                mesh.faceOwner()[facei],    // owner
                 false,                      // face flip
-                coupledWantedPatch[faceI],  // patch for face
+                coupledWantedPatch[facei],  // patch for face
                 zoneID,                     // zone for face
                 zoneFlip,                   // face flip in zone
                 modifiedFace                // modify or add status
             );
 
-            if (mesh.isInternalFace(faceI))
+            if (mesh.isInternalFace(facei))
             {
-                label zoneID = faceZones.whichZone(faceI);
+                label zoneID = faceZones.whichZone(facei);
                 bool zoneFlip = false;
 
                 if (zoneID >= 0)
                 {
                     const faceZone& fZone = faceZones[zoneID];
-                    zoneFlip = fZone.flipMap()[fZone.whichFace(faceI)];
+                    zoneFlip = fZone.flipMap()[fZone.whichFace(facei)];
                 }
                 // Use neighbour side of face
                 modifyOrAddFace
                 (
                     meshMod,
                     f.reverseFace(),            // modified face
-                    faceI,                      // label of face
-                    mesh.faceNeighbour()[faceI],// owner
+                    facei,                      // label of face
+                    mesh.faceNeighbour()[facei],// owner
                     false,                      // face flip
-                    coupledWantedPatch[faceI],  // patch for face
+                    coupledWantedPatch[facei],  // patch for face
                     zoneID,                     // zone for face
                     zoneFlip,                   // face flip in zone
                     modifiedFace                // modify or add status
@@ -386,29 +389,29 @@ void createCyclicCoupledBaffles
 {
     const faceZoneMesh& faceZones = mesh.faceZones();
 
-    forAll(cyclicMasterPatch, faceI)
+    forAll(cyclicMasterPatch, facei)
     {
-        if (cyclicMasterPatch[faceI] != -1)
+        if (cyclicMasterPatch[facei] != -1)
         {
-            const face& f = mesh.faces()[faceI];
+            const face& f = mesh.faces()[facei];
 
-            label zoneID = faceZones.whichZone(faceI);
+            label zoneID = faceZones.whichZone(facei);
             bool zoneFlip = false;
 
             if (zoneID >= 0)
             {
                 const faceZone& fZone = faceZones[zoneID];
-                zoneFlip = fZone.flipMap()[fZone.whichFace(faceI)];
+                zoneFlip = fZone.flipMap()[fZone.whichFace(facei)];
             }
 
             modifyOrAddFace
             (
                 meshMod,
                 f.reverseFace(),                    // modified face
-                faceI,                              // label of face
-                mesh.faceNeighbour()[faceI],        // owner
+                facei,                              // label of face
+                mesh.faceNeighbour()[facei],        // owner
                 false,                              // face flip
-                cyclicMasterPatch[faceI],           // patch for face
+                cyclicMasterPatch[facei],           // patch for face
                 zoneID,                             // zone for face
                 zoneFlip,                           // face flip in zone
                 modifiedFace                        // modify or add
@@ -416,30 +419,30 @@ void createCyclicCoupledBaffles
         }
     }
 
-    forAll(cyclicSlavePatch, faceI)
+    forAll(cyclicSlavePatch, facei)
     {
-        if (cyclicSlavePatch[faceI] != -1)
+        if (cyclicSlavePatch[facei] != -1)
         {
-            const face& f = mesh.faces()[faceI];
-            if (mesh.isInternalFace(faceI))
+            const face& f = mesh.faces()[facei];
+            if (mesh.isInternalFace(facei))
             {
-                label zoneID = faceZones.whichZone(faceI);
+                label zoneID = faceZones.whichZone(facei);
                 bool zoneFlip = false;
 
                 if (zoneID >= 0)
                 {
                     const faceZone& fZone = faceZones[zoneID];
-                    zoneFlip = fZone.flipMap()[fZone.whichFace(faceI)];
+                    zoneFlip = fZone.flipMap()[fZone.whichFace(facei)];
                 }
             // Use owner side of face
                 modifyOrAddFace
                 (
                     meshMod,
                     f,                          // modified face
-                    faceI,                      // label of face
-                    mesh.faceOwner()[faceI],    // owner
+                    facei,                      // label of face
+                    mesh.faceOwner()[facei],    // owner
                     false,                      // face flip
-                    cyclicSlavePatch[faceI],    // patch for face
+                    cyclicSlavePatch[facei],    // patch for face
                     zoneID,                     // zone for face
                     zoneFlip,                   // face flip in zone
                     modifiedFace                // modify or add status
@@ -459,19 +462,19 @@ void createBaffles
 {
     const faceZoneMesh& faceZones = mesh.faceZones();
     Info << "faceZone:createBaffle " << faceZones << endl;
-    forAll(wantedPatch, faceI)
+    forAll(wantedPatch, facei)
     {
-        if (wantedPatch[faceI] != -1)
+        if (wantedPatch[facei] != -1)
         {
-            const face& f = mesh.faces()[faceI];
+            const face& f = mesh.faces()[facei];
 
-            label zoneID = faceZones.whichZone(faceI);
+            label zoneID = faceZones.whichZone(facei);
             bool zoneFlip = false;
 
             if (zoneID >= 0)
             {
                 const faceZone& fZone = faceZones[zoneID];
-                zoneFlip = fZone.flipMap()[fZone.whichFace(faceI)];
+                zoneFlip = fZone.flipMap()[fZone.whichFace(facei)];
             }
 
             meshMod.setAction
@@ -479,26 +482,26 @@ void createBaffles
                 polyModifyFace
                 (
                     f,                          // modified face
-                    faceI,                      // label of face
-                    mesh.faceOwner()[faceI],    // owner
+                    facei,                      // label of face
+                    mesh.faceOwner()[facei],    // owner
                     -1,                         // neighbour
                     false,                      // face flip
-                    wantedPatch[faceI],         // patch for face
+                    wantedPatch[facei],         // patch for face
                     false,                      // remove from zone
                     zoneID,                     // zone for face
                     zoneFlip                    // face flip in zone
                 )
             );
 
-            if (mesh.isInternalFace(faceI))
+            if (mesh.isInternalFace(facei))
             {
-                label zoneID = faceZones.whichZone(faceI);
+                label zoneID = faceZones.whichZone(facei);
                 bool zoneFlip = false;
 
                 if (zoneID >= 0)
                 {
                     const faceZone& fZone = faceZones[zoneID];
-                    zoneFlip = fZone.flipMap()[fZone.whichFace(faceI)];
+                    zoneFlip = fZone.flipMap()[fZone.whichFace(facei)];
                 }
 
                 meshMod.setAction
@@ -506,13 +509,13 @@ void createBaffles
                     polyAddFace
                     (
                         f.reverseFace(),            // modified face
-                        mesh.faceNeighbour()[faceI],// owner
+                        mesh.faceNeighbour()[facei],// owner
                         -1,                         // neighbour
                         -1,                         // masterPointID
                         -1,                         // masterEdgeID
-                        faceI,                      // masterFaceID,
+                        facei,                      // masterFaceID,
                         false,                      // face flip
-                        wantedPatch[faceI],         // patch for face
+                        wantedPatch[facei],         // patch for face
                         zoneID,                     // zone for face
                         zoneFlip                    // face flip in zone
                     )
@@ -526,11 +529,11 @@ void createBaffles
 // Wrapper around find patch. Also makes sure same patch in parallel.
 label findPatch(const polyBoundaryMesh& patches, const word& patchName)
 {
-    label patchI = patches.findPatchID(patchName);
+    label patchi = patches.findPatchID(patchName);
 
-    if (patchI == -1)
+    if (patchi == -1)
     {
-        FatalErrorIn("findPatch(const polyBoundaryMesh&, const word&)")
+        FatalErrorInFunction
             << "Illegal patch " << patchName
             << nl << "Valid patches are " << patches.names()
             << exit(FatalError);
@@ -538,20 +541,20 @@ label findPatch(const polyBoundaryMesh& patches, const word& patchName)
 
     // Check same patch for all procs
     {
-        label newPatch = patchI;
+        label newPatch = patchi;
         reduce(newPatch, minOp<label>());
 
-        if (newPatch != patchI)
+        if (newPatch != patchi)
         {
-            FatalErrorIn("findPatch(const polyBoundaryMesh&, const word&)")
+            FatalErrorInFunction
                 << "Patch " << patchName
                 << " should have the same patch index on all processors." << nl
-                << "On my processor it has index " << patchI
+                << "On my processor it has index " << patchi
                 << " ; on some other processor it has index " << newPatch
                 << exit(FatalError);
         }
     }
-    return patchI;
+    return patchi;
 }
 
 
@@ -580,10 +583,10 @@ int main(int argc, char *argv[])
     );
 
     // Per faceSet the patch to put the baffles into
-    const List<Pair<word> > setsAndPatches(dict.lookup("blockedFaces"));
+    const List<Pair<word>> setsAndPatches(dict.lookup("blockedFaces"));
 
     // Per faceSet the patch to put the coupled baffles into
-    DynamicList<FixedList<word, 3> > coupledAndPatches(10);
+    DynamicList<FixedList<word, 3>> coupledAndPatches(10);
     const dictionary& functionDicts = dict.subDict("coupledFaces");
     forAllConstIter(dictionary, functionDicts, iter)
     {
@@ -641,7 +644,7 @@ int main(int argc, char *argv[])
     {
         faceSet fSet(mesh, setsAndPatches[setI][0]);
 
-        label patchI = findPatch
+        label patchi = findPatch
         (
             mesh.boundaryMesh(),
             setsAndPatches[setI][1]
@@ -651,14 +654,14 @@ int main(int argc, char *argv[])
         {
             if (wantedPatch[iter.key()] != -1)
             {
-                FatalErrorIn(args.executable())
+                FatalErrorInFunction
                     << "Face " << iter.key()
                     << " is in faceSet " << setsAndPatches[setI][0]
                     << " destined for patch " << setsAndPatches[setI][1]
                     << " but also in patch " << wantedPatch[iter.key()]
                     << exit(FatalError);
             }
-            wantedPatch[iter.key()] = patchI;
+            wantedPatch[iter.key()] = patchi;
         }
     }
 
@@ -683,27 +686,27 @@ int main(int argc, char *argv[])
         );
 
         faceSet fSet(mesh, coupledAndPatches[setI][0]);
-        label patchI = findPatch(patches, coupledAndPatches[setI][1]);
+        label patchi = findPatch(patches, coupledAndPatches[setI][1]);
 
         forAllConstIter(faceSet, fSet, iter)
         {
             if (coupledWantedPatch[iter.key()] != -1)
             {
-                FatalErrorIn(args.executable())
+                FatalErrorInFunction
                     << "Face " << iter.key()
                     << " is in faceSet " << coupledAndPatches[setI][0]
                     << " destined for patch " << coupledAndPatches[setI][1]
                     << " but also in patch " << coupledWantedPatch[iter.key()]
                     << exit(FatalError);
             }
-                coupledWantedPatch[iter.key()] = patchI;
+                coupledWantedPatch[iter.key()] = patchi;
                 cyclicWantedPatch_half0[iter.key()] = cyclicId;
                 cyclicWantedPatch_half1[iter.key()] = cyclicSlaveId;
         }
     }
 
     // Exposed faces patch
-    label defaultPatchI = findPatch(mesh.boundaryMesh(), defaultPatch);
+    label defaultPatchi = findPatch(mesh.boundaryMesh(), defaultPatch);
 
 
     //
@@ -722,7 +725,7 @@ int main(int argc, char *argv[])
         blockedCells.invert(mesh.nCells());
 
         // Create subsetted mesh.
-        subsetter.setLargeCellSubset(blockedCells, defaultPatchI, true);
+        subsetter.setLargeCellSubset(blockedCells, defaultPatchi, true);
     }
 
 
@@ -780,8 +783,8 @@ int main(int argc, char *argv[])
     (
         subsetter,
         objects,
-        defaultPatchI,
-        pTraits<scalar>::zero,
+        defaultPatchi,
+        scalar(Zero),
         volScalarField::typeName,
         scalarFlds
     );
@@ -792,8 +795,8 @@ int main(int argc, char *argv[])
     (
         subsetter,
         objects,
-        defaultPatchI,
-        pTraits<vector>::zero,
+        defaultPatchi,
+        vector(Zero),
         volVectorField::typeName,
         vectorFlds
     );
@@ -810,8 +813,8 @@ int main(int argc, char *argv[])
     (
         subsetter,
         objects,
-        defaultPatchI,
-        pTraits<sphericalTensor>::zero,
+        defaultPatchi,
+        sphericalTensor(Zero),
         volSphericalTensorField::typeName,
         sphericalTensorFlds
     );
@@ -822,8 +825,8 @@ int main(int argc, char *argv[])
     (
         subsetter,
         objects,
-        defaultPatchI,
-        pTraits<symmTensor>::zero,
+        defaultPatchi,
+        symmTensor(Zero),
         volSymmTensorField::typeName,
         symmTensorFlds
     );
@@ -834,8 +837,8 @@ int main(int argc, char *argv[])
     (
         subsetter,
         objects,
-        defaultPatchI,
-        pTraits<tensor>::zero,
+        defaultPatchi,
+        tensor(Zero),
         volTensorField::typeName,
         tensorFlds
     );
@@ -848,8 +851,8 @@ int main(int argc, char *argv[])
     (
         subsetter,
         objects,
-        defaultPatchI,
-        pTraits<scalar>::zero,
+        defaultPatchi,
+        scalar(Zero),
         surfaceScalarField::typeName,
         surfScalarFlds
     );
@@ -860,8 +863,8 @@ int main(int argc, char *argv[])
     (
         subsetter,
         objects,
-        defaultPatchI,
-        pTraits<vector>::zero,
+        defaultPatchi,
+        vector(Zero),
         surfaceVectorField::typeName,
         surfVectorFlds
     );
@@ -878,8 +881,8 @@ int main(int argc, char *argv[])
     (
         subsetter,
         objects,
-        defaultPatchI,
-        pTraits<sphericalTensor>::zero,
+        defaultPatchi,
+        sphericalTensor(Zero),
         surfaceSphericalTensorField::typeName,
         surfSphericalTensorFlds
     );
@@ -898,8 +901,8 @@ int main(int argc, char *argv[])
     (
         subsetter,
         objects,
-        defaultPatchI,
-        pTraits<symmTensor>::zero,
+        defaultPatchi,
+        symmTensor(Zero),
         surfaceSymmTensorField::typeName,
         surfSymmTensorFlds
     );
@@ -910,8 +913,8 @@ int main(int argc, char *argv[])
     (
         subsetter,
         objects,
-        defaultPatchI,
-        pTraits<tensor>::zero,
+        defaultPatchi,
+        tensor(Zero),
         surfaceTensorField::typeName,
         surfTensorFlds
     );
@@ -1075,25 +1078,25 @@ int main(int argc, char *argv[])
     (
         subsetter.subMesh(),
         map,
-        vector::zero
+        Zero
     );
     initCreatedPatches<volSphericalTensorField>
     (
         subsetter.subMesh(),
         map,
-        sphericalTensor::zero
+        Zero
     );
     initCreatedPatches<volSymmTensorField>
     (
         subsetter.subMesh(),
         map,
-        symmTensor::zero
+        Zero
     );
     initCreatedPatches<volTensorField>
     (
         subsetter.subMesh(),
         map,
-        tensor::zero
+        Zero
     );
 
     initCreatedPatches<surfaceScalarField>
@@ -1106,25 +1109,25 @@ int main(int argc, char *argv[])
     (
         subsetter.subMesh(),
         map,
-        vector::zero
+        Zero
     );
     initCreatedPatches<surfaceSphericalTensorField>
     (
         subsetter.subMesh(),
         map,
-        sphericalTensor::zero
+        Zero
     );
     initCreatedPatches<surfaceSymmTensorField>
     (
         subsetter.subMesh(),
         map,
-        symmTensor::zero
+        Zero
     );
     initCreatedPatches<surfaceTensorField>
     (
         subsetter.subMesh(),
         map,
-        tensor::zero
+        Zero
     );
 
 
@@ -1151,7 +1154,7 @@ int main(int argc, char *argv[])
 
     if (cellRegion.nRegions() > 1)
     {
-        WarningIn(args.executable())
+        WarningInFunction
             << "Removing blocked faces and cells created "
             << cellRegion.nRegions()
             << " regions that are not connected via a face." << nl
@@ -1167,7 +1170,7 @@ int main(int argc, char *argv[])
 
         if (startFrom != "latestTime")
         {
-            WarningIn(args.executable())
+            WarningInFunction
                 << "To run splitMeshRegions please set your"
                 << " startFrom entry to latestTime" << endl;
         }

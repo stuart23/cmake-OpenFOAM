@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,42 +23,31 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-\mainpage OpenFOAM&reg;: open source CFD
+\mainpage Free, Open Source Software from the OpenFOAM Foundation
 
 \section about About OpenFOAM
 
     OpenFOAM is a free, open source CFD software package released free and
     open-source under the GNU General Public License by the,
-    <a href="http://www.openfoam.org">OpenFOAM Foundation</a>.  It has a large
+    <a href="http://openfoam.org">OpenFOAM Foundation</a>.  It has a large
     user base across most areas of engineering and science, from both commercial
     and academic organisations.  OpenFOAM has an extensive range of features to
     solve anything from complex fluid flows involving chemical reactions,
     turbulence and heat transfer, to solid dynamics and electromagnetics.
-    <a href="http://www.openfoam.org/features">More ...</a>
+    <a href="http://openfoam.org/features">More ...</a>
 
+\section layout OpenFOAM Directory Structure
 
-\section layout Code Layout
+    OpenFOAM comprises of four main directories:
+    - \b src: the core OpenFOAM libraries
+    - \b applications: solvers and utilities
+    - \b tutorials: test-cases that demonstrate a wide-range of OpenFOAM
+         functionality
+    - \b doc: documentation
 
-    The OpenFOAM source code comprises of four main components:
-    - src:
-        the core OpenFOAM source code
+\section usingOpenFOAM Using OpenFOAM
 
-    - applications:
-        collections of library functionality wrapped up into applications,
-        such as solvers and utilities
-
-    - tutorials:
-        a suite of test cases that highlight a broad cross-section of
-        OpenFOAM's capabilities
-
-    - doc:
-        supporting documentation
-
-
-\section usingTheCode Using the code
-
-    - \subpage pagePostProcessing
+    - \ref grpFunctionObjects namespace Foam::functionObjects
     - \subpage pageBoundaryConditions
-
 
 \*---------------------------------------------------------------------------*/

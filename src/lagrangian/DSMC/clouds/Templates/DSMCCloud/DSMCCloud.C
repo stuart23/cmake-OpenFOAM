@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -109,12 +109,12 @@ void Foam::DSMCCloud<ParcelType>::initialise
 
     numberDensities /= nParticle_;
 
-    forAll(mesh_.cells(), cellI)
+    forAll(mesh_.cells(), celli)
     {
         List<tetIndices> cellTets = polyMeshTetDecomposition::cellTetIndices
         (
             mesh_,
-            cellI
+            celli
         );
 
         forAll(cellTets, tetI)
@@ -131,7 +131,7 @@ void Foam::DSMCCloud<ParcelType>::initialise
 
                 if (typeId == -1)
                 {
-                    FatalErrorIn("Foam::DSMCCloud<ParcelType>::initialise")
+                    FatalErrorInFunction
                         << "typeId " << moleculeName << "not defined." << nl
                         << abort(FatalError);
                 }
@@ -181,7 +181,7 @@ void Foam::DSMCCloud<ParcelType>::initialise
                         p,
                         U,
                         Ei,
-                        cellI,
+                        celli,
                         cellTetIs.face(),
                         cellTetIs.tetPt(),
                         typeId
@@ -202,7 +202,7 @@ void Foam::DSMCCloud<ParcelType>::initialise
         mostAbundantType
     );
 
-    sigmaTcRMax_.internalField() = cP.sigmaT()*maxwellianMostProbableSpeed
+    sigmaTcRMax_.primitiveFieldRef() = cP.sigmaT()*maxwellianMostProbableSpeed
     (
         temperature,
         cP.mass()
@@ -221,7 +221,7 @@ void Foam::DSMCCloud<ParcelType>::collisions()
     }
 
     // Temporary storage for subCells
-    List<DynamicList<label> > subCells(8);
+    List<DynamicList<label>> subCells(8);
 
     scalar deltaT = mesh().time().deltaTValue();
 
@@ -229,9 +229,9 @@ void Foam::DSMCCloud<ParcelType>::collisions()
 
     label collisions = 0;
 
-    forAll(cellOccupancy_, cellI)
+    forAll(cellOccupancy_, celli)
     {
-        const DynamicList<ParcelType*>& cellParcels(cellOccupancy_[cellI]);
+        const DynamicList<ParcelType*>& cellParcels(cellOccupancy_[celli]);
 
         label nC(cellParcels.size());
 
@@ -249,7 +249,7 @@ void Foam::DSMCCloud<ParcelType>::collisions()
             // Inverse addressing specifying which subCell a parcel is in
             List<label> whichSubCell(cellParcels.size());
 
-            const point& cC = mesh_.cellCentres()[cellI];
+            const point& cC = mesh_.cellCentres()[celli];
 
             forAll(cellParcels, i)
             {
@@ -265,15 +265,15 @@ void Foam::DSMCCloud<ParcelType>::collisions()
 
             // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-            scalar sigmaTcRMax = sigmaTcRMax_[cellI];
+            scalar sigmaTcRMax = sigmaTcRMax_[celli];
 
             scalar selectedPairs =
-                collisionSelectionRemainder_[cellI]
+                collisionSelectionRemainder_[celli]
               + 0.5*nC*(nC - 1)*nParticle_*sigmaTcRMax*deltaT
-               /mesh_.cellVolumes()[cellI];
+               /mesh_.cellVolumes()[celli];
 
             label nCandidates(selectedPairs);
-            collisionSelectionRemainder_[cellI] = selectedPairs - nCandidates;
+            collisionSelectionRemainder_[celli] = selectedPairs - nCandidates;
             collisionCandidates += nCandidates;
 
             for (label c = 0; c < nCandidates; c++)
@@ -343,9 +343,9 @@ void Foam::DSMCCloud<ParcelType>::collisions()
                 // initial value in the acceptance-rejection criteria because
                 // the number of collision candidates selected was based on this
 
-                if (sigmaTcR > sigmaTcRMax_[cellI])
+                if (sigmaTcR > sigmaTcRMax_[celli])
                 {
-                    sigmaTcRMax_[cellI] = sigmaTcR;
+                    sigmaTcRMax_[celli] = sigmaTcR;
                 }
 
                 if ((sigmaTcR/sigmaTcRMax) > rndGen_.scalar01())
@@ -392,7 +392,7 @@ void Foam::DSMCCloud<ParcelType>::resetFields()
     (
         "zero",
         dimensionSet(1, -1, -2, 0, 0),
-        vector::zero
+        Zero
     );
 
     rhoN_ = dimensionedScalar("zero",  dimensionSet(0, -3, 0, 0, 0), VSMALL);
@@ -406,7 +406,7 @@ void Foam::DSMCCloud<ParcelType>::resetFields()
     (
         "zero",
         dimensionSet(1, -2, -1, 0, 0),
-        vector::zero
+        Zero
     );
 }
 
@@ -414,26 +414,26 @@ void Foam::DSMCCloud<ParcelType>::resetFields()
 template<class ParcelType>
 void Foam::DSMCCloud<ParcelType>::calculateFields()
 {
-    scalarField& rhoN = rhoN_.internalField();
-    scalarField& rhoM = rhoM_.internalField();
-    scalarField& dsmcRhoN = dsmcRhoN_.internalField();
-    scalarField& linearKE = linearKE_.internalField();
-    scalarField& internalE = internalE_.internalField();
-    scalarField& iDof = iDof_.internalField();
-    vectorField& momentum = momentum_.internalField();
+    scalarField& rhoN = rhoN_.primitiveFieldRef();
+    scalarField& rhoM = rhoM_.primitiveFieldRef();
+    scalarField& dsmcRhoN = dsmcRhoN_.primitiveFieldRef();
+    scalarField& linearKE = linearKE_.primitiveFieldRef();
+    scalarField& internalE = internalE_.primitiveFieldRef();
+    scalarField& iDof = iDof_.primitiveFieldRef();
+    vectorField& momentum = momentum_.primitiveFieldRef();
 
     forAllConstIter(typename DSMCCloud<ParcelType>, *this, iter)
     {
         const ParcelType& p = iter();
-        const label cellI = p.cell();
+        const label celli = p.cell();
 
-        rhoN[cellI]++;
-        rhoM[cellI] += constProps(p.typeId()).mass();
-        dsmcRhoN[cellI]++;
-        linearKE[cellI] += 0.5*constProps(p.typeId()).mass()*(p.U() & p.U());
-        internalE[cellI] += p.Ei();
-        iDof[cellI] += constProps(p.typeId()).internalDegreesOfFreedom();
-        momentum[cellI] += constProps(p.typeId()).mass()*p.U();
+        rhoN[celli]++;
+        rhoM[celli] += constProps(p.typeId()).mass();
+        dsmcRhoN[celli]++;
+        linearKE[celli] += 0.5*constProps(p.typeId()).mass()*(p.U() & p.U());
+        internalE[celli] += p.Ei();
+        iDof[celli] += constProps(p.typeId()).internalDegreesOfFreedom();
+        momentum[celli] += constProps(p.typeId()).mass()*p.U();
     }
 
     rhoN *= nParticle_/mesh().cellVolumes();
@@ -466,8 +466,8 @@ void Foam::DSMCCloud<ParcelType>::addNewParcel
     const vector& position,
     const vector& U,
     const scalar Ei,
-    const label cellI,
-    const label tetFaceI,
+    const label celli,
+    const label tetFacei,
     const label tetPtI,
     const label typeId
 )
@@ -478,8 +478,8 @@ void Foam::DSMCCloud<ParcelType>::addNewParcel
         position,
         U,
         Ei,
-        cellI,
-        tetFaceI,
+        celli,
+        tetFacei,
         tetPtI,
         typeId
     );
@@ -681,7 +681,7 @@ Foam::DSMCCloud<ParcelType>::DSMCCloud
     ),
     binaryCollisionModel_
     (
-        BinaryCollisionModel<DSMCCloud<ParcelType> >::New
+        BinaryCollisionModel<DSMCCloud<ParcelType>>::New
         (
             particleProperties_,
             *this
@@ -689,7 +689,7 @@ Foam::DSMCCloud<ParcelType>::DSMCCloud
     ),
     wallInteractionModel_
     (
-        WallInteractionModel<DSMCCloud<ParcelType> >::New
+        WallInteractionModel<DSMCCloud<ParcelType>>::New
         (
             particleProperties_,
             *this
@@ -697,7 +697,7 @@ Foam::DSMCCloud<ParcelType>::DSMCCloud
     ),
     inflowBoundaryModel_
     (
-        InflowBoundaryModel<DSMCCloud<ParcelType> >::New
+        InflowBoundaryModel<DSMCCloud<ParcelType>>::New
         (
             particleProperties_,
             *this
@@ -800,7 +800,7 @@ Foam::DSMCCloud<ParcelType>::DSMCCloud
         (
             "zero",
             dimensionSet(1, -1, -2, 0, 0),
-            vector::zero
+            Zero
         )
     ),
     rhoN_
@@ -896,7 +896,7 @@ Foam::DSMCCloud<ParcelType>::DSMCCloud
         (
             "zero",
             dimensionSet(1, -2, -1, 0, 0),
-            vector::zero
+            Zero
         )
     ),
     constProps_(),
@@ -934,7 +934,7 @@ Foam::DSMCCloud<ParcelType>::DSMCCloud
             (
                 "zero",
                 dimensionSet(0, 1, -1, 0, 0),
-                vector::zero
+                Zero
             )
         )
     ),

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -31,11 +31,10 @@ Description
     Constructs on-the-fly a new boundary condition (derived from
     mixedFvPatchField) which is then used to evaluate.
 
-    \heading Patch usage
-
+Usage
     Example:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            codedMixed;
 
@@ -43,14 +42,14 @@ Description
         refGradient     uniform (0 0 0);
         valueFraction   uniform 1;
 
-        redirectType    rampedMixed;   // name of generated BC
+        name    rampedMixed;   // name of generated BC
 
         code
         #{
             this->refValue() =
                 vector(1, 0, 0)
                *min(10, 0.1*this->db().time().value());
-            this->refGrad() = vector::zero;
+            this->refGrad() = Zero;
             this->valueFraction() = 1.0;
         #};
 
@@ -71,18 +70,18 @@ Description
     which would have a corresponding entry
 
     \verbatim
-    myPatch
+    <patchName>
     {
         code
         #{
             this->refValue() = min(10, 0.1*this->db().time().value());
-            this->refGrad() = vector::zero;
+            this->refGrad() = Zero;
             this->valueFraction() = 1.0;
         #};
     }
     \endverbatim
 
-SeeAlso
+See also
     Foam::dynamicCode
     Foam::functionEntries::codeStream
 
@@ -122,9 +121,9 @@ class codedMixedFvPatchField
         //- Dictionary contents for the boundary condition
         mutable dictionary dict_;
 
-        const word redirectType_;
+        const word name_;
 
-        mutable autoPtr<mixedFvPatchField<Type> > redirectPatchFieldPtr_;
+        mutable autoPtr<mixedFvPatchField<Type>> redirectPatchFieldPtr_;
 
 
     // Private Member Functions
@@ -199,9 +198,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchField<Type>> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new codedMixedFvPatchField<Type>(*this)
             );
@@ -215,12 +214,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchField<Type>> clone
         (
             const DimensionedField<Type, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new codedMixedFvPatchField<Type>(*this, iF)
             );
@@ -236,7 +235,7 @@ public:
         virtual void updateCoeffs();
 
         //- Evaluate the patch field
-        //  This is only needed to set the updated() flag of the redirectType
+        //  This is only needed to set the updated() flag of the name
         //  to false.
         virtual void evaluate
         (
@@ -255,7 +254,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "codedMixedFvPatchField.C"
+    #include "codedMixedFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

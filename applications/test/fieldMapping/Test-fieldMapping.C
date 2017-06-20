@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -39,6 +39,7 @@ Description
 #include "mapPolyMesh.H"
 #include "polyTopoChange.H"
 #include "fvcDiv.H"
+#include "zeroGradientFvPatchFields.H"
 #include "Random.H"
 
 using namespace Foam;
@@ -162,11 +163,11 @@ int main(int argc, char *argv[])
         }
 
         // Remove face
-        label candidateFaceI = rndGen.integer(0, mesh.nInternalFaces()-1);
-        Info<< "Wanting to delete face " << mesh.faceCentres()[candidateFaceI]
+        label candidateFacei = rndGen.integer(0, mesh.nInternalFaces()-1);
+        Info<< "Wanting to delete face " << mesh.faceCentres()[candidateFacei]
             << nl << endl;
 
-        labelList candidates(1, candidateFaceI);
+        labelList candidates(1, candidateFacei);
 
 
         // Get compatible set of faces and connected sets of cells.
@@ -225,7 +226,7 @@ int main(int argc, char *argv[])
         {
             if (mesh.V().size() != mesh.nCells())
             {
-                FatalErrorIn(args.executable())
+                FatalErrorInFunction
                     << "Volume not mapped. V:" << mesh.V().size()
                     << " nCells:" << mesh.nCells()
                     << exit(FatalError);
@@ -238,7 +239,7 @@ int main(int argc, char *argv[])
 
             if (mag(newVol-totalVol)/totalVol > 1e-10)
             {
-                FatalErrorIn(args.executable())
+                FatalErrorInFunction
                     << "Volume loss: old volume:" << totalVol
                     << "  new volume:" << newVol
                     << exit(FatalError);
@@ -260,7 +261,7 @@ int main(int argc, char *argv[])
 
             if (notEqual(max, 1.0, 1e-10) || notEqual(min, 1.0, 1e-10))
             {
-                FatalErrorIn(args.executable())
+                FatalErrorInFunction
                     << "Uniform volVectorField not preserved."
                     << " Min and max should both be 1.0. min:" << min
                     << " max:" << max
@@ -284,7 +285,7 @@ int main(int argc, char *argv[])
 
             if (notEqual(max, 0.0, 1e-10) || notEqual(min, 0.0, 1e-10))
             {
-                FatalErrorIn(args.executable())
+                FatalErrorInFunction
                     << "Linear profile not preserved."
                     << " Min and max should both be 0.0. min:" << min
                     << " max:" << max
@@ -299,15 +300,15 @@ int main(int argc, char *argv[])
         // Check face field mapping
         if (surfaceOne.size())
         {
-            const scalar max = gMax(surfaceOne.internalField());
-            const scalar min = gMin(surfaceOne.internalField());
+            const scalar max = gMax(surfaceOne.primitiveField());
+            const scalar min = gMin(surfaceOne.primitiveField());
 
             Info<< "Uniform surface field min = " << min
                 << "  max = " << max << endl;
 
             if (notEqual(max, 1.0, 1e-10) || notEqual(min, 1.0, 1e-10))
             {
-                FatalErrorIn(args.executable())
+                FatalErrorInFunction
                     << "Uniform surfaceScalarField not preserved."
                     << " Min and max should both be 1.0. min:" << min
                     << " max:" << max

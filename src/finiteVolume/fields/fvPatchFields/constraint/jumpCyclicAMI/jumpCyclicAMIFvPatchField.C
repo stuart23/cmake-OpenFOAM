@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -91,15 +91,15 @@ Foam::jumpCyclicAMIFvPatchField<Type>::jumpCyclicAMIFvPatchField
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::jumpCyclicAMIFvPatchField<Type>::patchNeighbourField() const
 {
-    const Field<Type>& iField = this->internalField();
+    const Field<Type>& iField = this->primitiveField();
     const labelUList& nbrFaceCells =
         this->cyclicAMIPatch().cyclicAMIPatch().neighbPatch().faceCells();
 
     Field<Type> pnf(iField, nbrFaceCells);
-    tmp<Field<Type> > tpnf;
+    tmp<Field<Type>> tpnf;
 
     if (this->cyclicAMIPatch().applyLowWeightCorrection())
     {
@@ -120,7 +120,7 @@ Foam::jumpCyclicAMIFvPatchField<Type>::patchNeighbourField() const
         tpnf = transform(this->forwardT(), tpnf);
     }
 
-    tmp<Field<Type> > tjf = jump();
+    tmp<Field<Type>> tjf = jump();
     if (!this->cyclicAMIPatch().owner())
     {
         tjf = -tjf;
@@ -140,17 +140,7 @@ void Foam::jumpCyclicAMIFvPatchField<Type>::updateInterfaceMatrix
     const Pstream::commsTypes
 ) const
 {
-    notImplemented
-    (
-        "void Foam::jumpCyclicAMIFvPatchField<Type>::updateInterfaceMatrix"
-        "("
-            "scalarField&, "
-            "const scalarField&, "
-            "const scalarField& coeffs,"
-            "const direction, "
-            "const Pstream::commsTypes"
-        ") const"
-    );
+    NotImplemented;
 }
 
 
@@ -184,7 +174,7 @@ void Foam::jumpCyclicAMIFvPatchField<Type>::updateInterfaceMatrix
     }
 
     // only apply jump to original field
-    if (&psiInternal == &this->internalField())
+    if (&psiInternal == &this->primitiveField())
     {
         Field<Type> jf(this->jump());
         if (!this->cyclicAMIPatch().owner())

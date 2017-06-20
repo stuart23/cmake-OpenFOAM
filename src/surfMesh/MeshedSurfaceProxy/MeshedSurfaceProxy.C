@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -62,10 +62,7 @@ void Foam::MeshedSurfaceProxy<Face>::write
 {
     if (debug)
     {
-        Info<< "MeshedSurfaceProxy::write"
-            "(const fileName&, const MeshedSurfaceProxy&) : "
-            "writing to " << name
-            << endl;
+        InfoInFunction << "Writing to " << name << endl;
     }
 
     word ext = name.ext();
@@ -75,10 +72,8 @@ void Foam::MeshedSurfaceProxy<Face>::write
 
     if (mfIter == writefileExtensionMemberFunctionTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "MeshedSurfaceProxy::write(const fileName&)"
-        )   << "Unknown file extension " << ext << nl << nl
+        FatalErrorInFunction
+            << "Unknown file extension " << ext << nl << nl
             << "Valid types are :" << endl
             << writeTypes()
             << exit(FatalError);
@@ -100,14 +95,11 @@ void Foam::MeshedSurfaceProxy<Face>::write
 
     if (debug)
     {
-        Info<< "MeshedSurfaceProxy::write"
-            "(const Time&, const word&) : "
-            "writing to " << name
-            << endl;
+        InfoInFunction << "Writing to " << name << endl;
     }
 
 
-    // the local location
+    // The local location
     const fileName objectDir
     (
         t.timePath()/surfaceRegistry::prefix/name/surfMesh::meshSubDir

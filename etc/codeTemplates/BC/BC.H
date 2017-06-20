@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -43,8 +43,7 @@ Description
         Q_{t}  | TYPE function of time [units]
     \endtable
 
-    \heading Patch usage
-
+Usage
     \table
         Property   | Description                  | Req'd? | Default
         scalarData | single scalar value          | yes    |
@@ -56,7 +55,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type       NAME;
         scalarData -1;
@@ -80,7 +79,7 @@ SourceFiles
 #define CONSTRUCT_H
 
 #include "BASEFvPatchFields.H"
-#include "DataEntry.H"
+#include "Function1.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -110,7 +109,7 @@ class CONSTRUCT
         FIELD fieldData_;
 
         //- Type specified as a function of time for time-varying BCs
-        autoPtr<DataEntry<TYPE> > timeVsData_;
+        autoPtr<Function1<TYPE>> timeVsData_;
 
         //- Word entry, e.g. pName_ for name of the pressure field on database
         word wordData_;
@@ -236,7 +235,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "CONSTRUCT.C"
+    #include "CONSTRUCT.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

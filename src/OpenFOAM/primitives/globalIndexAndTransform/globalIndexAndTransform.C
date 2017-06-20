@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -134,9 +134,9 @@ void Foam::globalIndexAndTransform::determineTransforms()
 
     label dummyMatch = -1;
 
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        const polyPatch& pp = patches[patchI];
+        const polyPatch& pp = patches[patchi];
 
         // Note: special check for unordered cyclics. These are in fact
         // transform bcs and should probably be split off.
@@ -180,11 +180,8 @@ void Foam::globalIndexAndTransform::determineTransforms()
                         {
                             if (nextTrans == 6)
                             {
-                                FatalErrorIn
-                                (
-                                     "void Foam::globalIndexAndTransform::"
-                                     "determineTransforms()"
-                                )   << "More than six unsigned transforms"
+                                FatalErrorInFunction
+                                    << "More than six unsigned transforms"
                                     << " detected:" << nl << transforms_
                                     << exit(FatalError);
                             }
@@ -220,11 +217,8 @@ void Foam::globalIndexAndTransform::determineTransforms()
                         {
                             if (nextTrans == 6)
                             {
-                                FatalErrorIn
-                                (
-                                    "void Foam::globalIndexAndTransform::"
-                                    "determineTransforms()"
-                                )   << "More than six unsigned transforms"
+                                FatalErrorInFunction
+                                    << "More than six unsigned transforms"
                                     << " detected:" << nl << transforms_
                                     << exit(FatalError);
                             }
@@ -240,7 +234,7 @@ void Foam::globalIndexAndTransform::determineTransforms()
 
     // Collect transforms on master
 
-    List<List<vectorTensorTransform> > allTransforms(Pstream::nProcs());
+    List<List<vectorTensorTransform>> allTransforms(Pstream::nProcs());
     allTransforms[Pstream::myProcNo()] = transforms_;
     Pstream::gatherList(allTransforms);
 
@@ -255,10 +249,10 @@ void Foam::globalIndexAndTransform::determineTransforms()
 
         label nextTrans = 0;
 
-        forAll(allTransforms, procI)
+        forAll(allTransforms, proci)
         {
             const List<vectorTensorTransform>& procTransVecs =
-                allTransforms[procI];
+                allTransforms[proci];
 
             forAll(procTransVecs, pSVI)
             {
@@ -273,7 +267,7 @@ void Foam::globalIndexAndTransform::determineTransforms()
                             transforms_,
                             dummyMatch,
                             transform,
-                            allTols[procI][pSVI],
+                            allTols[proci][pSVI],
                             true
                         ) ==  0
                     )
@@ -283,11 +277,7 @@ void Foam::globalIndexAndTransform::determineTransforms()
 
                     if (nextTrans > 3)
                     {
-                        FatalErrorIn
-                        (
-                            "void Foam::globalIndexAndTransform::"
-                            "determineTransforms()"
-                        )
+                        FatalErrorInFunction
                             << "More than three independent basic "
                             << "transforms detected:" << nl
                             << allTransforms
@@ -305,10 +295,8 @@ void Foam::globalIndexAndTransform::determineTransforms()
 
     if (transforms_.size() > 3)
     {
-        WarningIn
-        (
-            "void globalIndexAndTransform::determineTransforms()"
-        )   << "More than three independent basic "
+        WarningInFunction
+            << "More than three independent basic "
             << "transforms detected:" << nl
             << transforms_ << nl
             << "This is not a space filling tiling and will probably"
@@ -367,11 +355,11 @@ void Foam::globalIndexAndTransform::determinePatchTransformSign()
 
     label matchTransI = -1;
 
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        const polyPatch& pp = patches[patchI];
+        const polyPatch& pp = patches[patchi];
 
-        // Pout<< nl << patchI << " " << pp.name() << endl;
+        // Pout<< nl << patchi << " " << pp.name() << endl;
 
         // Note: special check for unordered cyclics. These are in fact
         // transform bcs and should probably be split off.
@@ -428,7 +416,7 @@ void Foam::globalIndexAndTransform::determinePatchTransformSign()
                         //        ]
                         //     << endl;
 
-                        patchTransformSign_[patchI] =
+                        patchTransformSign_[patchi] =
                             Pair<label>(matchTransI, sign);
                     }
                 }
@@ -472,7 +460,7 @@ void Foam::globalIndexAndTransform::determinePatchTransformSign()
                         //        ]
                         //     << endl;
 
-                        patchTransformSign_[patchI] =
+                        patchTransformSign_[patchi] =
                             Pair<label>(matchTransI, sign);
                     }
                 }
@@ -526,13 +514,13 @@ Foam::globalIndexAndTransform::globalIndexAndTransform
 
 
         Info<< "\tpatch\ttransform\tsign" << endl;
-        forAll(patchTransformSign_, patchI)
+        forAll(patchTransformSign_, patchi)
         {
-            if (patchTransformSign_[patchI].first() != -1)
+            if (patchTransformSign_[patchi].first() != -1)
             {
-                Info<< '\t' << patches[patchI].name()
-                    << '\t' << patchTransformSign_[patchI].first()
-                    << '\t' << patchTransformSign_[patchI].second()
+                Info<< '\t' << patches[patchi].name()
+                    << '\t' << patchTransformSign_[patchi].first()
+                    << '\t' << patchTransformSign_[patchi].second()
                     << endl;
             }
         }

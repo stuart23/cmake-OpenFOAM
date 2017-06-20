@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,8 +30,7 @@ Group
 Description
     This boundary condition provides a uniform fixed gradient condition.
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         uniformGradient | uniform gradient     | yes         |
@@ -39,7 +38,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            uniformFixedGradient;
         uniformGradient constant 0.2;
@@ -47,12 +46,12 @@ Description
     \endverbatim
 
 Note
-    The uniformGradient entry is a DataEntry type, able to describe time
+    The uniformGradient entry is a Function1 type, able to describe time
     varying functions.  The example above gives the usage for supplying a
     constant value.
 
-SeeAlso
-    Foam::DataEntry
+See also
+    Foam::Function1Types
     Foam::fixedGradientFvPatchField
 
 SourceFiles
@@ -64,7 +63,7 @@ SourceFiles
 #define uniformFixedGradientFvPatchField_H
 
 #include "fixedGradientFvPatchFields.H"
-#include "DataEntry.H"
+#include "Function1.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -83,7 +82,7 @@ class uniformFixedGradientFvPatchField
     // Private data
 
         //- Gradient
-        autoPtr<DataEntry<Type> > uniformGradient_;
+        autoPtr<Function1<Type>> uniformGradient_;
 
 
 public:
@@ -134,9 +133,9 @@ public:
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchField<Type>> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new uniformFixedGradientFvPatchField<Type>(*this)
             );
@@ -150,12 +149,12 @@ public:
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchField<Type>> clone
         (
             const DimensionedField<Type, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchField<Type>>
             (
                 new uniformFixedGradientFvPatchField<Type>(*this, iF)
             );
@@ -164,12 +163,8 @@ public:
 
     // Member functions
 
-
-        // Evaluation functions
-
-            //- Update the coefficients associated with the patch field
-            virtual void updateCoeffs();
-
+        //- Update the coefficients associated with the patch field
+        virtual void updateCoeffs();
 
         //- Write
         virtual void write(Ostream&) const;
@@ -183,7 +178,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "uniformFixedGradientFvPatchField.C"
+    #include "uniformFixedGradientFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

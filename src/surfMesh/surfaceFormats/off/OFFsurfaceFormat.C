@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -56,10 +56,7 @@ bool Foam::fileFormats::OFFsurfaceFormat<Face>::read
     IFstream is(filename);
     if (!is.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::OFFsurfaceFormat::read(const fileName&)"
-        )
+        FatalErrorInFunction
             << "Cannot read file " << filename
             << exit(FatalError);
     }
@@ -68,10 +65,7 @@ bool Foam::fileFormats::OFFsurfaceFormat<Face>::read
     string hdr = this->getLineNoComment(is);
     if (hdr != "OFF")
     {
-        FatalErrorIn
-        (
-            "fileFormats::OFFsurfaceFormat::read(const fileName&)"
-        )
+        FatalErrorInFunction
             << "OFF file " << filename << " does not start with 'OFF'"
             << exit(FatalError);
     }
@@ -88,7 +82,7 @@ bool Foam::fileFormats::OFFsurfaceFormat<Face>::read
 
     // Read points
     pointField pointLst(nPoints);
-    forAll(pointLst, pointI)
+    forAll(pointLst, pointi)
     {
         scalar x, y, z;
         line = this->getLineNoComment(is);
@@ -96,14 +90,14 @@ bool Foam::fileFormats::OFFsurfaceFormat<Face>::read
             IStringStream lineStream(line);
             lineStream >> x >> y >> z;
         }
-        pointLst[pointI] = point(x, y, z);
+        pointLst[pointi] = point(x, y, z);
     }
 
     // Read faces - ignore optional zone information
     // use a DynamicList for possible on-the-fly triangulation
     DynamicList<Face>  dynFaces(nElems);
 
-    for (label faceI = 0; faceI < nElems; ++faceI)
+    for (label facei = 0; facei < nElems; ++facei)
     {
         line = this->getLineNoComment(is);
 
@@ -162,11 +156,7 @@ void Foam::fileFormats::OFFsurfaceFormat<Face>::write
     OFstream os(filename);
     if (!os.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::OFFsurfaceFormat::write"
-            "(const fileName&, const MeshedSurfaceProxy<Face>&)"
-        )
+        FatalErrorInFunction
             << "Cannot open file for writing " << filename
             << exit(FatalError);
     }
@@ -211,7 +201,7 @@ void Foam::fileFormats::OFFsurfaceFormat<Face>::write
 
         if (surf.useFaceMap())
         {
-            forAll(zoneLst[zoneI], localFaceI)
+            forAll(zoneLst[zoneI], localFacei)
             {
                 const Face& f = faceLst[faceMap[faceIndex++]];
 
@@ -227,7 +217,7 @@ void Foam::fileFormats::OFFsurfaceFormat<Face>::write
         }
         else
         {
-            forAll(zoneLst[zoneI], localFaceI)
+            forAll(zoneLst[zoneI], localFacei)
             {
                 const Face& f = faceLst[faceIndex++];
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -32,19 +32,19 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTemplate2TypeNameAndDebug(volScalarField::DimensionedInternalField, 0);
-defineTemplate2TypeNameAndDebug(volVectorField::DimensionedInternalField, 0);
+defineTemplate2TypeNameAndDebug(volScalarField::Internal, 0);
+defineTemplate2TypeNameAndDebug(volVectorField::Internal, 0);
 defineTemplate2TypeNameAndDebug
 (
-    volSphericalTensorField::DimensionedInternalField,
+    volSphericalTensorField::Internal,
     0
 );
 defineTemplate2TypeNameAndDebug
 (
-    volSymmTensorField::DimensionedInternalField,
+    volSymmTensorField::Internal,
     0
 );
-defineTemplate2TypeNameAndDebug(volTensorField::DimensionedInternalField, 0);
+defineTemplate2TypeNameAndDebug(volTensorField::Internal, 0);
 
 defineTemplateTypeNameAndDebug(volScalarField, 0);
 defineTemplateTypeNameAndDebug(volVectorField, 0);
@@ -57,7 +57,7 @@ defineTemplateTypeNameAndDebug(volTensorField, 0);
 
 // specialization for scalar fields
 template<>
-tmp<GeometricField<scalar, fvPatchField, volMesh> >
+tmp<GeometricField<scalar, fvPatchField, volMesh>>
 GeometricField<scalar, fvPatchField, volMesh>::component
 (
     const direction

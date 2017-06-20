@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -43,9 +43,9 @@ void Foam::MRFZone::makeRelativeRhoFlux
 
     const vector Omega = omega_->value(mesh_.time().timeOutputValue())*axis_;
 
-    const vectorField& Cfi = Cf.internalField();
-    const vectorField& Sfi = Sf.internalField();
-    scalarField& phii = phi.internalField();
+    const vectorField& Cfi = Cf;
+    const vectorField& Sfi = Sf;
+    scalarField& phii = phi.primitiveFieldRef();
 
     // Internal faces
     forAll(internalFaces_, i)
@@ -54,7 +54,7 @@ void Foam::MRFZone::makeRelativeRhoFlux
         phii[facei] -= rho[facei]*(Omega ^ (Cfi[facei] - origin_)) & Sfi[facei];
     }
 
-    makeRelativeRhoFlux(rho.boundaryField(), phi.boundaryField());
+    makeRelativeRhoFlux(rho.boundaryField(), phi.boundaryFieldRef());
 }
 
 
@@ -98,6 +98,40 @@ void Foam::MRFZone::makeRelativeRhoFlux
 
 
 template<class RhoFieldType>
+void Foam::MRFZone::makeRelativeRhoFlux
+(
+    const RhoFieldType& rho,
+    Field<scalar>& phi,
+    const label patchi
+) const
+{
+    const surfaceVectorField& Cf = mesh_.Cf();
+    const surfaceVectorField& Sf = mesh_.Sf();
+
+    const vector Omega = omega_->value(mesh_.time().timeOutputValue())*axis_;
+
+    // Included patches
+    forAll(includedFaces_[patchi], i)
+    {
+        label patchFacei = includedFaces_[patchi][i];
+
+        phi[patchFacei] = 0.0;
+    }
+
+    // Excluded patches
+    forAll(excludedFaces_[patchi], i)
+    {
+        label patchFacei = excludedFaces_[patchi][i];
+
+        phi[patchFacei] -=
+            rho[patchFacei]
+          * (Omega ^ (Cf.boundaryField()[patchi][patchFacei] - origin_))
+          & Sf.boundaryField()[patchi][patchFacei];
+    }
+}
+
+
+template<class RhoFieldType>
 void Foam::MRFZone::makeAbsoluteRhoFlux
 (
     const RhoFieldType& rho,
@@ -109,9 +143,9 @@ void Foam::MRFZone::makeAbsoluteRhoFlux
 
     const vector Omega = omega_->value(mesh_.time().timeOutputValue())*axis_;
 
-    const vectorField& Cfi = Cf.internalField();
-    const vectorField& Sfi = Sf.internalField();
-    scalarField& phii = phi.internalField();
+    const vectorField& Cfi = Cf;
+    const vectorField& Sfi = Sf;
+    scalarField& phii = phi.primitiveFieldRef();
 
     // Internal faces
     forAll(internalFaces_, i)
@@ -120,6 +154,9 @@ void Foam::MRFZone::makeAbsoluteRhoFlux
         phii[facei] += rho[facei]*(Omega ^ (Cfi[facei] - origin_)) & Sfi[facei];
     }
 
+    surfaceScalarField::Boundary& phibf = phi.boundaryFieldRef();
+
+
     // Included patches
     forAll(includedFaces_, patchi)
     {
@@ -127,7 +164,7 @@ void Foam::MRFZone::makeAbsoluteRhoFlux
         {
             label patchFacei = includedFaces_[patchi][i];
 
-            phi.boundaryField()[patchi][patchFacei] +=
+            phibf[patchi][patchFacei] +=
                 rho.boundaryField()[patchi][patchFacei]
               * (Omega ^ (Cf.boundaryField()[patchi][patchFacei] - origin_))
               & Sf.boundaryField()[patchi][patchFacei];
@@ -141,7 +178,7 @@ void Foam::MRFZone::makeAbsoluteRhoFlux
         {
             label patchFacei = excludedFaces_[patchi][i];
 
-            phi.boundaryField()[patchi][patchFacei] +=
+            phibf[patchi][patchFacei] +=
                 rho.boundaryField()[patchi][patchFacei]
               * (Omega ^ (Cf.boundaryField()[patchi][patchFacei] - origin_))
               & Sf.boundaryField()[patchi][patchFacei];

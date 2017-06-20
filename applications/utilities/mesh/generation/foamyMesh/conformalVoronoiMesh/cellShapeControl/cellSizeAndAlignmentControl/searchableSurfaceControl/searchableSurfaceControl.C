@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -69,10 +69,7 @@ addToRunTimeSelectionTable
 ////
 ////    if (!surfHit.hit())
 ////    {
-////        FatalErrorIn
-////        (
-////            "Foam::tensor Foam::conformalVoronoiMesh::requiredAlignment"
-////        )
+////        FatalErrorInFunction
 ////            << "findSurfaceNearest did not find a hit across the surfaces."
 ////            << exit(FatalError) << endl;
 ////    }
@@ -103,7 +100,7 @@ addToRunTimeSelectionTable
 //
 //    const tensor Rp = rotationTensor(vector(0,0,1), np);
 //
-//    vector na = vector::zero;
+//    vector na = Zero;
 //
 //    scalar smallestAngle = GREAT;
 //
@@ -125,7 +122,7 @@ addToRunTimeSelectionTable
 //
 //    if (mag(ns) < SMALL)
 //    {
-//        WarningIn("conformalVoronoiMesh::requiredAlignment")
+//        WarningInFunction
 //            << "Parallel normals detected in spoke search." << nl
 //            << "point: " << pt << nl
 //            << "np   : " << np << nl
@@ -466,11 +463,8 @@ void Foam::searchableSurfaceControl::initialVertices
         if (!cellSize(pts[pI], sizes[pI], priority))
         {
             sizes[pI] = defaultCellSize_;
-//            FatalErrorIn
-//            (
-//                "Foam::searchableSurfaceControl::initialVertices"
-//                "(pointField&, scalarField&, tensorField&)"
-//            )   << "Could not calculate cell size"
+//            FatalErrorInFunction
+//                << "Could not calculate cell size"
 //                << abort(FatalError);
         }
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -75,9 +75,7 @@ bool Foam::radiation::noRadiation::read()
 
 
 void Foam::radiation::noRadiation::calculate()
-{
-    // Do nothing
-}
+{}
 
 
 Foam::tmp<Foam::volScalarField> Foam::radiation::noRadiation::Rp() const
@@ -106,10 +104,10 @@ Foam::tmp<Foam::volScalarField> Foam::radiation::noRadiation::Rp() const
 }
 
 
-Foam::tmp<Foam::DimensionedField<Foam::scalar, Foam::volMesh> >
+Foam::tmp<Foam::DimensionedField<Foam::scalar, Foam::volMesh>>
 Foam::radiation::noRadiation::Ru() const
 {
-    return tmp<DimensionedField<scalar, volMesh> >
+    return tmp<DimensionedField<scalar, volMesh>>
     (
         new DimensionedField<scalar, volMesh>
         (

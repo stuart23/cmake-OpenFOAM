@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -151,7 +151,7 @@ void Foam::WallLocalSpringSliderDashpot<CloudType>::evaluateWall
 
             fT_PW = -mu*mag(fN_PW)*USlip_PW/mag(USlip_PW);
 
-            tangentialOverlap_PW = vector::zero;
+            tangentialOverlap_PW = Zero;
         }
         else
         {
@@ -214,11 +214,11 @@ Foam::WallLocalSpringSliderDashpot<CloudType>::WallLocalSpringSliderDashpot
 
     DynamicList<label> wallPatchIndices;
 
-    forAll(bMesh, patchI)
+    forAll(bMesh, patchi)
     {
-        if (isA<wallPolyPatch>(bMesh[patchI]))
+        if (isA<wallPolyPatch>(bMesh[patchi]))
         {
-            wallPatchIndices.append(bMesh[patchI].index());
+            wallPatchIndices.append(bMesh[patchi].index());
         }
     }
 
@@ -337,9 +337,9 @@ void Foam::WallLocalSpringSliderDashpot<CloudType>::evaluateWall
 (
     typename CloudType::parcelType& p,
     const List<point>& flatSitePoints,
-    const List<WallSiteData<vector> >& flatSiteData,
+    const List<WallSiteData<vector>>& flatSiteData,
     const List<point>& sharpSitePoints,
-    const List<WallSiteData<vector> >& sharpSiteData
+    const List<WallSiteData<vector>>& sharpSiteData
 ) const
 {
     scalar pREff = this->pREff(p);

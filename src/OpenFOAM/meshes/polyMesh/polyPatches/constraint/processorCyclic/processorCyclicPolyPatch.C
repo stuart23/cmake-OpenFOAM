@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -41,7 +41,6 @@ namespace Foam
 
 Foam::processorCyclicPolyPatch::processorCyclicPolyPatch
 (
-    const word& name,
     const label size,
     const label start,
     const label index,
@@ -55,7 +54,7 @@ Foam::processorCyclicPolyPatch::processorCyclicPolyPatch
 :
     processorPolyPatch
     (
-        name,
+        newName(referPatchName, myProcNo, neighbProcNo),
         size,
         start,
         index,
@@ -157,6 +156,33 @@ Foam::processorCyclicPolyPatch::~processorCyclicPolyPatch()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+Foam::word Foam::processorCyclicPolyPatch::newName
+(
+    const word& cyclicPolyPatchName,
+    const label myProcNo,
+    const label neighbProcNo
+)
+{
+    return
+        processorPolyPatch::newName(myProcNo, neighbProcNo)
+      + "through"
+      + cyclicPolyPatchName;
+}
+
+
+Foam::labelList Foam::processorCyclicPolyPatch::patchIDs
+(
+    const word& cyclicPolyPatchName,
+    const polyBoundaryMesh& bm
+)
+{
+    return bm.findIndices
+    (
+        string("procBoundary.*to.*through" + cyclicPolyPatchName)
+    );
+}
+
+
 int Foam::processorCyclicPolyPatch::tag() const
 {
     if (tag_ == -1)
@@ -179,7 +205,7 @@ int Foam::processorCyclicPolyPatch::tag() const
 
         if (tag_ == Pstream::msgType() || tag_ == -1)
         {
-            FatalErrorIn("processorCyclicPolyPatch::tag() const")
+            FatalErrorInFunction
                 << "Tag calculated from cyclic patch name " << tag_
                 << " is the same as the current message type "
                 << Pstream::msgType() << " or -1" << nl
@@ -295,10 +321,6 @@ void Foam::processorCyclicPolyPatch::initOrder
 }
 
 
-// Return new ordering. Ordering is -faceMap: for every face index
-// the new face -rotation:for every new face the clockwise shift
-// of the original face. Return false if nothing changes (faceMap
-// is identity, rotation is 0)
 bool Foam::processorCyclicPolyPatch::order
 (
     PstreamBuffers& pBufs,

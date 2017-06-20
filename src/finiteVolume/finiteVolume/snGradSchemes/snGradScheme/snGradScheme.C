@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -42,7 +42,7 @@ namespace fv
 // * * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * //
 
 template<class Type>
-tmp<snGradScheme<Type> > snGradScheme<Type>::New
+tmp<snGradScheme<Type>> snGradScheme<Type>::New
 (
     const fvMesh& mesh,
     Istream& schemeData
@@ -50,16 +50,13 @@ tmp<snGradScheme<Type> > snGradScheme<Type>::New
 {
     if (fv::debug)
     {
-        Info<< "snGradScheme<Type>::New(const fvMesh&, Istream&)"
-               " : constructing snGradScheme<Type>"
-            << endl;
+        InfoInFunction << "Constructing snGradScheme<Type>" << endl;
     }
 
     if (schemeData.eof())
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "snGradScheme<Type>::New(const fvMesh&, Istream&)",
             schemeData
         )   << "Discretisation scheme not specified"
             << endl << endl
@@ -75,9 +72,8 @@ tmp<snGradScheme<Type> > snGradScheme<Type>::New
 
     if (constructorIter == MeshConstructorTablePtr_->end())
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "snGradScheme<Type>::New(const fvMesh&, Istream&)",
             schemeData
         )   << "Unknown discretisation scheme "
             << schemeName << nl << nl
@@ -100,7 +96,7 @@ snGradScheme<Type>::~snGradScheme()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
+tmp<GeometricField<Type, fvsPatchField, surfaceMesh>>
 snGradScheme<Type>::snGrad
 (
     const GeometricField<Type, fvPatchField, volMesh>& vf,
@@ -111,7 +107,7 @@ snGradScheme<Type>::snGrad
     const fvMesh& mesh = vf.mesh();
 
     // construct GeometricField<Type, fvsPatchField, surfaceMesh>
-    tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > tsf
+    tmp<GeometricField<Type, fvsPatchField, surfaceMesh>> tsf
     (
         new GeometricField<Type, fvsPatchField, surfaceMesh>
         (
@@ -127,10 +123,10 @@ snGradScheme<Type>::snGrad
             vf.dimensions()*tdeltaCoeffs().dimensions()
         )
     );
-    GeometricField<Type, fvsPatchField, surfaceMesh>& ssf = tsf();
+    GeometricField<Type, fvsPatchField, surfaceMesh>& ssf = tsf.ref();
 
     // set reference to difference factors array
-    const scalarField& deltaCoeffs = tdeltaCoeffs().internalField();
+    const scalarField& deltaCoeffs = tdeltaCoeffs();
 
     // owner/neighbour addressing
     const labelUList& owner = mesh.owner();
@@ -142,18 +138,20 @@ snGradScheme<Type>::snGrad
             deltaCoeffs[facei]*(vf[neighbour[facei]] - vf[owner[facei]]);
     }
 
+    typename GeometricField<Type, fvsPatchField, surfaceMesh>::
+        Boundary& ssfbf = ssf.boundaryFieldRef();
+
     forAll(vf.boundaryField(), patchi)
     {
         const fvPatchField<Type>& pvf = vf.boundaryField()[patchi];
 
         if (pvf.coupled())
         {
-            ssf.boundaryField()[patchi] =
-                pvf.snGrad(tdeltaCoeffs().boundaryField()[patchi]);
+            ssfbf[patchi] = pvf.snGrad(tdeltaCoeffs().boundaryField()[patchi]);
         }
         else
         {
-            ssf.boundaryField()[patchi] = pvf.snGrad();
+            ssfbf[patchi] = pvf.snGrad();
         }
     }
 
@@ -162,7 +160,7 @@ snGradScheme<Type>::snGrad
 
 
 template<class Type>
-tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
+tmp<GeometricField<Type, fvsPatchField, surfaceMesh>>
 snGradScheme<Type>::sndGrad
 (
     const GeometricField<Type, fvPatchField, volMesh>& vf,
@@ -173,39 +171,35 @@ snGradScheme<Type>::sndGrad
 }
 
 
-//- Return the face-snGrad of the given cell field
-//  with explicit correction
 template<class Type>
-tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
+tmp<GeometricField<Type, fvsPatchField, surfaceMesh>>
 snGradScheme<Type>::snGrad
 (
     const GeometricField<Type, fvPatchField, volMesh>& vf
 ) const
 {
-    tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > tsf
+    tmp<GeometricField<Type, fvsPatchField, surfaceMesh>> tsf
     (
         snGrad(vf, deltaCoeffs(vf))
     );
 
     if (corrected())
     {
-        tsf() += correction(vf);
+        tsf.ref() += correction(vf);
     }
 
     return tsf;
 }
 
 
-//- Return the face-snGrad of the given cell field
-//  with explicit correction
 template<class Type>
-tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
+tmp<GeometricField<Type, fvsPatchField, surfaceMesh>>
 snGradScheme<Type>::snGrad
 (
-    const tmp<GeometricField<Type, fvPatchField, volMesh> >& tvf
+    const tmp<GeometricField<Type, fvPatchField, volMesh>>& tvf
 ) const
 {
-    tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > tsf
+    tmp<GeometricField<Type, fvsPatchField, surfaceMesh>> tsf
     (
         snGrad(tvf())
     );

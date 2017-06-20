@@ -24,7 +24,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "continuousGasKEqn.H"
-#include "addToRunTimeSelectionTable.H"
 #include "twoPhaseSystem.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -75,7 +74,6 @@ continuousGasKEqn<BasicTurbulenceModel>::continuousGasKEqn
 {
     if (type == typeName)
     {
-        kEqn<BasicTurbulenceModel>::correctNut();
         this->printCoeffs(type);
     }
 }

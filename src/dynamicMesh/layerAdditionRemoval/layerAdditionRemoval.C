@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -58,7 +58,7 @@ void Foam::layerAdditionRemoval::checkDefinition()
 {
     if (!faceZoneID_.active())
     {
-        FatalErrorIn("void Foam::layerAdditionRemoval::checkDefinition()")
+        FatalErrorInFunction
             << "Master face zone named " << faceZoneID_.name()
             << " cannot be found."
             << abort(FatalError);
@@ -70,10 +70,8 @@ void Foam::layerAdditionRemoval::checkDefinition()
      || maxLayerThickness_ < minLayerThickness_
     )
     {
-        FatalErrorIn
-        (
-            "void Foam::layerAdditionRemoval::checkDefinition()"
-        )   << "Incorrect layer thickness definition."
+        FatalErrorInFunction
+            << "Incorrect layer thickness definition."
             << abort(FatalError);
     }
 
@@ -83,7 +81,7 @@ void Foam::layerAdditionRemoval::checkDefinition()
 
     if (nFaces == 0)
     {
-        FatalErrorIn("void Foam::layerAdditionRemoval::checkDefinition()")
+        FatalErrorInFunction
             << "Face extrusion zone contains no faces. "
             << "Please check your mesh definition."
             << abort(FatalError);
@@ -222,7 +220,7 @@ bool Foam::layerAdditionRemoval::changeTopology() const
 
     if (min(V) < -VSMALL)
     {
-        FatalErrorIn("bool layerAdditionRemoval::changeTopology() const")
+        FatalErrorInFunction
             << "negative cell volume. Error in mesh motion before "
             << "topological change.\n V: " << V
             << abort(FatalError);
@@ -236,9 +234,9 @@ bool Foam::layerAdditionRemoval::changeTopology() const
     if (thicknessFromVolume_)
     {
         // Thickness calculated from cell volume/face area
-        forAll(fz, faceI)
+        forAll(fz, facei)
         {
-            scalar curDelta = V[mc[faceI]]/mag(S[fz[faceI]]);
+            scalar curDelta = V[mc[facei]]/mag(S[fz[facei]]);
             avgDelta += curDelta;
             minDelta = min(minDelta, curDelta);
             maxDelta = max(maxDelta, curDelta);
@@ -252,9 +250,9 @@ bool Foam::layerAdditionRemoval::changeTopology() const
         const Map<label>& zoneMeshPointMap = fz().meshPointMap();
 
         // Edges with only one point on zone
-        forAll(mc, faceI)
+        forAll(mc, facei)
         {
-            const cell& cFaces = mesh.cells()[mc[faceI]];
+            const cell& cFaces = mesh.cells()[mc[facei]];
             const edgeList cellEdges(cFaces.edges(mesh.faces()));
 
             forAll(cellEdges, i)
@@ -462,13 +460,8 @@ void Foam::layerAdditionRemoval::setMinLayerThickness(const scalar t) const
 {
     if (t < VSMALL || maxLayerThickness_ < t)
     {
-        FatalErrorIn
-        (
-            "void layerAdditionRemoval::setMinLayerThickness"
-            "("
-                "const scalar"
-            ") const"
-        )   << "Incorrect layer thickness definition."
+        FatalErrorInFunction
+            << "Incorrect layer thickness definition."
             << abort(FatalError);
     }
 
@@ -480,13 +473,8 @@ void Foam::layerAdditionRemoval::setMaxLayerThickness(const scalar t) const
 {
     if (t < minLayerThickness_)
     {
-        FatalErrorIn
-        (
-            "void layerAdditionRemoval::setMaxLayerThickness"
-            "("
-                "const scalar"
-            ") const"
-        )   << "Incorrect layer thickness definition."
+        FatalErrorInFunction
+            << "Incorrect layer thickness definition."
             << abort(FatalError);
     }
 

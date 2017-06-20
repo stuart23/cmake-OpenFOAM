@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -114,7 +114,7 @@ void Foam::starMesh::readBoundary()
         }
         else
         {
-            FatalErrorIn("starMesh::readBoundary()")
+            FatalErrorInFunction
                 << "Cannot read file "
                 << boundaryFileName
                 << abort(FatalError);
@@ -137,7 +137,7 @@ void Foam::starMesh::readBoundary()
 
         IFstream boundaryFile(boundaryFileName);
 
-        for (label faceI=0; faceI<nFaces; faceI++)
+        for (label facei=0; facei<nFaces; facei++)
         {
             boundaryFile >> lineIndex;
 
@@ -170,7 +170,7 @@ void Foam::starMesh::readBoundary()
             )
             {
                 //Info<< "Converting collapsed quad into triangle"
-                //    << " for face " << faceI
+                //    << " for face " << facei
                 //    << " in Star boundary " << lineIndex << endl;
 
                 pointLabelsTri[0] = pointLabels[0];
@@ -220,7 +220,7 @@ void Foam::starMesh::readBoundary()
     }
     else
     {
-        WarningIn("void starMesh::readBoundary()")
+        WarningInFunction
             << "no boundary faces in file "
             << boundaryFileName
             << endl;
@@ -241,13 +241,13 @@ void Foam::starMesh::readBoundary()
         defaultFacesType_
     );
 
-    forAll(patchDicts, patchI)
+    forAll(patchDicts, patchi)
     {
-        if (patchDicts.set(patchI))
+        if (patchDicts.set(patchi))
         {
-            const dictionary& dict = patchDicts[patchI];
-            dict.readIfPresent("type", patchTypes_[patchI]);
-            dict.readIfPresent("physicalType", patchPhysicalTypes_[patchI]);
+            const dictionary& dict = patchDicts[patchi];
+            dict.readIfPresent("type", patchTypes_[patchi]);
+            dict.readIfPresent("physicalType", patchPhysicalTypes_[patchi]);
         }
     }
 }

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -27,15 +27,10 @@ License
 #include "mappedPatchBase.H"
 #include "volFields.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-mappedFixedValueFvPatchField<Type>::mappedFixedValueFvPatchField
+Foam::mappedFixedValueFvPatchField<Type>::mappedFixedValueFvPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF
@@ -47,7 +42,20 @@ mappedFixedValueFvPatchField<Type>::mappedFixedValueFvPatchField
 
 
 template<class Type>
-mappedFixedValueFvPatchField<Type>::mappedFixedValueFvPatchField
+Foam::mappedFixedValueFvPatchField<Type>::mappedFixedValueFvPatchField
+(
+    const fvPatch& p,
+    const DimensionedField<Type, volMesh>& iF,
+    const dictionary& dict
+)
+:
+    fixedValueFvPatchField<Type>(p, iF, dict),
+    mappedPatchFieldBase<Type>(this->mapper(p, iF), *this, dict)
+{}
+
+
+template<class Type>
+Foam::mappedFixedValueFvPatchField<Type>::mappedFixedValueFvPatchField
 (
     const mappedFixedValueFvPatchField<Type>& ptf,
     const fvPatch& p,
@@ -61,20 +69,7 @@ mappedFixedValueFvPatchField<Type>::mappedFixedValueFvPatchField
 
 
 template<class Type>
-mappedFixedValueFvPatchField<Type>::mappedFixedValueFvPatchField
-(
-    const fvPatch& p,
-    const DimensionedField<Type, volMesh>& iF,
-    const dictionary& dict
-)
-:
-    fixedValueFvPatchField<Type>(p, iF, dict),
-    mappedPatchFieldBase<Type>(this->mapper(p, iF), *this, dict)
-{}
-
-
-template<class Type>
-mappedFixedValueFvPatchField<Type>::mappedFixedValueFvPatchField
+Foam::mappedFixedValueFvPatchField<Type>::mappedFixedValueFvPatchField
 (
     const mappedFixedValueFvPatchField<Type>& ptf
 )
@@ -85,7 +80,7 @@ mappedFixedValueFvPatchField<Type>::mappedFixedValueFvPatchField
 
 
 template<class Type>
-mappedFixedValueFvPatchField<Type>::mappedFixedValueFvPatchField
+Foam::mappedFixedValueFvPatchField<Type>::mappedFixedValueFvPatchField
 (
     const mappedFixedValueFvPatchField<Type>& ptf,
     const DimensionedField<Type, volMesh>& iF
@@ -99,7 +94,7 @@ mappedFixedValueFvPatchField<Type>::mappedFixedValueFvPatchField
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-const mappedPatchBase& mappedFixedValueFvPatchField<Type>::mapper
+const Foam::mappedPatchBase& Foam::mappedFixedValueFvPatchField<Type>::mapper
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF
@@ -107,10 +102,7 @@ const mappedPatchBase& mappedFixedValueFvPatchField<Type>::mapper
 {
     if (!isA<mappedPatchBase>(p.patch()))
     {
-        FatalErrorIn
-        (
-            "mappedFixedValueFvPatchField<Type>::mapper()"
-        )   << "\n    patch type '" << p.patch().type()
+        FatalErrorInFunction
             << "' not type '" << mappedPatchBase::typeName << "'"
             << "\n    for patch " << p.patch().name()
             << " of field " << iF.name()
@@ -122,7 +114,7 @@ const mappedPatchBase& mappedFixedValueFvPatchField<Type>::mapper
 
 
 template<class Type>
-void mappedFixedValueFvPatchField<Type>::updateCoeffs()
+void Foam::mappedFixedValueFvPatchField<Type>::updateCoeffs()
 {
     if (this->updated())
     {
@@ -134,7 +126,7 @@ void mappedFixedValueFvPatchField<Type>::updateCoeffs()
     if (debug)
     {
         Info<< "mapped on field:"
-            << this->dimensionedInternalField().name()
+            << this->internalField().name()
             << " patch:" << this->patch().name()
             << "  avg:" << gAverage(*this)
             << "  min:" << gMin(*this)
@@ -147,16 +139,12 @@ void mappedFixedValueFvPatchField<Type>::updateCoeffs()
 
 
 template<class Type>
-void mappedFixedValueFvPatchField<Type>::write(Ostream& os) const
+void Foam::mappedFixedValueFvPatchField<Type>::write(Ostream& os) const
 {
     fvPatchField<Type>::write(os);
     mappedPatchFieldBase<Type>::write(os);
     this->writeEntry("value", os);
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

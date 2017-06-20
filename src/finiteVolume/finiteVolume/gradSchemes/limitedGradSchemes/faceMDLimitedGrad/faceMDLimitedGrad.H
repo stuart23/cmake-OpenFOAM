@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -63,7 +63,7 @@ class faceMDLimitedGrad
 {
     // Private Data
 
-        tmp<fv::gradScheme<Type> > basicGradScheme_;
+        tmp<fv::gradScheme<Type>> basicGradScheme_;
 
         //- Limiter coefficient
         const scalar k_;
@@ -104,9 +104,8 @@ public:
         {
             if (k_ < 0 || k_ > 1)
             {
-                FatalIOErrorIn
+                FatalIOErrorInFunction
                 (
-                    "faceMDLimitedGrad(const fvMesh&, Istream& schemeData)",
                     schemeData
                 )   << "coefficient = " << k_
                     << " should be >= 0 and <= 1"

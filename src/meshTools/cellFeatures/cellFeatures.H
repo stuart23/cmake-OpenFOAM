@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -69,7 +69,7 @@ class cellFeatures
         //  same face before edge/point is 'feature'.
         scalar minCos_;
 
-        label cellI_;
+        label celli_;
 
         //- Feature edges
         labelHashSet featureEdge_;
@@ -78,7 +78,7 @@ class cellFeatures
         mutable faceList* facesPtr_;
 
         //- New to old face mapping
-        mutable List<DynamicList<label> > faceMap_;
+        mutable List<DynamicList<label>> faceMap_;
 
 
     // Private Member Functions
@@ -88,7 +88,7 @@ class cellFeatures
         label nextEdge
         (
             const Map<label>& toSuperFace,
-            const label superFaceI,
+            const label superFacei,
             const label thisEdgeI,
             const label thisVertI
         ) const;
@@ -97,8 +97,8 @@ class cellFeatures
 
         void walkSuperFace
         (
-            const label faceI,
-            const label superFaceI,
+            const label facei,
+            const label superFacei,
             Map<label>& toSuperFace
         ) const;
 
@@ -120,7 +120,7 @@ public:
         (
             const primitiveMesh&,
             const scalar minCos,    // angle to use for feature recognition.
-            const label cellI
+            const label celli
         );
 
 
@@ -147,7 +147,7 @@ public:
             }
 
             //- New to old faceMap. Guaranteed to be shrunk.
-            const List<DynamicList<label> >& faceMap() const
+            const List<DynamicList<label>>& faceMap() const
             {
                 if (!facesPtr_)
                 {
@@ -171,9 +171,9 @@ public:
             //  from one face but not from another.
             bool isFeaturePoint(const label edge0, const label edge1) const;
 
-            //- Is vertexI on faceI used by two edges that form feature
+            //- Is vertexI on facei used by two edges that form feature
             //  point
-            bool isFeatureVertex(const label faceI, const label vertI) const;
+            bool isFeatureVertex(const label facei, const label vertI) const;
 
 };
 

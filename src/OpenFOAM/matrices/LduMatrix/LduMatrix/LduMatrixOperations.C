@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -84,12 +84,12 @@ void Foam::LduMatrix<Type, DType, LUType>::sumMagOffDiag
 
 
 template<class Type, class DType, class LUType>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::LduMatrix<Type, DType, LUType>::H(const Field<Type>& psi) const
 {
-    tmp<Field<Type> > tHpsi
+    tmp<Field<Type>> tHpsi
     (
-        new Field<Type>(lduAddr().size(), pTraits<Type>::zero)
+        new Field<Type>(lduAddr().size(), Zero)
     );
 
     if (lowerPtr_ || upperPtr_)
@@ -119,17 +119,17 @@ Foam::LduMatrix<Type, DType, LUType>::H(const Field<Type>& psi) const
 }
 
 template<class Type, class DType, class LUType>
-Foam::tmp<Foam::Field<Type> >
-Foam::LduMatrix<Type, DType, LUType>::H(const tmp<Field<Type> >& tpsi) const
+Foam::tmp<Foam::Field<Type>>
+Foam::LduMatrix<Type, DType, LUType>::H(const tmp<Field<Type>>& tpsi) const
 {
-    tmp<Field<Type> > tHpsi(H(tpsi()));
+    tmp<Field<Type>> tHpsi(H(tpsi()));
     tpsi.clear();
     return tHpsi;
 }
 
 
 template<class Type, class DType, class LUType>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::LduMatrix<Type, DType, LUType>::faceH(const Field<Type>& psi) const
 {
     const Field<LUType>& Lower = const_cast<const LduMatrix&>(*this).lower();
@@ -139,7 +139,7 @@ Foam::LduMatrix<Type, DType, LUType>::faceH(const Field<Type>& psi) const
     const unallocLabelList& l = lduAddr().lowerAddr();
     const unallocLabelList& u = lduAddr().upperAddr();
 
-    tmp<Field<Type> > tfaceHpsi(new Field<Type> (Lower.size()));
+    tmp<Field<Type>> tfaceHpsi(new Field<Type> (Lower.size()));
     Field<Type> & faceHpsi = tfaceHpsi();
 
     for (label face=0; face<l.size(); face++)
@@ -152,10 +152,10 @@ Foam::LduMatrix<Type, DType, LUType>::faceH(const Field<Type>& psi) const
 
 
 template<class Type, class DType, class LUType>
-Foam::tmp<Foam::Field<Type> >
-Foam::LduMatrix<Type, DType, LUType>::faceH(const tmp<Field<Type> >& tpsi) const
+Foam::tmp<Foam::Field<Type>>
+Foam::LduMatrix<Type, DType, LUType>::faceH(const tmp<Field<Type>>& tpsi) const
 {
-    tmp<Field<Type> > tfaceHpsi(faceH(tpsi()));
+    tmp<Field<Type>> tfaceHpsi(faceH(tpsi()));
     tpsi.clear();
     return tfaceHpsi;
 }
@@ -168,10 +168,8 @@ void Foam::LduMatrix<Type, DType, LUType>::operator=(const LduMatrix& A)
 {
     if (this == &A)
     {
-        FatalErrorIn
-        (
-            "LduMatrix<Type, DType, LUType>::operator=(const LduMatrix&)"
-        )   << "attempted assignment to self"
+        FatalErrorInFunction
+            << "attempted assignment to self"
             << abort(FatalError);
     }
 
@@ -305,10 +303,8 @@ void Foam::LduMatrix<Type, DType, LUType>::operator+=(const LduMatrix& A)
     }
     else
     {
-        FatalErrorIn
-        (
-            "LduMatrix<Type, DType, LUType>::operator+=(const LduMatrix& A)"
-        )   << "Unknown matrix type combination"
+        FatalErrorInFunction
+            << "Unknown matrix type combination"
             << abort(FatalError);
     }
 
@@ -384,10 +380,8 @@ void Foam::LduMatrix<Type, DType, LUType>::operator-=(const LduMatrix& A)
     }
     else
     {
-        FatalErrorIn
-        (
-            "LduMatrix<Type, DType, LUType>::operator-=(const LduMatrix& A)"
-        )   << "Unknown matrix type combination"
+        FatalErrorInFunction
+            << "Unknown matrix type combination"
             << abort(FatalError);
     }
 
@@ -433,10 +427,8 @@ void Foam::LduMatrix<Type, DType, LUType>::operator*=
         }
     }
 
-    FatalErrorIn
-    (
-        "LduMatrix<Type, DType, LUType>::operator*=(const scalarField& sf)"
-    )   << "Scaling a matrix by scalarField is not currently supported\n"
+    FatalErrorInFunction
+        << "Scaling a matrix by scalarField is not currently supported\n"
            "because scaling interfacesUpper_ and interfacesLower_ "
            "require special transfers"
         << abort(FatalError);

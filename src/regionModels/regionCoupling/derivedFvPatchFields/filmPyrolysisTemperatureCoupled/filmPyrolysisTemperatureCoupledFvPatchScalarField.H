@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,19 +30,19 @@ Description
     for patches on the primary region based on whether the patch is seen to
     be 'wet', retrieved from the film alpha field.
 
-    \li if the patch is wet, the temperature is set using the film temperature
-    \li otherwise, it is set using pyrolysis temperature
+    - if the patch is wet, the temperature is set using the film temperature
+    - otherwise, it is set using pyrolysis temperature
 
     Example of the boundary condition specification:
     \verbatim
-        myPatch
-        {
-            type            filmPyrolysisTemperatureCoupled;
-            phi             phi;      // name of flux field (default = phi)
-            rho             rho;      // name of density field (default = rho)
-            deltaWet        1e-4;     // threshold height for 'wet' film
-            value           uniform   300; // initial temperature / [K]
-        }
+    <patchName>
+    {
+        type            filmPyrolysisTemperatureCoupled;
+        phi             phi;      // name of flux field (default = phi)
+        rho             rho;      // name of density field (default = rho)
+        deltaWet        1e-4;     // threshold height for 'wet' film
+        value           uniform   300; // initial temperature / [K]
+    }
     \endverbatim
 
 SourceFiles

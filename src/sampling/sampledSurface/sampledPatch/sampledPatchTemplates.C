@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,19 +28,19 @@ License
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::sampledPatch::sampleField
 (
     const GeometricField<Type, fvPatchField, volMesh>& vField
 ) const
 {
     // One value per face
-    tmp<Field<Type> > tvalues(new Field<Type>(patchFaceLabels_.size()));
-    Field<Type>& values = tvalues();
+    tmp<Field<Type>> tvalues(new Field<Type>(patchFaceLabels_.size()));
+    Field<Type>& values = tvalues.ref();
     forAll(patchFaceLabels_, i)
     {
-        label patchI = patchIDs_[patchIndex_[i]];
-        const Field<Type>& bField = vField.boundaryField()[patchI];
+        label patchi = patchIDs_[patchIndex_[i]];
+        const Field<Type>& bField = vField.boundaryField()[patchi];
         values[i] = bField[patchFaceLabels_[i]];
     }
 
@@ -49,20 +49,20 @@ Foam::sampledPatch::sampleField
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::sampledPatch::sampleField
 (
     const GeometricField<Type, fvsPatchField, surfaceMesh>& sField
 ) const
 {
     // One value per face
-    tmp<Field<Type> > tvalues(new Field<Type>(patchFaceLabels_.size()));
-    Field<Type>& values = tvalues();
+    tmp<Field<Type>> tvalues(new Field<Type>(patchFaceLabels_.size()));
+    Field<Type>& values = tvalues.ref();
 
     forAll(patchFaceLabels_, i)
     {
-        label patchI = patchIDs_[patchIndex_[i]];
-        values[i] = sField.boundaryField()[patchI][patchFaceLabels_[i]];
+        label patchi = patchIDs_[patchIndex_[i]];
+        values[i] = sField.boundaryField()[patchi][patchFaceLabels_[i]];
     }
 
     return tvalues;
@@ -70,43 +70,43 @@ Foam::sampledPatch::sampleField
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::sampledPatch::interpolateField
 (
     const interpolation<Type>& interpolator
 ) const
 {
     // One value per vertex
-    tmp<Field<Type> > tvalues(new Field<Type>(points().size()));
-    Field<Type>& values = tvalues();
+    tmp<Field<Type>> tvalues(new Field<Type>(points().size()));
+    Field<Type>& values = tvalues.ref();
 
     const labelList& own = mesh().faceOwner();
 
     boolList pointDone(points().size(), false);
 
-    forAll(faces(), cutFaceI)
+    forAll(faces(), cutFacei)
     {
-        label patchI = patchIDs_[patchIndex_[cutFaceI]];
-        const polyPatch& pp = mesh().boundaryMesh()[patchI];
-        label patchFaceI = patchFaceLabels()[cutFaceI];
-        const face& f = faces()[cutFaceI];
+        label patchi = patchIDs_[patchIndex_[cutFacei]];
+        const polyPatch& pp = mesh().boundaryMesh()[patchi];
+        label patchFacei = patchFaceLabels()[cutFacei];
+        const face& f = faces()[cutFacei];
 
         forAll(f, faceVertI)
         {
-            label pointI = f[faceVertI];
+            label pointi = f[faceVertI];
 
-            if (!pointDone[pointI])
+            if (!pointDone[pointi])
             {
-                label faceI = patchFaceI + pp.start();
-                label cellI = own[faceI];
+                label facei = patchFacei + pp.start();
+                label celli = own[facei];
 
-                values[pointI] = interpolator.interpolate
+                values[pointi] = interpolator.interpolate
                 (
-                    points()[pointI],
-                    cellI,
-                    faceI
+                    points()[pointi],
+                    celli,
+                    facei
                 );
-                pointDone[pointI] = true;
+                pointDone[pointi] = true;
             }
         }
     }

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -63,7 +63,7 @@ IncompressibleTurbulenceModel
 // * * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * //
 
 template<class TransportModel>
-Foam::autoPtr<Foam::IncompressibleTurbulenceModel<TransportModel> >
+Foam::autoPtr<Foam::IncompressibleTurbulenceModel<TransportModel>>
 Foam::IncompressibleTurbulenceModel<TransportModel>::New
 (
     const volVectorField& U,
@@ -121,11 +121,7 @@ Foam::tmp<Foam::volSymmTensorField>
 Foam::IncompressibleTurbulenceModel<TransportModel>::
 devRhoReff() const
 {
-    notImplemented
-    (
-        "IncompressibleTurbulenceModel<TransportModel>::"
-        "devRhoReff()"
-    );
+    NotImplemented;
 
     return devReff();
 }
@@ -139,11 +135,7 @@ divDevRhoReff
     volVectorField& U
 ) const
 {
-    notImplemented
-    (
-        "IncompressibleTurbulenceModel<TransportModel>::"
-        "divDevRhoReff(volVectorField& U)"
-    );
+    NotImplemented;
 
     return divDevReff(U);
 }
@@ -158,11 +150,7 @@ divDevRhoReff
     volVectorField& U
 ) const
 {
-    notImplemented
-    (
-        "IncompressibleTurbulenceModel<TransportModel>::"
-        "divDevRhoReff(const volScalarField& rho, volVectorField& U)"
-    );
+    NotImplemented;
 
     return divDevReff(U);
 }

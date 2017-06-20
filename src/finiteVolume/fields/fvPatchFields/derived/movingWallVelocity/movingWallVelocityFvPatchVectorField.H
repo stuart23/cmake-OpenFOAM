@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -29,28 +29,19 @@ Group
 
 Description
     This boundary condition provides a velocity condition for cases with
-    moving walls.  In addition, it should also be applied to 'moving' walls
-    for moving reference frame (MRF) calculations.
+    moving walls.
 
-
-    \heading Patch usage
-
-    \table
-        Property     | Description             | Required    | Default value
-        U            | velociy field name      | no          | U
-    \endtable
-
+Usage
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            movingWallVelocity;
-        U               U;
-        value           uniform 0; // initial value
+        value           uniform (0 0 0);    // Initial value
     }
     \endverbatim
 
-SeeAlso
+See also
     Foam::fixedValueFvPatchVectorField
     Foam::MRFZone
 
@@ -62,7 +53,6 @@ SourceFiles
 #ifndef movingWallVelocityFvPatchVectorField_H
 #define movingWallVelocityFvPatchVectorField_H
 
-#include "fvPatchFields.H"
 #include "fixedValueFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -78,11 +68,6 @@ class movingWallVelocityFvPatchVectorField
 :
     public fixedValueFvPatchVectorField
 {
-    // Private data
-
-       //- Name of velocity field
-       word UName_;
-
 
 public:
 

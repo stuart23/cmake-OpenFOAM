@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "v2f.H"
+#include "fvOptions.H"
 #include "bound.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -56,6 +57,7 @@ void v2f<BasicTurbulenceModel>::correctNut()
 {
     this->nut_ = min(CmuKEps_*sqr(k_)/epsilon_, this->Cmu_*v2_*Ts());
     this->nut_.correctBoundaryConditions();
+    fv::options::New(this->mesh_).correct(this->nut_);
 
     BasicTurbulenceModel::correctNut();
 }
@@ -76,7 +78,7 @@ v2f<BasicTurbulenceModel>::v2f
     const word& type
 )
 :
-    eddyViscosity<RASModel<BasicTurbulenceModel> >
+    eddyViscosity<RASModel<BasicTurbulenceModel>>
     (
         type,
         alpha,
@@ -239,7 +241,6 @@ v2f<BasicTurbulenceModel>::v2f
     if (type == typeName)
     {
         this->printCoeffs(type);
-        correctNut();
     }
 }
 
@@ -249,7 +250,7 @@ v2f<BasicTurbulenceModel>::v2f
 template<class BasicTurbulenceModel>
 bool v2f<BasicTurbulenceModel>::read()
 {
-    if (eddyViscosity<RASModel<BasicTurbulenceModel> >::read())
+    if (eddyViscosity<RASModel<BasicTurbulenceModel>>::read())
     {
         Cmu_.readIfPresent(this->coeffDict());
         CmuKEps_.readIfPresent(this->coeffDict());
@@ -285,8 +286,9 @@ void v2f<BasicTurbulenceModel>::correct()
     const surfaceScalarField& alphaRhoPhi = this->alphaRhoPhi_;
     const volVectorField& U = this->U_;
     volScalarField& nut = this->nut_;
+    fv::options& fvOptions(fv::options::New(this->mesh_));
 
-    eddyViscosity<RASModel<BasicTurbulenceModel> >::correct();
+    eddyViscosity<RASModel<BasicTurbulenceModel>>::correct();
 
     volScalarField divU(fvc::div(fvc::absolute(this->phi(), U)));
 
@@ -312,7 +314,7 @@ void v2f<BasicTurbulenceModel>::correct()
     );
 
     // Update epsilon (and possibly G) at the wall
-    epsilon_.boundaryField().updateCoeffs();
+    epsilon_.boundaryFieldRef().updateCoeffs();
 
     // Dissipation equation
     tmp<fvScalarMatrix> epsEqn
@@ -324,13 +326,14 @@ void v2f<BasicTurbulenceModel>::correct()
         Ceps1*alpha*rho*G/Ts
       - fvm::SuSp(((2.0/3.0)*Ceps1 + Ceps3_)*alpha*rho*divU, epsilon_)
       - fvm::Sp(Ceps2_*alpha*rho/Ts, epsilon_)
+      + fvOptions(alpha, rho, epsilon_)
     );
 
-    epsEqn().relax();
-
-    epsEqn().boundaryManipulate(epsilon_.boundaryField());
-
+    epsEqn.ref().relax();
+    fvOptions.constrain(epsEqn.ref());
+    epsEqn.ref().boundaryManipulate(epsilon_.boundaryFieldRef());
     solve(epsEqn);
+    fvOptions.correct(epsilon_);
     bound(epsilon_, this->epsilonMin_);
 
 
@@ -344,10 +347,13 @@ void v2f<BasicTurbulenceModel>::correct()
         alpha*rho*G
       - fvm::SuSp((2.0/3.0)*alpha*rho*divU, k_)
       - fvm::Sp(alpha*rho*epsilon_/k_, k_)
+      + fvOptions(alpha, rho, k_)
     );
 
-    kEqn().relax();
+    kEqn.ref().relax();
+    fvOptions.constrain(kEqn.ref());
     solve(kEqn);
+    fvOptions.correct(k_);
     bound(k_, this->kMin_);
 
 
@@ -360,8 +366,10 @@ void v2f<BasicTurbulenceModel>::correct()
       - 1.0/L2/k_*(v2fAlpha - C2_*G)
     );
 
-    fEqn().relax();
+    fEqn.ref().relax();
+    fvOptions.constrain(fEqn.ref());
     solve(fEqn);
+    fvOptions.correct(f_);
     bound(f_, fMin_);
 
 
@@ -374,10 +382,13 @@ void v2f<BasicTurbulenceModel>::correct()
       ==
         alpha*rho*min(k_*f_, C2_*G - v2fAlpha)
       - fvm::Sp(N*alpha*rho*epsilon_/k_, v2_)
+      + fvOptions(alpha, rho, v2_)
     );
 
-    v2Eqn().relax();
+    v2Eqn.ref().relax();
+    fvOptions.constrain(v2Eqn.ref());
     solve(v2Eqn);
+    fvOptions.correct(v2_);
     bound(v2_, v2Min_);
 
     correctNut();

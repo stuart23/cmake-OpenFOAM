@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -98,7 +98,7 @@ inline bool Foam::HashTable<T, Key, Hash>::set
 
 
 template<class T, class Key, class Hash>
-inline Foam::Xfer<Foam::HashTable<T, Key, Hash> >
+inline Foam::Xfer<Foam::HashTable<T, Key, Hash>>
 Foam::HashTable<T, Key, Hash>::xfer()
 {
     return xferMove(*this);
@@ -114,7 +114,7 @@ inline T& Foam::HashTable<T, Key, Hash>::operator[](const Key& key)
 
     if (iter == this->end())
     {
-        FatalErrorIn("HashTable<T, Key, Hash>::operator[](const Key&)")
+        FatalErrorInFunction
             << key << " not found in table.  Valid entries: "
             << toc()
             << exit(FatalError);
@@ -131,7 +131,7 @@ inline const T& Foam::HashTable<T, Key, Hash>::operator[](const Key& key) const
 
     if (iter == this->cend())
     {
-        FatalErrorIn("HashTable<T, Key, Hash>::operator[](const Key&) const")
+        FatalErrorInFunction
             << key << " not found in table.  Valid entries: "
             << toc()
             << exit(FatalError);

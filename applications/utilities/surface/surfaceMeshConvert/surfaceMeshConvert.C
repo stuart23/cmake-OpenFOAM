@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -29,28 +29,29 @@ Description
     transformations (rotate/translate) on a coordinateSystem.
 
 Usage
-    - surfaceMeshConvert inputFile outputFile [OPTION]
+    \b surfaceMeshConvert inputFile outputFile [OPTION]
 
-    \param -clean \n
-    Perform some surface checking/cleanup on the input surface.
+    Options:
+      - \par -clean
+        Perform some surface checking/cleanup on the input surface.
 
-    \param -scaleIn \<scale\> \n
-    Specify a scaling factor when reading files.
+      - \par -scaleIn \<scale\>
+        Specify a scaling factor when reading files.
 
-    \param -scaleOut \<scale\> \n
-    Specify a scaling factor when writing files.
+      - \par -scaleOut \<scale\>
+        Specify a scaling factor when writing files.
 
-    \param -dict \<dictionary\> \n
-    Specify an alternative dictionary for constant/coordinateSystems.
+      - \par -dict \<dictionary\>
+        Specify an alternative dictionary for constant/coordinateSystems.
 
-    \param -from \<coordinateSystem\> \n
-    Specify a coordinate System when reading files.
+      - \par -from \<coordinateSystem\>
+        Specify a coordinate System when reading files.
 
-    \param -to \<coordinateSystem\> \n
-    Specify a coordinate System when writing files.
+      - \par -to \<coordinateSystem\>
+        Specify a coordinate System when writing files.
 
-    \param -tri \n
-    Triangulate surface.
+      - \par -tri
+        Triangulate surface.
 
 Note
     The filename extensions are used to determine the file format type.
@@ -124,7 +125,7 @@ int main(int argc, char *argv[])
     // disable inplace editing
     if (importName == exportName)
     {
-        FatalErrorIn(args.executable())
+        FatalErrorInFunction
             << "Output file " << exportName << " would overwrite input file."
             << exit(FatalError);
     }
@@ -196,7 +197,7 @@ int main(int argc, char *argv[])
 
         if (!csDictIoPtr->headerOk())
         {
-            FatalErrorIn(args.executable())
+            FatalErrorInFunction
                 << "Cannot open coordinateSystems file\n    "
                 << csDictIoPtr->objectPath() << nl
                 << exit(FatalError);
@@ -211,7 +212,7 @@ int main(int argc, char *argv[])
             const label csIndex = csLst.findIndex(csName);
             if (csIndex < 0)
             {
-                FatalErrorIn(args.executable())
+                FatalErrorInFunction
                     << "Cannot find -from " << csName << nl
                     << "available coordinateSystems: " << csLst.toc() << nl
                     << exit(FatalError);
@@ -227,7 +228,7 @@ int main(int argc, char *argv[])
             const label csIndex = csLst.findIndex(csName);
             if (csIndex < 0)
             {
-                FatalErrorIn(args.executable())
+                FatalErrorInFunction
                     << "Cannot find -to " << csName << nl
                     << "available coordinateSystems: " << csLst.toc() << nl
                     << exit(FatalError);
@@ -240,7 +241,7 @@ int main(int argc, char *argv[])
         // maybe fix this later
         if (fromCsys.valid() && toCsys.valid())
         {
-            FatalErrorIn(args.executable())
+            FatalErrorInFunction
                 << "Only allowed  '-from' or '-to' option at the moment."
                 << exit(FatalError);
         }

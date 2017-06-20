@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -80,8 +80,8 @@ protected:
 
     // Protected Member Functions
 
-        //- Returns local patchI if patch is in patchIds_ list
-        label applyToPatch(const label globalPatchI) const;
+        //- Returns local patchi if patch is in patchIds_ list
+        label applyToPatch(const label globalPatchi) const;
 
         //- Write post-processing info
         virtual void write();
@@ -107,9 +107,9 @@ public:
         ParticleErosion(const ParticleErosion<CloudType>& pe);
 
         //- Construct and return a clone
-        virtual autoPtr<CloudFunctionObject<CloudType> > clone() const
+        virtual autoPtr<CloudFunctionObject<CloudType>> clone() const
         {
-            return autoPtr<CloudFunctionObject<CloudType> >
+            return autoPtr<CloudFunctionObject<CloudType>>
             (
                 new ParticleErosion<CloudType>(*this)
             );
@@ -146,7 +146,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "ParticleErosion.C"
+    #include "ParticleErosion.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

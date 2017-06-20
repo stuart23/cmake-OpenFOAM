@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -37,7 +37,7 @@ void Foam::MPPICCloud<CloudType>::setModels()
 {
     packingModel_.reset
     (
-        PackingModel<MPPICCloud<CloudType> >::New
+        PackingModel<MPPICCloud<CloudType>>::New
         (
             this->subModelProperties(),
             *this
@@ -45,7 +45,7 @@ void Foam::MPPICCloud<CloudType>::setModels()
     );
     dampingModel_.reset
     (
-        DampingModel<MPPICCloud<CloudType> >::New
+        DampingModel<MPPICCloud<CloudType>>::New
         (
             this->subModelProperties(),
             *this
@@ -53,7 +53,7 @@ void Foam::MPPICCloud<CloudType>::setModels()
     );
     isotropyModel_.reset
     (
-        IsotropyModel<MPPICCloud<CloudType> >::New
+        IsotropyModel<MPPICCloud<CloudType>>::New
         (
             this->subModelProperties(),
             *this
@@ -82,18 +82,8 @@ Foam::MPPICCloud<CloudType>::MPPICCloud
 {
     if (this->solution().steadyState())
     {
-        FatalErrorIn
-        (
-            "Foam::MPPICCloud<CloudType>::MPPICCloud"
-            "("
-                "const word&, "
-                "const volScalarField&, "
-                "const volVectorField&, "
-                "const volScalarField&, "
-                "const dimensionedVector&, "
-                "bool"
-            ")"
-        )   << "MPPIC modelling not available for steady state calculations"
+        FatalErrorInFunction
+            << "MPPIC modelling not available for steady state calculations"
             << exit(FatalError);
     }
 
@@ -174,7 +164,7 @@ void Foam::MPPICCloud<CloudType>::evolve()
     if (this->solution().canEvolve())
     {
         typename parcelType::template
-            TrackingData<MPPICCloud<CloudType> > td(*this);
+            TrackingData<MPPICCloud<CloudType>> td(*this);
 
         this->solve(td);
     }
@@ -273,8 +263,8 @@ void Foam::MPPICCloud<CloudType>::info()
 
     tmp<volScalarField> alpha = this->theta();
 
-    const scalar alphaMin = gMin(alpha().internalField());
-    const scalar alphaMax = gMax(alpha().internalField());
+    const scalar alphaMin = gMin(alpha().primitiveField());
+    const scalar alphaMax = gMax(alpha().primitiveField());
 
     Info<< "    Min cell volume fraction        = " << alphaMin << endl;
     Info<< "    Max cell volume fraction        = " << alphaMax << endl;
@@ -286,13 +276,13 @@ void Foam::MPPICCloud<CloudType>::info()
 
     scalar nMin = GREAT;
 
-    forAll(this->mesh().cells(), cellI)
+    forAll(this->mesh().cells(), celli)
     {
-        const label n = this->cellOccupancy()[cellI].size();
+        const label n = this->cellOccupancy()[celli].size();
 
         if (n > 0)
         {
-            const scalar nPack = n*alphaMax/alpha()[cellI];
+            const scalar nPack = n*alphaMax/alpha()[celli];
 
             if (nPack < nMin)
             {

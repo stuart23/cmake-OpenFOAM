@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,19 +25,22 @@ Class
     Foam::StandardWallInteraction
 
 Description
-    Wall interaction model. Three choices:
-    - rebound - optionally specify elasticity and resitution coefficients
-    - stick   - particles assigined zero velocity
-    - escape  - remove particle from the domain
+    Wall interaction model.
+
+    Three choices:
+      - rebound - optionally specify elasticity and restitution coefficients
+      - stick   - particles assigned zero velocity
+      - escape  - remove particle from the domain
 
     Example usage:
-
-        StandardWallInteractionCoeffs
-        {
-            type        rebound; // stick, escape
-            e           1;       // optional - elasticity coeff
-            mu          0;       // optional - restitution coeff
-        }
+    \verbatim
+    StandardWallInteractionCoeffs
+    {
+        type        rebound; // stick, escape
+        e           1;       // optional - elasticity coeff
+        mu          0;       // optional - restitution coeff
+    }
+    \endverbatim
 
 \*---------------------------------------------------------------------------*/
 
@@ -104,9 +107,9 @@ public:
         StandardWallInteraction(const StandardWallInteraction<CloudType>& pim);
 
         //- Construct and return a clone using supplied owner cloud
-        virtual autoPtr<PatchInteractionModel<CloudType> > clone() const
+        virtual autoPtr<PatchInteractionModel<CloudType>> clone() const
         {
-            return autoPtr<PatchInteractionModel<CloudType> >
+            return autoPtr<PatchInteractionModel<CloudType>>
             (
                 new StandardWallInteraction<CloudType>(*this)
             );
@@ -145,7 +148,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "StandardWallInteraction.C"
+    #include "StandardWallInteraction.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

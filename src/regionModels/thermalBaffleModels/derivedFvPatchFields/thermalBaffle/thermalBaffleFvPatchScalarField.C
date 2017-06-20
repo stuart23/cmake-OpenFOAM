@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -208,18 +208,18 @@ void thermalBaffleFvPatchScalarField::createPatchMesh()
     dicts[topPatchID].add("sampleMode", mpp.sampleModeNames_[mpp.mode()]);
 
 
-    forAll (regionPatches, patchI)
+    forAll(regionPatches, patchi)
     {
-        dictionary&  patchDict = dicts[patchI];
+        dictionary&  patchDict = dicts[patchi];
         patchDict.set("nFaces", 0);
         patchDict.set("startFace", 0);
 
-        regionPatches[patchI] = polyPatch::New
+        regionPatches[patchi] = polyPatch::New
         (
-            patchTypes[patchI],
-            patchNames[patchI],
-            dicts[patchI],
-            patchI,
+            patchTypes[patchi],
+            patchNames[patchi],
+            dicts[patchi],
+            patchi,
             thisMesh.boundaryMesh()
         ).ptr();
     }
@@ -238,10 +238,8 @@ void thermalBaffleFvPatchScalarField::createPatchMesh()
 
     if (extrudeMeshPtr_.empty())
     {
-        WarningIn
-        (
-            "thermalBaffleFvPatchScalarField::createPatchMesh()\n"
-        )   << "Specified IOobject::MUST_READ_IF_MODIFIED but class"
+        WarningInFunction
+            << "Specified IOobject::MUST_READ_IF_MODIFIED but class"
             << " patchMeshPtr not set."
             << endl;
     }

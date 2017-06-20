@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2014-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2014-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -49,7 +49,7 @@ JohnsonJacksonParticleSlipFvPatchVectorField
 )
 :
     partialSlipFvPatchVectorField(p, iF),
-    specularityCoefficient_(p.size())
+    specularityCoefficient_("specularityCoefficient", dimless, 0)
 {}
 
 
@@ -89,16 +89,8 @@ JohnsonJacksonParticleSlipFvPatchVectorField
      || (specularityCoefficient_.value() > 1)
     )
     {
-        FatalErrorIn
-        (
-            "("
-                "Foam::JohnsonJacksonParticleSlipFvPatchVectorField::"
-                "JohnsonJacksonParticleSlipFvPatchVectorField"
-                "const fvPatch& p,"
-                "const DimensionedField<scalar, volMesh>& iF,"
-                "const dictionary& dict"
-            ")"
-        )   << "The specularity coefficient has to be between 0 and 1"
+        FatalErrorInFunction
+            << "The specularity coefficient has to be between 0 and 1"
             << abort(FatalError);
     }
 
@@ -168,7 +160,7 @@ void Foam::JohnsonJacksonParticleSlipFvPatchVectorField::updateCoeffs()
 
     const phaseModel& phased
     (
-        fluid.phase1().name() == dimensionedInternalField().group()
+        fluid.phase1().name() == internalField().group()
       ? fluid.phase1()
       : fluid.phase2()
     );
@@ -195,6 +187,14 @@ void Foam::JohnsonJacksonParticleSlipFvPatchVectorField::updateCoeffs()
         patch().lookupPatchField<volScalarField, scalar>
         (
             IOobject::groupName("nut", phased.name())
+        )
+    );
+
+    const scalarField nuFric
+    (
+        patch().lookupPatchField<volScalarField, scalar>
+        (
+            IOobject::groupName("nuFric", phased.name())
         )
     );
 
@@ -230,7 +230,7 @@ void Foam::JohnsonJacksonParticleSlipFvPatchVectorField::updateCoeffs()
        *gs0
        *specularityCoefficient_.value()
        *sqrt(3.0*Theta)
-       /max(6.0*nu*alphaMax.value(), SMALL)
+       /max(6.0*(nu - nuFric)*alphaMax.value(), SMALL)
     );
 
     this->valueFraction() = c/(c + patch().deltaCoeffs());

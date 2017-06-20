@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -45,9 +45,9 @@ inline Foam::autoPtr<T>::autoPtr(const autoPtr<T>& ap)
 
 
 template<class T>
-inline Foam::autoPtr<T>::autoPtr(const autoPtr<T>& ap, const bool reUse)
+inline Foam::autoPtr<T>::autoPtr(const autoPtr<T>& ap, const bool reuse)
 {
-    if (reUse)
+    if (reuse)
     {
         ptr_ = ap.ptr_;
         ap.ptr_ = 0;
@@ -100,7 +100,7 @@ inline void Foam::autoPtr<T>::set(T* p)
 {
     if (ptr_)
     {
-        FatalErrorIn("void Foam::autoPtr<T>::set(T*)")
+        FatalErrorInFunction
             << "object of type " << typeid(T).name()
             << " already allocated"
             << abort(FatalError);
@@ -136,7 +136,7 @@ inline T& Foam::autoPtr<T>::operator()()
 {
     if (!ptr_)
     {
-        FatalErrorIn("T& Foam::autoPtr<T>::operator()()")
+        FatalErrorInFunction
             << "object of type " << typeid(T).name()
             << " is not allocated"
             << abort(FatalError);
@@ -151,7 +151,7 @@ inline const T& Foam::autoPtr<T>::operator()() const
 {
     if (!ptr_)
     {
-        FatalErrorIn("const T& Foam::autoPtr<T>::operator()() const")
+        FatalErrorInFunction
             << "object of type " << typeid(T).name()
             << " is not allocated"
             << abort(FatalError);
@@ -173,7 +173,7 @@ inline T* Foam::autoPtr<T>::operator->()
 {
     if (!ptr_)
     {
-        FatalErrorIn("Foam::autoPtr<T>::operator->()")
+        FatalErrorInFunction
             << "object of type " << typeid(T).name()
             << " is not allocated"
             << abort(FatalError);

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -190,8 +190,8 @@ public:
         (
             const polyMesh& mesh,
             const vector& position,
-            const label cellI,
-            const label tetFaceI,
+            const label celli,
+            const label tetFacei,
             const label tetPtI
         );
 
@@ -200,8 +200,8 @@ public:
         (
             const polyMesh& mesh,
             const vector& position,
-            const label cellI,
-            const label tetFaceI,
+            const label celli,
+            const label tetFacei,
             const label tetPtI,
             const label typeId,
             const scalar nParticle0,
@@ -270,9 +270,9 @@ public:
                 mesh_(mesh)
             {}
 
-            autoPtr<SprayParcel<ParcelType> > operator()(Istream& is) const
+            autoPtr<SprayParcel<ParcelType>> operator()(Istream& is) const
             {
-                return autoPtr<SprayParcel<ParcelType> >
+                return autoPtr<SprayParcel<ParcelType>>
                 (
                     new SprayParcel<ParcelType>(mesh_, is, true)
                 );
@@ -374,7 +374,7 @@ public:
             (
                 TrackData& td,
                 const scalar dt,
-                const label cellI
+                const label celli
             );
 
             //- Correct parcel properties according to atomization model
@@ -383,7 +383,7 @@ public:
             (
                 TrackData& td,
                 const scalar dt,
-                const label cellI
+                const label celli
             );
 
             //- Correct parcel properties according to breakup model
@@ -392,7 +392,7 @@ public:
             (
                 TrackData& td,
                 const scalar dt,
-                const label cellI
+                const label celli
             );
 
             //- Correct cell values using latest transfer information
@@ -401,7 +401,7 @@ public:
             (
                 TrackData& td,
                 const scalar dt,
-                const label cellI
+                const label celli
             );
 
             //- Correct surface values due to emitted species
@@ -409,7 +409,7 @@ public:
             void correctSurfaceValues
             (
                 TrackData& td,
-                const label cellI,
+                const label celli,
                 const scalar T,
                 const scalarField& Cs,
                 scalar& rhos,
@@ -424,7 +424,7 @@ public:
             (
                 TrackData& td,
                 const scalar dt,
-                const label cellI
+                const label celli
             );
 
             //- Calculate the chi-factor for flash-boiling for the

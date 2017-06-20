@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -32,24 +32,50 @@ inline const Foam::dimensionSet& Foam::geometricOneField::dimensions() const
     return dimless;
 }
 
-inline Foam::scalar Foam::geometricOneField::operator[](const label) const
+
+inline Foam::one Foam::geometricOneField::operator[](const label) const
 {
-    return scalar(1);
+    return one();
 }
+
 
 inline Foam::oneField Foam::geometricOneField::field() const
 {
     return oneField();
 }
 
+
 inline Foam::oneField Foam::geometricOneField::oldTime() const
 {
     return oneField();
 }
 
-inline Foam::oneFieldField Foam::geometricOneField::boundaryField() const
+
+inline Foam::geometricOneField::Internal
+Foam::geometricOneField::operator()() const
 {
-    return oneFieldField();
+    return Internal();
+}
+
+
+inline Foam::geometricOneField::Internal
+Foam::geometricOneField::v() const
+{
+    return Internal();
+}
+
+
+inline typename Foam::geometricOneField::Internal::FieldType
+Foam::geometricOneField::primitiveField() const
+{
+    return typename Internal::FieldType();
+}
+
+
+inline Foam::geometricOneField::Boundary
+Foam::geometricOneField::boundaryField() const
+{
+    return Boundary();
 }
 
 
@@ -62,6 +88,27 @@ inline const Foam::geometricOneField& Foam::operator*
     return gof;
 }
 
+
+inline const Foam::geometricOneField::Internal& Foam::operator*
+(
+    const geometricOneField::Internal& of,
+    const geometricOneField&
+)
+{
+    return of;
+}
+
+
+inline const Foam::geometricOneField::Internal& Foam::operator*
+(
+    const geometricOneField&,
+    const geometricOneField::Internal& of
+)
+{
+    return of;
+}
+
+
 inline const Foam::geometricOneField& Foam::operator/
 (
     const geometricOneField& gof,
@@ -69,6 +116,26 @@ inline const Foam::geometricOneField& Foam::operator/
 )
 {
     return gof;
+}
+
+
+inline const Foam::geometricOneField::Internal& Foam::operator/
+(
+    const geometricOneField::Internal& of,
+    const geometricOneField&
+)
+{
+    return of;
+}
+
+
+inline const Foam::geometricOneField::Internal& Foam::operator/
+(
+    const geometricOneField&,
+    const geometricOneField::Internal& of
+)
+{
+    return of;
 }
 
 

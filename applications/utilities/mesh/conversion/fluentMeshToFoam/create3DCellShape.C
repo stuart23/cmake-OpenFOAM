@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -74,13 +74,8 @@ cellShape create3DCellShape
     // Checking
     if (faceLabels.size() != curModel.nFaces())
     {
-        FatalErrorIn
-        (
-            "create3DCellShape(const label cellIndex, "
-            "const labelList& faceLabels, const labelListList& faces, "
-            "const labelList& owner, const labelList& neighbour, "
-            "const label fluentCellModelID)"
-        )   << "Number of face labels not equal to"
+        FatalErrorInFunction
+            << "Number of face labels not equal to"
             << "number of face in the model. "
             << "Number of face labels: " << faceLabels.size()
             << " number of faces in model: " << curModel.nFaces()
@@ -90,36 +85,31 @@ cellShape create3DCellShape
     // make a list of outward-pointing faces
     labelListList localFaces(faceLabels.size());
 
-    forAll(faceLabels, faceI)
+    forAll(faceLabels, facei)
     {
-        const label curFaceLabel = faceLabels[faceI];
+        const label curFaceLabel = faceLabels[facei];
 
         const labelList& curFace = faces[curFaceLabel];
 
         if (owner[curFaceLabel] == cellIndex)
         {
-            localFaces[faceI] = curFace;
+            localFaces[facei] = curFace;
         }
         else if (neighbour[curFaceLabel] == cellIndex)
         {
             // Reverse the face
-            localFaces[faceI].setSize(curFace.size());
+            localFaces[facei].setSize(curFace.size());
 
             forAllReverse(curFace, i)
             {
-                localFaces[faceI][curFace.size() - i - 1] =
+                localFaces[facei][curFace.size() - i - 1] =
                     curFace[i];
             }
         }
         else
         {
-            FatalErrorIn
-            (
-                "create3DCellShape(const label cellIndex, "
-                "const labelList& faceLabels, const labelListList& faces, "
-                "const labelList& owner, const labelList& neighbour, "
-                "const label fluentCellModelID)"
-            )   << "face " << curFaceLabel
+            FatalErrorInFunction
+                << "face " << curFaceLabel
                 << " does not belong to cell " << cellIndex
                 << ". Face owner: " << owner[curFaceLabel] << " neighbour: "
                 << neighbour[curFaceLabel]
@@ -154,20 +144,20 @@ cellShape create3DCellShape
 
     bool found = false;
 
-    forAll(localFaces, meshFaceI)
+    forAll(localFaces, meshFacei)
     {
-        if (localFaces[meshFaceI].size() == firstModelFace.size())
+        if (localFaces[meshFacei].size() == firstModelFace.size())
         {
             // Match. Insert points into the pointLabels
             found = true;
 
-            const labelList& curMeshFace = localFaces[meshFaceI];
+            const labelList& curMeshFace = localFaces[meshFacei];
 
-            meshFaceUsed[meshFaceI] = true;
+            meshFaceUsed[meshFacei] = true;
 
-            forAll(curMeshFace, pointI)
+            forAll(curMeshFace, pointi)
             {
-                pointLabels[firstModelFace[pointI]] = curMeshFace[pointI];
+                pointLabels[firstModelFace[pointi]] = curMeshFace[pointi];
             }
 
             break;
@@ -176,38 +166,33 @@ cellShape create3DCellShape
 
     if (!found)
     {
-        FatalErrorIn
-        (
-            "create3DCellShape(const label cellIndex, "
-            "const labelList& faceLabels, const labelListList& faces, "
-            "const labelList& owner, const labelList& neighbour, "
-            "const label fluentCellModelID)"
-        )   << "Cannot find match for first face. "
+        FatalErrorInFunction
+            << "Cannot find match for first face. "
             << "cell model: " << curModel.name() << " first model face: "
             << firstModelFace << " Mesh faces: " << localFaces
             << abort(FatalError);
     }
 
-    for (label modelFaceI = 1; modelFaceI < modelFaces.size(); modelFaceI++)
+    for (label modelFacei = 1; modelFacei < modelFaces.size(); modelFacei++)
     {
         // get the next model face
         const labelList& curModelFace =
             modelFaces
-            [faceMatchingOrder[fluentCellModelID][modelFaceI]];
+            [faceMatchingOrder[fluentCellModelID][modelFacei]];
 
         found = false;
 
         // Loop through mesh faces until a match is found
-        forAll(localFaces, meshFaceI)
+        forAll(localFaces, meshFacei)
         {
             if
             (
-                !meshFaceUsed[meshFaceI]
-             && localFaces[meshFaceI].size() == curModelFace.size()
+                !meshFaceUsed[meshFacei]
+             && localFaces[meshFacei].size() == curModelFace.size()
             )
             {
                 // A possible match. A mesh face will be rotated, so make a copy
-                labelList meshFaceLabels = localFaces[meshFaceI];
+                labelList meshFaceLabels = localFaces[meshFacei];
 
                 for
                 (
@@ -219,12 +204,12 @@ cellShape create3DCellShape
                     // try matching the face
                     label nMatchedLabels = 0;
 
-                    forAll(meshFaceLabels, pointI)
+                    forAll(meshFaceLabels, pointi)
                     {
                         if
                         (
-                            pointLabels[curModelFace[pointI]]
-                         == meshFaceLabels[pointI]
+                            pointLabels[curModelFace[pointi]]
+                         == meshFaceLabels[pointi]
                         )
                         {
                             nMatchedLabels++;
@@ -240,13 +225,13 @@ cellShape create3DCellShape
                     if (found)
                     {
                         // match found. Insert mesh face
-                        forAll(meshFaceLabels, pointI)
+                        forAll(meshFaceLabels, pointi)
                         {
-                            pointLabels[curModelFace[pointI]] =
-                                meshFaceLabels[pointI];
+                            pointLabels[curModelFace[pointi]] =
+                                meshFaceLabels[pointi];
                         }
 
-                        meshFaceUsed[meshFaceI] = true;
+                        meshFaceUsed[meshFacei] = true;
 
                         break;
                     }
@@ -271,14 +256,9 @@ cellShape create3DCellShape
         if (!found)
         {
             // A model face is not matched. Shape detection failed
-            FatalErrorIn
-            (
-                "create3DCellShape(const label cellIndex, "
-                "const labelList& faceLabels, const labelListList& faces, "
-                "const labelList& owner, const labelList& neighbour, "
-                "const label fluentCellModelID)"
-            )   << "Cannot find match for face "
-                << modelFaceI
+            FatalErrorInFunction
+                << "Cannot find match for face "
+                << modelFacei
                 << ".\nModel: " << curModel.name() << " model face: "
                 << curModelFace << " Mesh faces: " << localFaces
                 << "Matched points: " << pointLabels

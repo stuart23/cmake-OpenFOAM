@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -68,8 +68,8 @@ mappedPatchFieldBase<Type>::mappedPatchFieldBase
     (
         dict.template lookupOrDefault<word>
         (
-            "fieldName",
-            patchField_.dimensionedInternalField().name()
+            "field",
+            patchField_.internalField().name()
         )
     ),
     setAverage_(readBool(dict.lookup("setAverage"))),
@@ -92,9 +92,9 @@ mappedPatchFieldBase<Type>::mappedPatchFieldBase
 :
     mapper_(mapper),
     patchField_(patchField),
-    fieldName_(patchField_.dimensionedInternalField().name()),
+    fieldName_(patchField_.internalField().name()),
     setAverage_(false),
-    average_(pTraits<Type>::zero),
+    average_(Zero),
     interpolationScheme_(interpolationCell<Type>::typeName)
 {}
 
@@ -143,13 +143,13 @@ mappedPatchFieldBase<Type>::sampleField() const
 
     if (mapper_.sameRegion())
     {
-        if (fieldName_ == patchField_.dimensionedInternalField().name())
+        if (fieldName_ == patchField_.internalField().name())
         {
             // Optimisation: bypass field lookup
             return
                 dynamic_cast<const fieldType&>
                 (
-                    patchField_.dimensionedInternalField()
+                    patchField_.internalField()
                 );
         }
         else
@@ -166,7 +166,7 @@ mappedPatchFieldBase<Type>::sampleField() const
 
 
 template<class Type>
-tmp<Field<Type> > mappedPatchFieldBase<Type>::mappedField() const
+tmp<Field<Type>> mappedPatchFieldBase<Type>::mappedField() const
 {
     typedef GeometricField<Type, fvPatchField, volMesh> fieldType;
 
@@ -179,8 +179,8 @@ tmp<Field<Type> > mappedPatchFieldBase<Type>::mappedField() const
     const fvMesh& nbrMesh = refCast<const fvMesh>(mapper_.sampleMesh());
 
     // Result of obtaining remote values
-    tmp<Field<Type> > tnewValues(new Field<Type>(0));
-    Field<Type>& newValues = tnewValues();
+    tmp<Field<Type>> tnewValues(new Field<Type>(0));
+    Field<Type>& newValues = tnewValues.ref();
 
     switch (mapper_.mode())
     {
@@ -203,7 +203,7 @@ tmp<Field<Type> > mappedPatchFieldBase<Type>::mappedField() const
                     samples
                 );
 
-                autoPtr<interpolation<Type> > interpolator
+                autoPtr<interpolation<Type>> interpolator
                 (
                     interpolation<Type>::New
                     (
@@ -214,14 +214,14 @@ tmp<Field<Type> > mappedPatchFieldBase<Type>::mappedField() const
                 const interpolation<Type>& interp = interpolator();
 
                 newValues.setSize(samples.size(), pTraits<Type>::max);
-                forAll(samples, cellI)
+                forAll(samples, celli)
                 {
-                    if (samples[cellI] != point::max)
+                    if (samples[celli] != point::max)
                     {
-                        newValues[cellI] = interp.interpolate
+                        newValues[celli] = interp.interpolate
                         (
-                            samples[cellI],
-                            cellI
+                            samples[celli],
+                            celli
                         );
                     }
                 }
@@ -243,10 +243,8 @@ tmp<Field<Type> > mappedPatchFieldBase<Type>::mappedField() const
 
             if (nbrPatchID < 0)
             {
-                FatalErrorIn
-                (
-                    "void mappedPatchFieldBase<Type>::updateCoeffs()"
-                )<< "Unable to find sample patch " << mapper_.samplePatch()
+                FatalErrorInFunction
+                 << "Unable to find sample patch " << mapper_.samplePatch()
                  << " in region " << mapper_.sampleRegion()
                  << " for patch " << patchField_.patch().name() << nl
                  << abort(FatalError);
@@ -261,19 +259,19 @@ tmp<Field<Type> > mappedPatchFieldBase<Type>::mappedField() const
         }
         case mappedPatchBase::NEARESTFACE:
         {
-            Field<Type> allValues(nbrMesh.nFaces(), pTraits<Type>::zero);
+            Field<Type> allValues(nbrMesh.nFaces(), Zero);
 
             const fieldType& nbrField = sampleField();
 
-            forAll(nbrField.boundaryField(), patchI)
+            forAll(nbrField.boundaryField(), patchi)
             {
                 const fvPatchField<Type>& pf =
-                    nbrField.boundaryField()[patchI];
+                    nbrField.boundaryField()[patchi];
                 label faceStart = pf.patch().start();
 
-                forAll(pf, faceI)
+                forAll(pf, facei)
                 {
-                    allValues[faceStart++] = pf[faceI];
+                    allValues[faceStart++] = pf[facei];
                 }
             }
 
@@ -284,10 +282,8 @@ tmp<Field<Type> > mappedPatchFieldBase<Type>::mappedField() const
         }
         default:
         {
-            FatalErrorIn
-            (
-                "mappedPatchFieldBase<Type>::updateCoeffs()"
-            )<< "Unknown sampling mode: " << mapper_.mode()
+            FatalErrorInFunction
+             << "Unknown sampling mode: " << mapper_.mode()
              << nl << abort(FatalError);
         }
     }
@@ -318,7 +314,7 @@ tmp<Field<Type> > mappedPatchFieldBase<Type>::mappedField() const
 template<class Type>
 void mappedPatchFieldBase<Type>::write(Ostream& os) const
 {
-    os.writeKeyword("fieldName") << fieldName_ << token::END_STATEMENT << nl;
+    os.writeKeyword("field") << fieldName_ << token::END_STATEMENT << nl;
     os.writeKeyword("setAverage") << setAverage_ << token::END_STATEMENT << nl;
     os.writeKeyword("average") << average_ << token::END_STATEMENT << nl;
     os.writeKeyword("interpolationScheme") << interpolationScheme_

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -140,10 +140,7 @@ bool Foam::fileFormats::STARCDedgeFormat::read
     IFstream is(baseName + ".cel");
     if (!is.good())
     {
-        FatalErrorIn
-        (
-            "fileFormats::STARCDedgeFormat::read(const fileName&)"
-        )
+        FatalErrorInFunction
             << "Cannot read file " << is.name()
             << exit(FatalError);
     }
@@ -196,17 +193,17 @@ bool Foam::fileFormats::STARCDedgeFormat::read
         label nUsed = 0;
 
         pointField& pts = storedPoints();
-        forAll(pts, pointI)
+        forAll(pts, pointi)
         {
-            if (usedPoints.get(pointI))
+            if (usedPoints.get(pointi))
             {
-                if (nUsed != pointI)
+                if (nUsed != pointi)
                 {
-                    pts[nUsed] = pts[pointI];
+                    pts[nUsed] = pts[pointi];
                 }
 
                 // map prev -> new id
-                mapPointId.set(pointI, nUsed);
+                mapPointId.set(pointi, nUsed);
 
                 ++nUsed;
             }

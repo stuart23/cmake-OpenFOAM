@@ -57,20 +57,20 @@ Foam::anisotropicFilter::anisotropicFilter
             mesh
         ),
         mesh,
-        dimensionedVector("zero", dimLength*dimLength, vector::zero),
+        dimensionedVector("zero", dimLength*dimLength, Zero),
         calculatedFvPatchVectorField::typeName
     )
 {
     for (direction d=0; d<vector::nComponents; d++)
     {
-        coeff_.internalField().replace
+        coeff_.primitiveFieldRef().replace
         (
             d,
             (1/widthCoeff_)*
             sqr
             (
                 2.0*mesh.V()
-               /fvc::surfaceSum(mag(mesh.Sf().component(d)))().internalField()
+               /fvc::surfaceSum(mag(mesh.Sf().component(d)))().primitiveField()
             )
         );
     }
@@ -94,20 +94,20 @@ Foam::anisotropicFilter::anisotropicFilter
             mesh
         ),
         mesh,
-        dimensionedVector("zero", dimLength*dimLength, vector::zero),
+        dimensionedVector("zero", dimLength*dimLength, Zero),
         calculatedFvPatchScalarField::typeName
     )
 {
     for (direction d=0; d<vector::nComponents; d++)
     {
-        coeff_.internalField().replace
+        coeff_.primitiveFieldRef().replace
         (
             d,
             (1/widthCoeff_)*
             sqr
             (
                 2.0*mesh.V()
-               /fvc::surfaceSum(mag(mesh.Sf().component(d)))().internalField()
+               /fvc::surfaceSum(mag(mesh.Sf().component(d)))().primitiveField()
             )
         );
     }
@@ -196,7 +196,7 @@ Foam::tmp<Foam::volSymmTensorField> Foam::anisotropicFilter::operator()
 
     for (direction d=0; d<symmTensor::nComponents; d++)
     {
-        tmpFilteredField().replace
+        tmpFilteredField.ref().replace
         (
             d, anisotropicFilter::operator()(unFilteredField().component(d))
         );
@@ -232,7 +232,7 @@ Foam::tmp<Foam::volTensorField> Foam::anisotropicFilter::operator()
 
     for (direction d=0; d<tensor::nComponents; d++)
     {
-        tmpFilteredField().replace
+        tmpFilteredField.ref().replace
         (
             d, anisotropicFilter::operator()(unFilteredField().component(d))
         );

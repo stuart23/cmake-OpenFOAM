@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -72,7 +72,7 @@ Foam::displacementLaplacianFvMotionSolver::displacementLaplacianFvMotionSolver
         (
             "cellDisplacement",
             pointDisplacement_.dimensions(),
-            vector::zero
+            Zero
         ),
         cellMotionBoundaryTypes<vector>(pointDisplacement_.boundaryField())
     ),
@@ -173,9 +173,9 @@ Foam::displacementLaplacianFvMotionSolver::curPoints() const
                 << endl;
         }
 
-        pointLocation_().internalField() =
+        pointLocation_().primitiveFieldRef() =
             points0()
-          + pointDisplacement_.internalField();
+          + pointDisplacement_.primitiveField();
 
         pointLocation_().correctBoundaryConditions();
 
@@ -190,16 +190,17 @@ Foam::displacementLaplacianFvMotionSolver::curPoints() const
             }
         }
 
-        twoDCorrectPoints(pointLocation_().internalField());
+        twoDCorrectPoints(pointLocation_().primitiveFieldRef());
 
-        return tmp<pointField>(pointLocation_().internalField());
+        return tmp<pointField>(pointLocation_().primitiveField());
     }
     else
     {
         tmp<pointField> tcurPoints
         (
-            points0() + pointDisplacement_.internalField()
+            points0() + pointDisplacement_.primitiveField()
         );
+        pointField& curPoints = tcurPoints.ref();
 
         // Implement frozen points
         if (frozenPointsZone_ != -1)
@@ -208,11 +209,11 @@ Foam::displacementLaplacianFvMotionSolver::curPoints() const
 
             forAll(pz, i)
             {
-                tcurPoints()[pz[i]] = points0()[pz[i]];
+                curPoints[pz[i]] = points0()[pz[i]];
             }
         }
 
-        twoDCorrectPoints(tcurPoints());
+        twoDCorrectPoints(curPoints);
 
         return tcurPoints;
     }
@@ -226,7 +227,7 @@ void Foam::displacementLaplacianFvMotionSolver::solve()
     movePoints(fvMesh_.points());
 
     diffusivity().correct();
-    pointDisplacement_.boundaryField().updateCoeffs();
+    pointDisplacement_.boundaryFieldRef().updateCoeffs();
 
     Foam::solve
     (

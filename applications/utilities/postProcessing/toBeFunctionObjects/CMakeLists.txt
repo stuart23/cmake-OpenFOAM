@@ -1,0 +1,6 @@
+add_subdirectory( lagrangian\particleTracks )
+add_subdirectory( lagrangian\steadyParticleTracks )
+add_subdirectory( streamFunction )
+add_subdirectory( wallHeatFlux )
+add_subdirectory( wdot )
+add_subdirectory( writeCellCentres )

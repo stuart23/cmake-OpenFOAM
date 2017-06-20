@@ -1,4 +1,4 @@
-tmp<fv::convectionScheme<scalar> > mvConvection
+tmp<fv::convectionScheme<scalar>> mvConvection
 (
     fv::convectionScheme<scalar>::New
     (
@@ -73,6 +73,8 @@ if (ign.ignited())
       + fvm::div(phiSt, b)
       - fvm::Sp(fvc::div(phiSt), b)
       - fvm::laplacian(Db, b)
+     ==
+        betav*fvOptions(rho, b)
     );
 
 
@@ -82,7 +84,13 @@ if (ign.ignited())
 
     // Solve for b
     // ~~~~~~~~~~~
+    bEqn.relax();
+
+    fvOptions.constrain(bEqn);
+
     bEqn.solve();
+
+    fvOptions.correct(b);
 
     Info<< "min(b) = " << min(b).value() << endl;
 

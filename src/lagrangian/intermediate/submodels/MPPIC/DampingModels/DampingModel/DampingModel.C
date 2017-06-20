@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -73,7 +73,7 @@ Foam::DampingModel<CloudType>::~DampingModel()
 // * * * * * * * * * * * * * * * *  Selector * * * * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::autoPtr<Foam::DampingModel<CloudType> >
+Foam::autoPtr<Foam::DampingModel<CloudType>>
 Foam::DampingModel<CloudType>::New
 (
     const dictionary& dict,
@@ -89,14 +89,8 @@ Foam::DampingModel<CloudType>::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "DampingModel<CloudType>::New"
-            "("
-                "const dictionary&, "
-                "CloudType&"
-            ")"
-        )   << "Unknown damping model type " << modelType
+        FatalErrorInFunction
+            << "Unknown damping model type " << modelType
             << ", constructor not in hash table" << nl << nl
             << "    Valid damping model types are:" << nl
             << dictionaryConstructorTablePtr_->sortedToc()
@@ -104,7 +98,7 @@ Foam::DampingModel<CloudType>::New
     }
 
     return
-        autoPtr<DampingModel<CloudType> >
+        autoPtr<DampingModel<CloudType>>
         (
             cstrIter()(dict, owner)
         );

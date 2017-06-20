@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,30 +30,27 @@ Description
     All systems are defined by an origin point and a co-ordinate rotation.
 
     \verbatim
-        coordinateSystem
+    coordinateSystem
+    {
+        type    cartesian;
+        origin  (0 0 0);
+        coordinateRotation
         {
-            type    cartesian;
-            origin  (0 0 0);
-            coordinateRotation
-            {
-                type        cylindrical;
-                e3          (0 0 1);
-            }
+            type        cylindrical;
+            e3          (0 0 1);
         }
+    }
     \endverbatim
 
     Types of coordinateRotation:
-    1) axesRotation
-    2) STARCDRotation
-    3) cylindrical
-    4) EulerCoordinateRotation
+      -# axesRotation
+      -# \link STARCDCoordinateRotation STARCDRotation \endlink
+      -# cylindricalCS cylindrical
+      -# EulerCoordinateRotation
 
     Type of co-ordinates:
-    1) cartesian
+      -# \link cartesianCS cartesian \endlink
 
-
-See Also
-    coordinateSystem and coordinateSystem::New
 
 SourceFiles
     coordinateSystem.C
@@ -78,6 +75,14 @@ SourceFiles
 
 namespace Foam
 {
+
+// Forward declaration of friend functions and operators
+
+class coordinateSystem;
+
+bool operator!=(const coordinateSystem&, const coordinateSystem&);
+Ostream& operator<<(Ostream&, const coordinateSystem&);
+
 
 /*---------------------------------------------------------------------------*\
                      Class coordinateSystem Declaration
@@ -281,7 +286,7 @@ public:
             }
 
             //- Return as dictionary of entries
-            //  \param [in] ignoreType drop type (cartesian, cylindrical, etc)
+            //  \param[in] ignoreType drop type (cartesian, cylindrical, etc)
             //  when generating the dictionary
             virtual dictionary dict(bool ignoreType=false) const;
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -44,6 +44,14 @@ namespace Foam
 {
 
 class objectRegistry;
+
+
+// Forward declaration of friend functions and operators
+
+class lduMesh;
+
+Ostream& operator<<(Ostream&, const InfoProxy<lduMesh>&);
+
 
 /*---------------------------------------------------------------------------*\
                            Class lduMesh Declaration
@@ -90,6 +98,7 @@ public:
                 const BinaryOp& bop
             ) const;
 
+
         // Info
 
             //- Return info proxy.
@@ -98,6 +107,7 @@ public:
             {
                 return *this;
             }
+
 
     // Ostream operator
 
@@ -112,7 +122,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "lduMeshTemplates.C"
+    #include "lduMeshTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

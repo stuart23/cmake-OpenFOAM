@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -72,7 +72,7 @@ public:
 
         bool writeData(Ostream&) const
         {
-            notImplemented("zonesEntries::writeData(Ostream&) const");
+            NotImplemented;
             return false;
         }
 };
@@ -295,9 +295,9 @@ void Foam::vtkPV3Foam::updateInfoPatches
 
         if (!reader_->GetShowGroupsOnly())
         {
-            forAll(patches, patchI)
+            forAll(patches, patchi)
             {
-                const polyPatch& pp = patches[patchI];
+                const polyPatch& pp = patches[patchi];
 
                 if (pp.size())
                 {
@@ -344,12 +344,12 @@ void Foam::vtkPV3Foam::updateInfoPatches
             wordList names(patchEntries.size());
             labelList sizes(patchEntries.size());
 
-            forAll(patchEntries, patchI)
+            forAll(patchEntries, patchi)
             {
-                const dictionary& patchDict = patchEntries[patchI].dict();
+                const dictionary& patchDict = patchEntries[patchi].dict();
 
-                sizes[patchI] = readLabel(patchDict.lookup("nFaces"));
-                names[patchI] = patchEntries[patchI].keyword();
+                sizes[patchi] = readLabel(patchDict.lookup("nFaces"));
+                names[patchi] = patchEntries[patchi].keyword();
             }
 
 
@@ -358,9 +358,9 @@ void Foam::vtkPV3Foam::updateInfoPatches
 
             HashTable<labelList, word> groups(patchEntries.size());
 
-            forAll(patchEntries, patchI)
+            forAll(patchEntries, patchi)
             {
-                const dictionary& patchDict = patchEntries[patchI].dict();
+                const dictionary& patchDict = patchEntries[patchi].dict();
 
                 wordList groupNames;
                 patchDict.readIfPresent("inGroups", groupNames);
@@ -373,11 +373,11 @@ void Foam::vtkPV3Foam::updateInfoPatches
                     );
                     if (iter != groups.end())
                     {
-                        iter().append(patchI);
+                        iter().append(patchi);
                     }
                     else
                     {
-                        groups.insert(groupNames[groupI], labelList(1, patchI));
+                        groups.insert(groupNames[groupI], labelList(1, patchi));
                     }
                 }
             }
@@ -432,14 +432,14 @@ void Foam::vtkPV3Foam::updateInfoPatches
 
             if (!reader_->GetShowGroupsOnly())
             {
-                forAll(names, patchI)
+                forAll(names, patchi)
                 {
                     // Valid patch if nFace > 0 - add patch to GUI list
-                    if (sizes[patchI])
+                    if (sizes[patchi])
                     {
                         arraySelection->AddArray
                         (
-                            (names[patchI] + " - patch").c_str()
+                            (names[patchi] + " - patch").c_str()
                         );
 
                         ++nPatches;
@@ -678,33 +678,33 @@ void Foam::vtkPV3Foam::updateInfoLagrangianFields()
         lagrangianPrefix/cloudName
     );
 
-    addToSelection<IOField<label> >
+    addToSelection<IOField<label>>
     (
         fieldSelection,
         objects
     );
-    addToSelection<IOField<scalar> >
+    addToSelection<IOField<scalar>>
     (
         fieldSelection,
         objects
     );
-    addToSelection<IOField<vector> >
+    addToSelection<IOField<vector>>
     (
         fieldSelection,
         objects
     );
-    addToSelection<IOField<sphericalTensor> >
+    addToSelection<IOField<sphericalTensor>>
     (
         fieldSelection,
 
         objects
     );
-    addToSelection<IOField<symmTensor> >
+    addToSelection<IOField<symmTensor>>
     (
         fieldSelection,
         objects
     );
-    addToSelection<IOField<tensor> >
+    addToSelection<IOField<tensor>>
     (
         fieldSelection,
         objects

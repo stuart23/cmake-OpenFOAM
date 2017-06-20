@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,16 +26,24 @@ License
 #include "patchProbes.H"
 #include "volFields.H"
 #include "IOmanip.H"
-// For 'nearInfo' helper class only
 #include "mappedPatchBase.H"
 #include "treeBoundBox.H"
 #include "treeDataFace.H"
+#include "addToRunTimeSelectionTable.H"
+
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
     defineTypeNameAndDebug(patchProbes, 0);
+
+    addToRunTimeSelectionTable
+    (
+        functionObject,
+        patchProbes,
+        dictionary
+    );
 }
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -46,14 +54,12 @@ void Foam::patchProbes::findElements(const fvMesh& mesh)
 
     const polyBoundaryMesh& bm = mesh.boundaryMesh();
 
-    label patchI = bm.findPatchID(patchName_);
+    label patchi = bm.findPatchID(patchName_);
 
-    if (patchI == -1)
+    if (patchi == -1)
     {
-        FatalErrorIn
-        (
-            " Foam::patchProbes::findElements(const fvMesh&)"
-        )   << " Unknown patch name "
+        FatalErrorInFunction
+            << " Unknown patch name "
             << patchName_ << endl
             << exit(FatalError);
     }
@@ -61,7 +67,7 @@ void Foam::patchProbes::findElements(const fvMesh& mesh)
      // All the info for nearest. Construct to miss
     List<mappedPatchBase::nearInfo> nearest(this->size());
 
-    const polyPatch& pp = bm[patchI];
+    const polyPatch& pp = bm[patchi];
 
     if (pp.size() > 0)
     {
@@ -92,9 +98,9 @@ void Foam::patchProbes::findElements(const fvMesh& mesh)
         );
 
 
-        forAll(probeLocations(), probeI)
+        forAll(probeLocations(), probei)
         {
-            const point sample = probeLocations()[probeI];
+            const point sample = probeLocations()[probei];
 
             scalar span = boundaryTree.bb().mag();
 
@@ -113,16 +119,13 @@ void Foam::patchProbes::findElements(const fvMesh& mesh)
                 );
             }
 
-            label faceI = boundaryTree.shapes().faceLabels()[info.index()];
+            label facei = boundaryTree.shapes().faceLabels()[info.index()];
 
-            const label patchi = bm.whichPatch(faceI);
+            const label patchi = bm.whichPatch(facei);
 
             if (isA<emptyPolyPatch>(bm[patchi]))
             {
-                WarningIn
-                (
-                    " Foam::patchProbes::findElements(const fvMesh&)"
-                )
+                WarningInFunction
                 << " The sample point: " << sample
                 << " belongs to " << patchi
                 << " which is an empty patch. This is not permitted. "
@@ -131,7 +134,7 @@ void Foam::patchProbes::findElements(const fvMesh& mesh)
             }
             else
             {
-                const point& fc = mesh.faceCentres()[faceI];
+                const point& fc = mesh.faceCentres()[facei];
 
                 mappedPatchBase::nearInfo sampleInfo;
 
@@ -139,13 +142,13 @@ void Foam::patchProbes::findElements(const fvMesh& mesh)
                 (
                     true,
                     fc,
-                    faceI
+                    facei
                 );
 
                 sampleInfo.second().first() = magSqr(fc-sample);
                 sampleInfo.second().second() = Pstream::myProcNo();
 
-                nearest[probeI]= sampleInfo;
+                nearest[probei]= sampleInfo;
             }
         }
     }
@@ -157,14 +160,14 @@ void Foam::patchProbes::findElements(const fvMesh& mesh)
 
     if (debug)
     {
-        Info<< "patchProbes::findElements" << " : " << endl;
+        InfoInFunction << endl;
         forAll(nearest, sampleI)
         {
-            label procI = nearest[sampleI].second().second();
+            label proci = nearest[sampleI].second().second();
             label localI = nearest[sampleI].first().index();
 
             Info<< "    " << sampleI << " coord:"<< operator[](sampleI)
-                << " found on processor:" << procI
+                << " found on processor:" << proci
                 << " in local cell/face:" << localI
                 << " with fc:" << nearest[sampleI].first().rawPoint() << endl;
         }
@@ -190,12 +193,32 @@ void Foam::patchProbes::findElements(const fvMesh& mesh)
 Foam::patchProbes::patchProbes
 (
     const word& name,
+    const Time& t,
+    const dictionary& dict
+)
+:
+    probes(name, t, dict)
+{
+    // When constructing probes above it will have called the
+    // probes::findElements (since the virtual mechanism not yet operating).
+    // Not easy to workaround (apart from feeding through flag into constructor)
+    // so clear out any cells found for now.
+    elementList_.clear();
+    faceList_.clear();
+
+    read(dict);
+}
+
+
+Foam::patchProbes::patchProbes
+(
+    const word& name,
     const objectRegistry& obr,
     const dictionary& dict,
     const bool loadFromFiles
 )
 :
-    probes(name, obr, dict, loadFromFiles)
+    probes(name, obr, dict)
 {
     // When constructing probes above it will have called the
     // probes::findElements (since the virtual mechanism not yet operating).
@@ -214,7 +237,7 @@ Foam::patchProbes::~patchProbes()
 {}
 
 
-void Foam::patchProbes::write()
+bool Foam::patchProbes::write()
 {
     if (this->size() && prepare())
     {
@@ -230,12 +253,15 @@ void Foam::patchProbes::write()
         sampleAndWriteSurfaceFields(surfaceSymmTensorFields_);
         sampleAndWriteSurfaceFields(surfaceTensorFields_);
     }
+
+    return true;
 }
 
-void Foam::patchProbes::read(const dictionary& dict)
+
+bool Foam::patchProbes::read(const dictionary& dict)
 {
     dict.lookup("patchName") >> patchName_;
-    probes::read(dict);
+    return probes::read(dict);
 }
 
 

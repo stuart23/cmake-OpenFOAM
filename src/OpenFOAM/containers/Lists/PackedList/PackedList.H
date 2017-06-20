@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -89,7 +89,7 @@ Note
     \endverbatim
     In both cases, the supplied indices can be randomly ordered.
 
-SeeAlso
+See also
     Foam::DynamicList
 
 SourceFiles
@@ -103,7 +103,7 @@ SourceFiles
 
 #include "labelList.H"
 #include "UIndirectList.H"
-#include "StaticAssert.H"
+#include <type_traits>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -174,7 +174,11 @@ private:
     //  it is more efficient to use a normal list.
     //  Thus max nBits is 1/2 of the base storage size.
     //  For simplicity, assume 8-bit bytes in the assert.
-    StaticAssert(nBits && nBits <= (sizeof(StorageType) << 2));
+    static_assert
+    (
+        nBits && nBits <= (sizeof(StorageType) << 2),
+        "nBits must be positive (non-zero) and fit within the storage"
+    );
 
     // Private data
 
@@ -226,7 +230,7 @@ public:
         inline PackedList(const PackedList<nBits>&);
 
         //- Construct by transferring the parameter contents
-        inline PackedList(const Xfer<PackedList<nBits> >&);
+        inline PackedList(const Xfer<PackedList<nBits>>&);
 
         //- Construct from a list of labels
         explicit inline PackedList(const labelUList&);
@@ -235,7 +239,7 @@ public:
         explicit inline PackedList(const UIndirectList<label>&);
 
         //- Clone
-        inline autoPtr< PackedList<nBits> > clone() const;
+        inline autoPtr<PackedList<nBits>> clone() const;
 
 
     // Member Functions
@@ -344,7 +348,7 @@ public:
             inline void transfer(PackedList<nBits>&);
 
             //- Transfer contents to the Xfer container
-            inline Xfer<PackedList<nBits> > xfer();
+            inline Xfer<PackedList<nBits>> xfer();
 
 
         // IO
@@ -398,16 +402,16 @@ public:
             inline iteratorBase operator[](const label);
 
             //- Assignment of all entries to the given value. Takes linear time.
-            inline PackedList<nBits>& operator=(const unsigned int val);
+            inline void operator=(const unsigned int val);
 
             //- Assignment operator.
-            PackedList<nBits>& operator=(const PackedList<nBits>&);
+            void operator=(const PackedList<nBits>&);
 
             //- Assignment operator.
-            PackedList<nBits>& operator=(const labelUList&);
+            void operator=(const labelUList&);
 
             //- Assignment operator.
-            PackedList<nBits>& operator=(const UIndirectList<label>&);
+            void operator=(const UIndirectList<label>&);
 
 
     // Iterators and helpers
@@ -468,11 +472,11 @@ public:
 
                 //- Assign value, not position.
                 //  This allows packed[0] = packed[3] for assigning values
-                inline unsigned int operator=(const iteratorBase&);
+                inline void operator=(const iteratorBase&);
 
                 //- Assign value.
                 //  A non-existent entry will be auto-vivified.
-                inline unsigned int operator=(const unsigned int val);
+                inline void operator=(const unsigned int val);
 
                 //- Conversion operator
                 //  Never auto-vivify entries.
@@ -522,7 +526,7 @@ public:
 
                 //- Assign from iteratorBase, eg iter = packedlist[i]
                 //  An out-of-range iterator is assigned end()
-                inline iterator& operator=(const iteratorBase&);
+                inline void operator=(const iteratorBase&);
 
                 //- Return value
                 inline unsigned int operator*() const;
@@ -583,7 +587,7 @@ public:
 
                 //- Assign from iteratorBase or derived
                 //  eg, iter = packedlist[i] or even iter = list.begin()
-                inline const_iterator& operator=(const iteratorBase&);
+                inline void operator=(const iteratorBase&);
 
                 //- Return referenced value directly
                 inline unsigned int operator*() const;
@@ -639,7 +643,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "PackedList.C"
+    #include "PackedList.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

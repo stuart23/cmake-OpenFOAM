@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -75,10 +75,8 @@ label findEdge(const primitiveMesh& mesh, const label v0, const label v1)
         }
     }
 
-    FatalErrorIn
-    (
-        "findEdge(const primitiveMesh&, const label, const label)"
-    )   << "Cannot find edge between mesh points " << v0 << " and " << v1
+    FatalErrorInFunction
+        << "Cannot find edge between mesh points " << v0 << " and " << v1
         << abort(FatalError);
 
     return -1;
@@ -88,20 +86,20 @@ label findEdge(const primitiveMesh& mesh, const label v0, const label v1)
 // Checks whether patch present
 void checkPatch(const polyBoundaryMesh& bMesh, const word& name)
 {
-    const label patchI = bMesh.findPatchID(name);
+    const label patchi = bMesh.findPatchID(name);
 
-    if (patchI == -1)
+    if (patchi == -1)
     {
-        FatalErrorIn("checkPatch(const polyBoundaryMesh&, const word&)")
+        FatalErrorInFunction
             << "Cannot find patch " << name << nl
             << "It should be present but of zero size" << endl
             << "Valid patches are " << bMesh.names()
             << exit(FatalError);
     }
 
-    if (bMesh[patchI].size())
+    if (bMesh[patchi].size())
     {
-        FatalErrorIn("checkPatch(const polyBoundaryMesh&, const word&)")
+        FatalErrorInFunction
             << "Patch " << name << " is present but non-zero size"
             << exit(FatalError);
     }
@@ -143,7 +141,7 @@ int main(int argc, char *argv[])
     {
         if (!mesh.isInternalFace(faces[i]))
         {
-            FatalErrorIn(args.executable())
+            FatalErrorInFunction
             << "Face " << faces[i] << " in faceSet " << setName
             << " is not an internal face."
             << exit(FatalError);
@@ -202,15 +200,15 @@ int main(int argc, char *argv[])
     }
 
     // Find sides reachable from 0th face of faceSet
-    label startFaceI = faces[0];
+    label startFacei = faces[0];
 
     regionSide regionInfo
     (
         mesh,
         facesSet,
         fenceEdges,
-        mesh.faceOwner()[startFaceI],
-        startFaceI
+        mesh.faceOwner()[startFacei],
+        startFacei
     );
 
     // Determine flip state for all faces in faceSet
@@ -282,12 +280,12 @@ int main(int argc, char *argv[])
     Info<< "Writing mesh to " << runTime.timeName() << endl;
     if (!mesh.write())
     {
-        FatalErrorIn(args.executable())
+        FatalErrorInFunction
             << "Failed writing polyMesh."
             << exit(FatalError);
     }
 
-    Info<< nl << "end" << endl;
+    Info<< "End\n" << endl;
     return 0;
 }
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -87,13 +87,13 @@ class CoBlended
         const scalar Co1_;
 
         //- Scheme 1
-        tmp<surfaceInterpolationScheme<Type> > tScheme1_;
+        tmp<surfaceInterpolationScheme<Type>> tScheme1_;
 
         //- Courant number above which scheme2 is used
         const scalar Co2_;
 
         //- Scheme 2
-        tmp<surfaceInterpolationScheme<Type> > tScheme2_;
+        tmp<surfaceInterpolationScheme<Type>> tScheme2_;
 
         //- The face-flux used to compute the face Courant number
         const surfaceScalarField& faceFlux_;
@@ -143,7 +143,7 @@ public:
         {
             if (Co1_ < 0 || Co2_ < 0 || Co1_ >= Co2_)
             {
-                FatalIOErrorIn("CoBlended(const fvMesh&, Istream&)", is)
+                FatalIOErrorInFunction(is)
                     << "coefficients = " << Co1_ << " and " << Co2_
                     << " should be > 0 and Co2 > Co1"
                     << exit(FatalIOError);
@@ -174,7 +174,7 @@ public:
         {
             if (Co1_ < 0 || Co2_ < 0 || Co1_ >= Co2_)
             {
-                FatalIOErrorIn("CoBlended(const fvMesh&, Istream&)", is)
+                FatalIOErrorInFunction(is)
                     << "coefficients = " << Co1_ << " and " << Co2_
                     << " should be > 0 and Co2 > Co1"
                     << exit(FatalIOError);
@@ -205,10 +205,8 @@ public:
             }
             else if (faceFlux_.dimensions() != dimVelocity*dimArea)
             {
-                FatalErrorIn
-                (
-                    "CoBlended::blendingFactor()"
-                )   << "dimensions of faceFlux are not correct"
+                FatalErrorInFunction
+                    << "dimensions of faceFlux are not correct"
                     << exit(FatalError);
             }
 
@@ -253,7 +251,7 @@ public:
 
         //- Return the face-interpolate of the given cell field
         //  with explicit correction
-        tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
+        tmp<GeometricField<Type, fvsPatchField, surfaceMesh>>
         interpolate
         (
             const GeometricField<Type, fvPatchField, volMesh>& vf
@@ -276,7 +274,7 @@ public:
 
         //- Return the explicit correction to the face-interpolate
         //  for the given field
-        virtual tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
+        virtual tmp<GeometricField<Type, fvsPatchField, surfaceMesh>>
         correction
         (
             const GeometricField<Type, fvPatchField, volMesh>& vf
@@ -315,7 +313,7 @@ public:
             }
             else
             {
-                return tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
+                return tmp<GeometricField<Type, fvsPatchField, surfaceMesh>>
                 (
                     NULL
                 );

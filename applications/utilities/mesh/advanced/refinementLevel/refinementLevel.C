@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -64,17 +64,17 @@ bool limitRefinementLevel
 
     label oldNCells = refCells.size();
 
-    forAll(cellCells, cellI)
+    forAll(cellCells, celli)
     {
-        const labelList& cCells = cellCells[cellI];
+        const labelList& cCells = cellCells[celli];
 
         forAll(cCells, i)
         {
-            if (refLevel[cCells[i]] > (refLevel[cellI]+1))
+            if (refLevel[cCells[i]] > (refLevel[celli]+1))
             {
                 // Found neighbour with >=2 difference in refLevel.
-                refCells.insert(cellI);
-                refLevel[cellI]++;
+                refCells.insert(celli);
+                refLevel[celli]++;
                 break;
             }
         }
@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
     SortableList<scalar> sortedVols(vols);
 
     // All cell labels, sorted per bin.
-    DynamicList<DynamicList<label> > bins;
+    DynamicList<DynamicList<label>> bins;
 
     // Lower/upper limits
     DynamicList<scalar> lowerLimits;
@@ -221,9 +221,9 @@ int main(int argc, char *argv[])
 
     List<polyPatch*> p(patches.size());
 
-    forAll(p, patchI)
+    forAll(p, patchi)
     {
-        p[patchI] = patches[patchI].clone(fMesh.boundaryMesh()).ptr();
+        p[patchi] = patches[patchi].clone(fMesh.boundaryMesh()).ptr();
     }
 
     fMesh.addFvPatches(p);
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
 
     if (!readLevel && refHeader.headerOk())
     {
-        WarningIn(args.executable())
+        WarningInFunction
             << "Detected " << refHeader.name() << " file in "
             << polyMesh::defaultRegion <<  " directory. Please remove to"
             << " recreate it or use the -readLevel option to use it"
@@ -294,23 +294,25 @@ int main(int argc, char *argv[])
         }
     }
 
+    volScalarField::Boundary& postRefLevelBf =
+        postRefLevel.boundaryFieldRef();
 
     // For volScalarField: set boundary values to same as cell.
     // Note: could also put
     // zeroGradient b.c. on postRefLevel and do evaluate.
-    forAll(postRefLevel.boundaryField(), patchI)
+    forAll(postRefLevel.boundaryField(), patchi)
     {
-        const polyPatch& pp = patches[patchI];
+        const polyPatch& pp = patches[patchi];
 
-        fvPatchScalarField& bField = postRefLevel.boundaryField()[patchI];
+        fvPatchScalarField& bField = postRefLevelBf[patchi];
 
         Info<< "Setting field for patch "<< endl;
 
-        forAll(bField, faceI)
+        forAll(bField, facei)
         {
-            label own = mesh.faceOwner()[pp.start() + faceI];
+            label own = mesh.faceOwner()[pp.start() + facei];
 
-            bField[faceI] = postRefLevel[own];
+            bField[facei] = postRefLevel[own];
         }
     }
 

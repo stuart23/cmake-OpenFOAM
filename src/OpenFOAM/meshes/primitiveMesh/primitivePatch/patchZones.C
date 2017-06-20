@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -29,14 +29,12 @@ License
 
 namespace Foam
 {
-defineTypeNameAndDebug(patchZones, 0);
+    defineTypeNameAndDebug(patchZones, 0);
 }
 
 
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
-// Gets labels of changed faces and propagates them to the edges. Returns
-// labels of edges changed.
 Foam::labelList Foam::patchZones::faceToEdge
 (
     const labelList& changedFaces,
@@ -48,9 +46,9 @@ Foam::labelList Foam::patchZones::faceToEdge
 
     forAll(changedFaces, i)
     {
-        label faceI = changedFaces[i];
+        label facei = changedFaces[i];
 
-        const labelList& fEdges = pp_.faceEdges()[faceI];
+        const labelList& fEdges = pp_.faceEdges()[facei];
 
         forAll(fEdges, fEdgeI)
         {
@@ -71,7 +69,6 @@ Foam::labelList Foam::patchZones::faceToEdge
 }
 
 
-// Reverse of faceToEdge: gets edges and returns faces
 Foam::labelList Foam::patchZones::edgeToFace(const labelList& changedEdges)
 {
     labelList changedFaces(pp_.size(), -1);
@@ -83,15 +80,15 @@ Foam::labelList Foam::patchZones::edgeToFace(const labelList& changedEdges)
 
         const labelList& eFaces = pp_.edgeFaces()[edgeI];
 
-        forAll(eFaces, eFaceI)
+        forAll(eFaces, eFacei)
         {
-            label faceI = eFaces[eFaceI];
+            label facei = eFaces[eFacei];
 
-            if (operator[](faceI) == -1)
+            if (operator[](facei) == -1)
             {
-                operator[](faceI) = nZones_;
+                operator[](facei) = nZones_;
 
-                changedFaces[changedI++] = faceI;
+                changedFaces[changedI++] = facei;
             }
         }
     }
@@ -102,11 +99,10 @@ Foam::labelList Foam::patchZones::edgeToFace(const labelList& changedEdges)
 }
 
 
-// Finds area, starting at faceI, delimited by borderEdge
-void Foam::patchZones::markZone(label faceI)
+void Foam::patchZones::markZone(label facei)
 {
     // List of faces whose faceZone has been set.
-    labelList changedFaces(1, faceI);
+    labelList changedFaces(1, facei);
     // List of edges whose faceZone has been set.
     labelList changedEdges;
 
@@ -148,7 +144,6 @@ void Foam::patchZones::markZone(label faceI)
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from components
 Foam::patchZones::patchZones
 (
     const primitivePatch& pp,
@@ -165,33 +160,31 @@ Foam::patchZones::patchZones
 
     if (borderEdge.size() != pp_.nEdges())
     {
-        FatalErrorIn
-        (
-            "patchZones::patchZones(const primitivePatch&, const boolList&)"
-        )   << "borderEdge boolList not same size as number of edges" << endl
+        FatalErrorInFunction
+            << "borderEdge boolList not same size as number of edges" << endl
             << "borderEdge:" << borderEdge.size() << endl
             << "nEdges    :" << pp_.nEdges()
             << abort(FatalError);
     }
 
-    label faceI = 0;
+    label facei = 0;
 
     while (true)
     {
         // Find first non-visited face
-        for (; faceI < pp_.size(); faceI++)
+        for (; facei < pp_.size(); facei++)
         {
-            if (operator[](faceI) == -1)
+            if (operator[](facei) == -1)
             {
-                operator[](faceI) = nZones_;
+                operator[](facei) = nZones_;
 
-                markZone(faceI);
+                markZone(facei);
 
                 break;
             }
         }
 
-        if (faceI == pp_.size())
+        if (facei == pp_.size())
         {
             // Finished.
             break;

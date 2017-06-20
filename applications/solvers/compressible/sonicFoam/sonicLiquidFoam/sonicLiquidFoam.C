@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -37,14 +37,12 @@ Description
 
 int main(int argc, char *argv[])
 {
+    #include "postProcess.H"
+
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
-
-    pimpleControl pimple(mesh);
-
-    #include "readThermodynamicProperties.H"
-    #include "readTransportProperties.H"
+    #include "createControl.H"
     #include "createFields.H"
     #include "initContinuityErrs.H"
 
@@ -89,7 +87,7 @@ int main(int argc, char *argv[])
                     "phid",
                     psi
                    *(
-                       (fvc::interpolate(U) & mesh.Sf())
+                       fvc::flux(U)
                      + rhorAUf*fvc::ddtCorr(rho, U, phi)/fvc::interpolate(rho)
                     )
                 );

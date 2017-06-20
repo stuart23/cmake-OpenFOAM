@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -46,19 +46,19 @@ bool validTri
 (
     const bool verbose,
     const triSurface& surf,
-    const label faceI
+    const label facei
 )
 {
     // Simple check on indices ok.
 
-    const labelledTri& f = surf[faceI];
+    const labelledTri& f = surf[facei];
 
     forAll(f, fp)
     {
         if (f[fp] < 0 || f[fp] >= surf.points().size())
         {
-            WarningIn("validTri(const triSurface&, const label)")
-                << "triangle " << faceI << " vertices " << f
+            WarningInFunction
+                << "triangle " << facei << " vertices " << f
                 << " uses point indices outside point range 0.."
                 << surf.points().size()-1 << endl;
             return false;
@@ -67,8 +67,8 @@ bool validTri
 
     if ((f[0] == f[1]) || (f[0] == f[2]) || (f[1] == f[2]))
     {
-        WarningIn("validTri(const triSurface&, const label)")
-            << "triangle " << faceI
+        WarningInFunction
+            << "triangle " << facei
             << " uses non-unique vertices " << f
             << " coords:" << f.points(surf.points())
             << endl;
@@ -77,21 +77,21 @@ bool validTri
 
     // duplicate triangle check
 
-    const labelList& fFaces = surf.faceFaces()[faceI];
+    const labelList& fFaces = surf.faceFaces()[facei];
 
     // Check if faceNeighbours use same points as this face.
     // Note: discards normal information - sides of baffle are merged.
     forAll(fFaces, i)
     {
-        label nbrFaceI = fFaces[i];
+        label nbrFacei = fFaces[i];
 
-        if (nbrFaceI <= faceI)
+        if (nbrFacei <= facei)
         {
             // lower numbered faces already checked
             continue;
         }
 
-        const labelledTri& nbrF = surf[nbrFaceI];
+        const labelledTri& nbrF = surf[nbrFacei];
 
         if
         (
@@ -100,9 +100,9 @@ bool validTri
          && ((f[2] == nbrF[0]) || (f[2] == nbrF[1]) || (f[2] == nbrF[2]))
         )
         {
-            WarningIn("validTri(const triSurface&, const label)")
-                << "triangle " << faceI << " vertices " << f
-                << " has the same vertices as triangle " << nbrFaceI
+            WarningInFunction
+                << "triangle " << facei << " vertices " << f
+                << " has the same vertices as triangle " << nbrFacei
                 << " vertices " << nbrF
                 << " coords:" << f.points(surf.points())
                 << endl;
@@ -146,11 +146,8 @@ labelList countBins
 
             if ((index < 0) || (index >= nBins))
             {
-                WarningIn
-                (
-                    "countBins(const scalar, const scalar, const label"
-                    ", const scalarField&)"
-                )   << "value " << val << " at index " << i
+                WarningInFunction
+                    << "value " << val << " at index " << i
                     << " outside range " << min << " .. " << max << endl;
 
                 if (index < 0)
@@ -251,14 +248,14 @@ int main(int argc, char *argv[])
     {
         labelList regionSize(surf.patches().size(), 0);
 
-        forAll(surf, faceI)
+        forAll(surf, facei)
         {
-            label region = surf[faceI].region();
+            label region = surf[facei].region();
 
             if (region < 0 || region >= regionSize.size())
             {
-                WarningIn(args.executable())
-                    << "Triangle " << faceI << " vertices " << surf[faceI]
+                WarningInFunction
+                    << "Triangle " << facei << " vertices " << surf[facei]
                     << " has region " << region << " which is outside the range"
                     << " of regions 0.." << surf.patches().size()-1
                     << endl;
@@ -271,10 +268,10 @@ int main(int argc, char *argv[])
 
         Info<< "Region\tSize" << nl
             << "------\t----" << nl;
-        forAll(surf.patches(), patchI)
+        forAll(surf.patches(), patchi)
         {
-            Info<< surf.patches()[patchI].name() << '\t'
-                << regionSize[patchI] << nl;
+            Info<< surf.patches()[patchi].name() << '\t'
+                << regionSize[patchi] << nl;
         }
         Info<< nl << endl;
     }
@@ -286,11 +283,11 @@ int main(int argc, char *argv[])
     {
         DynamicList<label> illegalFaces(surf.size()/100 + 1);
 
-        forAll(surf, faceI)
+        forAll(surf, facei)
         {
-            if (!validTri(verbose, surf, faceI))
+            if (!validTri(verbose, surf, facei))
             {
-                illegalFaces.append(faceI);
+                illegalFaces.append(facei);
             }
         }
 
@@ -318,19 +315,19 @@ int main(int argc, char *argv[])
 
     {
         scalarField triQ(surf.size(), 0);
-        forAll(surf, faceI)
+        forAll(surf, facei)
         {
-            const labelledTri& f = surf[faceI];
+            const labelledTri& f = surf[facei];
 
             if (f[0] == f[1] || f[0] == f[2] || f[1] == f[2])
             {
                 //WarningIn(args.executable())
-                //    << "Illegal triangle " << faceI << " vertices " << f
+                //    << "Illegal triangle " << facei << " vertices " << f
                 //    << " coords " << f.points(surf.points()) << endl;
             }
             else
             {
-                triQ[faceI] = triPointRef
+                triQ[facei] = triPointRef
                 (
                     surf.points()[f[0]],
                     surf.points()[f[1]],
@@ -371,7 +368,7 @@ int main(int argc, char *argv[])
 
         if (triQ[minIndex] < SMALL)
         {
-            WarningIn(args.executable()) << "Minimum triangle quality is "
+            WarningInFunction
                 << triQ[minIndex] << ". This might give problems in"
                 << " self-intersection testing later on." << endl;
         }
@@ -380,11 +377,11 @@ int main(int argc, char *argv[])
         {
             DynamicList<label> problemFaces(surf.size()/100+1);
 
-            forAll(triQ, faceI)
+            forAll(triQ, facei)
             {
-                if (triQ[faceI] < 1e-11)
+                if (triQ[facei] < 1e-11)
                 {
-                    problemFaces.append(faceI);
+                    problemFaces.append(facei);
                 }
             }
 
@@ -537,9 +534,9 @@ int main(int argc, char *argv[])
 
         if (myFaces.size() > 2)
         {
-            forAll(myFaces, myFaceI)
+            forAll(myFaces, myFacei)
             {
-                problemFaces.append(myFaces[myFaceI]);
+                problemFaces.append(myFaces[myFacei]);
             }
 
             nMultEdges++;
@@ -648,11 +645,11 @@ int main(int argc, char *argv[])
             {
                 boolList includeMap(surf.size(), false);
 
-                forAll(faceZone, faceI)
+                forAll(faceZone, facei)
                 {
-                    if (faceZone[faceI] == zone)
+                    if (faceZone[facei] == zone)
                     {
-                        includeMap[faceI] = true;
+                        includeMap[facei] = true;
                     }
                 }
 
@@ -769,9 +766,9 @@ int main(int argc, char *argv[])
         //    Info<< "Writing edges of intersection to selfInter.obj" << endl;
         //
         //    OFstream intStream("selfInter.obj");
-        //    forAll(inter.cutPoints(), cutPointI)
+        //    forAll(inter.cutPoints(), cutPointi)
         //    {
-        //        const point& pt = inter.cutPoints()[cutPointI];
+        //        const point& pt = inter.cutPoints()[cutPointi];
         //
         //        intStream << "v " << pt.x() << ' ' << pt.y() << ' ' << pt.z()
         //            << endl;

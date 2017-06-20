@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -51,7 +51,7 @@ namespace Foam
 template<class CloudType>
 class CloudFunctionObjectList
 :
-    public PtrList<CloudFunctionObject<CloudType> >
+    public PtrList<CloudFunctionObject<CloudType>>
 {
 protected:
 
@@ -113,7 +113,7 @@ public:
             virtual void postMove
             (
                 typename CloudType::parcelType& p,
-                const label cellI,
+                const label celli,
                 const scalar dt,
                 const point& position0,
                 bool& keepParticle
@@ -133,7 +133,7 @@ public:
             virtual void postFace
             (
                 const typename CloudType::parcelType& p,
-                const label faceI,
+                const label facei,
                 bool& keepParticle
             );
 };

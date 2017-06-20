@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -76,7 +76,7 @@ Foam::ParticleStressModels::Lun::~Lun()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::tmp<Foam::Field<Foam::scalar> >
+Foam::tmp<Foam::Field<Foam::scalar>>
 Foam::ParticleStressModels::Lun::tau
 (
     const Field<scalar>& alpha,
@@ -84,7 +84,7 @@ Foam::ParticleStressModels::Lun::tau
     const Field<scalar>& uSqr
 ) const
 {
-    tmp<Field<scalar> > g0
+    tmp<Field<scalar>> g0
     (
         0.6
       / max
@@ -94,13 +94,13 @@ Foam::ParticleStressModels::Lun::tau
         )
     );
 
-    tmp<Field<scalar> > gT(uSqr/3.0);
+    tmp<Field<scalar>> gT(uSqr/3.0);
 
     return alpha*rho*(1.0 + alpha*(1.0 + e_)*g0)*gT;
 }
 
 
-Foam::tmp<Foam::Field<Foam::scalar> >
+Foam::tmp<Foam::Field<Foam::scalar>>
 Foam::ParticleStressModels::Lun::dTaudTheta
 (
     const Field<scalar>& alpha,
@@ -108,14 +108,9 @@ Foam::ParticleStressModels::Lun::dTaudTheta
     const Field<scalar>& uSqr
 ) const
 {
-    notImplemented
-    (
-        "Foam::scalar Foam::ParticleStressModels::Lun::dTau_dTheta"
-        "(const Field<scalar>&, const Field<scalar>&, const Field<scalar>&) "
-        "const"
-    );
+    NotImplemented;
 
-    return tmp<Field<scalar> >(NULL);
+    return tmp<Field<scalar>>(NULL);
 }
 
 

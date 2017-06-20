@@ -2,7 +2,7 @@
  =========                   |
  \\      /   F ield          | OpenFOAM: The Open Source CFD Toolbox
   \\    /    O peration      |
-   \\  /     A nd            | Copyright (C) 2011-2013 OpenFOAM Foundation
+   \\  /     A nd            | Copyright (C) 2011-2016 OpenFOAM Foundation
     \\/      M anipulation   |
 -------------------------------------------------------------------------------
 License
@@ -83,14 +83,14 @@ int main(int argc, char *argv[])
     const fileName surfFileName = args[1];
     const scalar density = args.optionLookupOrDefault("density", 1.0);
 
-    vector refPt = vector::zero;
+    vector refPt = Zero;
     bool calcAroundRefPt = args.optionReadIfPresent("referencePoint", refPt);
 
     triSurface surf(surfFileName);
 
     scalar m = 0.0;
-    vector cM = vector::zero;
-    tensor J = tensor::zero;
+    vector cM = Zero;
+    tensor J = Zero;
 
     if (args.optionFound("shellProperties"))
     {
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 
     if (m < 0)
     {
-        WarningIn(args.executable() + "::main")
+        WarningInFunction
             << "Negative mass detected, the surface may be inside-out." << endl;
     }
 
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
 
     while ((magSqr(eVal) < VSMALL) && pertI < 10)
     {
-        WarningIn(args.executable() + "::main")
+        WarningInFunction
             << "No eigenValues found, shape may have symmetry, "
             << "perturbing inertia tensor diagonal" << endl;
 
@@ -320,7 +320,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        WarningIn(args.executable() + "::main")
+        WarningInFunction
             << "Non-unique eigenvectors, cannot compute transformation "
             << "from Cartesian axes" << endl;
 
@@ -331,14 +331,14 @@ int main(int argc, char *argv[])
 
     scalar surfaceArea = 0;
 
-    forAll(surf, faceI)
+    forAll(surf, facei)
     {
-        const labelledTri& f = surf[faceI];
+        const labelledTri& f = surf[facei];
 
         if (f[0] == f[1] || f[0] == f[2] || f[1] == f[2])
         {
-            WarningIn(args.executable())
-               << "Illegal triangle " << faceI << " vertices " << f
+            WarningInFunction
+               << "Illegal triangle " << facei << " vertices " << f
                << " coords " << f.points(surf.points()) << endl;
         }
         else

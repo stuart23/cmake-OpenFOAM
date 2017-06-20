@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,19 +30,17 @@ License
 #include "globalMeshData.H"
 #include "twoDPointCorrector.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(pointConstraints, 0);
+    defineTypeNameAndDebug(pointConstraints, 0);
+}
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void pointConstraints::makePatchPatchAddressing()
+void Foam::pointConstraints::makePatchPatchAddressing()
 {
     if (debug)
     {
@@ -189,19 +187,19 @@ void pointConstraints::makePatchPatchAddressing()
         globalPointSlavesMap.distribute(constraints);
 
         // Combine master with slave constraints
-        forAll(globalPointSlaves, pointI)
+        forAll(globalPointSlaves, pointi)
         {
-            const labelList& slaves = globalPointSlaves[pointI];
+            const labelList& slaves = globalPointSlaves[pointi];
 
             // Combine master constraint with slave constraints
             forAll(slaves, i)
             {
-                constraints[pointI].combine(constraints[slaves[i]]);
+                constraints[pointi].combine(constraints[slaves[i]]);
             }
             // Duplicate master constraint into slave slots
             forAll(slaves, i)
             {
-                constraints[slaves[i]] = constraints[pointI];
+                constraints[slaves[i]] = constraints[pointi];
             }
         }
 
@@ -213,23 +211,23 @@ void pointConstraints::makePatchPatchAddressing()
         );
 
         // Add back into patchPatch constraints
-        forAll(constraints, coupledPointI)
+        forAll(constraints, coupledPointi)
         {
-            if (constraints[coupledPointI].first() != 0)
+            if (constraints[coupledPointi].first() != 0)
             {
-                label meshPointI = cpMeshPoints[coupledPointI];
+                label meshPointi = cpMeshPoints[coupledPointi];
 
-                Map<label>::iterator iter = patchPatchPointSet.find(meshPointI);
+                Map<label>::iterator iter = patchPatchPointSet.find(meshPointi);
 
                 label constraintI = -1;
 
                 if (iter == patchPatchPointSet.end())
                 {
-                    //Pout<< indent << "on meshpoint:" << meshPointI
-                    //    << " coupled:" << coupledPointI
-                    //    << " at:" << mesh.points()[meshPointI]
+                    //Pout<< indent << "on meshpoint:" << meshPointi
+                    //    << " coupled:" << coupledPointi
+                    //    << " at:" << mesh.points()[meshPointi]
                     //    << " have new constraint:"
-                    //    << constraints[coupledPointI]
+                    //    << constraints[coupledPointi]
                     //    << endl;
 
                     // Allocate new constraint
@@ -237,17 +235,17 @@ void pointConstraints::makePatchPatchAddressing()
                     {
                         patchPatchPoints.setSize(pppi+100);
                     }
-                    patchPatchPointSet.insert(meshPointI, pppi);
-                    patchPatchPoints[pppi] = meshPointI;
+                    patchPatchPointSet.insert(meshPointi, pppi);
+                    patchPatchPoints[pppi] = meshPointi;
                     constraintI = pppi++;
                 }
                 else
                 {
-                    //Pout<< indent << "on meshpoint:" << meshPointI
-                    //    << " coupled:" << coupledPointI
-                    //    << " at:" << mesh.points()[meshPointI]
+                    //Pout<< indent << "on meshpoint:" << meshPointi
+                    //    << " coupled:" << coupledPointi
+                    //    << " at:" << mesh.points()[meshPointi]
                     //    << " have possibly extended constraint:"
-                    //    << constraints[coupledPointI]
+                    //    << constraints[coupledPointi]
                     //    << endl;
 
                     constraintI = iter();
@@ -257,7 +255,7 @@ void pointConstraints::makePatchPatchAddressing()
                 // on coupled.
                 patchPatchPointConstraints_[constraintI].combine
                 (
-                    constraints[coupledPointI]
+                    constraints[coupledPointi]
                 );
             }
         }
@@ -325,7 +323,7 @@ void pointConstraints::makePatchPatchAddressing()
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-pointConstraints::pointConstraints(const pointMesh& pm)
+Foam::pointConstraints::pointConstraints(const pointMesh& pm)
 :
     MeshObject<pointMesh, Foam::UpdateableMeshObject, pointConstraints>(pm)
 {
@@ -342,7 +340,7 @@ pointConstraints::pointConstraints(const pointMesh& pm)
 
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
 
-pointConstraints::~pointConstraints()
+Foam::pointConstraints::~pointConstraints()
 {
     if (debug)
     {
@@ -353,19 +351,19 @@ pointConstraints::~pointConstraints()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void pointConstraints::updateMesh(const mapPolyMesh&)
+void Foam::pointConstraints::updateMesh(const mapPolyMesh&)
 {
     makePatchPatchAddressing();
 }
 
 
-bool pointConstraints::movePoints()
+bool Foam::pointConstraints::movePoints()
 {
     return true;
 }
 
 
-void pointConstraints::constrainDisplacement
+void Foam::pointConstraints::constrainDisplacement
 (
     pointVectorField& pf,
     const bool overrideFixedValue
@@ -380,7 +378,7 @@ void pointConstraints::constrainDisplacement
     syncUntransformedData
     (
         pf.mesh()(),
-        pf.internalField(),
+        pf.primitiveFieldRef(),
         maxMagSqrEqOp<vector>()
     );
 
@@ -392,7 +390,7 @@ void pointConstraints::constrainDisplacement
     twoDPointCorrector::New(mesh()()).correctDisplacement
     (
         mesh()().points(),
-        pf.internalField()
+        pf.primitiveFieldRef()
     );
 
     if (overrideFixedValue)
@@ -402,10 +400,8 @@ void pointConstraints::constrainDisplacement
 }
 
 
-// Specialisation of constrainCorners for scalars because
-// no constraint need be applied
 template<>
-void pointConstraints::constrainCorners<scalar>
+void Foam::pointConstraints::constrainCorners<Foam::scalar>
 (
     GeometricField<scalar, pointPatchField, pointMesh>& pf
 ) const
@@ -413,15 +409,11 @@ void pointConstraints::constrainCorners<scalar>
 
 
 template<>
-void pointConstraints::constrainCorners<label>
+void Foam::pointConstraints::constrainCorners<Foam::label>
 (
     GeometricField<label, pointPatchField, pointMesh>& pf
 ) const
 {}
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

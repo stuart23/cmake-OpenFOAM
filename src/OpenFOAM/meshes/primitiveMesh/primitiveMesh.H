@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -212,7 +212,7 @@ class primitiveMesh
             //- Helper: return (after optional creation) edge between two points
             static label getEdge
             (
-                List<DynamicList<label> >&,
+                List<DynamicList<label>>&,
                 DynamicList<edge>&,
                 const label,
                 const label
@@ -360,6 +360,10 @@ protected:
             ) const;
 
             //- Check face angles
+            //  Allows a slight non-convexity.  E.g. maxDeg = 10 allows for
+            //  angles < 190 (or 10 degrees concavity) (if truly concave and
+            //  points not visible from face centre the face-pyramid check in
+            //  checkMesh will fail)
             bool checkFaceAngles
             (
                 const pointField& points,
@@ -808,47 +812,47 @@ public:
             //- cellCells using cells.
             const labelList& cellCells
             (
-                const label cellI,
+                const label celli,
                 DynamicList<label>&
             ) const;
 
-            const labelList& cellCells(const label cellI) const;
+            const labelList& cellCells(const label celli) const;
 
             //- cellPoints using cells
             const labelList& cellPoints
             (
-                const label cellI,
+                const label celli,
                 DynamicList<label>&
             ) const;
 
-            const labelList& cellPoints(const label cellI) const;
+            const labelList& cellPoints(const label celli) const;
 
             //- pointCells using pointFaces
             const labelList& pointCells
             (
-                const label pointI,
+                const label pointi,
                 DynamicList<label>&
             ) const;
 
-            const labelList& pointCells(const label pointI) const;
+            const labelList& pointCells(const label pointi) const;
 
             //- pointPoints using edges, pointEdges
             const labelList& pointPoints
             (
-                const label pointI,
+                const label pointi,
                 DynamicList<label>&
             ) const;
 
-            const labelList& pointPoints(const label pointI) const;
+            const labelList& pointPoints(const label pointi) const;
 
             //- faceEdges using pointFaces, edges, pointEdges
             const labelList& faceEdges
             (
-                const label faceI,
+                const label facei,
                 DynamicList<label>&
             ) const;
 
-            const labelList& faceEdges(const label faceI) const;
+            const labelList& faceEdges(const label facei) const;
 
             //- edgeFaces using pointFaces, edges, pointEdges
             const labelList& edgeFaces
@@ -871,11 +875,11 @@ public:
             //- cellEdges using cells, pointFaces, edges, pointEdges
             const labelList& cellEdges
             (
-                const label cellI,
+                const label celli,
                 DynamicList<label>&
             ) const;
 
-            const labelList& cellEdges(const label cellI) const;
+            const labelList& cellEdges(const label celli) const;
 
 
             //- Clear geometry

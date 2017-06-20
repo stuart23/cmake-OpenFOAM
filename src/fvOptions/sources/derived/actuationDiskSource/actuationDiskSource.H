@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -44,13 +44,12 @@ Description
         U_1 | velocity at the disk
     \endvartable
 
-    \heading Source usage
-
+Usage
     Example usage:
     \verbatim
     actuationDiskSourceCoeffs
     {
-        fieldNames      (U);        // names of fields to apply source
+        fields          (U);        // names of fields to apply source
         diskDir         (-1 0 0);   // disk direction
         Cp              0.1;        // power coefficient
         Ct              0.5;        // thrust coefficient
@@ -193,7 +192,7 @@ public:
             virtual void addSup
             (
                 fvMatrix<vector>& eqn,
-                const label fieldI
+                const label fieldi
             );
 
             //- Source term to compressible momentum equation
@@ -201,7 +200,7 @@ public:
             (
                 const volScalarField& rho,
                 fvMatrix<vector>& eqn,
-                const label fieldI
+                const label fieldi
             );
 
 
@@ -220,7 +219,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "actuationDiskSourceTemplates.C"
+    #include "actuationDiskSourceTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

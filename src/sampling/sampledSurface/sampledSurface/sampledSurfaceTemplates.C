@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -35,10 +35,7 @@ bool Foam::sampledSurface::checkFieldSize(const Field<Type>& field) const
 
     if (field.size() != faces().size())
     {
-        FatalErrorIn
-        (
-            "sampledSurface::checkFieldSize(const Field<Type>&) const"
-        )
+        FatalErrorInFunction
             << "size mismatch: "
             << "field (" << field.size()
             << ") != surface (" << faces().size() << ")"
@@ -52,7 +49,7 @@ bool Foam::sampledSurface::checkFieldSize(const Field<Type>& field) const
 template<class Type>
 Type Foam::sampledSurface::integrate(const Field<Type>& field) const
 {
-    Type value = pTraits<Type>::zero;
+    Type value = Zero;
 
     if (checkFieldSize(field))
     {
@@ -65,7 +62,7 @@ Type Foam::sampledSurface::integrate(const Field<Type>& field) const
 
 
 template<class Type>
-Type Foam::sampledSurface::integrate(const tmp<Field<Type> >& field) const
+Type Foam::sampledSurface::integrate(const tmp<Field<Type>>& field) const
 {
     Type value = integrate(field());
     field.clear();
@@ -76,7 +73,7 @@ Type Foam::sampledSurface::integrate(const tmp<Field<Type> >& field) const
 template<class Type>
 Type Foam::sampledSurface::average(const Field<Type>& field) const
 {
-    Type value = pTraits<Type>::zero;
+    Type value = Zero;
 
     if (checkFieldSize(field))
     {
@@ -92,13 +89,13 @@ Type Foam::sampledSurface::average(const Field<Type>& field) const
     }
     else
     {
-        return pTraits<Type>::zero;
+        return Zero;
     }
 }
 
 
 template<class Type>
-Type Foam::sampledSurface::average(const tmp<Field<Type> >& field) const
+Type Foam::sampledSurface::average(const tmp<Field<Type>>& field) const
 {
     Type value = average(field());
     field.clear();
@@ -117,9 +114,9 @@ void Foam::sampledSurface::project
     {
         const vectorField& norm = Sf();
 
-        forAll(norm, faceI)
+        forAll(norm, facei)
         {
-            res[faceI] = field[faceI] & (norm[faceI]/mag(norm[faceI]));
+            res[facei] = field[facei] & (norm[facei]/mag(norm[facei]));
         }
     }
     else
@@ -133,7 +130,7 @@ template<class ReturnType, class Type>
 void Foam::sampledSurface::project
 (
     Field<ReturnType>& res,
-    const tmp<Field<Type> >& field
+    const tmp<Field<Type>>& field
 ) const
 {
     project(res, field());
@@ -142,20 +139,20 @@ void Foam::sampledSurface::project
 
 
 template<class ReturnType, class Type>
-Foam::tmp<Foam::Field<ReturnType> >
+Foam::tmp<Foam::Field<ReturnType>>
 Foam::sampledSurface::project
 (
-    const tmp<Field<Type> >& field
+    const tmp<Field<Type>>& field
 ) const
 {
-    tmp<Field<ReturnType> > tRes(new Field<ReturnType>(faces().size()));
+    tmp<Field<ReturnType>> tRes(new Field<ReturnType>(faces().size()));
     project(tRes(), field);
     return tRes;
 }
 
 
 template<class Type>
-Foam::tmp<Foam::GeometricField<Type, Foam::fvPatchField, Foam::volMesh> >
+Foam::tmp<Foam::GeometricField<Type, Foam::fvPatchField, Foam::volMesh>>
 Foam::sampledSurface::pointAverage
 (
     const GeometricField<Type, pointPatchField, pointMesh>& pfld
@@ -163,7 +160,7 @@ Foam::sampledSurface::pointAverage
 {
     const fvMesh& mesh = dynamic_cast<const fvMesh&>(pfld.mesh()());
 
-    tmp<GeometricField<Type, fvPatchField, volMesh> > tcellAvg
+    tmp<GeometricField<Type, fvPatchField, volMesh>> tcellAvg
     (
         new GeometricField<Type, fvPatchField, volMesh>
         (
@@ -177,29 +174,29 @@ Foam::sampledSurface::pointAverage
                 false
             ),
             mesh,
-            dimensioned<Type>("zero", dimless, pTraits<Type>::zero)
+            dimensioned<Type>("zero", dimless, Zero)
         )
     );
-    GeometricField<Type, fvPatchField, volMesh>& cellAvg = tcellAvg();
+    GeometricField<Type, fvPatchField, volMesh>& cellAvg = tcellAvg.ref();
 
     labelField nPointCells(mesh.nCells(), 0);
     {
-        for (label pointI = 0; pointI < mesh.nPoints(); pointI++)
+        for (label pointi = 0; pointi < mesh.nPoints(); pointi++)
         {
-            const labelList& pCells = mesh.pointCells(pointI);
+            const labelList& pCells = mesh.pointCells(pointi);
 
             forAll(pCells, i)
             {
-                label cellI = pCells[i];
+                label celli = pCells[i];
 
-                cellAvg[cellI] += pfld[pointI];
-                nPointCells[cellI]++;
+                cellAvg[celli] += pfld[pointi];
+                nPointCells[celli]++;
             }
         }
     }
-    forAll(cellAvg, cellI)
+    forAll(cellAvg, celli)
     {
-        cellAvg[cellI] /= nPointCells[cellI];
+        cellAvg[celli] /= nPointCells[celli];
     }
     // Give value to calculatedFvPatchFields
     cellAvg.correctBoundaryConditions();

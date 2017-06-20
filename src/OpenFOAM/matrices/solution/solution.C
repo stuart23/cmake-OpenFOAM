@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,11 +26,6 @@ License
 #include "solution.H"
 #include "Time.H"
 
-// These are for old syntax compatibility:
-#include "BICCG.H"
-#include "ICCG.H"
-#include "IStringStream.H"
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
@@ -39,12 +34,10 @@ namespace Foam
 }
 
 // List of sub-dictionaries to rewrite
-//! \cond localScope
 static const Foam::List<Foam::word> subDictNames
 (
     Foam::IStringStream("(preconditioner smoother)")()
 );
-//! \endcond
 
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
@@ -108,7 +101,7 @@ void Foam::solution::read(const dictionary& dict)
 
         if (debug)
         {
-            Info<< "relaxation factors:" << nl
+            Info<< "Relaxation factors:" << nl
                 << "fields: " << fieldRelaxDict_ << nl
                 << "equations: " << eqnRelaxDict_ << endl;
         }
@@ -187,47 +180,33 @@ Foam::label Foam::solution::upgradeSolverDict
             word name(is);
             dictionary subdict;
 
-            if (name == "BICCG")
-            {
-                // special treatment for very old syntax
-                subdict = BICCG::solverDict(is);
-            }
-            else if (name == "ICCG")
-            {
-                // special treatment for very old syntax
-                subdict = ICCG::solverDict(is);
-            }
-            else
-            {
-                subdict.add("solver", name);
-                subdict <<= dictionary(is);
+            subdict.add("solver", name);
+            subdict <<= dictionary(is);
 
-                // preconditioner and smoother entries can be
-                // 1) primitiveEntry w/o settings,
-                // 2) or a dictionaryEntry.
-                // transform primitiveEntry with settings -> dictionaryEntry
-                forAll(subDictNames, dictI)
+            // preconditioner and smoother entries can be
+            // 1) primitiveEntry w/o settings,
+            // 2) or a dictionaryEntry.
+            // transform primitiveEntry with settings -> dictionaryEntry
+            forAll(subDictNames, dictI)
+            {
+                const word& dictName = subDictNames[dictI];
+                entry* ePtr = subdict.lookupEntryPtr(dictName,false,false);
+
+                if (ePtr && !ePtr->isDict())
                 {
-                    const word& dictName = subDictNames[dictI];
-                    entry* ePtr = subdict.lookupEntryPtr(dictName,false,false);
+                    Istream& is = ePtr->stream();
+                    is >> name;
 
-                    if (ePtr && !ePtr->isDict())
+                    if (!is.eof())
                     {
-                        Istream& is = ePtr->stream();
-                        is >> name;
+                        dictionary newDict;
+                        newDict.add(dictName, name);
+                        newDict <<= dictionary(is);
 
-                        if (!is.eof())
-                        {
-                            dictionary newDict;
-                            newDict.add(dictName, name);
-                            newDict <<= dictionary(is);
-
-                            subdict.set(dictName, newDict);
-                        }
+                        subdict.set(dictName, newDict);
                     }
                 }
             }
-
 
             // write out information to help people adjust to the new syntax
             if (verbose && Pstream::master())
@@ -306,9 +285,8 @@ Foam::scalar Foam::solution::fieldRelaxationFactor(const word& name) const
     }
     else
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "Foam::solution::fieldRelaxationFactor(const word&)",
             fieldRelaxDict_
         )   << "Cannot find variable relaxation factor for '" << name
             << "' or a suitable default value."
@@ -336,9 +314,8 @@ Foam::scalar Foam::solution::equationRelaxationFactor(const word& name) const
     }
     else
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "Foam::solution::eqnRelaxationFactor(const word&)",
             eqnRelaxDict_
         )   << "Cannot find equation relaxation factor for '" << name
             << "' or a suitable default value."
@@ -366,8 +343,7 @@ const Foam::dictionary& Foam::solution::solverDict(const word& name) const
 {
     if (debug)
     {
-        InfoIn("solution::solverDict(const word&)")
-            << "Lookup solver for " << name << endl;
+        Info<< "Lookup solver for " << name << endl;
     }
 
     return solvers_.subDict(name);
@@ -378,8 +354,7 @@ const Foam::dictionary& Foam::solution::solver(const word& name) const
 {
     if (debug)
     {
-        InfoIn("solution::solver(const word&)")
-            << "Lookup solver for " << name << endl;
+        Info<< "Lookup solver for " << name << endl;
     }
 
     return solvers_.subDict(name);

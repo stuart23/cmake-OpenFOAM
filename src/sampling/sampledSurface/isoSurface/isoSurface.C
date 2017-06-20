@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -37,7 +37,7 @@ License
 
 namespace Foam
 {
-defineTypeNameAndDebug(isoSurface, 0);
+    defineTypeNameAndDebug(isoSurface, 0);
 }
 
 
@@ -58,7 +58,6 @@ bool Foam::isoSurface::noTransform(const tensor& tt) const
 }
 
 
-// Calculates per face whether couple is collocated.
 bool Foam::isoSurface::collocatedPatch(const polyPatch& pp)
 {
     const coupledPolyPatch& cpp = refCast<const coupledPolyPatch>(pp);
@@ -66,7 +65,6 @@ bool Foam::isoSurface::collocatedPatch(const polyPatch& pp)
 }
 
 
-// Calculates per face whether couple is collocated.
 Foam::PackedBoolList Foam::isoSurface::collocatedFaces
 (
     const coupledPolyPatch& pp
@@ -97,10 +95,8 @@ Foam::PackedBoolList Foam::isoSurface::collocatedFaces
     }
     else
     {
-        FatalErrorIn
-        (
-            "isoSurface::collocatedFaces(const coupledPolyPatch&) const"
-        )   << "Unhandled coupledPolyPatch type " << pp.type()
+        FatalErrorInFunction
+            << "Unhandled coupledPolyPatch type " << pp.type()
             << abort(FatalError);
     }
     return collocated;
@@ -120,27 +116,27 @@ void Foam::isoSurface::syncUnseparatedPoints
     if (Pstream::parRun())
     {
         // Send
-        forAll(patches, patchI)
+        forAll(patches, patchi)
         {
             if
             (
-                isA<processorPolyPatch>(patches[patchI])
-             && patches[patchI].nPoints() > 0
-             && collocatedPatch(patches[patchI])
+                isA<processorPolyPatch>(patches[patchi])
+             && patches[patchi].nPoints() > 0
+             && collocatedPatch(patches[patchi])
             )
             {
                 const processorPolyPatch& pp =
-                    refCast<const processorPolyPatch>(patches[patchI]);
+                    refCast<const processorPolyPatch>(patches[patchi]);
 
                 const labelList& meshPts = pp.meshPoints();
                 const labelList& nbrPts = pp.neighbPoints();
 
                 pointField patchInfo(meshPts.size());
 
-                forAll(nbrPts, pointI)
+                forAll(nbrPts, pointi)
                 {
-                    label nbrPointI = nbrPts[pointI];
-                    patchInfo[nbrPointI] = pointValues[meshPts[pointI]];
+                    label nbrPointi = nbrPts[pointi];
+                    patchInfo[nbrPointi] = pointValues[meshPts[pointi]];
                 }
 
                 OPstream toNbr(Pstream::blocking, pp.neighbProcNo());
@@ -150,17 +146,17 @@ void Foam::isoSurface::syncUnseparatedPoints
 
         // Receive and combine.
 
-        forAll(patches, patchI)
+        forAll(patches, patchi)
         {
             if
             (
-                isA<processorPolyPatch>(patches[patchI])
-             && patches[patchI].nPoints() > 0
-             && collocatedPatch(patches[patchI])
+                isA<processorPolyPatch>(patches[patchi])
+             && patches[patchi].nPoints() > 0
+             && collocatedPatch(patches[patchi])
             )
             {
                 const processorPolyPatch& pp =
-                    refCast<const processorPolyPatch>(patches[patchI]);
+                    refCast<const processorPolyPatch>(patches[patchi]);
 
                 pointField nbrPatchInfo(pp.nPoints());
                 {
@@ -172,13 +168,13 @@ void Foam::isoSurface::syncUnseparatedPoints
 
                 const labelList& meshPts = pp.meshPoints();
 
-                forAll(meshPts, pointI)
+                forAll(meshPts, pointi)
                 {
-                    label meshPointI = meshPts[pointI];
+                    label meshPointi = meshPts[pointi];
                     minEqOp<point>()
                     (
-                        pointValues[meshPointI],
-                        nbrPatchInfo[pointI]
+                        pointValues[meshPointi],
+                        nbrPatchInfo[pointi]
                     );
                 }
             }
@@ -186,12 +182,12 @@ void Foam::isoSurface::syncUnseparatedPoints
     }
 
     // Do the cyclics.
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        if (isA<cyclicPolyPatch>(patches[patchI]))
+        if (isA<cyclicPolyPatch>(patches[patchi]))
         {
             const cyclicPolyPatch& cycPatch =
-                refCast<const cyclicPolyPatch>(patches[patchI]);
+                refCast<const cyclicPolyPatch>(patches[patchi]);
 
             if (cycPatch.owner() && collocatedPatch(cycPatch))
             {
@@ -235,9 +231,9 @@ void Foam::isoSurface::syncUnseparatedPoints
 
         forAll(pd.sharedPointLabels(), i)
         {
-            label meshPointI = pd.sharedPointLabels()[i];
+            label meshPointi = pd.sharedPointLabels()[i];
             // Fill my entries in the shared points
-            sharedPts[pd.sharedPointAddr()[i]] = pointValues[meshPointI];
+            sharedPts[pd.sharedPointAddr()[i]] = pointValues[meshPointi];
         }
 
         // Combine on master.
@@ -248,8 +244,8 @@ void Foam::isoSurface::syncUnseparatedPoints
         // my local information.
         forAll(pd.sharedPointLabels(), i)
         {
-            label meshPointI = pd.sharedPointLabels()[i];
-            pointValues[meshPointI] = sharedPts[pd.sharedPointAddr()[i]];
+            label meshPointi = pd.sharedPointLabels()[i];
+            pointValues[meshPointi] = sharedPts[pd.sharedPointAddr()[i]];
         }
     }
 }
@@ -299,14 +295,13 @@ bool Foam::isoSurface::isEdgeOfFaceCut
 }
 
 
-// Get neighbour value and position.
 void Foam::isoSurface::getNeighbour
 (
     const labelList& boundaryRegion,
     const volVectorField& meshC,
     const volScalarField& cVals,
-    const label cellI,
-    const label faceI,
+    const label celli,
+    const label facei,
     scalar& nbrValue,
     point& nbrPoint
 ) const
@@ -314,26 +309,25 @@ void Foam::isoSurface::getNeighbour
     const labelList& own = mesh_.faceOwner();
     const labelList& nei = mesh_.faceNeighbour();
 
-    if (mesh_.isInternalFace(faceI))
+    if (mesh_.isInternalFace(facei))
     {
-        label nbr = (own[faceI] == cellI ? nei[faceI] : own[faceI]);
+        label nbr = (own[facei] == celli ? nei[facei] : own[facei]);
         nbrValue = cVals[nbr];
         nbrPoint = meshC[nbr];
     }
     else
     {
-        label bFaceI = faceI-mesh_.nInternalFaces();
-        label patchI = boundaryRegion[bFaceI];
-        const polyPatch& pp = mesh_.boundaryMesh()[patchI];
-        label patchFaceI = faceI-pp.start();
+        label bFacei = facei-mesh_.nInternalFaces();
+        label patchi = boundaryRegion[bFacei];
+        const polyPatch& pp = mesh_.boundaryMesh()[patchi];
+        label patchFacei = facei-pp.start();
 
-        nbrValue = cVals.boundaryField()[patchI][patchFaceI];
-        nbrPoint = meshC.boundaryField()[patchI][patchFaceI];
+        nbrValue = cVals.boundaryField()[patchi][patchFacei];
+        nbrPoint = meshC.boundaryField()[patchi][patchFacei];
     }
 }
 
 
-// Determine for every face/cell whether it (possibly) generates triangles.
 void Foam::isoSurface::calcCutTypes
 (
     const labelList& boundaryRegion,
@@ -349,10 +343,10 @@ void Foam::isoSurface::calcCutTypes
     faceCutType_.setSize(mesh_.nFaces());
     faceCutType_ = NOTCUT;
 
-    for (label faceI = 0; faceI < mesh_.nInternalFaces(); faceI++)
+    for (label facei = 0; facei < mesh_.nInternalFaces(); facei++)
     {
         // CC edge.
-        bool ownLower = (cVals[own[faceI]] < iso_);
+        bool ownLower = (cVals[own[facei]] < iso_);
 
         scalar nbrValue;
         point nbrPoint;
@@ -361,8 +355,8 @@ void Foam::isoSurface::calcCutTypes
             boundaryRegion,
             meshC,
             cVals,
-            own[faceI],
-            faceI,
+            own[facei],
+            facei,
             nbrValue,
             nbrPoint
         );
@@ -371,30 +365,30 @@ void Foam::isoSurface::calcCutTypes
 
         if (ownLower != neiLower)
         {
-            faceCutType_[faceI] = CUT;
+            faceCutType_[facei] = CUT;
         }
         else
         {
             // See if any mesh edge is cut by looping over all the edges of the
             // face.
-            const face f = mesh_.faces()[faceI];
+            const face f = mesh_.faces()[facei];
 
             if (isEdgeOfFaceCut(pVals, f, ownLower, neiLower))
             {
-                faceCutType_[faceI] = CUT;
+                faceCutType_[facei] = CUT;
             }
         }
     }
 
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        const polyPatch& pp = patches[patchI];
+        const polyPatch& pp = patches[patchi];
 
-        label faceI = pp.start();
+        label facei = pp.start();
 
         forAll(pp, i)
         {
-            bool ownLower = (cVals[own[faceI]] < iso_);
+            bool ownLower = (cVals[own[facei]] < iso_);
 
             scalar nbrValue;
             point nbrPoint;
@@ -403,8 +397,8 @@ void Foam::isoSurface::calcCutTypes
                 boundaryRegion,
                 meshC,
                 cVals,
-                own[faceI],
-                faceI,
+                own[facei],
+                facei,
                 nbrValue,
                 nbrPoint
             );
@@ -413,20 +407,20 @@ void Foam::isoSurface::calcCutTypes
 
             if (ownLower != neiLower)
             {
-                faceCutType_[faceI] = CUT;
+                faceCutType_[facei] = CUT;
             }
             else
             {
                 // Mesh edge.
-                const face f = mesh_.faces()[faceI];
+                const face f = mesh_.faces()[facei];
 
                 if (isEdgeOfFaceCut(pVals, f, ownLower, neiLower))
                 {
-                    faceCutType_[faceI] = CUT;
+                    faceCutType_[facei] = CUT;
                 }
             }
 
-            faceI++;
+            facei++;
         }
     }
 
@@ -436,29 +430,29 @@ void Foam::isoSurface::calcCutTypes
     cellCutType_.setSize(mesh_.nCells());
     cellCutType_ = NOTCUT;
 
-    for (label faceI = 0; faceI < mesh_.nInternalFaces(); faceI++)
+    for (label facei = 0; facei < mesh_.nInternalFaces(); facei++)
     {
-        if (faceCutType_[faceI] != NOTCUT)
+        if (faceCutType_[facei] != NOTCUT)
         {
-            if (cellCutType_[own[faceI]] == NOTCUT)
+            if (cellCutType_[own[facei]] == NOTCUT)
             {
-                cellCutType_[own[faceI]] = CUT;
+                cellCutType_[own[facei]] = CUT;
                 nCutCells_++;
             }
-            if (cellCutType_[nei[faceI]] == NOTCUT)
+            if (cellCutType_[nei[facei]] == NOTCUT)
             {
-                cellCutType_[nei[faceI]] = CUT;
+                cellCutType_[nei[facei]] = CUT;
                 nCutCells_++;
             }
         }
     }
-    for (label faceI = mesh_.nInternalFaces(); faceI < mesh_.nFaces(); faceI++)
+    for (label facei = mesh_.nInternalFaces(); facei < mesh_.nFaces(); facei++)
     {
-        if (faceCutType_[faceI] != NOTCUT)
+        if (faceCutType_[facei] != NOTCUT)
         {
-            if (cellCutType_[own[faceI]] == NOTCUT)
+            if (cellCutType_[own[facei]] == NOTCUT)
             {
-                cellCutType_[own[faceI]] = CUT;
+                cellCutType_[own[facei]] = CUT;
                 nCutCells_++;
             }
         }
@@ -473,47 +467,10 @@ void Foam::isoSurface::calcCutTypes
 }
 
 
-// Return the two common points between two triangles
-Foam::labelPair Foam::isoSurface::findCommonPoints
-(
-    const labelledTri& tri0,
-    const labelledTri& tri1
-)
-{
-    labelPair common(-1, -1);
-
-    label fp0 = 0;
-    label fp1 = findIndex(tri1, tri0[fp0]);
-
-    if (fp1 == -1)
-    {
-        fp0 = 1;
-        fp1 = findIndex(tri1, tri0[fp0]);
-    }
-
-    if (fp1 != -1)
-    {
-        // So tri0[fp0] is tri1[fp1]
-
-        // Find next common point
-        label fp0p1 = tri0.fcIndex(fp0);
-        label fp1p1 = tri1.fcIndex(fp1);
-        label fp1m1 = tri1.rcIndex(fp1);
-
-        if (tri0[fp0p1] == tri1[fp1p1] || tri0[fp0p1] == tri1[fp1m1])
-        {
-            common[0] = tri0[fp0];
-            common[1] = tri0[fp0p1];
-        }
-    }
-    return common;
-}
-
-
 // Caculate centre of surface.
 Foam::point Foam::isoSurface::calcCentre(const triSurface& s)
 {
-    vector sum = vector::zero;
+    vector sum = Zero;
 
     forAll(s, i)
     {
@@ -523,75 +480,6 @@ Foam::point Foam::isoSurface::calcCentre(const triSurface& s)
 }
 
 
-// Replace surface (localPoints, localTris) with single point. Returns
-// point. Destructs arguments.
-Foam::pointIndexHit Foam::isoSurface::collapseSurface
-(
-    pointField& localPoints,
-    DynamicList<labelledTri, 64>& localTris
-)
-{
-    pointIndexHit info(false, vector::zero, localTris.size());
-
-    if (localTris.size() == 1)
-    {
-        const labelledTri& tri = localTris[0];
-        info.setPoint(tri.centre(localPoints));
-        info.setHit();
-    }
-    else if (localTris.size() == 2)
-    {
-        // Check if the two triangles share an edge.
-        const labelledTri& tri0 = localTris[0];
-        const labelledTri& tri1 = localTris[0];
-
-        labelPair shared = findCommonPoints(tri0, tri1);
-
-        if (shared[0] != -1)
-        {
-            info.setPoint
-            (
-                0.5
-              * (
-                    tri0.centre(localPoints)
-                  + tri1.centre(localPoints)
-                )
-            );
-            info.setHit();
-        }
-    }
-    else if (localTris.size())
-    {
-        // Check if single region. Rare situation.
-        triSurface surf
-        (
-            localTris,
-            geometricSurfacePatchList(0),
-            localPoints,
-            true
-        );
-        localTris.clearStorage();
-
-        labelList faceZone;
-        label nZones = surf.markZones
-        (
-            boolList(surf.nEdges(), false),
-            faceZone
-        );
-
-        if (nZones == 1)
-        {
-            info.setPoint(calcCentre(surf));
-            info.setHit();
-        }
-    }
-
-    return info;
-}
-
-
-// Determine per cell centre whether all the intersections get collapsed
-// to a single point
 void Foam::isoSurface::calcSnappedCc
 (
     const labelList& boundaryRegion,
@@ -612,24 +500,24 @@ void Foam::isoSurface::calcSnappedCc
     // Work arrays
     DynamicList<point, 64> localTriPoints(64);
 
-    forAll(mesh_.cells(), cellI)
+    forAll(mesh_.cells(), celli)
     {
-        if (cellCutType_[cellI] == CUT)
+        if (cellCutType_[celli] == CUT)
         {
-            scalar cVal = cVals[cellI];
+            scalar cVal = cVals[celli];
 
-            const cell& cFaces = mesh_.cells()[cellI];
+            const cell& cFaces = mesh_.cells()[celli];
 
             localTriPoints.clear();
             label nOther = 0;
-            point otherPointSum = vector::zero;
+            point otherPointSum = Zero;
 
             // Create points for all intersections close to cell centre
             // (i.e. from pyramid edges)
 
-            forAll(cFaces, cFaceI)
+            forAll(cFaces, cFacei)
             {
-                label faceI = cFaces[cFaceI];
+                label facei = cFaces[cFacei];
 
                 scalar nbrValue;
                 point nbrPoint;
@@ -638,8 +526,8 @@ void Foam::isoSurface::calcSnappedCc
                     boundaryRegion,
                     meshC,
                     cVals,
-                    cellI,
-                    faceI,
+                    celli,
+                    facei,
                     nbrValue,
                     nbrPoint
                 );
@@ -650,21 +538,21 @@ void Foam::isoSurface::calcSnappedCc
 
                 // From cc to neighbour cc.
                 s[2] = isoFraction(cVal, nbrValue);
-                pt[2] = (1.0-s[2])*cc[cellI] + s[2]*nbrPoint;
+                pt[2] = (1.0-s[2])*cc[celli] + s[2]*nbrPoint;
 
-                const face& f = mesh_.faces()[cFaces[cFaceI]];
+                const face& f = mesh_.faces()[cFaces[cFacei]];
 
                 forAll(f, fp)
                 {
                     // From cc to fp
                     label p0 = f[fp];
                     s[0] = isoFraction(cVal, pVals[p0]);
-                    pt[0] = (1.0-s[0])*cc[cellI] + s[0]*pts[p0];
+                    pt[0] = (1.0-s[0])*cc[celli] + s[0]*pts[p0];
 
                     // From cc to fp+1
                     label p1 = f[f.fcIndex(fp)];
                     s[1] = isoFraction(cVal, pVals[p1]);
-                    pt[1] = (1.0-s[1])*cc[cellI] + s[1]*pts[p1];
+                    pt[1] = (1.0-s[1])*cc[celli] + s[1]*pts[p1];
 
                     if
                     (
@@ -698,12 +586,12 @@ void Foam::isoSurface::calcSnappedCc
                 // points.
                 if (nOther > 0)
                 {
-                    snappedCc[cellI] = snappedPoints.size();
+                    snappedCc[celli] = snappedPoints.size();
                     snappedPoints.append(otherPointSum/nOther);
 
-                    //Pout<< "    point:" << pointI
-                    //    << " replacing coord:" << mesh_.points()[pointI]
-                    //    << " by average:" << collapsedPoint[pointI] << endl;
+                    //Pout<< "    point:" << pointi
+                    //    << " replacing coord:" << mesh_.points()[pointi]
+                    //    << " by average:" << collapsedPoint[pointi] << endl;
                 }
             }
             else if (localTriPoints.size() == 3)
@@ -711,12 +599,12 @@ void Foam::isoSurface::calcSnappedCc
                 // Single triangle. No need for any analysis. Average points.
                 pointField points;
                 points.transfer(localTriPoints);
-                snappedCc[cellI] = snappedPoints.size();
+                snappedCc[celli] = snappedPoints.size();
                 snappedPoints.append(sum(points)/points.size());
 
-                //Pout<< "    point:" << pointI
-                //    << " replacing coord:" << mesh_.points()[pointI]
-                //    << " by average:" << collapsedPoint[pointI] << endl;
+                //Pout<< "    point:" << pointi
+                //    << " replacing coord:" << mesh_.points()[pointi]
+                //    << " by average:" << collapsedPoint[pointi] << endl;
             }
             else
             {
@@ -745,11 +633,11 @@ void Foam::isoSurface::calcSnappedCc
 
                 if (nZones == 1)
                 {
-                    snappedCc[cellI] = snappedPoints.size();
+                    snappedCc[celli] = snappedPoints.size();
                     snappedPoints.append(calcCentre(surf));
-                    //Pout<< "    point:" << pointI << " nZones:" << nZones
-                    //    << " replacing coord:" << mesh_.points()[pointI]
-                    //    << " by average:" << collapsedPoint[pointI] << endl;
+                    //Pout<< "    point:" << pointi << " nZones:" << nZones
+                    //    << " replacing coord:" << mesh_.points()[pointi]
+                    //    << " by average:" << collapsedPoint[pointi] << endl;
                 }
             }
         }
@@ -757,8 +645,6 @@ void Foam::isoSurface::calcSnappedCc
 }
 
 
-// Determine per meshpoint whether all the intersections get collapsed
-// to a single point
 void Foam::isoSurface::calcSnappedPoint
 (
     const PackedBoolList& isBoundaryPoint,
@@ -780,22 +666,22 @@ void Foam::isoSurface::calcSnappedPoint
     // Work arrays
     DynamicList<point, 64> localTriPoints(100);
 
-    forAll(mesh_.pointFaces(), pointI)
+    forAll(mesh_.pointFaces(), pointi)
     {
-        if (isBoundaryPoint.get(pointI) == 1)
+        if (isBoundaryPoint.get(pointi) == 1)
         {
             continue;
         }
 
-        const labelList& pFaces = mesh_.pointFaces()[pointI];
+        const labelList& pFaces = mesh_.pointFaces()[pointi];
 
         bool anyCut = false;
 
         forAll(pFaces, i)
         {
-            label faceI = pFaces[i];
+            label facei = pFaces[i];
 
-            if (faceCutType_[faceI] == CUT)
+            if (faceCutType_[facei] == CUT)
             {
                 anyCut = true;
                 break;
@@ -810,16 +696,16 @@ void Foam::isoSurface::calcSnappedPoint
 
         localTriPoints.clear();
         label nOther = 0;
-        point otherPointSum = vector::zero;
+        point otherPointSum = Zero;
 
-        forAll(pFaces, pFaceI)
+        forAll(pFaces, pFacei)
         {
             // Create points for all intersections close to point
             // (i.e. from pyramid edges)
 
-            label faceI = pFaces[pFaceI];
-            const face& f = mesh_.faces()[faceI];
-            label own = mesh_.faceOwner()[faceI];
+            label facei = pFaces[pFacei];
+            const face& f = mesh_.faces()[facei];
+            label own = mesh_.faceOwner()[facei];
 
             // Get neighbour value
             scalar nbrValue;
@@ -830,7 +716,7 @@ void Foam::isoSurface::calcSnappedPoint
                 meshC,
                 cVals,
                 own,
-                faceI,
+                facei,
                 nbrValue,
                 nbrPoint
             );
@@ -839,20 +725,20 @@ void Foam::isoSurface::calcSnappedPoint
             FixedList<scalar, 4> s;
             FixedList<point, 4> pt;
 
-            label fp = findIndex(f, pointI);
-            s[0] = isoFraction(pVals[pointI], cVals[own]);
-            pt[0] = (1.0-s[0])*pts[pointI] + s[0]*cc[own];
+            label fp = findIndex(f, pointi);
+            s[0] = isoFraction(pVals[pointi], cVals[own]);
+            pt[0] = (1.0-s[0])*pts[pointi] + s[0]*cc[own];
 
-            s[1] = isoFraction(pVals[pointI], nbrValue);
-            pt[1] = (1.0-s[1])*pts[pointI] + s[1]*nbrPoint;
+            s[1] = isoFraction(pVals[pointi], nbrValue);
+            pt[1] = (1.0-s[1])*pts[pointi] + s[1]*nbrPoint;
 
-            label nextPointI = f[f.fcIndex(fp)];
-            s[2] = isoFraction(pVals[pointI], pVals[nextPointI]);
-            pt[2] = (1.0-s[2])*pts[pointI] + s[2]*pts[nextPointI];
+            label nextPointi = f[f.fcIndex(fp)];
+            s[2] = isoFraction(pVals[pointi], pVals[nextPointi]);
+            pt[2] = (1.0-s[2])*pts[pointi] + s[2]*pts[nextPointi];
 
-            label prevPointI = f[f.rcIndex(fp)];
-            s[3] = isoFraction(pVals[pointI], pVals[prevPointI]);
-            pt[3] = (1.0-s[3])*pts[pointI] + s[3]*pts[prevPointI];
+            label prevPointi = f[f.rcIndex(fp)];
+            s[3] = isoFraction(pVals[pointi], pVals[prevPointi]);
+            pt[3] = (1.0-s[3])*pts[pointi] + s[3]*pts[prevPointi];
 
             if
             (
@@ -894,7 +780,7 @@ void Foam::isoSurface::calcSnappedPoint
             // points.
             if (nOther > 0)
             {
-                collapsedPoint[pointI] = otherPointSum/nOther;
+                collapsedPoint[pointi] = otherPointSum/nOther;
             }
         }
         else if (localTriPoints.size() == 3)
@@ -902,7 +788,7 @@ void Foam::isoSurface::calcSnappedPoint
             // Single triangle. No need for any analysis. Average points.
             pointField points;
             points.transfer(localTriPoints);
-            collapsedPoint[pointI] = sum(points)/points.size();
+            collapsedPoint[pointi] = sum(points)/points.size();
         }
         else
         {
@@ -931,7 +817,7 @@ void Foam::isoSurface::calcSnappedPoint
 
             if (nZones == 1)
             {
-                collapsedPoint[pointI] = calcCentre(surf);
+                collapsedPoint[pointi] = calcCentre(surf);
             }
         }
     }
@@ -944,12 +830,12 @@ void Foam::isoSurface::calcSnappedPoint
     snappedPoint.setSize(mesh_.nPoints());
     snappedPoint = -1;
 
-    forAll(collapsedPoint, pointI)
+    forAll(collapsedPoint, pointi)
     {
-        if (collapsedPoint[pointI] != point::max)
+        if (collapsedPoint[pointi] != point::max)
         {
-            snappedPoint[pointI] = snappedPoints.size();
-            snappedPoints.append(collapsedPoint[pointI]);
+            snappedPoint[pointi] = snappedPoints.size();
+            snappedPoints.append(collapsedPoint[pointi]);
         }
     }
 }
@@ -967,7 +853,7 @@ Foam::triSurface Foam::isoSurface::stitchTriPoints
 
     if ((triPoints.size() % 3) != 0)
     {
-        FatalErrorIn("isoSurface::stitchTriPoints(..)")
+        FatalErrorInFunction
             << "Problem: number of points " << triPoints.size()
             << " not a multiple of 3." << abort(FatalError);
     }
@@ -998,7 +884,7 @@ Foam::triSurface Foam::isoSurface::stitchTriPoints
 
         if (hasMerged)
         {
-            FatalErrorIn("isoSurface::stitchTriPoints(..)")
+            FatalErrorInFunction
                 << "Merged points contain duplicates"
                 << " when merging with distance " << mergeDistance_ << endl
                 << "merged:" << newPoints.size() << " re-merged:"
@@ -1011,19 +897,19 @@ Foam::triSurface Foam::isoSurface::stitchTriPoints
     List<labelledTri> tris;
     {
         DynamicList<labelledTri> dynTris(nTris);
-        label rawPointI = 0;
+        label rawPointi = 0;
         DynamicList<label> newToOldTri(nTris);
 
         for (label oldTriI = 0; oldTriI < nTris; oldTriI++)
         {
             labelledTri tri
             (
-                triPointReverseMap[rawPointI],
-                triPointReverseMap[rawPointI+1],
-                triPointReverseMap[rawPointI+2],
+                triPointReverseMap[rawPointi],
+                triPointReverseMap[rawPointi+1],
+                triPointReverseMap[rawPointi+2],
                 0
             );
-            rawPointI += 3;
+            rawPointi += 3;
 
             if ((tri[0] != tri[1]) && (tri[0] != tri[2]) && (tri[1] != tri[2]))
             {
@@ -1096,30 +982,30 @@ Foam::triSurface Foam::isoSurface::stitchTriPoints
         {
             triSurface surf(tris, geometricSurfacePatchList(0), newPoints);
 
-            forAll(surf, faceI)
+            forAll(surf, facei)
             {
-                const labelledTri& f = surf[faceI];
-                const labelList& fFaces = surf.faceFaces()[faceI];
+                const labelledTri& f = surf[facei];
+                const labelList& fFaces = surf.faceFaces()[facei];
 
                 forAll(fFaces, i)
                 {
-                    label nbrFaceI = fFaces[i];
+                    label nbrFacei = fFaces[i];
 
-                    if (nbrFaceI <= faceI)
+                    if (nbrFacei <= facei)
                     {
                         // lower numbered faces already checked
                         continue;
                     }
 
-                    const labelledTri& nbrF = surf[nbrFaceI];
+                    const labelledTri& nbrF = surf[nbrFacei];
 
                     if (f == nbrF)
                     {
-                        FatalErrorIn("validTri(const triSurface&, const label)")
+                        FatalErrorInFunction
                             << "Check : "
-                            << " triangle " << faceI << " vertices " << f
+                            << " triangle " << facei << " vertices " << f
                             << " fc:" << f.centre(surf.points())
-                            << " has the same vertices as triangle " << nbrFaceI
+                            << " has the same vertices as triangle " << nbrFacei
                             << " vertices " << nbrF
                             << " fc:" << nbrF.centre(surf.points())
                             << abort(FatalError);
@@ -1133,12 +1019,11 @@ Foam::triSurface Foam::isoSurface::stitchTriPoints
 }
 
 
-// Does face use valid vertices?
-bool Foam::isoSurface::validTri(const triSurface& surf, const label faceI)
+bool Foam::isoSurface::validTri(const triSurface& surf, const label facei)
 {
     // Simple check on indices ok.
 
-    const labelledTri& f = surf[faceI];
+    const labelledTri& f = surf[facei];
 
     if
     (
@@ -1147,8 +1032,8 @@ bool Foam::isoSurface::validTri(const triSurface& surf, const label faceI)
      || (f[2] < 0) || (f[2] >= surf.points().size())
     )
     {
-        WarningIn("validTri(const triSurface&, const label)")
-            << "triangle " << faceI << " vertices " << f
+        WarningInFunction
+            << "triangle " << facei << " vertices " << f
             << " uses point indices outside point range 0.."
             << surf.points().size()-1 << endl;
 
@@ -1157,8 +1042,8 @@ bool Foam::isoSurface::validTri(const triSurface& surf, const label faceI)
 
     if ((f[0] == f[1]) || (f[0] == f[2]) || (f[1] == f[2]))
     {
-        WarningIn("validTri(const triSurface&, const label)")
-            << "triangle " << faceI
+        WarningInFunction
+            << "triangle " << facei
             << " uses non-unique vertices " << f
             << endl;
         return false;
@@ -1166,21 +1051,21 @@ bool Foam::isoSurface::validTri(const triSurface& surf, const label faceI)
 
     // duplicate triangle check
 
-    const labelList& fFaces = surf.faceFaces()[faceI];
+    const labelList& fFaces = surf.faceFaces()[facei];
 
     // Check if faceNeighbours use same points as this face.
     // Note: discards normal information - sides of baffle are merged.
     forAll(fFaces, i)
     {
-        label nbrFaceI = fFaces[i];
+        label nbrFacei = fFaces[i];
 
-        if (nbrFaceI <= faceI)
+        if (nbrFacei <= facei)
         {
             // lower numbered faces already checked
             continue;
         }
 
-        const labelledTri& nbrF = surf[nbrFaceI];
+        const labelledTri& nbrF = surf[nbrFacei];
 
         if
         (
@@ -1189,10 +1074,10 @@ bool Foam::isoSurface::validTri(const triSurface& surf, const label faceI)
          && ((f[2] == nbrF[0]) || (f[2] == nbrF[1]) || (f[2] == nbrF[2]))
         )
         {
-            WarningIn("validTri(const triSurface&, const label)")
-                << "triangle " << faceI << " vertices " << f
+            WarningInFunction
+                << "triangle " << facei << " vertices " << f
                 << " fc:" << f.centre(surf.points())
-                << " has the same vertices as triangle " << nbrFaceI
+                << " has the same vertices as triangle " << nbrFacei
                 << " vertices " << nbrF
                 << " fc:" << nbrF.centre(surf.points())
                 << endl;
@@ -1201,437 +1086,6 @@ bool Foam::isoSurface::validTri(const triSurface& surf, const label faceI)
         }
     }
     return true;
-}
-
-
-void Foam::isoSurface::calcAddressing
-(
-    const triSurface& surf,
-    List<FixedList<label, 3> >& faceEdges,
-    labelList& edgeFace0,
-    labelList& edgeFace1,
-    Map<labelList>& edgeFacesRest
-) const
-{
-    const pointField& points = surf.points();
-
-    pointField edgeCentres(3*surf.size());
-    label edgeI = 0;
-    forAll(surf, triI)
-    {
-        const labelledTri& tri = surf[triI];
-        edgeCentres[edgeI++] = 0.5*(points[tri[0]]+points[tri[1]]);
-        edgeCentres[edgeI++] = 0.5*(points[tri[1]]+points[tri[2]]);
-        edgeCentres[edgeI++] = 0.5*(points[tri[2]]+points[tri[0]]);
-    }
-
-    pointField mergedCentres;
-    labelList oldToMerged;
-    bool hasMerged = mergePoints
-    (
-        edgeCentres,
-        mergeDistance_,
-        false,
-        oldToMerged,
-        mergedCentres
-    );
-
-    if (debug)
-    {
-        Pout<< "isoSurface : detected "
-            << mergedCentres.size()
-            << " geometric edges on " << surf.size() << " triangles." << endl;
-    }
-
-    if (!hasMerged)
-    {
-        return;
-    }
-
-
-    // Determine faceEdges
-    faceEdges.setSize(surf.size());
-    edgeI = 0;
-    forAll(surf, triI)
-    {
-        faceEdges[triI][0] = oldToMerged[edgeI++];
-        faceEdges[triI][1] = oldToMerged[edgeI++];
-        faceEdges[triI][2] = oldToMerged[edgeI++];
-    }
-
-
-    // Determine edgeFaces
-    edgeFace0.setSize(mergedCentres.size());
-    edgeFace0 = -1;
-    edgeFace1.setSize(mergedCentres.size());
-    edgeFace1 = -1;
-    edgeFacesRest.clear();
-
-    // Overflow edge faces for geometric shared edges that turned
-    // out to be different anyway.
-    EdgeMap<labelList> extraEdgeFaces(mergedCentres.size()/100);
-
-    forAll(oldToMerged, oldEdgeI)
-    {
-        label triI = oldEdgeI / 3;
-        label edgeI = oldToMerged[oldEdgeI];
-
-        if (edgeFace0[edgeI] == -1)
-        {
-            // First triangle for edge
-            edgeFace0[edgeI] = triI;
-        }
-        else
-        {
-            //- Check that the two triangles actually topologically
-            //  share an edge
-            const labelledTri& prevTri = surf[edgeFace0[edgeI]];
-            const labelledTri& tri = surf[triI];
-
-            label fp = oldEdgeI % 3;
-
-            edge e(tri[fp], tri[tri.fcIndex(fp)]);
-
-            label prevTriIndex = -1;
-
-            forAll(prevTri, i)
-            {
-                if (edge(prevTri[i], prevTri[prevTri.fcIndex(i)]) == e)
-                {
-                    prevTriIndex = i;
-                    break;
-                }
-            }
-
-            if (prevTriIndex == -1)
-            {
-                // Different edge. Store for later.
-                EdgeMap<labelList>::iterator iter = extraEdgeFaces.find(e);
-
-                if (iter != extraEdgeFaces.end())
-                {
-                    labelList& eFaces = iter();
-                    label sz = eFaces.size();
-                    eFaces.setSize(sz+1);
-                    eFaces[sz] = triI;
-                }
-                else
-                {
-                    extraEdgeFaces.insert(e, labelList(1, triI));
-                }
-            }
-            else if (edgeFace1[edgeI] == -1)
-            {
-                edgeFace1[edgeI] = triI;
-            }
-            else
-            {
-                //WarningIn("orientSurface(triSurface&)")
-                //    << "Edge " << edgeI << " with centre "
-                //    << mergedCentres[edgeI]
-                //    << " used by more than two triangles: "
-                //    << edgeFace0[edgeI] << ", "
-                //    << edgeFace1[edgeI] << " and " << triI << endl;
-                Map<labelList>::iterator iter = edgeFacesRest.find(edgeI);
-
-                if (iter != edgeFacesRest.end())
-                {
-                    labelList& eFaces = iter();
-                    label sz = eFaces.size();
-                    eFaces.setSize(sz+1);
-                    eFaces[sz] = triI;
-                }
-                else
-                {
-                    edgeFacesRest.insert(edgeI, labelList(1, triI));
-                }
-            }
-        }
-    }
-
-    // Add extraEdgeFaces
-    edgeI = edgeFace0.size();
-
-    edgeFace0.setSize(edgeI + extraEdgeFaces.size());
-    edgeFace1.setSize(edgeI + extraEdgeFaces.size(), -1);
-
-    forAllConstIter(EdgeMap<labelList>, extraEdgeFaces, iter)
-    {
-        const labelList& eFaces = iter();
-
-        // The current edge will become edgeI. Replace all occurrences in
-        // faceEdges
-        forAll(eFaces, i)
-        {
-            label triI = eFaces[i];
-            const labelledTri& tri = surf[triI];
-
-            FixedList<label, 3>& fEdges = faceEdges[triI];
-            forAll(tri, fp)
-            {
-                edge e(tri[fp], tri[tri.fcIndex(fp)]);
-
-                if (e == iter.key())
-                {
-                    fEdges[fp] = edgeI;
-                    break;
-                }
-            }
-        }
-
-
-        // Add face to edgeFaces
-
-        edgeFace0[edgeI] = eFaces[0];
-
-        if (eFaces.size() >= 2)
-        {
-            edgeFace1[edgeI] = eFaces[1];
-
-            if (eFaces.size() > 2)
-            {
-                edgeFacesRest.insert
-                (
-                    edgeI,
-                    SubList<label>(eFaces, eFaces.size()-2, 2)
-                );
-            }
-        }
-
-        edgeI++;
-    }
-}
-
-
-void Foam::isoSurface::walkOrientation
-(
-    const triSurface& surf,
-    const List<FixedList<label, 3> >& faceEdges,
-    const labelList& edgeFace0,
-    const labelList& edgeFace1,
-    const label seedTriI,
-    labelList& flipState
-)
-{
-    // Do walk for consistent orientation.
-    DynamicList<label> changedFaces(surf.size());
-
-    changedFaces.append(seedTriI);
-
-    while (changedFaces.size())
-    {
-        DynamicList<label> newChangedFaces(changedFaces.size());
-
-        forAll(changedFaces, i)
-        {
-            label triI = changedFaces[i];
-            const labelledTri& tri = surf[triI];
-            const FixedList<label, 3>& fEdges = faceEdges[triI];
-
-            forAll(fEdges, fp)
-            {
-                label edgeI = fEdges[fp];
-
-                // my points:
-                label p0 = tri[fp];
-                label p1 = tri[tri.fcIndex(fp)];
-
-                label nbrI =
-                (
-                    edgeFace0[edgeI] != triI
-                  ? edgeFace0[edgeI]
-                  : edgeFace1[edgeI]
-                );
-
-                if (nbrI != -1 && flipState[nbrI] == -1)
-                {
-                    const labelledTri& nbrTri = surf[nbrI];
-
-                    // nbr points
-                    label nbrFp = findIndex(nbrTri, p0);
-
-                    if (nbrFp == -1)
-                    {
-                        FatalErrorIn("isoSurface::walkOrientation(..)")
-                            << "triI:" << triI
-                            << " tri:" << tri
-                            << " p0:" << p0
-                            << " p1:" << p1
-                            << " fEdges:" << fEdges
-                            << " edgeI:" << edgeI
-                            << " edgeFace0:" << edgeFace0[edgeI]
-                            << " edgeFace1:" << edgeFace1[edgeI]
-                            << " nbrI:" << nbrI
-                            << " nbrTri:" << nbrTri
-                            << abort(FatalError);
-                    }
-
-
-                    label nbrP1 = nbrTri[nbrTri.rcIndex(nbrFp)];
-
-                    bool sameOrientation = (p1 == nbrP1);
-
-                    if (flipState[triI] == 0)
-                    {
-                        flipState[nbrI] = (sameOrientation ? 0 : 1);
-                    }
-                    else
-                    {
-                        flipState[nbrI] = (sameOrientation ? 1 : 0);
-                    }
-                    newChangedFaces.append(nbrI);
-                }
-            }
-        }
-
-        changedFaces.transfer(newChangedFaces);
-    }
-}
-
-
-void Foam::isoSurface::orientSurface
-(
-    triSurface& surf,
-    const List<FixedList<label, 3> >& faceEdges,
-    const labelList& edgeFace0,
-    const labelList& edgeFace1,
-    const Map<labelList>& edgeFacesRest
-)
-{
-    // -1 : unvisited
-    //  0 : leave as is
-    //  1 : flip
-    labelList flipState(surf.size(), -1);
-
-    label seedTriI = 0;
-
-    while (true)
-    {
-        // Find first unvisited triangle
-        for
-        (
-            ;
-            seedTriI < surf.size() && flipState[seedTriI] != -1;
-            seedTriI++
-        )
-        {}
-
-        if (seedTriI == surf.size())
-        {
-            break;
-        }
-
-        // Note: Determine orientation of seedTriI?
-        // for now assume it is ok
-        flipState[seedTriI] = 0;
-
-        walkOrientation
-        (
-            surf,
-            faceEdges,
-            edgeFace0,
-            edgeFace1,
-            seedTriI,
-            flipState
-        );
-    }
-
-    // Do actual flipping
-    surf.clearOut();
-    forAll(surf, triI)
-    {
-        if (flipState[triI] == 1)
-        {
-            labelledTri tri(surf[triI]);
-
-            surf[triI][0] = tri[0];
-            surf[triI][1] = tri[2];
-            surf[triI][2] = tri[1];
-        }
-        else if (flipState[triI] == -1)
-        {
-            FatalErrorIn
-            (
-                "isoSurface::orientSurface(triSurface&, const label)"
-            )   << "problem" << abort(FatalError);
-        }
-    }
-}
-
-
-// Checks if triangle is connected through edgeI only.
-bool Foam::isoSurface::danglingTriangle
-(
-    const FixedList<label, 3>& fEdges,
-    const labelList& edgeFace1
-)
-{
-    label nOpen = 0;
-    forAll(fEdges, i)
-    {
-        if (edgeFace1[fEdges[i]] == -1)
-        {
-            nOpen++;
-        }
-    }
-
-    if (nOpen == 1 || nOpen == 2 || nOpen == 3)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-
-// Mark triangles to keep. Returns number of dangling triangles.
-Foam::label Foam::isoSurface::markDanglingTriangles
-(
-    const List<FixedList<label, 3> >& faceEdges,
-    const labelList& edgeFace0,
-    const labelList& edgeFace1,
-    const Map<labelList>& edgeFacesRest,
-    boolList& keepTriangles
-)
-{
-    keepTriangles.setSize(faceEdges.size());
-    keepTriangles = true;
-
-    label nDangling = 0;
-
-    // Remove any dangling triangles
-    forAllConstIter(Map<labelList>,  edgeFacesRest, iter)
-    {
-        // These are all the non-manifold edges. Filter out all triangles
-        // with only one connected edge (= this edge)
-
-        label edgeI = iter.key();
-        const labelList& otherEdgeFaces = iter();
-
-        // Remove all dangling triangles
-        if (danglingTriangle(faceEdges[edgeFace0[edgeI]], edgeFace1))
-        {
-            keepTriangles[edgeFace0[edgeI]] = false;
-            nDangling++;
-        }
-        if (danglingTriangle(faceEdges[edgeFace1[edgeI]], edgeFace1))
-        {
-            keepTriangles[edgeFace1[edgeI]] = false;
-            nDangling++;
-        }
-        forAll(otherEdgeFaces, i)
-        {
-            label triI = otherEdgeFaces[i];
-            if (danglingTriangle(faceEdges[triI], edgeFace1))
-            {
-                keepTriangles[triI] = false;
-                nDangling++;
-            }
-        }
-    }
-    return nDangling;
 }
 
 
@@ -1658,7 +1112,7 @@ Foam::triSurface Foam::isoSurface::subsetMesh
     oldToNewPoints.setSize(s.points().size());
     oldToNewPoints = -1;
     {
-        label pointI = 0;
+        label pointi = 0;
 
         forAll(include, oldFacei)
         {
@@ -1669,17 +1123,17 @@ Foam::triSurface Foam::isoSurface::subsetMesh
 
                 forAll(tri, fp)
                 {
-                    label oldPointI = tri[fp];
+                    label oldPointi = tri[fp];
 
-                    if (oldToNewPoints[oldPointI] == -1)
+                    if (oldToNewPoints[oldPointi] == -1)
                     {
-                        oldToNewPoints[oldPointI] = pointI;
-                        newToOldPoints[pointI++] = oldPointI;
+                        oldToNewPoints[oldPointi] = pointi;
+                        newToOldPoints[pointi++] = oldPointi;
                     }
                 }
             }
         }
-        newToOldPoints.setSize(pointI);
+        newToOldPoints.setSize(pointi);
     }
 
     // Extract points
@@ -1729,8 +1183,8 @@ Foam::isoSurface::isoSurface
         Pout<< "isoSurface:" << nl
             << "    isoField      : " << cVals.name() << nl
             << "    cell min/max  : "
-            << min(cVals.internalField()) << " / "
-            << max(cVals.internalField()) << nl
+            << min(cVals.primitiveField()) << " / "
+            << max(cVals.primitiveField()) << nl
             << "    point min/max : "
             << min(pVals_) << " / "
             << max(pVals_) << nl
@@ -1773,16 +1227,16 @@ Foam::isoSurface::isoSurface
         mesh_.cellCentres(),
         mesh_.faceCentres()
     );
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        const polyPatch& pp = patches[patchI];
+        const polyPatch& pp = patches[patchi];
 
         // Adapt separated coupled (proc and cyclic) patches
         if (pp.coupled())
         {
             fvPatchVectorField& pfld = const_cast<fvPatchVectorField&>
             (
-                meshC.boundaryField()[patchI]
+                meshC.boundaryField()[patchi]
             );
 
             PackedBoolList isCollocated
@@ -1800,26 +1254,26 @@ Foam::isoSurface::isoSurface
         }
         else if (isA<emptyPolyPatch>(pp))
         {
-            typedef slicedVolVectorField::GeometricBoundaryField bType;
+            typedef slicedVolVectorField::Boundary bType;
 
             bType& bfld = const_cast<bType&>(meshC.boundaryField());
 
             // Clear old value. Cannot resize it since is a slice.
-            bfld.set(patchI, NULL);
+            bfld.set(patchi, NULL);
 
             // Set new value we can change
             bfld.set
             (
-                patchI,
+                patchi,
                 new calculatedFvPatchField<vector>
                 (
-                    mesh_.boundary()[patchI],
+                    mesh_.boundary()[patchi],
                     meshC
                 )
             );
 
             // Change to face centres
-            bfld[patchI] = pp.patchSlice(mesh_.faceCentres());
+            bfld[patchi] = pp.patchSlice(mesh_.faceCentres());
         }
     }
 
@@ -1828,16 +1282,16 @@ Foam::isoSurface::isoSurface
     // Pre-calculate patch-per-face to avoid whichPatch call.
     labelList boundaryRegion(mesh_.nFaces()-mesh_.nInternalFaces());
 
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        const polyPatch& pp = patches[patchI];
+        const polyPatch& pp = patches[patchi];
 
-        label faceI = pp.start();
+        label facei = pp.start();
 
         forAll(pp, i)
         {
-            boundaryRegion[faceI-mesh_.nInternalFaces()] = patchI;
-            faceI++;
+            boundaryRegion[facei-mesh_.nInternalFaces()] = patchi;
+            facei++;
         }
     }
 
@@ -1888,17 +1342,17 @@ Foam::isoSurface::isoSurface
         // Determine if point is on boundary.
         PackedBoolList isBoundaryPoint(mesh_.nPoints());
 
-        forAll(patches, patchI)
+        forAll(patches, patchi)
         {
             // Mark all boundary points that are not physically coupled
             // (so anything but collocated coupled patches)
 
-            if (patches[patchI].coupled())
+            if (patches[patchi].coupled())
             {
                 const coupledPolyPatch& cpp =
                     refCast<const coupledPolyPatch>
                     (
-                        patches[patchI]
+                        patches[patchi]
                     );
 
                 PackedBoolList isCollocated(collocatedFaces(cpp));
@@ -1918,7 +1372,7 @@ Foam::isoSurface::isoSurface
             }
             else
             {
-                const polyPatch& pp = patches[patchI];
+                const polyPatch& pp = patches[patchi];
 
                 forAll(pp, i)
                 {
@@ -1957,57 +1411,58 @@ Foam::isoSurface::isoSurface
     }
 
 
-
-    DynamicList<point> triPoints(nCutCells_);
-    DynamicList<label> triMeshCells(nCutCells_);
-
-    generateTriPoints
-    (
-        cValsPtr_(),
-        pVals_,
-
-        meshC,
-        mesh_.points(),
-
-        snappedPoints,
-        snappedCc,
-        snappedPoint,
-
-        triPoints,
-        triMeshCells
-    );
-
-    if (debug)
     {
-        Pout<< "isoSurface : generated " << triMeshCells.size()
-            << " unmerged triangles from " << triPoints.size()
-            << " unmerged points." << endl;
-    }
+        DynamicList<point> triPoints(3*nCutCells_);
+        DynamicList<label> triMeshCells(nCutCells_);
 
-
-    // Merge points and compact out non-valid triangles
-    labelList triMap;           // merged to unmerged triangle
-    triSurface::operator=
-    (
-        stitchTriPoints
+        generateTriPoints
         (
-            true,               // check for duplicate tris
-            triPoints,
-            triPointMergeMap_,  // unmerged to merged point
-            triMap
-        )
-    );
+            cValsPtr_(),
+            pVals_,
 
-    if (debug)
-    {
-        Pout<< "isoSurface : generated " << triMap.size()
-            << " merged triangles." << endl;
-    }
+            meshC,
+            mesh_.points(),
 
-    meshCells_.setSize(triMap.size());
-    forAll(triMap, i)
-    {
-        meshCells_[i] = triMeshCells[triMap[i]];
+            snappedPoints,
+            snappedCc,
+            snappedPoint,
+
+            triPoints,      // 3 points of the triangle
+            triMeshCells    // per triangle the originating cell
+        );
+
+        if (debug)
+        {
+            Pout<< "isoSurface : generated " << triMeshCells.size()
+                << " unmerged triangles from " << triPoints.size()
+                << " unmerged points." << endl;
+        }
+
+
+        // Merge points and compact out non-valid triangles
+        labelList triMap;           // merged to unmerged triangle
+        triSurface::operator=
+        (
+            stitchTriPoints
+            (
+                true,               // check for duplicate tris
+                triPoints,
+                triPointMergeMap_,  // unmerged to merged point
+                triMap
+            )
+        );
+
+        if (debug)
+        {
+            Pout<< "isoSurface : generated " << triMap.size()
+                << " merged triangles." << endl;
+        }
+
+        meshCells_.setSize(triMap.size());
+        forAll(triMap, i)
+        {
+            meshCells_[i] = triMeshCells[triMap[i]];
+        }
     }
 
     if (debug)
@@ -2020,70 +1475,6 @@ Foam::isoSurface::isoSurface
             // Copied from surfaceCheck
             validTri(*this, triI);
         }
-    }
-
-
-    if (false)
-    {
-        List<FixedList<label, 3> > faceEdges;
-        labelList edgeFace0, edgeFace1;
-        Map<labelList> edgeFacesRest;
-
-
-        while (true)
-        {
-            // Calculate addressing
-            calcAddressing
-            (
-                *this,
-                faceEdges,
-                edgeFace0,
-                edgeFace1,
-                edgeFacesRest
-            );
-
-            // See if any dangling triangles
-            boolList keepTriangles;
-            label nDangling = markDanglingTriangles
-            (
-                faceEdges,
-                edgeFace0,
-                edgeFace1,
-                edgeFacesRest,
-                keepTriangles
-            );
-
-            if (debug)
-            {
-                Pout<< "isoSurface : detected " << nDangling
-                    << " dangling triangles." << endl;
-            }
-
-            if (nDangling == 0)
-            {
-                break;
-            }
-
-            // Create face map (new to old)
-            labelList subsetTriMap(findIndices(keepTriangles, true));
-
-            labelList subsetPointMap;
-            labelList reversePointMap;
-            triSurface::operator=
-            (
-                subsetMesh
-                (
-                    *this,
-                    subsetTriMap,
-                    reversePointMap,
-                    subsetPointMap
-                )
-            );
-            meshCells_ = labelField(meshCells_, subsetTriMap);
-            inplaceRenumber(reversePointMap, triPointMergeMap_);
-        }
-
-        orientSurface(*this, faceEdges, edgeFace0, edgeFace1, edgeFacesRest);
     }
 
 

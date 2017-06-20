@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -146,11 +146,8 @@ void Foam::sammMesh::addSAMMcell
     // grab the shape from the table
     if (!sammShapeLookup[typeFlag] || !sammAddressingTable[typeFlag])
     {
-        FatalErrorIn
-        (
-            "sammMesh::addRegularCell(const labelList& labels, "
-            "const label nCreatedCells)"
-        )   << "SAMM type " << typeFlag << " has no registered label. BUG!"
+        FatalErrorInFunction
+            << "SAMM type " << typeFlag << " has no registered label. BUG!"
             << abort(FatalError);
     }
 
@@ -206,7 +203,7 @@ void Foam::sammMesh::readCells()
         }
         else
         {
-            FatalErrorIn("sammMesh::readCells()")
+            FatalErrorInFunction
                 << "Cannot read file "
                 << cellsFileName
                 << abort(FatalError);
@@ -233,7 +230,7 @@ void Foam::sammMesh::readCells()
         labelList labels(24, label(-1));
         label lineLabel, sammLabel, regionLabel, typeFlag;
 
-        for (label cellI = 0; cellI < nCells; cellI++)
+        for (label celli = 0; celli < nCells; celli++)
         {
             label nLabels = 0;
 
@@ -243,7 +240,7 @@ void Foam::sammMesh::readCells()
             {
                 if (nLabels > 24)
                 {
-                    FatalErrorIn("sammMesh::readCells()")
+                    FatalErrorInFunction
                         << "Unknown SAMM cell. "
                         << "More than 24 vertices"
                         << abort(FatalError);
@@ -251,7 +248,7 @@ void Foam::sammMesh::readCells()
 
                 if ((cellsFile >> lineLabel).eof())
                 {
-                    FatalErrorIn("sammMesh::readCells()")
+                    FatalErrorInFunction
                         << "Reached end of cells file before "
                         << "all cells are read in."
                         << abort(FatalError);
@@ -297,21 +294,21 @@ void Foam::sammMesh::readCells()
 
             } while (typeFlag == -1 || addOnToCell);
 
-            starCellLabelLookup_[lineLabel] = cellI;
+            starCellLabelLookup_[lineLabel] = celli;
 
             if (nLabels == 8)
             {
-                addRegularCell(labels, cellI);
+                addRegularCell(labels, celli);
             }
             else
             {
-                addSAMMcell(typeFlag, labels, cellI);
+                addSAMMcell(typeFlag, labels, celli);
             }
         }
     }
     else
     {
-        FatalErrorIn("sammMesh::readCells()")
+        FatalErrorInFunction
             << "No cells in file "
             << cellsFileName
             << abort(FatalError);

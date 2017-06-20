@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -122,9 +122,9 @@ void Foam::ensightSetWriter<Type>::write
 
         for (direction cmpt = 0; cmpt < vector::nComponents; cmpt++)
         {
-            forAll(points, pointI)
+            forAll(points, pointi)
             {
-                const scalar comp = points[pointI][cmpt];
+                const scalar comp = points[pointi][cmpt];
                 if (mag(comp) >= scalar(floatScalarVSMALL))
                 {
                     os  << setw(12) << comp << nl;
@@ -137,9 +137,9 @@ void Foam::ensightSetWriter<Type>::write
         }
         os  << "point" << nl
             << setw(10) << points.size() << nl;
-        forAll(points, pointI)
+        forAll(points, pointi)
         {
-            os  << setw(10) << pointI+1 << nl;
+            os  << setw(10) << pointi+1 << nl;
         }
     }
 
@@ -181,7 +181,7 @@ void Foam::ensightSetWriter<Type>::write
     const bool writeTracks,
     const PtrList<coordSet>& tracks,
     const wordList& valueSetNames,
-    const List<List<Field<Type> > >& valueSets,
+    const List<List<Field<Type>>>& valueSets,
     Ostream& os
 ) const
 {
@@ -240,9 +240,9 @@ void Foam::ensightSetWriter<Type>::write
 
             for (direction cmpt = 0; cmpt < vector::nComponents; cmpt++)
             {
-                forAll(points, pointI)
+                forAll(points, pointi)
                 {
-                    const scalar comp = points[pointI][cmpt];
+                    const scalar comp = points[pointi][cmpt];
                     if (mag(comp) >= scalar(floatScalarVSMALL))
                     {
                         os  << setw(12) << comp << nl;
@@ -279,7 +279,7 @@ void Foam::ensightSetWriter<Type>::write
         {
             os  << pTraits<Type>::typeName << nl;
 
-            const List<Field<Type> >& fieldVals = valueSets[setI];
+            const List<Field<Type>>& fieldVals = valueSets[setI];
             forAll(fieldVals, trackI)
             {
                 os  << "part" << nl

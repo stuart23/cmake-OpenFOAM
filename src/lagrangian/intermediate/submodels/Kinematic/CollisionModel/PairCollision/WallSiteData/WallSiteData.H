@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -67,7 +67,7 @@ class WallSiteData
     // Private data
 
         //- Index of originating patch
-        label patchI_;
+        label patchi_;
 
         //- Wall data
         Type wallData_;
@@ -83,7 +83,7 @@ public:
         //- Construct from components
         WallSiteData
         (
-            label patchI,
+            label patchi,
             const Type& wallData
         );
 
@@ -134,7 +134,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "WallSiteData.C"
+    #include "WallSiteData.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

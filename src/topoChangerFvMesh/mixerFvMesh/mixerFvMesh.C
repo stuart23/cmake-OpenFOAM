@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -54,7 +54,7 @@ void Foam::mixerFvMesh::addZonesAndModifiers()
      || topoChanger_.size()
     )
     {
-        Info<< "void mixerFvMesh::addZonesAndModifiers() : "
+        InfoInFunction
             << "Zones and modifiers already present.  Skipping."
             << endl;
 
@@ -143,11 +143,11 @@ void Foam::mixerFvMesh::addZonesAndModifiers()
     labelList movingCells(nCells());
     label nMovingCells = 0;
 
-    forAll(rs, cellI)
+    forAll(rs, celli)
     {
-        if (rs[cellI] == originRegion)
+        if (rs[celli] == originRegion)
         {
-            movingCells[nMovingCells] = cellI;
+            movingCells[nMovingCells] = celli;
             nMovingCells++;
         }
     }
@@ -196,14 +196,14 @@ void Foam::mixerFvMesh::calcMovingMasks() const
 {
     if (debug)
     {
-        Info<< "void mixerFvMesh::calcMovingMasks() const : "
+        InfoInFunction
             << "Calculating point and cell masks"
             << endl;
     }
 
     if (movingPointsMaskPtr_)
     {
-        FatalErrorIn("void mixerFvMesh::calcMovingMasks() const")
+        FatalErrorInFunction
             << "point mask already calculated"
             << abort(FatalError);
     }
@@ -217,18 +217,18 @@ void Foam::mixerFvMesh::calcMovingMasks() const
 
     const labelList& cellAddr = cellZones()["movingCells"];
 
-    forAll(cellAddr, cellI)
+    forAll(cellAddr, celli)
     {
-        const cell& curCell = c[cellAddr[cellI]];
+        const cell& curCell = c[cellAddr[celli]];
 
-        forAll(curCell, faceI)
+        forAll(curCell, facei)
         {
             // Mark all the points as moving
-            const face& curFace = f[curCell[faceI]];
+            const face& curFace = f[curCell[facei]];
 
-            forAll(curFace, pointI)
+            forAll(curFace, pointi)
             {
-                movingPointsMask[curFace[pointI]] = 1;
+                movingPointsMask[curFace[pointi]] = 1;
             }
         }
     }
@@ -241,13 +241,13 @@ void Foam::mixerFvMesh::calcMovingMasks() const
 
     const labelList& innerSliderAddr = faceZones()[innerSliderZoneName];
 
-    forAll(innerSliderAddr, faceI)
+    forAll(innerSliderAddr, facei)
     {
-        const face& curFace = f[innerSliderAddr[faceI]];
+        const face& curFace = f[innerSliderAddr[facei]];
 
-        forAll(curFace, pointI)
+        forAll(curFace, pointi)
         {
-            movingPointsMask[curFace[pointI]] = 1;
+            movingPointsMask[curFace[pointi]] = 1;
         }
     }
 
@@ -259,13 +259,13 @@ void Foam::mixerFvMesh::calcMovingMasks() const
 
     const labelList& outerSliderAddr = faceZones()[outerSliderZoneName];
 
-    forAll(outerSliderAddr, faceI)
+    forAll(outerSliderAddr, facei)
     {
-        const face& curFace = f[outerSliderAddr[faceI]];
+        const face& curFace = f[outerSliderAddr[facei]];
 
-        forAll(curFace, pointI)
+        forAll(curFace, pointi)
         {
-            movingPointsMask[curFace[pointI]] = 0;
+            movingPointsMask[curFace[pointi]] = 0;
         }
     }
 }
@@ -356,7 +356,7 @@ bool Foam::mixerFvMesh::update()
     {
         if (debug)
         {
-            Info<< "Mesh topology is changing" << endl;
+            InfoInFunction << "Mesh topology is changing" << endl;
         }
 
         deleteDemandDrivenData(movingPointsMaskPtr_);

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -94,7 +94,6 @@ class sampledIsoSurface
             mutable const volScalarField* volFieldPtr_;
 
             //- Cached pointfield
-            mutable autoPtr<pointScalarField> storedPointFieldPtr_;
             mutable const pointScalarField* pointFieldPtr_;
 
             // And on subsetted mesh
@@ -123,14 +122,14 @@ class sampledIsoSurface
 
         //- Sample field on faces
         template<class Type>
-        tmp<Field<Type> > sampleField
+        tmp<Field<Type>> sampleField
         (
             const GeometricField<Type, fvPatchField, volMesh>& vField
         ) const;
 
 
         template<class Type>
-        tmp<Field<Type> >
+        tmp<Field<Type>>
         interpolateField(const interpolation<Type>&) const;
 
 
@@ -276,7 +275,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "sampledIsoSurfaceTemplates.C"
+    #include "sampledIsoSurfaceTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

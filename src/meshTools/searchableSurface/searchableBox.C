@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -58,7 +58,7 @@ void Foam::searchableBox::projectOntoCoordPlane
     }
     else
     {
-        FatalErrorIn("searchableBox::projectOntoCoordPlane(..)")
+        FatalErrorInFunction
             << "Point on plane " << planePt
             << " is not on coordinate " << min()[dir]
             << " nor " << max()[dir] << abort(FatalError);
@@ -172,14 +172,8 @@ Foam::searchableBox::searchableBox
 {
     if (!contains(midpoint()))
     {
-        FatalErrorIn
-        (
-            "Foam::searchableBox::searchableBox\n"
-            "(\n"
-            "    const IOobject& io,\n"
-            "    const treeBoundBox& bb\n"
-            ")\n"
-        )   << "Illegal bounding box specification : "
+        FatalErrorInFunction
+            << "Illegal bounding box specification : "
             << static_cast<const treeBoundBox>(*this) << exit(FatalError);
     }
 
@@ -198,14 +192,8 @@ Foam::searchableBox::searchableBox
 {
     if (!contains(midpoint()))
     {
-        FatalErrorIn
-        (
-            "Foam::searchableBox::searchableBox\n"
-            "(\n"
-            "    const IOobject& io,\n"
-            "    const treeBoundBox& bb\n"
-            ")\n"
-        )   << "Illegal bounding box specification : "
+        FatalErrorInFunction
+            << "Illegal bounding box specification : "
             << static_cast<const treeBoundBox>(*this) << exit(FatalError);
     }
 
@@ -235,7 +223,7 @@ const Foam::wordList& Foam::searchableBox::regions() const
 Foam::tmp<Foam::pointField> Foam::searchableBox::coordinates() const
 {
     tmp<pointField> tCtrs = tmp<pointField>(new pointField(6));
-    pointField& ctrs = tCtrs();
+    pointField& ctrs = tCtrs.ref();
 
     const pointField pts(treeBoundBox::points());
     const faceList& fcs = treeBoundBox::faces;
@@ -377,11 +365,7 @@ Foam::pointIndexHit Foam::searchableBox::findNearest
     point& linePoint
 ) const
 {
-    notImplemented
-    (
-        "searchableBox::findNearest"
-        "(const linePointRef&, treeBoundBox&, point&)"
-    );
+    NotImplemented;
     return pointIndexHit();
 }
 
@@ -437,7 +421,7 @@ Foam::pointIndexHit Foam::searchableBox::findLine
 
         if (info.index() == -1)
         {
-            FatalErrorIn("searchableBox::findLine(const point&, const point&)")
+            FatalErrorInFunction
                 << "point " << info.rawPoint()
                 << " on segment " << start << end
                 << " should be on face of " << *this
@@ -513,7 +497,7 @@ void Foam::searchableBox::findLineAll
 (
     const pointField& start,
     const pointField& end,
-    List<List<pointIndexHit> >& info
+    List<List<pointIndexHit>>& info
 ) const
 {
     info.setSize(start.size());
@@ -535,22 +519,22 @@ void Foam::searchableBox::findLineAll
       + vector(ROOTVSMALL,ROOTVSMALL,ROOTVSMALL)
     );
 
-    forAll(start, pointI)
+    forAll(start, pointi)
     {
         // See if any intersection between pt and end
-        pointIndexHit inter = findLine(start[pointI], end[pointI]);
+        pointIndexHit inter = findLine(start[pointi], end[pointi]);
 
         if (inter.hit())
         {
             hits.clear();
             hits.append(inter);
 
-            point pt = inter.hitPoint() + smallVec[pointI];
+            point pt = inter.hitPoint() + smallVec[pointi];
 
-            while (((pt-start[pointI])&dirVec[pointI]) <= magSqrDirVec[pointI])
+            while (((pt-start[pointi])&dirVec[pointi]) <= magSqrDirVec[pointi])
             {
                 // See if any intersection between pt and end
-                pointIndexHit inter = findLine(pt, end[pointI]);
+                pointIndexHit inter = findLine(pt, end[pointi]);
 
                 // Check for not hit or hit same face as before (can happen
                 // if vector along surface of face)
@@ -564,14 +548,14 @@ void Foam::searchableBox::findLineAll
                 }
                 hits.append(inter);
 
-                pt = inter.hitPoint() + smallVec[pointI];
+                pt = inter.hitPoint() + smallVec[pointi];
             }
 
-            info[pointI].transfer(hits);
+            info[pointi].transfer(hits);
         }
         else
         {
-            info[pointI].clear();
+            info[pointi].clear();
         }
     }
 }
@@ -595,7 +579,7 @@ void Foam::searchableBox::getNormal
 ) const
 {
     normal.setSize(info.size());
-    normal = vector::zero;
+    normal = Zero;
 
     forAll(info, i)
     {
@@ -620,15 +604,15 @@ void Foam::searchableBox::getVolumeType
     volType.setSize(points.size());
     volType = volumeType::INSIDE;
 
-    forAll(points, pointI)
+    forAll(points, pointi)
     {
-        const point& pt = points[pointI];
+        const point& pt = points[pointi];
 
         for (direction dir = 0; dir < vector::nComponents; dir++)
         {
             if (pt[dir] < min()[dir] || pt[dir] > max()[dir])
             {
-                volType[pointI] = volumeType::OUTSIDE;
+                volType[pointi] = volumeType::OUTSIDE;
                 break;
             }
         }

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -37,10 +37,10 @@ Foam::sampledSets::volFieldSampler<Type>::volFieldSampler
     const PtrList<sampledSet>& samplers
 )
 :
-    List<Field<Type> >(samplers.size()),
+    List<Field<Type>>(samplers.size()),
     name_(field.name())
 {
-    autoPtr<interpolation<Type> > interpolator
+    autoPtr<interpolation<Type>> interpolator
     (
         interpolation<Type>::New(interpolationScheme, field)
     );
@@ -54,10 +54,10 @@ Foam::sampledSets::volFieldSampler<Type>::volFieldSampler
         forAll(samples, sampleI)
         {
             const point& samplePt = samples[sampleI];
-            label cellI = samples.cells()[sampleI];
-            label faceI = samples.faces()[sampleI];
+            label celli = samples.cells()[sampleI];
+            label facei = samples.faces()[sampleI];
 
-            if (cellI == -1 && faceI == -1)
+            if (celli == -1 && facei == -1)
             {
                 // Special condition for illegal sampling points
                 values[sampleI] = pTraits<Type>::max;
@@ -67,8 +67,8 @@ Foam::sampledSets::volFieldSampler<Type>::volFieldSampler
                 values[sampleI] = interpolator().interpolate
                 (
                     samplePt,
-                    cellI,
-                    faceI
+                    celli,
+                    facei
                 );
             }
         }
@@ -83,7 +83,7 @@ Foam::sampledSets::volFieldSampler<Type>::volFieldSampler
     const PtrList<sampledSet>& samplers
 )
 :
-    List<Field<Type> >(samplers.size()),
+    List<Field<Type>>(samplers.size()),
     name_(field.name())
 {
     forAll(samplers, setI)
@@ -94,15 +94,15 @@ Foam::sampledSets::volFieldSampler<Type>::volFieldSampler
         values.setSize(samples.size());
         forAll(samples, sampleI)
         {
-            label cellI = samples.cells()[sampleI];
+            label celli = samples.cells()[sampleI];
 
-            if (cellI ==-1)
+            if (celli ==-1)
             {
                 values[sampleI] = pTraits<Type>::max;
             }
             else
             {
-                values[sampleI] = field[cellI];
+                values[sampleI] = field[celli];
             }
         }
     }
@@ -112,11 +112,11 @@ Foam::sampledSets::volFieldSampler<Type>::volFieldSampler
 template<class Type>
 Foam::sampledSets::volFieldSampler<Type>::volFieldSampler
 (
-    const List<Field<Type> >& values,
+    const List<Field<Type>>& values,
     const word& name
 )
 :
-    List<Field<Type> >(values),
+    List<Field<Type>>(values),
     name_(name)
 {}
 
@@ -125,7 +125,7 @@ template<class Type>
 void Foam::sampledSets::writeSampleFile
 (
     const coordSet& masterSampleSet,
-    const PtrList<volFieldSampler<Type> >& masterFields,
+    const PtrList<volFieldSampler<Type>>& masterFields,
     const label setI,
     const fileName& timeDir,
     const writer<Type>& formatter
@@ -158,17 +158,8 @@ void Foam::sampledSets::writeSampleFile
     }
     else
     {
-        WarningIn
-        (
-            "void Foam::sampledSets::writeSampleFile"
-            "("
-                "const coordSet&, "
-                "const PtrList<volFieldSampler<Type> >&, "
-                "const label, "
-                "const fileName&, "
-                "const writer<Type>&"
-            ")"
-        )   << "File " << ofs.name() << " could not be opened. "
+        WarningInFunction
+            << "File " << ofs.name() << " could not be opened. "
             << "No data will be written" << endl;
     }
 }
@@ -177,19 +168,19 @@ void Foam::sampledSets::writeSampleFile
 template<class T>
 void Foam::sampledSets::combineSampledValues
 (
-    const PtrList<volFieldSampler<T> >& sampledFields,
+    const PtrList<volFieldSampler<T>>& sampledFields,
     const labelListList& indexSets,
-    PtrList<volFieldSampler<T> >& masterFields
+    PtrList<volFieldSampler<T>>& masterFields
 )
 {
     forAll(sampledFields, fieldi)
     {
-        List<Field<T> > masterValues(indexSets.size());
+        List<Field<T>> masterValues(indexSets.size());
 
         forAll(indexSets, setI)
         {
             // Collect data from all processors
-            List<Field<T> > gatheredData(Pstream::nProcs());
+            List<Field<T>> gatheredData(Pstream::nProcs());
             gatheredData[Pstream::myProcNo()] = sampledFields[fieldi][setI];
             Pstream::gatherList(gatheredData);
 
@@ -197,10 +188,10 @@ void Foam::sampledSets::combineSampledValues
             {
                 Field<T> allData
                 (
-                    ListListOps::combine<Field<T> >
+                    ListListOps::combine<Field<T>>
                     (
                         gatheredData,
-                        Foam::accessOp<Field<T> >()
+                        Foam::accessOp<Field<T>>()
                     )
                 );
 
@@ -242,7 +233,7 @@ void Foam::sampledSets::sampleAndWrite
         }
 
         // Storage for interpolated values
-        PtrList<volFieldSampler<Type> > sampledFields(fields.size());
+        PtrList<volFieldSampler<Type>> sampledFields(fields.size());
 
         forAll(fields, fieldi)
         {
@@ -301,7 +292,7 @@ void Foam::sampledSets::sampleAndWrite
                         (
                             interpolationScheme_,
                             mesh_.lookupObject
-                            <GeometricField<Type, fvPatchField, volMesh> >
+                            <GeometricField<Type, fvPatchField, volMesh>>
                             (fields[fieldi]),
                             *this
                         )
@@ -315,7 +306,7 @@ void Foam::sampledSets::sampleAndWrite
                         new volFieldSampler<Type>
                         (
                             mesh_.lookupObject
-                            <GeometricField<Type, fvPatchField, volMesh> >
+                            <GeometricField<Type, fvPatchField, volMesh>>
                             (fields[fieldi]),
                             *this
                         )
@@ -327,7 +318,7 @@ void Foam::sampledSets::sampleAndWrite
         // Combine sampled fields from processors.
         // Note: only master results are valid
 
-        PtrList<volFieldSampler<Type> > masterFields(sampledFields.size());
+        PtrList<volFieldSampler<Type>> masterFields(sampledFields.size());
         combineSampledValues(sampledFields, indexSets_, masterFields);
 
         if (Pstream::master())

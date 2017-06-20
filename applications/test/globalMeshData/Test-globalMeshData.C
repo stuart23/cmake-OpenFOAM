@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -64,10 +64,8 @@ int main(int argc, char *argv[])
 
         // Create field with my local data
         pointField coords(globalPointSlavesMap.constructSize());
-        SubList<point>(coords, coupledPatch.nPoints()).assign
-        (
-            coupledPatch.localPoints()
-        );
+        SubList<point>(coords, coupledPatch.nPoints()) =
+            coupledPatch.localPoints();
 
         // Exchange data. Apply positional transforms.
         globalPointSlavesMap.distribute
@@ -78,14 +76,14 @@ int main(int argc, char *argv[])
         );
 
         // Print
-        forAll(slaves, pointI)
+        forAll(slaves, pointi)
         {
-            const labelList& slavePoints = slaves[pointI];
+            const labelList& slavePoints = slaves[pointi];
 
             if (slavePoints.size() > 0)
             {
-                Pout<< "Master point:" << pointI
-                    << " coord:" << coords[pointI]
+                Pout<< "Master point:" << pointi
+                    << " coord:" << coords[pointi]
                     << " connected to untransformed slave points:" << endl;
 
                 forAll(slavePoints, i)
@@ -94,12 +92,12 @@ int main(int argc, char *argv[])
                 }
             }
 
-            const labelList& transformedSlavePoints = transformedSlaves[pointI];
+            const labelList& transformedSlavePoints = transformedSlaves[pointi];
 
             if (transformedSlavePoints.size() > 0)
             {
-                Pout<< "Master point:" << pointI
-                    << " coord:" << coords[pointI]
+                Pout<< "Master point:" << pointi
+                    << " coord:" << coords[pointi]
                     << " connected to transformed slave points:" << endl;
 
                 forAll(transformedSlavePoints, i)
@@ -185,8 +183,7 @@ int main(int argc, char *argv[])
         label nBnd = mesh.nFaces()-mesh.nInternalFaces();
 
         pointField fc(globalPointBoundaryFacesMap.constructSize());
-        SubList<point>(fc, nBnd).assign
-        (
+        SubList<point>(fc, nBnd) =
             primitivePatch
             (
                 SubList<face>
@@ -196,8 +193,7 @@ int main(int argc, char *argv[])
                     mesh.nInternalFaces()
                 ),
                 mesh.points()
-            ).faceCentres()
-        );
+            ).faceCentres();
 
         // Exchange data
         globalPointBoundaryFacesMap.distribute
@@ -208,14 +204,14 @@ int main(int argc, char *argv[])
         );
 
         // Print
-        forAll(slaves, pointI)
+        forAll(slaves, pointi)
         {
-            const labelList& slaveFaces = slaves[pointI];
+            const labelList& slaveFaces = slaves[pointi];
 
             if (slaveFaces.size() > 0)
             {
-                Pout<< "Master point:" << pointI
-                    << " at:" << coupledPatch.localPoints()[pointI]
+                Pout<< "Master point:" << pointi
+                    << " at:" << coupledPatch.localPoints()[pointi]
                     << " connected to " << slaveFaces.size()
                     << " untransformed faces:" << endl;
 
@@ -225,11 +221,11 @@ int main(int argc, char *argv[])
                 }
             }
 
-            const labelList& transformedSlaveFaces = transformedSlaves[pointI];
+            const labelList& transformedSlaveFaces = transformedSlaves[pointi];
 
             if (transformedSlaveFaces.size() > 0)
             {
-                Pout<< "Master point:" << pointI
+                Pout<< "Master point:" << pointi
                     << " connected to " << transformedSlaveFaces.size()
                     << " transformed faces:" << endl;
 
@@ -266,14 +262,14 @@ int main(int argc, char *argv[])
         );
 
         // Print
-        forAll(slaves, pointI)
+        forAll(slaves, pointi)
         {
-            const labelList& pointCells = slaves[pointI];
+            const labelList& pointCells = slaves[pointi];
 
             if (pointCells.size() > 0)
             {
-                Pout<< "Master point:" << pointI
-                    << " at:" << coupledPatch.localPoints()[pointI]
+                Pout<< "Master point:" << pointi
+                    << " at:" << coupledPatch.localPoints()[pointi]
                     << " connected to " << pointCells.size()
                     << " untransformed boundaryCells:" << endl;
 
@@ -283,11 +279,11 @@ int main(int argc, char *argv[])
                 }
             }
 
-            const labelList& transformPointCells = transformedSlaves[pointI];
+            const labelList& transformPointCells = transformedSlaves[pointi];
 
             if (transformPointCells.size() > 0)
             {
-                Pout<< "Master point:" << pointI
+                Pout<< "Master point:" << pointi
                     << " connected to " << transformPointCells.size()
                     << " transformed boundaryCells:" << endl;
 

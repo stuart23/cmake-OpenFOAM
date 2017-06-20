@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -43,7 +43,8 @@ bool Foam::adjustPhi
         scalar fixedMassOut = 0.0;
         scalar adjustableMassOut = 0.0;
 
-        surfaceScalarField::GeometricBoundaryField& bphi = phi.boundaryField();
+        surfaceScalarField::Boundary& bphi =
+            phi.boundaryFieldRef();
 
         forAll(bphi, patchi)
         {
@@ -103,15 +104,8 @@ bool Foam::adjustPhi
         }
         else if (mag(fixedMassOut - massIn)/totalFlux > 1e-8)
         {
-            FatalErrorIn
-            (
-                "adjustPhi"
-                "("
-                    "surfaceScalarField&, "
-                    "const volVectorField&,"
-                    "volScalarField&"
-                ")"
-            )   << "Continuity error cannot be removed by adjusting the"
+            FatalErrorInFunction
+                << "Continuity error cannot be removed by adjusting the"
                    " outflow.\nPlease check the velocity boundary conditions"
                    " and/or run potentialFoam to initialise the outflow." << nl
                 << "Total flux              : " << totalFlux << nl

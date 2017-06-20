@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -90,15 +90,15 @@ Foam::jumpCyclicFvPatchField<Type>::jumpCyclicFvPatchField
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
+Foam::tmp<Foam::Field<Type>>
 Foam::jumpCyclicFvPatchField<Type>::patchNeighbourField() const
 {
-    const Field<Type>& iField = this->internalField();
+    const Field<Type>& iField = this->primitiveField();
     const labelUList& nbrFaceCells =
         this->cyclicPatch().neighbFvPatch().faceCells();
 
-    tmp<Field<Type> > tpnf(new Field<Type>(this->size()));
-    Field<Type>& pnf = tpnf();
+    tmp<Field<Type>> tpnf(new Field<Type>(this->size()));
+    Field<Type>& pnf = tpnf.ref();
 
     Field<Type> jf(this->jump());
     if (!this->cyclicPatch().owner())
@@ -138,17 +138,7 @@ void Foam::jumpCyclicFvPatchField<Type>::updateInterfaceMatrix
     const Pstream::commsTypes
 ) const
 {
-    notImplemented
-    (
-        "void Foam::jumpCyclicFvPatchField<Type>::updateInterfaceMatrix"
-        "("
-            "scalarField&, "
-            "const scalarField&, "
-            "const scalarField&, "
-            "const direction, "
-            "const Pstream::commsTypes"
-        ") const"
-    );
+    NotImplemented;
 }
 
 
@@ -167,7 +157,7 @@ void Foam::jumpCyclicFvPatchField<Type>::updateInterfaceMatrix
         this->cyclicPatch().neighbFvPatch().faceCells();
 
     // only apply jump to original field
-    if (&psiInternal == &this->internalField())
+    if (&psiInternal == &this->primitiveField())
     {
         Field<Type> jf(this->jump());
 

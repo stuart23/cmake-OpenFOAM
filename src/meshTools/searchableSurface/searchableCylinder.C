@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,10 +30,8 @@ License
 
 namespace Foam
 {
-
-defineTypeNameAndDebug(searchableCylinder, 0);
-addToRunTimeSelectionTable(searchableSurface, searchableCylinder, dict);
-
+    defineTypeNameAndDebug(searchableCylinder, 0);
+    addToRunTimeSelectionTable(searchableSurface, searchableCylinder, dict);
 }
 
 
@@ -67,7 +65,7 @@ void Foam::searchableCylinder::boundingSpheres
 Foam::tmp<Foam::pointField> Foam::searchableCylinder::points() const
 {
     tmp<pointField> tPts(new pointField(2));
-    pointField& pts = tPts();
+    pointField& pts = tPts.ref();
 
     pts[0] = point1_;
     pts[1] = point2_;
@@ -95,7 +93,7 @@ Foam::pointIndexHit Foam::searchableCylinder::findNearest
 
     if (magV < ROOTVSMALL)
     {
-        v = vector::zero;
+        v = Zero;
     }
     else
     {
@@ -595,7 +593,7 @@ void Foam::searchableCylinder::findLineAll
 (
     const pointField& start,
     const pointField& end,
-    List<List<pointIndexHit> >& info
+    List<List<pointIndexHit>>& info
 ) const
 {
     info.setSize(start.size());
@@ -653,7 +651,7 @@ void Foam::searchableCylinder::getNormal
 ) const
 {
     normal.setSize(info.size());
-    normal = vector::zero;
+    normal = Zero;
 
     forAll(info, i)
     {
@@ -732,9 +730,9 @@ void Foam::searchableCylinder::getVolumeType
     volType.setSize(points.size());
     volType = volumeType::INSIDE;
 
-    forAll(points, pointI)
+    forAll(points, pointi)
     {
-        const point& pt = points[pointI];
+        const point& pt = points[pointi];
 
         vector v(pt - point1_);
 
@@ -744,12 +742,12 @@ void Foam::searchableCylinder::getVolumeType
         if (parallel < 0)
         {
             // left of point1 endcap
-            volType[pointI] = volumeType::OUTSIDE;
+            volType[pointi] = volumeType::OUTSIDE;
         }
         else if (parallel > magDir_)
         {
             // right of point2 endcap
-            volType[pointI] = volumeType::OUTSIDE;
+            volType[pointi] = volumeType::OUTSIDE;
         }
         else
         {
@@ -758,11 +756,11 @@ void Foam::searchableCylinder::getVolumeType
 
             if (mag(v) > radius_)
             {
-                volType[pointI] = volumeType::OUTSIDE;
+                volType[pointi] = volumeType::OUTSIDE;
             }
             else
             {
-                volType[pointI] = volumeType::INSIDE;
+                volType[pointi] = volumeType::INSIDE;
             }
         }
     }

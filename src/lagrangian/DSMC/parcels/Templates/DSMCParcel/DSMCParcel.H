@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -130,16 +130,16 @@ public:
     //- Class used to pass kinematic tracking data to the trackToFace function
     class trackingData
     :
-        public particle::TrackingData<DSMCCloud<DSMCParcel<ParcelType> > >
+        public particle::TrackingData<DSMCCloud<DSMCParcel<ParcelType>>>
     {
     public:
 
         // Constructors
 
             //- Construct from components
-            trackingData(DSMCCloud<DSMCParcel<ParcelType> >& cloud)
+            trackingData(DSMCCloud<DSMCParcel<ParcelType>>& cloud)
             :
-                particle::TrackingData<DSMCCloud<DSMCParcel<ParcelType> > >
+                particle::TrackingData<DSMCCloud<DSMCParcel<ParcelType>>>
                 (
                     cloud
                 )
@@ -181,8 +181,8 @@ public:
             const vector& position,
             const vector& U,
             const scalar Ei,
-            const label cellI,
-            const label tetFaceI,
+            const label celli,
+            const label tetFacei,
             const label tetPtI,
             const label typeId
         );
@@ -214,9 +214,9 @@ public:
                 mesh_(mesh)
             {}
 
-            autoPtr<DSMCParcel<ParcelType> > operator()(Istream& is) const
+            autoPtr<DSMCParcel<ParcelType>> operator()(Istream& is) const
             {
-                return autoPtr<DSMCParcel<ParcelType> >
+                return autoPtr<DSMCParcel<ParcelType>>
                 (
                     new DSMCParcel<ParcelType>(mesh_, is, true)
                 );
@@ -265,7 +265,7 @@ public:
             (
                 const polyPatch&,
                 TrackData& td,
-                const label patchI,
+                const label patchi,
                 const scalar trackFraction,
                 const tetIndices& tetIs
             );
@@ -307,9 +307,9 @@ public:
 
         // I-O
 
-            static void readFields(Cloud<DSMCParcel<ParcelType> >& c);
+            static void readFields(Cloud<DSMCParcel<ParcelType>>& c);
 
-            static void writeFields(const Cloud<DSMCParcel<ParcelType> >& c);
+            static void writeFields(const Cloud<DSMCParcel<ParcelType>>& c);
 
 
     // Ostream Operator

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -62,7 +62,7 @@ inline Foam::molecule::constantProperties::constantProperties
 
     mass_ = sum(siteMasses_);
 
-    vector centreOfMass(vector::zero);
+    vector centreOfMass(Zero);
 
     // Calculate the centre of mass of the body and subtract it from each
     // position
@@ -80,7 +80,7 @@ inline Foam::molecule::constantProperties::constantProperties
     {
         // Single site molecule - no rotational motion.
 
-        siteReferencePositions_[0] = vector::zero;
+        siteReferencePositions_[0] = Zero;
 
         momentOfInertia_ = diagTensor(-1, -1, -1);
     }
@@ -101,7 +101,7 @@ inline Foam::molecule::constantProperties::constantProperties
         // The rotation was around the centre of mass but remove any
         // components that have crept in due to floating point errors
 
-        centreOfMass = vector::zero;
+        centreOfMass = Zero;
 
         forAll(siteReferencePositions_, i)
         {
@@ -112,7 +112,7 @@ inline Foam::molecule::constantProperties::constantProperties
 
         siteReferencePositions_ -= centreOfMass;
 
-        diagTensor momOfInertia = diagTensor::zero;
+        diagTensor momOfInertia = Zero;
 
         forAll(siteReferencePositions_, i)
         {
@@ -135,7 +135,7 @@ inline Foam::molecule::constantProperties::constantProperties
 
         // Calculate the inertia tensor in the current orientation
 
-        tensor momOfInertia(tensor::zero);
+        tensor momOfInertia(Zero);
 
         forAll(siteReferencePositions_, i)
         {
@@ -151,7 +151,7 @@ inline Foam::molecule::constantProperties::constantProperties
 
         if (eigenValues(momOfInertia).x() < VSMALL)
         {
-            FatalErrorIn("molecule::constantProperties::constantProperties")
+            FatalErrorInFunction
                 << "An eigenvalue of the inertia tensor is zero, the molecule "
                 << dict.name() << " is not a valid 6DOF shape."
                 << nl << abort(FatalError);
@@ -179,7 +179,7 @@ inline Foam::molecule::constantProperties::constantProperties
         // The rotation was around the centre of mass but remove any
         // components that have crept in due to floating point errors
 
-        centreOfMass = vector::zero;
+        centreOfMass = Zero;
 
         forAll(siteReferencePositions_, i)
         {
@@ -193,7 +193,7 @@ inline Foam::molecule::constantProperties::constantProperties
         // Calculate the moment of inertia in the principle component
         // reference frame
 
-        momOfInertia = tensor::zero;
+        momOfInertia = Zero;
 
         forAll(siteReferencePositions_, i)
         {
@@ -221,8 +221,8 @@ inline Foam::molecule::molecule
 (
     const polyMesh& mesh,
     const vector& position,
-    const label cellI,
-    const label tetFaceI,
+    const label celli,
+    const label tetFacei,
     const label tetPtI,
     const tensor& Q,
     const vector& v,
@@ -236,7 +236,7 @@ inline Foam::molecule::molecule
 
 )
 :
-    particle(mesh, position, cellI, tetFaceI, tetPtI),
+    particle(mesh, position, celli, tetFacei, tetPtI),
     Q_(Q),
     v_(v),
     a_(a),
@@ -244,10 +244,10 @@ inline Foam::molecule::molecule
     tau_(tau),
     specialPosition_(specialPosition),
     potentialEnergy_(0.0),
-    rf_(tensor::zero),
+    rf_(Zero),
     special_(special),
     id_(id),
-    siteForces_(constProps.nSites(), vector::zero),
+    siteForces_(constProps.nSites(), Zero),
     sitePositions_(constProps.nSites())
 {
     setSitePositions(constProps);
@@ -264,7 +264,7 @@ inline void Foam::molecule::constantProperties::checkSiteListSizes() const
      || siteIds_.size() != siteCharges_.size()
     )
     {
-        FatalErrorIn("molecule::constantProperties::checkSiteListSizes")
+        FatalErrorInFunction
             << "Sizes of site id, charge and "
             << "referencePositions are not the same. "
             << nl << abort(FatalError);
@@ -378,7 +378,7 @@ inline bool Foam::molecule::constantProperties::pairPotentialSite
 
     if (s == -1)
     {
-        FatalErrorIn("moleculeI.H") << nl
+        FatalErrorInFunction
             << sId << " site not found."
             << nl << abort(FatalError);
     }
@@ -403,10 +403,8 @@ inline bool Foam::molecule::constantProperties::electrostaticSite
 
     if (s == -1)
     {
-        FatalErrorIn
-        (
-            "molecule::constantProperties::electrostaticSite(label)"
-        )   << sId << " site not found."
+        FatalErrorInFunction
+            << sId << " site not found."
             << nl << abort(FatalError);
     }
 

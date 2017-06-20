@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "ConeNozzleInjection.H"
-#include "TimeDataEntry.H"
+#include "TimeFunction1.H"
 #include "mathematicalConstants.H"
 #include "distributionModel.H"
 
@@ -48,7 +48,7 @@ void Foam::ConeNozzleInjection<CloudType>::setInjectionMethod()
         this->findCellAtPosition
         (
             injectorCell_,
-            tetFaceI_,
+            tetFacei_,
             tetPtI_,
             position_,
             false
@@ -56,7 +56,7 @@ void Foam::ConeNozzleInjection<CloudType>::setInjectionMethod()
     }
     else
     {
-        FatalErrorIn("Foam::InjectionModel<CloudType>::setInjectionMethod()")
+        FatalErrorInFunction
             << "injectionMethod must be either 'point' or 'disc'"
             << exit(FatalError);
     }
@@ -84,7 +84,7 @@ void Foam::ConeNozzleInjection<CloudType>::setFlowType()
     }
     else
     {
-        FatalErrorIn("Foam::InjectionModel<CloudType>::setFlowType()")
+        FatalErrorInFunction
             << "flowType must be either 'constantVelocity', "
             <<"'pressureDrivenVelocity' or 'flowRateAndDischarge'"
             << exit(FatalError);
@@ -110,7 +110,7 @@ Foam::ConeNozzleInjection<CloudType>::ConeNozzleInjection
     duration_(readScalar(this->coeffDict().lookup("duration"))),
     position_(this->coeffDict().lookup("position")),
     injectorCell_(-1),
-    tetFaceI_(-1),
+    tetFacei_(-1),
     tetPtI_(-1),
     direction_(this->coeffDict().lookup("direction")),
     parcelsPerSecond_
@@ -119,7 +119,7 @@ Foam::ConeNozzleInjection<CloudType>::ConeNozzleInjection
     ),
     flowRateProfile_
     (
-        TimeDataEntry<scalar>
+        TimeFunction1<scalar>
         (
             owner.db().time(),
             "flowRateProfile",
@@ -128,7 +128,7 @@ Foam::ConeNozzleInjection<CloudType>::ConeNozzleInjection
     ),
     thetaInner_
     (
-        TimeDataEntry<scalar>
+        TimeFunction1<scalar>
         (
             owner.db().time(),
             "thetaInner",
@@ -137,7 +137,7 @@ Foam::ConeNozzleInjection<CloudType>::ConeNozzleInjection
     ),
     thetaOuter_
     (
-        TimeDataEntry<scalar>
+        TimeFunction1<scalar>
         (
             owner.db().time(),
             "thetaOuter",
@@ -152,9 +152,9 @@ Foam::ConeNozzleInjection<CloudType>::ConeNozzleInjection
             owner.rndGen()
         )
     ),
-    tanVec1_(vector::zero),
-    tanVec2_(vector::zero),
-    normal_(vector::zero),
+    tanVec1_(Zero),
+    tanVec2_(Zero),
+    normal_(Zero),
 
     UMag_(0.0),
     Cd_(owner.db().time(), "Cd"),
@@ -162,15 +162,8 @@ Foam::ConeNozzleInjection<CloudType>::ConeNozzleInjection
 {
     if (innerDiameter_ >= outerDiameter_)
     {
-        FatalErrorIn
-        (
-            "Foam::ConeNozzleInjection<CloudType>::ConeNozzleInjection"
-            "("
-                "const dictionary&, "
-                "CloudType&, "
-                "const word&"
-            ")"
-        )<< "innerNozzleDiameter >= outerNozzleDiameter" << nl
+        FatalErrorInFunction
+         << "innerNozzleDiameter >= outerNozzleDiameter" << nl
          << exit(FatalError);
     }
 
@@ -186,7 +179,7 @@ Foam::ConeNozzleInjection<CloudType>::ConeNozzleInjection
     direction_ /= mag(direction_);
 
     // Determine direction vectors tangential to direction
-    vector tangent = vector::zero;
+    vector tangent = Zero;
     scalar magTangent = 0.0;
 
     while(magTangent < SMALL)
@@ -221,7 +214,7 @@ Foam::ConeNozzleInjection<CloudType>::ConeNozzleInjection
     duration_(im.duration_),
     position_(im.position_),
     injectorCell_(im.injectorCell_),
-    tetFaceI_(im.tetFaceI_),
+    tetFacei_(im.tetFacei_),
     tetPtI_(im.tetPtI_),
     direction_(im.direction_),
     parcelsPerSecond_(im.parcelsPerSecond_),
@@ -258,7 +251,7 @@ void Foam::ConeNozzleInjection<CloudType>::updateMesh()
             this->findCellAtPosition
             (
                 injectorCell_,
-                tetFaceI_,
+                tetFacei_,
                 tetPtI_,
                 position_
             );
@@ -322,7 +315,7 @@ void Foam::ConeNozzleInjection<CloudType>::setPositionAndCell
     const scalar,
     vector& position,
     label& cellOwner,
-    label& tetFaceI,
+    label& tetFacei,
     label& tetPtI
 )
 {
@@ -337,7 +330,7 @@ void Foam::ConeNozzleInjection<CloudType>::setPositionAndCell
         {
             position = position_;
             cellOwner = injectorCell_;
-            tetFaceI = tetFaceI_;
+            tetFacei = tetFacei_;
             tetPtI = tetPtI_;
 
             break;
@@ -352,7 +345,7 @@ void Foam::ConeNozzleInjection<CloudType>::setPositionAndCell
             this->findCellAtPosition
             (
                 cellOwner,
-                tetFaceI,
+                tetFacei,
                 tetPtI,
                 position,
                 false
@@ -361,19 +354,8 @@ void Foam::ConeNozzleInjection<CloudType>::setPositionAndCell
         }
         default:
         {
-            FatalErrorIn
-            (
-                "void Foam::ConeNozzleInjection<CloudType>::setPositionAndCell"
-                "("
-                    "const label, "
-                    "const label, "
-                    "const scalar, "
-                    "vector&, "
-                    "label&, "
-                    "label&, "
-                    "label&"
-                ")"
-            )<< "Unknown injectionMethod type" << nl
+            FatalErrorInFunction
+             << "Unknown injectionMethod type" << nl
              << exit(FatalError);
         }
     }

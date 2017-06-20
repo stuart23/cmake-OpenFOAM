@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 {
-    volScalarField& rDeltaT = trDeltaT();
+    volScalarField& rDeltaT = trDeltaT.ref();
 
     const dictionary& pimpleDict = pimple.dict();
 
@@ -58,23 +58,23 @@ License
 
     // Flow time scale
     {
-        rDeltaT.dimensionedInternalField() =
+        rDeltaT.ref() =
         (
-            fvc::surfaceSum(mag(phi))().dimensionedInternalField()
-           /((2*maxCo)*mesh.V()*rho.dimensionedInternalField())
+            fvc::surfaceSum(mag(phi))()()
+           /((2*maxCo)*mesh.V()*rho())
         );
 
         // Limit the largest time scale
         rDeltaT.max(1/maxDeltaT);
 
         Info<< "    Flow        = "
-            << gMin(1/rDeltaT.internalField()) << ", "
-            << gMax(1/rDeltaT.internalField()) << endl;
+            << gMin(1/rDeltaT.primitiveField()) << ", "
+            << gMax(1/rDeltaT.primitiveField()) << endl;
     }
 
     // Reaction source time scale
     {
-        volScalarField::DimensionedInternalField rDeltaTT
+        volScalarField::Internal rDeltaTT
         (
             mag
             (
@@ -83,9 +83,9 @@ License
             )
            /(
                alphaTemp
-              *rho.dimensionedInternalField()
-              *thermo.Cp()().dimensionedInternalField()
-              *T.dimensionedInternalField()
+              *rho()
+              *thermo.Cp()()()
+              *T()
            )
         );
 
@@ -93,9 +93,9 @@ License
             << gMin(1/(rDeltaTT.field() + VSMALL)) << ", "
             << gMax(1/(rDeltaTT.field() + VSMALL)) << endl;
 
-        rDeltaT.dimensionedInternalField() = max
+        rDeltaT.ref() = max
         (
-            rDeltaT.dimensionedInternalField(),
+            rDeltaT(),
             rDeltaTT
         );
     }
@@ -126,8 +126,8 @@ License
     }
 
     Info<< "    Overall     = "
-        << gMin(1/rDeltaT.internalField())
-        << ", " << gMax(1/rDeltaT.internalField()) << endl;
+        << gMin(1/rDeltaT.primitiveField())
+        << ", " << gMax(1/rDeltaT.primitiveField()) << endl;
 }
 
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -153,13 +153,13 @@ Foam::InterfaceCompositionModel<Thermo, OtherThermo>::D
         )
     );
 
-    volScalarField& D(tmpD());
+    volScalarField& D(tmpD.ref());
 
-    forAll(p, cellI)
+    forAll(p, celli)
     {
-        D[cellI] =
-            localThermo.alphah(p[cellI], T[cellI])
-           /localThermo.rho(p[cellI], T[cellI]);
+        D[celli] =
+            localThermo.alphah(p[celli], T[celli])
+           /localThermo.rho(p[celli], T[celli]);
     }
 
     D /= Le_;
@@ -207,13 +207,13 @@ Foam::InterfaceCompositionModel<Thermo, OtherThermo>::L
         )
     );
 
-    volScalarField& L(tmpL());
+    volScalarField& L(tmpL.ref());
 
-    forAll(p, cellI)
+    forAll(p, celli)
     {
-        L[cellI] =
-            localThermo.Ha(p[cellI], Tf[cellI])
-          - otherLocalThermo.Ha(otherP[cellI], Tf[cellI]);
+        L[celli] =
+            localThermo.Ha(p[celli], Tf[celli])
+          - otherLocalThermo.Ha(otherP[celli], Tf[celli]);
     }
 
     return tmpL;

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -41,7 +41,7 @@ namespace fvc
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class Type>
-tmp<GeometricField<Type, fvPatchField, volMesh> >
+tmp<GeometricField<Type, fvPatchField, volMesh>>
 average
 (
     const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf
@@ -49,7 +49,7 @@ average
 {
     const fvMesh& mesh = ssf.mesh();
 
-    tmp<GeometricField<Type, fvPatchField, volMesh> > taverage
+    tmp<GeometricField<Type, fvPatchField, volMesh>> taverage
     (
         new GeometricField<Type, fvPatchField, volMesh>
         (
@@ -65,16 +65,16 @@ average
             ssf.dimensions()
         )
     );
+    GeometricField<Type, fvPatchField, volMesh>& av = taverage.ref();
 
-    GeometricField<Type, fvPatchField, volMesh>& av = taverage();
-
-    av.internalField() =
+    av.primitiveFieldRef() =
     (
-        surfaceSum(mesh.magSf()*ssf)/surfaceSum(mesh.magSf())
-    )().internalField();
+        surfaceSum(mesh.magSf()*ssf)().primitiveField()
+       /surfaceSum(mesh.magSf())().primitiveField()
+    );
 
     typename GeometricField<Type, fvPatchField, volMesh>::
-    GeometricBoundaryField& bav = av.boundaryField();
+    Boundary& bav = av.boundaryFieldRef();
 
     forAll(bav, patchi)
     {
@@ -88,13 +88,13 @@ average
 
 
 template<class Type>
-tmp<GeometricField<Type, fvPatchField, volMesh> >
+tmp<GeometricField<Type, fvPatchField, volMesh>>
 average
 (
-    const tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >& tssf
+    const tmp<GeometricField<Type, fvsPatchField, surfaceMesh>>& tssf
 )
 {
-    tmp<GeometricField<Type, fvPatchField, volMesh> > taverage
+    tmp<GeometricField<Type, fvPatchField, volMesh>> taverage
     (
         fvc::average(tssf())
     );
@@ -104,7 +104,7 @@ average
 
 
 template<class Type>
-tmp<GeometricField<Type, fvPatchField, volMesh> >
+tmp<GeometricField<Type, fvPatchField, volMesh>>
 average
 (
     const GeometricField<Type, fvPatchField, volMesh>& vtf
@@ -115,13 +115,13 @@ average
 
 
 template<class Type>
-tmp<GeometricField<Type, fvPatchField, volMesh> >
+tmp<GeometricField<Type, fvPatchField, volMesh>>
 average
 (
-    const tmp<GeometricField<Type, fvPatchField, volMesh> >& tvtf
+    const tmp<GeometricField<Type, fvPatchField, volMesh>>& tvtf
 )
 {
-    tmp<GeometricField<Type, fvPatchField, volMesh> > taverage
+    tmp<GeometricField<Type, fvPatchField, volMesh>> taverage
     (
         fvc::average(tvtf())
     );

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -93,9 +93,9 @@ Foam::label Foam::sampledSets::classifyFields()
 
             if (indices.size())
             {
-                forAll(indices, fieldI)
+                forAll(indices, fieldi)
                 {
-                    const word& fieldName = allFields[indices[fieldI]];
+                    const word& fieldName = allFields[indices[fieldi]];
 
                     nFields += appendFieldGroup
                     (
@@ -106,7 +106,7 @@ Foam::label Foam::sampledSets::classifyFields()
             }
             else
             {
-                WarningIn("sampledSets::classifyFields()")
+                WarningInFunction
                     << "Cannot find field file matching "
                     << fieldSelection_[i] << endl;
             }
@@ -124,9 +124,9 @@ Foam::label Foam::sampledSets::classifyFields()
 
             if (indices.size())
             {
-                forAll(indices, fieldI)
+                forAll(indices, fieldi)
                 {
-                    const word& fieldName = allFields[indices[fieldI]];
+                    const word& fieldName = allFields[indices[fieldi]];
 
                     nFields += appendFieldGroup
                     (
@@ -137,7 +137,7 @@ Foam::label Foam::sampledSets::classifyFields()
             }
             else
             {
-                WarningIn("sampledSets::classifyFields()")
+                WarningInFunction
                     << "Cannot find registered field matching "
                     << fieldSelection_[i] << endl;
             }

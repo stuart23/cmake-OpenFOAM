@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -166,7 +166,7 @@ void Foam::extendedEdgeMesh::sortPointsAndEdges
                 );
         }
 
-        vector fC0tofC1(vector::zero);
+        vector fC0tofC1(Zero);
 
         if (eFaces.size() == 2)
         {
@@ -208,7 +208,7 @@ void Foam::extendedEdgeMesh::sortPointsAndEdges
     }
 
     // Reorder the edges by classification
-    List<DynamicList<label> > allEds(nEdgeTypes);
+    List<DynamicList<label>> allEds(nEdgeTypes);
 
     DynamicList<label>& externalEds(allEds[0]);
     DynamicList<label>& internalEds(allEds[1]);
@@ -242,15 +242,8 @@ void Foam::extendedEdgeMesh::sortPointsAndEdges
         }
         else if (eStat == NONE)
         {
-            FatalErrorIn
-            (
-                ":extendedEdgeMesh::sortPointsAndEdges"
-                "("
-                "    const Patch&,"
-                "    const labelList& featureEdges,"
-                "    const labelList& feaurePoints"
-                ")"
-            )   << nl << "classifyEdge returned NONE on edge "
+            FatalErrorInFunction
+                << nl << "classifyEdge returned NONE on edge "
                 << eds[i]
                 << ". There is a problem with definition of this edge."
                 << nl << abort(FatalError);
@@ -302,7 +295,7 @@ void Foam::extendedEdgeMesh::sortPointsAndEdges
 
     // Reorder the feature points by classification
 
-    List<DynamicList<label> > allPts(3);
+    List<DynamicList<label>> allPts(3);
 
     DynamicList<label>& convexPts(allPts[0]);
     DynamicList<label>& concavePts(allPts[1]);
@@ -326,15 +319,8 @@ void Foam::extendedEdgeMesh::sortPointsAndEdges
         }
         else if (ptStatus == NONFEATURE)
         {
-            FatalErrorIn
-            (
-                ":extendedEdgeMesh::sortPointsAndEdges"
-                "("
-                "    const Patch&,"
-                "    const labelList& featureEdges,"
-                "    const labelList& feaurePoints"
-                ")"
-            )   << nl << "classifyFeaturePoint returned NONFEATURE on point at "
+            FatalErrorInFunction
+                << nl << "classifyFeaturePoint returned NONFEATURE on point at "
                 << points()[i]
                 << ". There is a problem with definition of this feature point."
                 << nl << abort(FatalError);

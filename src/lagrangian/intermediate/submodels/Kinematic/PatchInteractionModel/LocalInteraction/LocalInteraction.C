@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -60,17 +60,17 @@ Foam::LocalInteraction<CloudType>::LocalInteraction
     }
 
     // check that interactions are valid/specified
-    forAll(patchData_, patchI)
+    forAll(patchData_, patchi)
     {
         const word& interactionTypeName =
-            patchData_[patchI].interactionTypeName();
+            patchData_[patchi].interactionTypeName();
         const typename PatchInteractionModel<CloudType>::interactionType& it =
             this->wordToInteractionType(interactionTypeName);
 
         if (it == PatchInteractionModel<CloudType>::itOther)
         {
-            const word& patchName = patchData_[patchI].patchName();
-            FatalErrorIn("LocalInteraction(const dictionary&, CloudType&)")
+            const word& patchName = patchData_[patchi].patchName();
+            FatalErrorInFunction
                 << "Unknown patch interaction type "
                 << interactionTypeName << " for patch " << patchName
                 << ". Valid selections are:"
@@ -176,9 +176,9 @@ bool Foam::LocalInteraction<CloudType>::correct
     const tetIndices& tetIs
 )
 {
-    label patchI = patchData_.applyToPatch(pp.index());
+    label patchi = patchData_.applyToPatch(pp.index());
 
-    if (patchI >= 0)
+    if (patchi >= 0)
     {
         vector& U = p.U();
         bool& active = p.active();
@@ -186,7 +186,7 @@ bool Foam::LocalInteraction<CloudType>::correct
         typename PatchInteractionModel<CloudType>::interactionType it =
             this->wordToInteractionType
             (
-                patchData_[patchI].interactionTypeName()
+                patchData_[patchi].interactionTypeName()
             );
 
         switch (it)
@@ -197,14 +197,14 @@ bool Foam::LocalInteraction<CloudType>::correct
 
                 keepParticle = false;
                 active = false;
-                U = vector::zero;
-                nEscape_[patchI]++;
-                massEscape_[patchI] += dm;
+                U = Zero;
+                nEscape_[patchi]++;
+                massEscape_[patchi] += dm;
                 if (writeFields_)
                 {
                     label pI = pp.index();
                     label fI = pp.whichFace(p.face());
-                    massEscape().boundaryField()[pI][fI] += dm;
+                    massEscape().boundaryFieldRef()[pI][fI] += dm;
                 }
                 break;
             }
@@ -214,14 +214,14 @@ bool Foam::LocalInteraction<CloudType>::correct
 
                 keepParticle = true;
                 active = false;
-                U = vector::zero;
-                nStick_[patchI]++;
-                massStick_[patchI] += dm;
+                U = Zero;
+                nStick_[patchi]++;
+                massStick_[patchi] += dm;
                 if (writeFields_)
                 {
                     label pI = pp.index();
                     label fI = pp.whichFace(p.face());
-                    massStick().boundaryField()[pI][fI] += dm;
+                    massStick().boundaryFieldRef()[pI][fI] += dm;
                 }
                 break;
             }
@@ -243,10 +243,10 @@ bool Foam::LocalInteraction<CloudType>::correct
 
                 if (Un > 0)
                 {
-                    U -= (1.0 + patchData_[patchI].e())*Un*nw;
+                    U -= (1.0 + patchData_[patchi].e())*Un*nw;
                 }
 
-                U -= patchData_[patchI].mu()*Ut;
+                U -= patchData_[patchi].mu()*Ut;
 
                 // Return velocity to global space
                 U += Up;
@@ -255,20 +255,11 @@ bool Foam::LocalInteraction<CloudType>::correct
             }
             default:
             {
-                FatalErrorIn
-                (
-                    "bool LocalInteraction<CloudType>::correct"
-                    "("
-                        "typename CloudType::parcelType&, "
-                        "const polyPatch&, "
-                        "bool&, "
-                        "const scalar, "
-                        "const tetIndices&"
-                    ") const"
-                )   << "Unknown interaction type "
-                    << patchData_[patchI].interactionTypeName()
+                FatalErrorInFunction
+                    << "Unknown interaction type "
+                    << patchData_[patchi].interactionTypeName()
                     << "(" << it << ") for patch "
-                    << patchData_[patchI].patchName()
+                    << patchData_[patchi].patchName()
                     << ". Valid selections are:" << this->interactionTypeNames_
                     << endl << abort(FatalError);
             }
@@ -325,7 +316,7 @@ void Foam::LocalInteraction<CloudType>::info(Ostream& os)
             << ", " << mps[i] << nl;
     }
 
-    if (this->outputTime())
+    if (this->writeTime())
     {
         this->setModelProperty("nEscape", npe);
         nEscape_ = 0;

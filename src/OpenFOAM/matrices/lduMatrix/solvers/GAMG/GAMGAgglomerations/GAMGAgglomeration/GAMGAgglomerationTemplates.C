@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -44,7 +44,7 @@ void Foam::GAMGAgglomeration::gatherList
         allVals.setSize(procIDs.size());
 
         allVals[0] = myVal;
-        for (label i = 1; i < procIDs.size(); i++)
+        for (label i=1; i<procIDs.size(); i++)
         {
             IPstream fromSlave
             (
@@ -81,7 +81,7 @@ void Foam::GAMGAgglomeration::restrictField
     const labelList& fineToCoarse
 ) const
 {
-    cf = pTraits<Type>::zero;
+    cf = Zero;
 
     forAll(ff, i)
     {
@@ -103,12 +103,8 @@ void Foam::GAMGAgglomeration::restrictField
 
     if (!procAgglom && ff.size() != fineToCoarse.size())
     {
-        FatalErrorIn
-        (
-            "void GAMGAgglomeration::restrictField"
-            "(Field<Type>& cf, const Field<Type>& ff, "
-            "const label fineLevelIndex) const"
-        )   << "field does not correspond to level " << fineLevelIndex
+        FatalErrorInFunction
+            << "field does not correspond to level " << fineLevelIndex
             << " sizes: field = " << ff.size()
             << " level = " << fineToCoarse.size()
             << abort(FatalError);
@@ -150,18 +146,14 @@ void Foam::GAMGAgglomeration::restrictFaceField
 
     if (ff.size() != fineToCoarse.size())
     {
-        FatalErrorIn
-        (
-            "void GAMGAgglomeration::restrictFaceField"
-            "(Field<Type>& cf, const Field<Type>& ff, "
-            "const label fineLevelIndex) const"
-        )   << "field does not correspond to level " << fineLevelIndex
+        FatalErrorInFunction
+            << "field does not correspond to level " << fineLevelIndex
             << " sizes: field = " << ff.size()
             << " level = " << fineToCoarse.size()
             << abort(FatalError);
     }
 
-    cf = pTraits<Type>::zero;
+    cf = Zero;
 
     forAll(fineToCoarse, ffacei)
     {

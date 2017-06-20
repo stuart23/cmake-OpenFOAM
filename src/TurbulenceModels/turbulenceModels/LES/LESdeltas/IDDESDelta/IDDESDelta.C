@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -66,7 +66,7 @@ void Foam::LESModels::IDDESDelta::calcDelta()
         )
     );
 
-    scalarField& faceToFacenMax = tfaceToFacenMax().internalField();
+    scalarField& faceToFacenMax = tfaceToFacenMax.ref().primitiveFieldRef();
 
     const cellList& cells = mesh.cells();
     const vectorField& faceCentres = mesh.faceCentres();
@@ -103,17 +103,17 @@ void Foam::LESModels::IDDESDelta::calcDelta()
 
     if (nD == 2)
     {
-        WarningIn("IDDESDelta::calcDelta()")
+        WarningInFunction
             << "Case is 2D, LES is not strictly applicable" << nl
             << endl;
     }
     else if (nD != 3)
     {
-        FatalErrorIn("IDDESDelta::calcDelta()")
+        FatalErrorInFunction
             << "Case must be either 2D or 3D" << exit(FatalError);
     }
 
-    delta_.internalField() =
+    delta_.primitiveFieldRef() =
         min
         (
             max

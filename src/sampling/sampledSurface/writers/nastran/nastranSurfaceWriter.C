@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -87,7 +87,7 @@ void Foam::nastranSurfaceWriter::formatOS(OFstream& os) const
 void Foam::nastranSurfaceWriter::writeCoord
 (
     const point& p,
-    const label pointI,
+    const label pointi,
     OFstream& os
 ) const
 {
@@ -110,7 +110,7 @@ void Foam::nastranSurfaceWriter::writeCoord
             os  << setw(8) << "GRID";
             os.unsetf(ios_base::left);
             os.setf(ios_base::right);
-            os  << setw(8) << pointI + 1
+            os  << setw(8) << pointi + 1
                 << "        " 
                 << setw(8) << p.x()
                 << setw(8) << p.y()
@@ -126,7 +126,7 @@ void Foam::nastranSurfaceWriter::writeCoord
             os  << setw(8) << "GRID*";
             os.unsetf(ios_base::left);
             os.setf(ios_base::right);
-            os  << setw(16) << pointI + 1
+            os  << setw(16) << pointi + 1
                 << "                "
                 << setw(16) << p.x()
                 << setw(16) << p.y()
@@ -145,7 +145,7 @@ void Foam::nastranSurfaceWriter::writeCoord
         case wfFree:
         {
             os  << "GRID"
-                << ',' << pointI + 1
+                << ',' << pointi + 1
                 << ','
                 << ',' << p.x()
                 << ',' << p.y()
@@ -156,14 +156,8 @@ void Foam::nastranSurfaceWriter::writeCoord
         }
         default:
         {
-            FatalErrorIn
-            (
-                "void Foam::nastranSurfaceWriter::writeCoord"
-                "("
-                    "Ostream&, "
-                    "const point&"
-                ") const"
-            )   << "Unknown writeFormat enumeration" << abort(FatalError);
+            FatalErrorInFunction
+                << "Unknown writeFormat enumeration" << abort(FatalError);
         }
     }
 }
@@ -255,16 +249,8 @@ void Foam::nastranSurfaceWriter::writeFace
         }
         default:
         {
-            FatalErrorIn
-            (
-                "void Foam::nastranSurfaceWriter::writeFace"
-                "("
-                    "const word&"
-                    "const labelList&"
-                    "label&"
-                    "Ostream&, "
-                ") const"
-            )   << "Unknown writeFormat enumeration" << abort(FatalError);
+            FatalErrorInFunction
+                << "Unknown writeFormat enumeration" << abort(FatalError);
         }
     }
 
@@ -275,7 +261,7 @@ void Foam::nastranSurfaceWriter::writeGeometry
 (
     const pointField& points,
     const faceList& faces,
-    List<DynamicList<face> >& decomposedFaces,
+    List<DynamicList<face>>& decomposedFaces,
     OFstream& os
 ) const
 {
@@ -285,9 +271,9 @@ void Foam::nastranSurfaceWriter::writeGeometry
         << "$ Points" << nl
         << "$" << nl;
 
-    forAll(points, pointI)
+    forAll(points, pointi)
     {
-        writeCoord(points[pointI], pointI, os);
+        writeCoord(points[pointi], pointi, os);
     }
 
 
@@ -299,19 +285,19 @@ void Foam::nastranSurfaceWriter::writeGeometry
 
     label nFace = 1;
 
-    forAll(faces, faceI)
+    forAll(faces, facei)
     {
-        const face& f = faces[faceI];
+        const face& f = faces[facei];
 
         if (f.size() == 3)
         {
-            writeFace("CTRIA3", faces[faceI], nFace, os);
-            decomposedFaces[faceI].append(faces[faceI]);
+            writeFace("CTRIA3", faces[facei], nFace, os);
+            decomposedFaces[facei].append(faces[facei]);
         }
         else if (f.size() == 4)
         {
-            writeFace("CQUAD4", faces[faceI], nFace, os);
-            decomposedFaces[faceI].append(faces[faceI]);
+            writeFace("CQUAD4", faces[facei], nFace, os);
+            decomposedFaces[facei].append(faces[facei]);
         }
         else
         {
@@ -323,7 +309,7 @@ void Foam::nastranSurfaceWriter::writeGeometry
             forAll(triFaces, triI)
             {
                 writeFace("CTRIA3", triFaces[triI], nFace, os);
-                decomposedFaces[faceI].append(triFaces[triI]);
+                decomposedFaces[facei].append(triFaces[triI]);
             }
         }
     }
@@ -353,7 +339,7 @@ Foam::nastranSurfaceWriter::nastranSurfaceWriter(const dictionary& options)
         writeFormat_ = writeFormatNames_.read(options.lookup("format"));
     }
 
-    List<Tuple2<word, word> > fieldSet(options.lookup("fields"));
+    List<Tuple2<word, word>> fieldSet(options.lookup("fields"));
 
     forAll(fieldSet, i)
     {
@@ -396,7 +382,7 @@ void Foam::nastranSurfaceWriter::write
         << "$" << nl
         << "BEGIN BULK" << nl;
 
-    List<DynamicList<face> > decomposedFaces(faces.size());
+    List<DynamicList<face>> decomposedFaces(faces.size());
 
     writeGeometry(points, faces, decomposedFaces, os);
 

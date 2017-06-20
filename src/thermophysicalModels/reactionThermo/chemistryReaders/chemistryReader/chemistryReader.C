@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class ThermoType>
-Foam::autoPtr<Foam::chemistryReader<ThermoType> >
+Foam::autoPtr<Foam::chemistryReader<ThermoType>>
 Foam::chemistryReader<ThermoType>::New
 (
     const dictionary& thermoDict,
@@ -49,17 +49,15 @@ Foam::chemistryReader<ThermoType>::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "chemistryReader::New(const dictionary&, speciesTable&)"
-        )   << "Unknown chemistryReader type "
+        FatalErrorInFunction
+            << "Unknown chemistryReader type "
             << chemistryReaderTypeName << nl << nl
             << "Valid chemistryReader types are:" << nl
             << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 
-    return autoPtr<chemistryReader<ThermoType> >
+    return autoPtr<chemistryReader<ThermoType>>
     (
         cstrIter()(thermoDict, species)
     );

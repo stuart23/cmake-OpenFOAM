@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,7 +24,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "XiEqModel.H"
-#include "zeroGradientFvPatchFields.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -111,40 +110,31 @@ Foam::XiEqModel::calculateSchelkinEffect(const scalar uPrimeCoef) const
                 false
             ),
             mesh,
-            dimensionedScalar("zero", Nv.dimensions(), 0.0),
-            zeroGradientFvPatchVectorField::typeName
+            dimensionedScalar("zero", Nv.dimensions(), 0.0)
         )
     );
+    volScalarField& N = tN.ref();
+    N.primitiveFieldRef() = Nv.primitiveField()*pow(mesh.V(), 2.0/3.0);
 
-    volScalarField& N = tN();
-
-    N.internalField() = Nv.internalField()*pow(mesh.V(), 2.0/3.0);
-
-    tmp<volSymmTensorField> tns
+    volSymmTensorField ns
     (
-        new volSymmTensorField
+        IOobject
         (
-            IOobject
-            (
-                "tns",
-                mesh.time().timeName(),
-                mesh,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
+            "tns",
+            mesh.time().timeName(),
             mesh,
-            dimensionedSymmTensor
-            (
-                "zero",
-                nsv.dimensions(),
-                pTraits<symmTensor>::zero
-            )
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedSymmTensor
+        (
+            "zero",
+            nsv.dimensions(),
+            Zero
         )
     );
-
-    volSymmTensorField& ns = tns();
-
-    ns.internalField() = nsv.internalField()*pow(mesh.V(), 2.0/3.0);
+    ns.primitiveFieldRef() = nsv.primitiveField()*pow(mesh.V(), 2.0/3.0);
 
     const volVectorField Uhat
     (
@@ -160,7 +150,7 @@ Foam::XiEqModel::calculateSchelkinEffect(const scalar uPrimeCoef) const
     const scalarField deltaUp(upLocal*(max(scalar(1.0), pow(nr, 0.5)) - 1.0));
 
     // Re use tN
-    N.internalField() = upLocal*(max(scalar(1.0), pow(nr, 0.5)) - 1.0);
+    N.primitiveFieldRef() = upLocal*(max(scalar(1.0), pow(nr, 0.5)) - 1.0);
 
     return tN;
 }

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -31,7 +31,7 @@ License
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::autoPtr< Foam::writer<Type> > Foam::writer<Type>::New
+Foam::autoPtr<Foam::writer<Type>> Foam::writer<Type>::New
 (
     const word& writeType
 )
@@ -41,17 +41,15 @@ Foam::autoPtr< Foam::writer<Type> > Foam::writer<Type>::New
 
     if (cstrIter == wordConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "writer::New(const word&)"
-        )   << "Unknown write type "
+        FatalErrorInFunction
+            << "Unknown write type "
             << writeType << nl << nl
             << "Valid write types : " << endl
             << wordConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 
-    return autoPtr<writer<Type> >(cstrIter()());
+    return autoPtr<writer<Type>>(cstrIter()());
 }
 
 
@@ -79,17 +77,17 @@ template<class Type>
 void Foam::writer<Type>::writeCoord
 (
     const coordSet& points,
-    const label pointI,
+    const label pointi,
     Ostream& os
 ) const
 {
     if (points.hasVectorAxis())
     {
-        write(points.vectorCoord(pointI), os);
+        write(points.vectorCoord(pointi), os);
     }
     else
     {
-        write(points.scalarCoord(pointI), os);
+        write(points.scalarCoord(pointi), os);
     }
 }
 
@@ -102,11 +100,11 @@ void Foam::writer<Type>::writeTable
     Ostream& os
 ) const
 {
-    forAll(points, pointI)
+    forAll(points, pointi)
     {
-        writeCoord(points, pointI, os);
+        writeCoord(points, pointi, os);
         writeSeparator(os);
-        write(values[pointI], os);
+        write(values[pointi], os);
         os << nl;
     }
 }
@@ -120,16 +118,16 @@ void Foam::writer<Type>::writeTable
     Ostream& os
 ) const
 {
-    forAll(points, pointI)
+    forAll(points, pointi)
     {
-        writeCoord(points, pointI, os);
+        writeCoord(points, pointi, os);
 
         forAll(valuesPtrList, i)
         {
             writeSeparator(os);
 
             const List<Type>& values = *valuesPtrList[i];
-            write(values[pointI], os);
+            write(values[pointi], os);
         }
         os << nl;
     }
@@ -157,7 +155,7 @@ void Foam::writer<Type>::write
 (
     const coordSet& points,
     const wordList& valueSetNames,
-    const List<Field<Type> >& valueSets,
+    const List<Field<Type>>& valueSets,
     Ostream& os
 ) const
 {

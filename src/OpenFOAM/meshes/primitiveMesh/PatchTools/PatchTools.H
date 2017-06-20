@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -47,6 +47,8 @@ SourceFiles
 
 #include "PrimitivePatch.H"
 #include "HashSet.H"
+#include "globalIndex.H"
+#include "autoPtr.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -84,7 +86,7 @@ public:
 
 
     //- Fill faceZone with currentZone for every face reachable
-    //  from faceI without crossing edge marked in borderEdge.
+    //  from facei without crossing edge marked in borderEdge.
     //  Note: faceZone has to be sized nFaces before calling.
     template
     <
@@ -98,7 +100,7 @@ public:
     (
         const PrimitivePatch<Face, FaceList, PointField, PointType>&,
         const BoolListType& borderEdge,
-        const label faceI,
+        const label facei,
         const label currentZone,
         labelList& faceZone
     );
@@ -123,6 +125,7 @@ public:
 
     //- Determine the mapping for a sub-patch.
     //  Only include faces for which bool-list entry is true.
+    //  \param[in]  p patch to be searched on
     //  \param[in]  includeFaces faces to include
     //  \param[out] pointMap mapping new to old localPoints
     //  \param[out] faceMap  mapping new to old faces
@@ -136,7 +139,7 @@ public:
     >
     static void subsetMap
     (
-        const PrimitivePatch<Face, FaceList, PointField, PointType>&,
+        const PrimitivePatch<Face, FaceList, PointField, PointType>& p,
         const BoolListType& includeFaces,
         labelList& pointMap,
         labelList& faceMap
@@ -300,6 +303,33 @@ public:
         List<Face>& mergedFaces,
         labelList& pointMergeMap
     );
+
+    //- Gather (mesh!) points and faces onto master and merge collocated
+    //  points into a single patch. Uses coupled point mesh
+    //  structure so does not need tolerances.
+    //  On master and slave returns:
+    //  - pointToGlobal : for every local point index the global point index
+    //  - uniqueMeshPointLabels : my local mesh points
+    //  - globalPoints : global numbering for the global points
+    //  - globalFaces : global numbering for the faces
+    //  On master only:
+    //  - mergedFaces : the merged faces
+    //  - mergedPoints : the merged points
+    template<class FaceList>
+    static void gatherAndMerge
+    (
+        const polyMesh& mesh,
+        const FaceList& faces,
+        const labelList& meshPoints,
+        const Map<label>& meshPointMap,
+
+        labelList& pointToGlobal,
+        labelList& uniqueMeshPointLabels,
+        autoPtr<globalIndex>& globalPoints,
+        autoPtr<globalIndex>& globalFaces,
+        List<typename FaceList::value_type>& mergedFaces,
+        pointField& mergedPoints
+    );
 };
 
 
@@ -310,7 +340,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "PatchTools.C"
+    #include "PatchTools.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

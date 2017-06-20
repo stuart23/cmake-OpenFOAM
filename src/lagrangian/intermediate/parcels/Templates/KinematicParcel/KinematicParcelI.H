@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -74,24 +74,24 @@ inline Foam::KinematicParcel<ParcelType>::KinematicParcel
 (
     const polyMesh& owner,
     const vector& position,
-    const label cellI,
-    const label tetFaceI,
+    const label celli,
+    const label tetFacei,
     const label tetPtI
 )
 :
-    ParcelType(owner, position, cellI, tetFaceI, tetPtI),
+    ParcelType(owner, position, celli, tetFacei, tetPtI),
     active_(true),
     typeId_(-1),
     nParticle_(0),
     d_(0.0),
     dTarget_(0.0),
-    U_(vector::zero),
+    U_(Zero),
     rho_(0.0),
     age_(0.0),
     tTurb_(0.0),
-    UTurb_(vector::zero),
+    UTurb_(Zero),
     rhoc_(0.0),
-    Uc_(vector::zero),
+    Uc_(Zero),
     muc_(0.0)
 {}
 
@@ -101,8 +101,8 @@ inline Foam::KinematicParcel<ParcelType>::KinematicParcel
 (
     const polyMesh& owner,
     const vector& position,
-    const label cellI,
-    const label tetFaceI,
+    const label celli,
+    const label tetFacei,
     const label tetPtI,
     const label typeId,
     const scalar nParticle0,
@@ -112,7 +112,7 @@ inline Foam::KinematicParcel<ParcelType>::KinematicParcel
     const constantProperties& constProps
 )
 :
-    ParcelType(owner, position, cellI, tetFaceI, tetPtI),
+    ParcelType(owner, position, celli, tetFacei, tetPtI),
     active_(true),
     typeId_(typeId),
     nParticle_(nParticle0),
@@ -122,9 +122,9 @@ inline Foam::KinematicParcel<ParcelType>::KinematicParcel
     rho_(constProps.rho0()),
     age_(0.0),
     tTurb_(0.0),
-    UTurb_(vector::zero),
+    UTurb_(Zero),
     rhoc_(0.0),
-    Uc_(vector::zero),
+    Uc_(Zero),
     muc_(0.0)
 {}
 
@@ -352,10 +352,10 @@ inline Foam::label Foam::KinematicParcel<ParcelType>::faceInterpolation() const
 template<class ParcelType>
 inline Foam::scalar Foam::KinematicParcel<ParcelType>::massCell
 (
-    const label cellI
+    const label celli
 ) const
 {
-    return rhoc_*this->mesh().cellVolumes()[cellI];
+    return rhoc_*this->mesh().cellVolumes()[celli];
 }
 
 

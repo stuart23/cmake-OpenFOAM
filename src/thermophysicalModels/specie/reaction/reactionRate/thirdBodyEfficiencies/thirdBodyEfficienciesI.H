@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -38,11 +38,8 @@ inline Foam::thirdBodyEfficiencies::thirdBodyEfficiencies
 {
     if (size() != species_.size())
     {
-        FatalErrorIn
-        (
-            "thirdBodyEfficiencies::thirdBodyEfficiencies"
-            "(const speciesTable& species, const scalarList& efficiencies)"
-        )   << "number of efficiencies = " << size()
+        FatalErrorInFunction
+            << "number of efficiencies = " << size()
             << " is not equal to the number of species " << species_.size()
             << exit(FatalError);
     }
@@ -76,10 +73,8 @@ inline Foam::thirdBodyEfficiencies::thirdBodyEfficiencies
         }
         else
         {
-            FatalIOErrorIn
+            FatalIOErrorInFunction
             (
-                "thirdBodyEfficiencies::thirdBodyEfficiencies"
-                "(const speciesTable& species, Istream& is)",
                 is
             )   << "expected <word>, found " << t.info()
                 << exit(FatalIOError);
@@ -88,10 +83,8 @@ inline Foam::thirdBodyEfficiencies::thirdBodyEfficiencies
 
     if (t.pToken() != token::END_LIST)
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "thirdBodyEfficiencies::thirdBodyEfficiencies"
-            "(const speciesTable& species, Istream& is)",
             is
         )   << "expected ')', found " << t.info()
             << exit(FatalIOError);
@@ -99,10 +92,8 @@ inline Foam::thirdBodyEfficiencies::thirdBodyEfficiencies
 
     if (size() != species_.size())
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "thirdBodyEfficiencies::thirdBodyEfficiencies"
-            "(const speciesTable& species, Istream& is)",
             is
         )   << "number of efficiencies = " << size()
             << " is not equal to the number of species " << species_.size()
@@ -122,14 +113,11 @@ inline Foam::thirdBodyEfficiencies::thirdBodyEfficiencies
 {
     if (dict.found("coeffs"))
     {
-        List<Tuple2<word, scalar> > coeffs(dict.lookup("coeffs"));
+        List<Tuple2<word, scalar>> coeffs(dict.lookup("coeffs"));
         if (coeffs.size() != species_.size())
         {
-            FatalErrorIn
-            (
-                "thirdBodyEfficiencies::thirdBodyEfficiencies"
-                "(const speciesTable&, const dictionary&)"
-            )   << "number of efficiencies = " << coeffs.size()
+            FatalErrorInFunction
+                << "number of efficiencies = " << coeffs.size()
                 << " is not equat to the number of species " << species_.size()
                 << exit(FatalIOError);
         }
@@ -163,7 +151,7 @@ inline Foam::scalar Foam::thirdBodyEfficiencies::M(const scalarList& c) const
 
 inline void Foam::thirdBodyEfficiencies::write(Ostream& os) const
 {
-    List<Tuple2<word, scalar> > coeffs(species_.size());
+    List<Tuple2<word, scalar>> coeffs(species_.size());
     forAll(coeffs, i)
     {
         coeffs[i].first() = species_[i];

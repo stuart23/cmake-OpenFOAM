@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -39,7 +39,6 @@ Description
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Constructor from components
 Foam::labelList Foam::bandCompression(const labelListList& cellCellAddressing)
 {
     labelList newOrder(cellCellAddressing.size());
@@ -69,15 +68,15 @@ Foam::labelList Foam::bandCompression(const labelListList& cellCellAddressing)
         label currentCell = -1;
         label minWeight = labelMax;
 
-        forAll(visited, cellI)
+        forAll(visited, celli)
         {
             // find the lowest connected cell that has not been visited yet
-            if (!visited[cellI])
+            if (!visited[celli])
             {
-                if (cellCellAddressing[cellI].size() < minWeight)
+                if (cellCellAddressing[celli].size() < minWeight)
                 {
-                    minWeight = cellCellAddressing[cellI].size();
-                    currentCell = cellI;
+                    minWeight = cellCellAddressing[celli].size();
+                    currentCell = celli;
                 }
             }
         }
@@ -154,15 +153,15 @@ Foam::labelList Foam::bandCompression
 {
     // Count number of neighbours
     labelList numNbrs(offsets.size()-1, 0);
-    forAll(numNbrs, cellI)
+    forAll(numNbrs, celli)
     {
-        label start = offsets[cellI];
-        label end = offsets[cellI+1];
+        label start = offsets[celli];
+        label end = offsets[celli+1];
 
-        for (label faceI = start; faceI < end; faceI++)
+        for (label facei = start; facei < end; facei++)
         {
-            numNbrs[cellI]++;
-            numNbrs[cellCells[faceI]]++;
+            numNbrs[celli]++;
+            numNbrs[cellCells[facei]]++;
         }
     }
 
@@ -194,15 +193,15 @@ Foam::labelList Foam::bandCompression
         label currentCell = -1;
         label minWeight = labelMax;
 
-        forAll(visited, cellI)
+        forAll(visited, celli)
         {
             // find the lowest connected cell that has not been visited yet
-            if (!visited[cellI])
+            if (!visited[celli])
             {
-                if (numNbrs[cellI] < minWeight)
+                if (numNbrs[celli] < minWeight)
                 {
-                    minWeight = numNbrs[cellI];
-                    currentCell = cellI;
+                    minWeight = numNbrs[celli];
+                    currentCell = celli;
                 }
             }
         }
@@ -246,9 +245,9 @@ Foam::labelList Foam::bandCompression
                 label start = offsets[currentCell];
                 label end = offsets[currentCell+1];
 
-                for (label faceI = start; faceI < end; faceI++)
+                for (label facei = start; facei < end; facei++)
                 {
-                    label nbr = cellCells[faceI];
+                    label nbr = cellCells[facei];
                     if (!visited[nbr])
                     {
                         // not visited, add to the list

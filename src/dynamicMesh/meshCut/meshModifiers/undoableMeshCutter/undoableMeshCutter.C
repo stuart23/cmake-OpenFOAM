@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -115,17 +115,14 @@ void Foam::undoableMeshCutter::updateLabels
 
         if (!splitPtr)
         {
-            FatalErrorIn
-            (
-                "undoableMeshCutter::updateLabels"
-                "(const labelList&, Map<splitCell*>&)"
-            )   << "Problem: null pointer on liveSplitCells list"
+            FatalErrorInFunction
+                << "Problem: null pointer on liveSplitCells list"
                 << abort(FatalError);
         }
 
-        label cellI = splitPtr->cellLabel();
+        label celli = splitPtr->cellLabel();
 
-        if (cellI != map[cellI])
+        if (celli != map[celli])
         {
             changed = true;
 
@@ -146,25 +143,25 @@ void Foam::undoableMeshCutter::updateLabels
         {
             splitCell* splitPtr = iter();
 
-            label cellI = splitPtr->cellLabel();
+            label celli = splitPtr->cellLabel();
 
-            label newCellI = map[cellI];
+            label newCelli = map[celli];
 
-            if (debug && (cellI != newCellI))
+            if (debug && (celli != newCelli))
             {
                 Pout<< "undoableMeshCutter::updateLabels :"
-                    << " Updating live (split)cell from " << cellI
-                    << " to " << newCellI << endl;
+                    << " Updating live (split)cell from " << celli
+                    << " to " << newCelli << endl;
             }
 
-            if (newCellI >= 0)
+            if (newCelli >= 0)
             {
-                // Update splitCell. Can do inplace since only one cellI will
+                // Update splitCell. Can do inplace since only one celli will
                 // refer to this structure.
-                splitPtr->cellLabel() = newCellI;
+                splitPtr->cellLabel() = newCelli;
 
                 // Update liveSplitCells
-                newLiveSplitCells.insert(newCellI, splitPtr);
+                newLiveSplitCells.insert(newCelli, splitPtr);
             }
         }
         liveSplitCells = newLiveSplitCells;
@@ -242,29 +239,29 @@ void Foam::undoableMeshCutter::setRefinement
         // Use cells cut in this iteration to update splitCell tree.
         forAllConstIter(Map<label>, addedCells(), iter)
         {
-            label cellI = iter.key();
+            label celli = iter.key();
 
-            label addedCellI = iter();
+            label addedCelli = iter();
 
 
-            // Newly created split cell. (cellI ->  cellI + addedCellI)
+            // Newly created split cell. (celli ->  celli + addedCelli)
 
-            // Check if cellI already part of split.
+            // Check if celli already part of split.
             Map<splitCell*>::iterator findCell =
-                liveSplitCells_.find(cellI);
+                liveSplitCells_.find(celli);
 
             if (findCell == liveSplitCells_.end())
             {
-                // CellI not yet split. It cannot be unlive split cell
+                // Celli not yet split. It cannot be unlive split cell
                 // since that would be illegal to split in the first
                 // place.
 
                 // Create 0th level. Null parent to denote this.
-                splitCell* parentPtr = new splitCell(cellI, NULL);
+                splitCell* parentPtr = new splitCell(celli, NULL);
 
-                splitCell* masterPtr = new splitCell(cellI, parentPtr);
+                splitCell* masterPtr = new splitCell(celli, parentPtr);
 
-                splitCell* slavePtr = new splitCell(addedCellI, parentPtr);
+                splitCell* slavePtr = new splitCell(addedCelli, parentPtr);
 
                 // Store newly created cells on parent together with face
                 // that splits them
@@ -273,15 +270,15 @@ void Foam::undoableMeshCutter::setRefinement
 
                 // Insert master and slave into live splitcell list
 
-                if (liveSplitCells_.found(addedCellI))
+                if (liveSplitCells_.found(addedCelli))
                 {
-                    FatalErrorIn("undoableMeshCutter::setRefinement")
-                        << "problem addedCell:" << addedCellI
+                    FatalErrorInFunction
+                        << "problem addedCell:" << addedCelli
                         << abort(FatalError);
                 }
 
-                liveSplitCells_.insert(cellI, masterPtr);
-                liveSplitCells_.insert(addedCellI, slavePtr);
+                liveSplitCells_.insert(celli, masterPtr);
+                liveSplitCells_.insert(addedCelli, slavePtr);
             }
             else
             {
@@ -291,9 +288,9 @@ void Foam::undoableMeshCutter::setRefinement
                 // It is no longer live
                 liveSplitCells_.erase(findCell);
 
-                splitCell* masterPtr = new splitCell(cellI, parentPtr);
+                splitCell* masterPtr = new splitCell(celli, parentPtr);
 
-                splitCell* slavePtr = new splitCell(addedCellI, parentPtr);
+                splitCell* slavePtr = new splitCell(addedCelli, parentPtr);
 
                 // Store newly created cells on parent together with face
                 // that splits them
@@ -302,15 +299,15 @@ void Foam::undoableMeshCutter::setRefinement
 
                 // Insert master and slave into live splitcell list
 
-                if (liveSplitCells_.found(addedCellI))
+                if (liveSplitCells_.found(addedCelli))
                 {
-                    FatalErrorIn("undoableMeshCutter::setRefinement")
-                        << "problem addedCell:" << addedCellI
+                    FatalErrorInFunction
+                        << "problem addedCell:" << addedCelli
                         << abort(FatalError);
                 }
 
-                liveSplitCells_.insert(cellI, masterPtr);
-                liveSplitCells_.insert(addedCellI, slavePtr);
+                liveSplitCells_.insert(celli, masterPtr);
+                liveSplitCells_.insert(addedCelli, slavePtr);
             }
         }
 
@@ -346,7 +343,7 @@ Foam::labelList Foam::undoableMeshCutter::getSplitFaces() const
 {
     if (!undoable_)
     {
-        FatalErrorIn("undoableMeshCutter::getSplitFaces()")
+        FatalErrorInFunction
             << "Only call if constructed with unrefinement capability"
             << abort(FatalError);
     }
@@ -359,7 +356,7 @@ Foam::labelList Foam::undoableMeshCutter::getSplitFaces() const
 
         if (!splitPtr->parent())
         {
-            FatalErrorIn("undoableMeshCutter::getSplitFaces()")
+            FatalErrorInFunction
                 << "Live split cell without parent" << endl
                 << "splitCell:" << splitPtr->cellLabel()
                 << abort(FatalError);
@@ -380,19 +377,19 @@ Foam::labelList Foam::undoableMeshCutter::getSplitFaces() const
                 // Both master and slave are live and are not refined.
                 // Find common face.
 
-                label cellI = splitPtr->cellLabel();
+                label celli = splitPtr->cellLabel();
 
-                label slaveCellI = slavePtr->cellLabel();
+                label slaveCelli = slavePtr->cellLabel();
 
-                label commonFaceI =
+                label commonFacei =
                     meshTools::getSharedFace
                     (
                         mesh(),
-                        cellI,
-                        slaveCellI
+                        celli,
+                        slaveCelli
                     );
 
-                liveSplitFaces.append(commonFaceI);
+                liveSplitFaces.append(commonFacei);
             }
         }
     }
@@ -407,7 +404,7 @@ Foam::Map<Foam::label> Foam::undoableMeshCutter::getAddedCells() const
 
     if (!undoable_)
     {
-        FatalErrorIn("undoableMeshCutter::getAddedCells()")
+        FatalErrorInFunction
             << "Only call if constructed with unrefinement capability"
             << abort(FatalError);
     }
@@ -420,7 +417,7 @@ Foam::Map<Foam::label> Foam::undoableMeshCutter::getAddedCells() const
 
         if (!splitPtr->parent())
         {
-            FatalErrorIn("undoableMeshCutter::getAddedCells()")
+            FatalErrorInFunction
                 << "Live split cell without parent" << endl
                 << "splitCell:" << splitPtr->cellLabel()
                 << abort(FatalError);
@@ -455,7 +452,7 @@ Foam::labelList Foam::undoableMeshCutter::removeSplitFaces
 {
     if (!undoable_)
     {
-        FatalErrorIn("undoableMeshCutter::removeSplitFaces(const labelList&)")
+        FatalErrorInFunction
             << "Only call if constructed with unrefinement capability"
             << abort(FatalError);
     }
@@ -479,10 +476,8 @@ Foam::labelList Foam::undoableMeshCutter::removeSplitFaces
         Pout<< "cellRegion:" << cellRegion << endl;
         Pout<< "cellRegionMaster:" << cellRegionMaster << endl;
 
-        FatalErrorIn
-        (
-            "undoableMeshCutter::removeSplitFaces(const labelList&)"
-        )   << "Faces to remove:" << splitFaces << endl
+        FatalErrorInFunction
+            << "Faces to remove:" << splitFaces << endl
             << "to be removed:" << facesToRemove
             << abort(FatalError);
     }
@@ -492,20 +487,18 @@ Foam::labelList Foam::undoableMeshCutter::removeSplitFaces
     // into owner.
     forAll(facesToRemove, facesToRemoveI)
     {
-        label faceI = facesToRemove[facesToRemoveI];
+        label facei = facesToRemove[facesToRemoveI];
 
-        if (!mesh().isInternalFace(faceI))
+        if (!mesh().isInternalFace(facei))
         {
-            FatalErrorIn
-            (
-                "undoableMeshCutter::removeSplitFaces(const labelList&)"
-            )   << "Trying to remove face that is not internal"
+            FatalErrorInFunction
+                << "Trying to remove face that is not internal"
                 << abort(FatalError);
         }
 
-        label own = mesh().faceOwner()[faceI];
+        label own = mesh().faceOwner()[facei];
 
-        label nbr = mesh().faceNeighbour()[faceI];
+        label nbr = mesh().faceNeighbour()[facei];
 
         Map<splitCell*>::iterator ownFind = liveSplitCells_.find(own);
 
@@ -534,7 +527,7 @@ Foam::labelList Foam::undoableMeshCutter::removeSplitFaces
 
             if (debug)
             {
-                Pout<< "Updating for removed splitFace " << faceI
+                Pout<< "Updating for removed splitFace " << facei
                     << " own:" << own <<  " nbr:" << nbr
                     << " ownPtr:" << ownPtr->cellLabel()
                     << " nbrPtr:" << nbrPtr->cellLabel()
@@ -542,29 +535,23 @@ Foam::labelList Foam::undoableMeshCutter::removeSplitFaces
             }
             if (!parentPtr)
             {
-                FatalErrorIn
-                (
-                    "undoableMeshCutter::removeSplitFaces(const labelList&)"
-                )   << "No parent for owner " << ownPtr->cellLabel()
+                FatalErrorInFunction
+                    << "No parent for owner " << ownPtr->cellLabel()
                     << abort(FatalError);
             }
 
             if (!nbrPtr->parent())
             {
-                FatalErrorIn
-                (
-                    "undoableMeshCutter::removeSplitFaces(const labelList&)"
-                )   << "No parent for neighbour " << nbrPtr->cellLabel()
+                FatalErrorInFunction
+                    << "No parent for neighbour " << nbrPtr->cellLabel()
                     << abort(FatalError);
             }
 
             if (parentPtr != nbrPtr->parent())
             {
-                FatalErrorIn
-                (
-                    "undoableMeshCutter::removeSplitFaces(const labelList&)"
-                )   << "Owner and neighbour liveSplitCell entries do not have"
-                    << " same parent. faceI:" << faceI << "  owner:" << own
+                FatalErrorInFunction
+                    << "Owner and neighbour liveSplitCell entries do not have"
+                    << " same parent. facei:" << facei << "  owner:" << own
                     << "  ownparent:" << parentPtr->cellLabel()
                     << " neighbour:" << nbr
                     << "  nbrparent:" << nbrPtr->parent()->cellLabel()
@@ -579,10 +566,8 @@ Foam::labelList Foam::undoableMeshCutter::removeSplitFaces
             )
             {
                 // Live owner and neighbour are refined themselves.
-                FatalErrorIn
-                (
-                    "undoableMeshCutter::removeSplitFaces(const labelList&)"
-                )   << "Owner and neighbour liveSplitCell entries are"
+                FatalErrorInFunction
+                    << "Owner and neighbour liveSplitCell entries are"
                     << " refined themselves or the parent is not refined"
                     << endl
                     << "owner unrefined:" << ownPtr->isUnrefined()

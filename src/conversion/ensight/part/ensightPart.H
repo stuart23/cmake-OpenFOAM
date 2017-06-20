@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -50,6 +50,14 @@ SourceFiles
 
 namespace Foam
 {
+
+// Forward declaration of friend functions and operators
+
+class ensightPart;
+
+Ostream& operator<<(Ostream&, const ensightPart&);
+ensightGeoFile& operator<<(ensightGeoFile&, const ensightPart&);
+
 
 /*---------------------------------------------------------------------------*\
                          Class ensightPart Declaration
@@ -340,7 +348,7 @@ public:
         //- Disallow default bitwise assignment
         void operator=(const ensightPart&)
         {
-            notImplemented("ensightPart::operator=(const ensightPart&)");
+            NotImplemented;
         }
 
 
@@ -362,7 +370,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "ensightPartTemplates.C"
+    #include "ensightPartTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

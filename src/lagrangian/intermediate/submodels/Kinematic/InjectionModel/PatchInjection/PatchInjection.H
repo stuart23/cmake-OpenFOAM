@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,15 +25,18 @@ Class
     Foam::PatchInjection
 
 Description
-    Patch injection
-    - User specifies
+    Patch injection.
+
+    User specifies:
       - Total mass to inject
       - Name of patch
       - Injection duration
       - Initial parcel velocity
       - Injection volume flow rate
-    - Parcel diameters obtained by distribution model
-    - Parcels injected randomly across the patch
+
+    Properties:
+      - Parcel diameters obtained by distribution model
+      - Parcels injected randomly across the patch
 
 SourceFiles
     PatchInjection.C
@@ -52,7 +55,7 @@ namespace Foam
 {
 
 template<class Type>
-class TimeDataEntry;
+class TimeFunction1;
 
 class distributionModel;
 
@@ -78,7 +81,7 @@ class PatchInjection
         const vector U0_;
 
         //- Flow rate profile relative to SOI []
-        const TimeDataEntry<scalar> flowRateProfile_;
+        const TimeFunction1<scalar> flowRateProfile_;
 
         //- Parcel size distribution model
         const autoPtr<distributionModels::distributionModel> sizeDistribution_;
@@ -104,9 +107,9 @@ public:
         PatchInjection(const PatchInjection<CloudType>& im);
 
         //- Construct and return a clone
-        virtual autoPtr<InjectionModel<CloudType> > clone() const
+        virtual autoPtr<InjectionModel<CloudType>> clone() const
         {
-            return autoPtr<InjectionModel<CloudType> >
+            return autoPtr<InjectionModel<CloudType>>
             (
                 new PatchInjection<CloudType>(*this)
             );
@@ -148,7 +151,7 @@ public:
                 const scalar time,
                 vector& position,
                 label& cellOwner,
-                label& tetFaceI,
+                label& tetFacei,
                 label& tetPtI
             );
 
@@ -176,7 +179,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "PatchInjection.C"
+    #include "PatchInjection.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

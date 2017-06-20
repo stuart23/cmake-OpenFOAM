@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -127,6 +127,10 @@ public:
         //- Return the Reynolds stress tensor
         virtual tmp<volSymmTensorField> R() const;
 
+        //- Validate the turbulence fields after construction
+        //  Update turbulence viscosity and other derived fields as requires
+        virtual void validate();
+
         //- Solve the turbulence equations and correct the turbulence viscosity
         virtual void correct() = 0;
 };
@@ -139,7 +143,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "eddyViscosity.C"
+    #include "eddyViscosity.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

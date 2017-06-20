@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -40,7 +40,7 @@ const Foam::word Foam::functionEntries::includeEntry::typeName
 // might include includeEntry
 int Foam::functionEntries::includeEntry::debug(0);
 
-bool Foam::functionEntries::includeEntry::report(false);
+bool Foam::functionEntries::includeEntry::log(false);
 
 
 namespace Foam
@@ -131,7 +131,7 @@ bool Foam::functionEntries::includeEntry::execute
 
     if (ifs)
     {
-        if (Foam::functionEntries::includeEntry::report)
+        if (Foam::functionEntries::includeEntry::log)
         {
             Info<< fName << endl;
         }
@@ -140,10 +140,8 @@ bool Foam::functionEntries::includeEntry::execute
     }
     else
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "functionEntries::includeEntry::includeEntry"
-            "(dictionary& parentDict, Istream&)",
             is
         )   << "Cannot open include file "
             << (ifs.name().size() ? ifs.name() : rawFName)
@@ -171,7 +169,7 @@ bool Foam::functionEntries::includeEntry::execute
 
     if (ifs)
     {
-        if (Foam::functionEntries::includeEntry::report)
+        if (Foam::functionEntries::includeEntry::log)
         {
             Info<< fName << endl;
         }
@@ -180,10 +178,8 @@ bool Foam::functionEntries::includeEntry::execute
     }
     else
     {
-        FatalIOErrorIn
+        FatalIOErrorInFunction
         (
-            "functionEntries::includeEntry::includeEntry"
-            "(dictionary& parentDict, primitiveEntry&, Istream&)",
             is
         )   << "Cannot open include file "
             << (ifs.name().size() ? ifs.name() : rawFName)

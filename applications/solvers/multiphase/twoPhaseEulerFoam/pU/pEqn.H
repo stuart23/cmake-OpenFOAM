@@ -70,18 +70,10 @@ tmp<surfaceScalarField> phiF2;
     surfaceScalarField snGradAlpha1(fvc::snGrad(alpha1)*mesh.magSf());
 
     // Phase-1 dispersion, lift and wall-lubrication flux
-    phiF1 =
-    (
-        Df1*snGradAlpha1
-      + (fvc::interpolate(rAU1*F) & mesh.Sf())
-    );
+    phiF1 = Df1*snGradAlpha1 + fvc::flux(rAU1*F);
 
     // Phase-1 dispersion, lift and wall-lubrication flux
-    phiF2 =
-    (
-      - Df2*snGradAlpha1
-      - (fvc::interpolate(rAU2*F) & mesh.Sf())
-    );
+    phiF2 = - Df2*snGradAlpha1 - fvc::flux(rAU2*F);
 }
 
 
@@ -90,6 +82,11 @@ while (pimple.correct())
 {
     // Update continuity errors due to temperature changes
     #include "correctContErrs.H"
+
+    volScalarField rho("rho", fluid.rho());
+
+    // Correct p_rgh for consistency with p and the updated densities
+    p_rgh = p - rho*gh;
 
     // Correct fixed-flux BCs to be consistent with the velocity BCs
     MRF.correctBoundaryFlux(U1, phi1);
@@ -121,9 +118,6 @@ while (pimple.correct())
            *rho2*U2.oldTime()/runTime.deltaT()
         );
 
-    // Mean density for buoyancy force and p_rgh -> p
-    volScalarField rho("rho", fluid.rho());
-
     surfaceScalarField ghSnGradRho
     (
         "ghSnGradRho",
@@ -154,17 +148,25 @@ while (pimple.correct())
     surfaceScalarField phiCorrCoeff1(pos(alphaf1Bar - 0.99));
     surfaceScalarField phiCorrCoeff2(pos(0.01 - alphaf1Bar));
 
-    forAll(mesh.boundary(), patchi)
     {
-        // Set ddtPhiCorr to 0 on non-coupled boundaries
-        if
-        (
-            !mesh.boundary()[patchi].coupled()
-         || isA<cyclicAMIFvPatch>(mesh.boundary()[patchi])
-        )
+        surfaceScalarField::Boundary& phiCorrCoeff1Bf =
+            phiCorrCoeff1.boundaryFieldRef();
+
+        surfaceScalarField::Boundary& phiCorrCoeff2Bf =
+            phiCorrCoeff2.boundaryFieldRef();
+
+        forAll(mesh.boundary(), patchi)
         {
-            phiCorrCoeff1.boundaryField()[patchi] = 0;
-            phiCorrCoeff2.boundaryField()[patchi] = 0;
+            // Set ddtPhiCorr to 0 on non-coupled boundaries
+            if
+            (
+               !mesh.boundary()[patchi].coupled()
+             || isA<cyclicAMIFvPatch>(mesh.boundary()[patchi])
+            )
+            {
+                phiCorrCoeff1Bf[patchi] = 0;
+                phiCorrCoeff2Bf[patchi] = 0;
+            }
         }
     }
 
@@ -172,11 +174,11 @@ while (pimple.correct())
     surfaceScalarField phiHbyA1
     (
         IOobject::groupName("phiHbyA", phase1.name()),
-        (fvc::interpolate(HbyA1) & mesh.Sf())
+        fvc::flux(HbyA1)
       + phiCorrCoeff1*fvc::interpolate(alpha1.oldTime()*rho1.oldTime()*rAU1)
        *(
             MRF.absolute(phi1.oldTime())
-          - (fvc::interpolate(U1.oldTime()) & mesh.Sf())
+          - fvc::flux(U1.oldTime())
         )/runTime.deltaT()
       - phiF1()
       - phig1
@@ -186,11 +188,11 @@ while (pimple.correct())
     surfaceScalarField phiHbyA2
     (
         IOobject::groupName("phiHbyA", phase2.name()),
-        (fvc::interpolate(HbyA2) & mesh.Sf())
+        fvc::flux(HbyA2)
       + phiCorrCoeff2*fvc::interpolate(alpha2.oldTime()*rho2.oldTime()*rAU2)
        *(
             MRF.absolute(phi2.oldTime())
-          - (fvc::interpolate(U2.oldTime()) & mesh.Sf())
+          - fvc::flux(U2.oldTime())
         )/runTime.deltaT()
       - phiF2()
       - phig2
@@ -220,7 +222,7 @@ while (pimple.correct())
     // Update the fixedFluxPressure BCs to ensure flux consistency
     setSnGrad<fixedFluxPressureFvPatchScalarField>
     (
-        p_rgh.boundaryField(),
+        p_rgh.boundaryFieldRef(),
         (
             phiHbyA.boundaryField()
           - (
@@ -252,26 +254,32 @@ while (pimple.correct())
                 contErr1
               - fvc::Sp(fvc::ddt(alpha1) + fvc::div(alphaPhi1), rho1)
             )/rho1
-          + (alpha1/rho1)*correction
+          + correction
             (
-                psi1*fvm::ddt(p_rgh)
-              + fvm::div(phid1, p_rgh) - fvm::Sp(fvc::div(phid1), p_rgh)
+                (alpha1/rho1)*
+                (
+                    psi1*fvm::ddt(p_rgh)
+                  + fvm::div(phid1, p_rgh) - fvm::Sp(fvc::div(phid1), p_rgh)
+                )
             );
-        deleteDemandDrivenData(pEqnComp1().faceFluxCorrectionPtr());
-        pEqnComp1().relax();
+        deleteDemandDrivenData(pEqnComp1.ref().faceFluxCorrectionPtr());
+        pEqnComp1.ref().relax();
 
         pEqnComp2 =
             (
                 contErr2
               - fvc::Sp(fvc::ddt(alpha2) + fvc::div(alphaPhi2), rho2)
             )/rho2
-          + (alpha2/rho2)*correction
+          + correction
             (
-                psi2*fvm::ddt(p_rgh)
-              + fvm::div(phid2, p_rgh) - fvm::Sp(fvc::div(phid2), p_rgh)
+                (alpha2/rho2)*
+                (
+                    psi2*fvm::ddt(p_rgh)
+                  + fvm::div(phid2, p_rgh) - fvm::Sp(fvc::div(phid2), p_rgh)
+                )
             );
-        deleteDemandDrivenData(pEqnComp2().faceFluxCorrectionPtr());
-        pEqnComp2().relax();
+        deleteDemandDrivenData(pEqnComp2.ref().faceFluxCorrectionPtr());
+        pEqnComp2.ref().relax();
     }
     else
     {

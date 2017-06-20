@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -108,17 +108,13 @@ public:
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const
         {
-            notImplemented
-            (
-                "localMax::weights"
-                "(const GeometricField<Type, fvPatchField, volMesh>&)"
-            );
+            NotImplemented;
 
             return tmp<surfaceScalarField>(NULL);
         }
 
         //- Return the face-interpolate of the given cell field
-        virtual tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
+        virtual tmp<GeometricField<Type, fvsPatchField, surfaceMesh>>
         interpolate
         (
             const GeometricField<Type, fvPatchField, volMesh>& vf
@@ -126,7 +122,7 @@ public:
         {
             const fvMesh& mesh = vf.mesh();
 
-            tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > tvff
+            tmp<GeometricField<Type, fvsPatchField, surfaceMesh>> tvff
             (
                 new GeometricField<Type, fvsPatchField, surfaceMesh>
                 (
@@ -140,12 +136,7 @@ public:
                     vf.dimensions()
                 )
             );
-            GeometricField<Type, fvsPatchField, surfaceMesh>& vff = tvff();
-
-            forAll(vff.boundaryField(), patchi)
-            {
-                vff.boundaryField()[patchi] = vf.boundaryField()[patchi];
-            }
+            GeometricField<Type, fvsPatchField, surfaceMesh>& vff = tvff.ref();
 
             const labelUList& own = mesh.owner();
             const labelUList& nei = mesh.neighbour();
@@ -153,6 +144,33 @@ public:
             forAll(vff, facei)
             {
                 vff[facei] = max(vf[own[facei]], vf[nei[facei]]);
+            }
+
+            typename GeometricField<Type, fvsPatchField, surfaceMesh>::
+                Boundary& bff = vff.boundaryFieldRef();
+
+            forAll(bff, patchi)
+            {
+                const fvPatchField<Type>& pf = vf.boundaryField()[patchi];
+                Field<Type>& pff = bff[patchi];
+
+                if (pf.coupled())
+                {
+                    tmp<Field<Type>> tpif(pf.patchInternalField());
+                    const Field<Type>& pif = tpif();
+
+                    tmp<Field<Type>> tpnf(pf.patchNeighbourField());
+                    const Field<Type>& pnf = tpnf();
+
+                    forAll(pff, i)
+                    {
+                        pff[i] = max(pif[i], pnf[i]);
+                    }
+                }
+                else
+                {
+                    pff = pf;
+                }
             }
 
             return tvff;

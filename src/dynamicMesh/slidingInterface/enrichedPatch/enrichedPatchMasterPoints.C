@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -38,7 +38,7 @@ void Foam::enrichedPatch::calcMasterPointFaces() const
 {
     if (masterPointFacesPtr_)
     {
-        FatalErrorIn("void enrichedPatch::calcMasterPointFaces() const")
+        FatalErrorInFunction
             << "Master point face addressing already calculated."
             << abort(FatalError);
     }
@@ -51,35 +51,35 @@ void Foam::enrichedPatch::calcMasterPointFaces() const
     // Master face points lists the points of the enriched master face plus
     // points projected into the master face
 
-    Map<DynamicList<label> > mpf(meshPoints().size());
+    Map<DynamicList<label>> mpf(meshPoints().size());
 
     const faceList& ef = enrichedFaces();
 
     // Add the original face points
-    forAll(masterPatch_, faceI)
+    forAll(masterPatch_, facei)
     {
-        const face& curFace = ef[faceI + slavePatch_.size()];
+        const face& curFace = ef[facei + slavePatch_.size()];
 //         Pout<< "Cur face in pfAddr: " << curFace << endl;
-        forAll(curFace, pointI)
+        forAll(curFace, pointi)
         {
-            Map<DynamicList<label> >::iterator mpfIter =
-                mpf.find(curFace[pointI]);
+            Map<DynamicList<label>>::iterator mpfIter =
+                mpf.find(curFace[pointi]);
 
             if (mpfIter == mpf.end())
             {
                 // Not found, add new dynamic list
                 mpf.insert
                 (
-                    curFace[pointI],
+                    curFace[pointi],
                     DynamicList<label>(primitiveMesh::facesPerPoint_)
                 );
 
                 // Iterator is invalidated - have to find again
-                mpf.find(curFace[pointI])().append(faceI);
+                mpf.find(curFace[pointi])().append(facei);
             }
             else
             {
-                mpfIter().append(faceI);
+                mpfIter().append(facei);
             }
         }
     }
@@ -87,21 +87,21 @@ void Foam::enrichedPatch::calcMasterPointFaces() const
     // Add the projected points which hit the face
     const labelList& slaveMeshPoints = slavePatch_.meshPoints();
 
-    forAll(slavePointFaceHits_, pointI)
+    forAll(slavePointFaceHits_, pointi)
     {
         if
         (
-            slavePointPointHits_[pointI] < 0
-         && slavePointEdgeHits_[pointI] < 0
-         && slavePointFaceHits_[pointI].hit()
+            slavePointPointHits_[pointi] < 0
+         && slavePointEdgeHits_[pointi] < 0
+         && slavePointFaceHits_[pointi].hit()
         )
         {
             // Get the index of projected point corresponding to this slave
             // point
             const label mergedSmp =
-                pointMergeMap().find(slaveMeshPoints[pointI])();
+                pointMergeMap().find(slaveMeshPoints[pointi])();
 
-            Map<DynamicList<label> >::iterator mpfIter =
+            Map<DynamicList<label>>::iterator mpfIter =
                 mpf.find(mergedSmp);
 
             if (mpfIter == mpf.end())
@@ -116,12 +116,12 @@ void Foam::enrichedPatch::calcMasterPointFaces() const
                 // Iterator is invalidated - have to find again
                 mpf.find(mergedSmp)().append
                 (
-                    slavePointFaceHits_[pointI].hitObject()
+                    slavePointFaceHits_[pointi].hitObject()
                 );
             }
             else
             {
-                mpfIter().append(slavePointFaceHits_[pointI].hitObject());
+                mpfIter().append(slavePointFaceHits_[pointi].hitObject());
             }
         }
     }

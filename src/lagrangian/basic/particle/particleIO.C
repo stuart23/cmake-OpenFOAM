@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -32,7 +32,7 @@ Foam::string Foam::particle::propertyList_ = Foam::particle::propertyList();
 
 const std::size_t Foam::particle::sizeofPosition_
 (
-    offsetof(particle, faceI_) - offsetof(particle, position_)
+    offsetof(particle, facei_) - offsetof(particle, position_)
 );
 
 const std::size_t Foam::particle::sizeofFields_
@@ -47,23 +47,23 @@ Foam::particle::particle(const polyMesh& mesh, Istream& is, bool readFields)
 :
     mesh_(mesh),
     position_(),
-    cellI_(-1),
-    faceI_(-1),
+    celli_(-1),
+    facei_(-1),
     stepFraction_(0.0),
-    tetFaceI_(-1),
+    tetFacei_(-1),
     tetPtI_(-1),
     origProc_(Pstream::myProcNo()),
     origId_(-1)
 {
     if (is.format() == IOstream::ASCII)
     {
-        is  >> position_ >> cellI_;
+        is  >> position_ >> celli_;
 
         if (readFields)
         {
-            is  >> faceI_
+            is  >> facei_
                 >> stepFraction_
-                >> tetFaceI_
+                >> tetFacei_
                 >> tetPtI_
                 >> origProc_
                 >> origId_;
@@ -90,7 +90,7 @@ void Foam::particle::writePosition(Ostream& os) const
 {
     if (os.format() == IOstream::ASCII)
     {
-        os  << position_ << token::SPACE << cellI_;
+        os  << position_ << token::SPACE << celli_;
     }
     else
     {
@@ -107,10 +107,10 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const particle& p)
     if (os.format() == IOstream::ASCII)
     {
         os  << p.position_
-            << token::SPACE << p.cellI_
-            << token::SPACE << p.faceI_
+            << token::SPACE << p.celli_
+            << token::SPACE << p.facei_
             << token::SPACE << p.stepFraction_
-            << token::SPACE << p.tetFaceI_
+            << token::SPACE << p.tetFacei_
             << token::SPACE << p.tetPtI_
             << token::SPACE << p.origProc_
             << token::SPACE << p.origId_;

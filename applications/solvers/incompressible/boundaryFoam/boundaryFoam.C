@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -38,6 +38,7 @@ Description
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
 #include "turbulentTransportModel.H"
+#include "fvOptions.H"
 #include "wallFvPatch.H"
 #include "makeGraph.H"
 
@@ -52,7 +53,10 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createMesh.H"
     #include "createFields.H"
+    #include "createFvOptions.H"
     #include "interrogateWallPatches.H"
+
+    turbulence->validate();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -67,12 +71,16 @@ int main(int argc, char *argv[])
 
         fvVectorMatrix UEqn
         (
-            divR == gradP
+            divR == gradP + fvOptions(U)
         );
 
         UEqn.relax();
 
+        fvOptions.constrain(UEqn);
+
         UEqn.solve();
+
+        fvOptions.correct(U);
 
 
         // Correct driving force for a constant volume flow rate
@@ -90,7 +98,7 @@ int main(int argc, char *argv[])
 
         #include "evaluateNearWall.H"
 
-        if (runTime.outputTime())
+        if (runTime.writeTime())
         {
             #include "makeGraphs.H"
         }

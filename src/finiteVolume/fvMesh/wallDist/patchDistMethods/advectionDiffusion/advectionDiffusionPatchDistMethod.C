@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -105,16 +105,17 @@ bool Foam::patchDistMethods::advectionDiffusion::correct
             false
         ),
         mesh_,
-        dimensionedVector("ny", dimless, vector::zero),
+        dimensionedVector("ny", dimless, Zero),
         patchTypes<vector>(mesh_, patchIDs_)
     );
 
     const fvPatchList& patches = mesh_.boundary();
+    volVectorField::Boundary& nybf = ny.boundaryFieldRef();
 
     forAllConstIter(labelHashSet, patchIDs_, iter)
     {
         label patchi = iter.key();
-        ny.boundaryField()[patchi] == -patches[patchi].nf();
+        nybf[patchi] == -patches[patchi].nf();
     }
 
     int iter = 0;

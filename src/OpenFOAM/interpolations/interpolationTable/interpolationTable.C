@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -43,10 +43,8 @@ void Foam::interpolationTable<Type>::readTable()
 
     if (this->empty())
     {
-        FatalErrorIn
-        (
-            "Foam::interpolationTable<Type>::readTable()"
-        )   << "table read from " << fName << " is empty" << nl
+        FatalErrorInFunction
+            << "table read from " << fName << " is empty" << nl
             << exit(FatalError);
     }
 
@@ -60,7 +58,7 @@ void Foam::interpolationTable<Type>::readTable()
 template<class Type>
 Foam::interpolationTable<Type>::interpolationTable()
 :
-    List<Tuple2<scalar, Type> >(),
+    List<Tuple2<scalar, Type>>(),
     boundsHandling_(interpolationTable::WARN),
     fileName_("fileNameIsUndefined"),
     reader_(NULL)
@@ -70,12 +68,12 @@ Foam::interpolationTable<Type>::interpolationTable()
 template<class Type>
 Foam::interpolationTable<Type>::interpolationTable
 (
-    const List<Tuple2<scalar, Type> >& values,
+    const List<Tuple2<scalar, Type>>& values,
     const boundsHandling bounds,
     const fileName& fName
 )
 :
-    List<Tuple2<scalar, Type> >(values),
+    List<Tuple2<scalar, Type>>(values),
     boundsHandling_(bounds),
     fileName_(fName),
     reader_(NULL)
@@ -85,7 +83,7 @@ Foam::interpolationTable<Type>::interpolationTable
 template<class Type>
 Foam::interpolationTable<Type>::interpolationTable(const fileName& fName)
 :
-    List<Tuple2<scalar, Type> >(),
+    List<Tuple2<scalar, Type>>(),
     boundsHandling_(interpolationTable::WARN),
     fileName_(fName),
     reader_(new openFoamTableReader<Type>(dictionary()))
@@ -97,7 +95,7 @@ Foam::interpolationTable<Type>::interpolationTable(const fileName& fName)
 template<class Type>
 Foam::interpolationTable<Type>::interpolationTable(const dictionary& dict)
 :
-    List<Tuple2<scalar, Type> >(),
+    List<Tuple2<scalar, Type>>(),
     boundsHandling_(wordToBoundsHandling(dict.lookup("outOfBounds"))),
     fileName_(dict.lookup("fileName")),
     reader_(tableReader<Type>::New(dict))
@@ -112,7 +110,7 @@ Foam::interpolationTable<Type>::interpolationTable
      const interpolationTable& interpTable
 )
 :
-    List<Tuple2<scalar, Type> >(interpTable),
+    List<Tuple2<scalar, Type>>(interpTable),
     boundsHandling_(interpTable.boundsHandling_),
     fileName_(interpTable.fileName_),
     reader_(interpTable.reader_)    // note: steals reader. Used in write().
@@ -183,10 +181,8 @@ Foam::interpolationTable<Type>::wordToBoundsHandling
     }
     else
     {
-        WarningIn
-        (
-            "Foam::interpolationTable<Type>::wordToBoundsHandling(const word&)"
-        )   << "bad outOfBounds specifier " << bound << " using 'warn'" << endl;
+        WarningInFunction
+            << "bad outOfBounds specifier " << bound << " using 'warn'" << endl;
 
         return interpolationTable::WARN;
     }
@@ -210,20 +206,18 @@ template<class Type>
 void Foam::interpolationTable<Type>::check() const
 {
     label n = this->size();
-    scalar prevValue = List<Tuple2<scalar, Type> >::operator[](0).first();
+    scalar prevValue = List<Tuple2<scalar, Type>>::operator[](0).first();
 
     for (label i=1; i<n; ++i)
     {
         const scalar currValue =
-            List<Tuple2<scalar, Type> >::operator[](i).first();
+            List<Tuple2<scalar, Type>>::operator[](i).first();
 
         // avoid duplicate values (divide-by-zero error)
         if (currValue <= prevValue)
         {
-            FatalErrorIn
-            (
-                "Foam::interpolationTable<Type>::checkOrder() const"
-            )   << "out-of-order value: "
+            FatalErrorInFunction
+                << "out-of-order value: "
                 << currValue << " at index " << i << nl
                 << exit(FatalError);
         }
@@ -257,8 +251,8 @@ Type Foam::interpolationTable<Type>::rateOfChange(const scalar value) const
         return 0;
     }
 
-    scalar minLimit = List<Tuple2<scalar, Type> >::operator[](0).first();
-    scalar maxLimit = List<Tuple2<scalar, Type> >::operator[](n-1).first();
+    scalar minLimit = List<Tuple2<scalar, Type>>::operator[](0).first();
+    scalar maxLimit = List<Tuple2<scalar, Type>>::operator[](n-1).first();
     scalar lookupValue = value;
 
     if (lookupValue < minLimit)
@@ -267,21 +261,15 @@ Type Foam::interpolationTable<Type>::rateOfChange(const scalar value) const
         {
             case interpolationTable::ERROR:
             {
-                FatalErrorIn
-                (
-                    "Foam::interpolationTable<Type>::operator[]"
-                    "(const scalar) const"
-                )   << "value (" << lookupValue << ") underflow" << nl
+                FatalErrorInFunction
+                    << "value (" << lookupValue << ") underflow" << nl
                     << exit(FatalError);
                 break;
             }
             case interpolationTable::WARN:
             {
-                WarningIn
-                (
-                    "Foam::interpolationTable<Type>::operator[]"
-                    "(const scalar) const"
-                )   << "value (" << lookupValue << ") underflow" << nl
+                WarningInFunction
+                    << "value (" << lookupValue << ") underflow" << nl
                     << "    Zero rate of change."
                     << endl;
                 // fall-through to 'CLAMP'
@@ -306,21 +294,15 @@ Type Foam::interpolationTable<Type>::rateOfChange(const scalar value) const
         {
             case interpolationTable::ERROR:
             {
-                FatalErrorIn
-                (
-                    "Foam::interpolationTable<Type>::operator[]"
-                    "(const label) const"
-                )   << "value (" << lookupValue << ") overflow" << nl
+                FatalErrorInFunction
+                    << "value (" << lookupValue << ") overflow" << nl
                     << exit(FatalError);
                 break;
             }
             case interpolationTable::WARN:
             {
-                WarningIn
-                (
-                    "Foam::interpolationTable<Type>::operator[]"
-                    "(const label) const"
-                )   << "value (" << lookupValue << ") overflow" << nl
+                WarningInFunction
+                    << "value (" << lookupValue << ") overflow" << nl
                     << "    Zero rate of change."
                     << endl;
                 // fall-through to 'CLAMP'
@@ -346,7 +328,7 @@ Type Foam::interpolationTable<Type>::rateOfChange(const scalar value) const
     // look for the correct range
     for (label i = 0; i < n; ++i)
     {
-        if (lookupValue >= List<Tuple2<scalar, Type> >::operator[](i).first())
+        if (lookupValue >= List<Tuple2<scalar, Type>>::operator[](i).first())
         {
             lo = hi = i;
         }
@@ -374,13 +356,13 @@ Type Foam::interpolationTable<Type>::rateOfChange(const scalar value) const
         return
         (
             (
-                List<Tuple2<scalar, Type> >::operator[](hi).second()
-              - List<Tuple2<scalar, Type> >::operator[](lo).second()
+                List<Tuple2<scalar, Type>>::operator[](hi).second()
+              - List<Tuple2<scalar, Type>>::operator[](lo).second()
             )
            /(
-               List<Tuple2<scalar, Type> >::operator[](hi).first()
+               List<Tuple2<scalar, Type>>::operator[](hi).first()
              + minLimit
-             - List<Tuple2<scalar, Type> >::operator[](lo).first()
+             - List<Tuple2<scalar, Type>>::operator[](lo).first()
             )
         );
     }
@@ -390,12 +372,12 @@ Type Foam::interpolationTable<Type>::rateOfChange(const scalar value) const
         return
         (
             (
-                List<Tuple2<scalar, Type> >::operator[](hi).second()
-              - List<Tuple2<scalar, Type> >::operator[](lo).second()
+                List<Tuple2<scalar, Type>>::operator[](hi).second()
+              - List<Tuple2<scalar, Type>>::operator[](lo).second()
             )
            /(
-                List<Tuple2<scalar, Type> >::operator[](hi).first()
-              - List<Tuple2<scalar, Type> >::operator[](lo).first()
+                List<Tuple2<scalar, Type>>::operator[](hi).first()
+              - List<Tuple2<scalar, Type>>::operator[](lo).first()
             )
         );
     }
@@ -421,21 +403,15 @@ Foam::interpolationTable<Type>::operator[](const label i) const
         {
             case interpolationTable::ERROR:
             {
-                FatalErrorIn
-                (
-                    "Foam::interpolationTable<Type>::operator[]"
-                    "(const label) const"
-                )   << "index (" << ii << ") underflow" << nl
+                FatalErrorInFunction
+                    << "index (" << ii << ") underflow" << nl
                     << exit(FatalError);
                 break;
             }
             case interpolationTable::WARN:
             {
-                WarningIn
-                (
-                    "Foam::interpolationTable<Type>::operator[]"
-                    "(const label) const"
-                )   << "index (" << ii << ") underflow" << nl
+                WarningInFunction
+                    << "index (" << ii << ") underflow" << nl
                     << "    Continuing with the first entry"
                     << endl;
                 // fall-through to 'CLAMP'
@@ -461,21 +437,15 @@ Foam::interpolationTable<Type>::operator[](const label i) const
         {
             case interpolationTable::ERROR:
             {
-                FatalErrorIn
-                (
-                    "Foam::interpolationTable<Type>::operator[]"
-                    "(const label) const"
-                )   << "index (" << ii << ") overflow" << nl
+                FatalErrorInFunction
+                    << "index (" << ii << ") overflow" << nl
                     << exit(FatalError);
                 break;
             }
             case interpolationTable::WARN:
             {
-                WarningIn
-                (
-                    "Foam::interpolationTable<Type>::operator[]"
-                    "(const label) const"
-                )   << "index (" << ii << ") overflow" << nl
+                WarningInFunction
+                    << "index (" << ii << ") overflow" << nl
                     << "    Continuing with the last entry"
                     << endl;
                 // fall-through to 'CLAMP'
@@ -496,7 +466,7 @@ Foam::interpolationTable<Type>::operator[](const label i) const
         }
     }
 
-    return List<Tuple2<scalar, Type> >::operator[](ii);
+    return List<Tuple2<scalar, Type>>::operator[](ii);
 }
 
 
@@ -507,11 +477,11 @@ Type Foam::interpolationTable<Type>::operator()(const scalar value) const
 
     if (n <= 1)
     {
-        return List<Tuple2<scalar, Type> >::operator[](0).second();
+        return List<Tuple2<scalar, Type>>::operator[](0).second();
     }
 
-    scalar minLimit = List<Tuple2<scalar, Type> >::operator[](0).first();
-    scalar maxLimit = List<Tuple2<scalar, Type> >::operator[](n-1).first();
+    scalar minLimit = List<Tuple2<scalar, Type>>::operator[](0).first();
+    scalar maxLimit = List<Tuple2<scalar, Type>>::operator[](n-1).first();
     scalar lookupValue = value;
 
     if (lookupValue < minLimit)
@@ -520,28 +490,22 @@ Type Foam::interpolationTable<Type>::operator()(const scalar value) const
         {
             case interpolationTable::ERROR:
             {
-                FatalErrorIn
-                (
-                    "Foam::interpolationTable<Type>::operator[]"
-                    "(const scalar) const"
-                )   << "value (" << lookupValue << ") underflow" << nl
+                FatalErrorInFunction
+                    << "value (" << lookupValue << ") underflow" << nl
                     << exit(FatalError);
                 break;
             }
             case interpolationTable::WARN:
             {
-                WarningIn
-                (
-                    "Foam::interpolationTable<Type>::operator[]"
-                    "(const scalar) const"
-                )   << "value (" << lookupValue << ") underflow" << nl
+                WarningInFunction
+                    << "value (" << lookupValue << ") underflow" << nl
                     << "    Continuing with the first entry"
                     << endl;
                 // fall-through to 'CLAMP'
             }
             case interpolationTable::CLAMP:
             {
-                return List<Tuple2<scalar, Type> >::operator[](0).second();
+                return List<Tuple2<scalar, Type>>::operator[](0).second();
                 break;
             }
             case interpolationTable::REPEAT:
@@ -559,28 +523,22 @@ Type Foam::interpolationTable<Type>::operator()(const scalar value) const
         {
             case interpolationTable::ERROR:
             {
-                FatalErrorIn
-                (
-                    "Foam::interpolationTable<Type>::operator[]"
-                    "(const label) const"
-                )   << "value (" << lookupValue << ") overflow" << nl
+                FatalErrorInFunction
+                    << "value (" << lookupValue << ") overflow" << nl
                     << exit(FatalError);
                 break;
             }
             case interpolationTable::WARN:
             {
-                WarningIn
-                (
-                    "Foam::interpolationTable<Type>::operator[]"
-                    "(const label) const"
-                )   << "value (" << lookupValue << ") overflow" << nl
+                WarningInFunction
+                    << "value (" << lookupValue << ") overflow" << nl
                     << "    Continuing with the last entry"
                     << endl;
                 // fall-through to 'CLAMP'
             }
             case interpolationTable::CLAMP:
             {
-                return List<Tuple2<scalar, Type> >::operator[](n-1).second();
+                return List<Tuple2<scalar, Type>>::operator[](n-1).second();
                 break;
             }
             case interpolationTable::REPEAT:
@@ -599,7 +557,7 @@ Type Foam::interpolationTable<Type>::operator()(const scalar value) const
     // look for the correct range
     for (label i = 0; i < n; ++i)
     {
-        if (lookupValue >= List<Tuple2<scalar, Type> >::operator[](i).first())
+        if (lookupValue >= List<Tuple2<scalar, Type>>::operator[](i).first())
         {
             lo = hi = i;
         }
@@ -613,7 +571,7 @@ Type Foam::interpolationTable<Type>::operator()(const scalar value) const
     if (lo == hi)
     {
         // we are at the end of the table - or there is only a single entry
-        return List<Tuple2<scalar, Type> >::operator[](hi).second();
+        return List<Tuple2<scalar, Type>>::operator[](hi).second();
     }
     else if (hi == 0)
     {
@@ -626,10 +584,10 @@ Type Foam::interpolationTable<Type>::operator()(const scalar value) const
 
         return
         (
-            List<Tuple2<scalar, Type> >::operator[](lo).second()
+            List<Tuple2<scalar, Type>>::operator[](lo).second()
           + (
-                List<Tuple2<scalar, Type> >::operator[](hi).second()
-              - List<Tuple2<scalar, Type> >::operator[](lo).second()
+                List<Tuple2<scalar, Type>>::operator[](hi).second()
+              - List<Tuple2<scalar, Type>>::operator[](lo).second()
             )
            *(lookupValue / minLimit)
         );
@@ -639,18 +597,18 @@ Type Foam::interpolationTable<Type>::operator()(const scalar value) const
         // normal interpolation
         return
         (
-            List<Tuple2<scalar, Type> >::operator[](lo).second()
+            List<Tuple2<scalar, Type>>::operator[](lo).second()
           + (
-                List<Tuple2<scalar, Type> >::operator[](hi).second()
-              - List<Tuple2<scalar, Type> >::operator[](lo).second()
+                List<Tuple2<scalar, Type>>::operator[](hi).second()
+              - List<Tuple2<scalar, Type>>::operator[](lo).second()
             )
            *(
                 lookupValue
-              - List<Tuple2<scalar, Type> >::operator[](lo).first()
+              - List<Tuple2<scalar, Type>>::operator[](lo).first()
             )
            /(
-                List<Tuple2<scalar, Type> >::operator[](hi).first()
-              - List<Tuple2<scalar, Type> >::operator[](lo).first()
+                List<Tuple2<scalar, Type>>::operator[](hi).first()
+              - List<Tuple2<scalar, Type>>::operator[](lo).first()
             )
         );
     }

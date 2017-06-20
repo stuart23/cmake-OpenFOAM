@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -27,16 +27,16 @@ Class
 Description
     Injection at specified positions, with the conditions:
 
-    - for injection to be allowed
+    For injection to be allowed
+      \verbatim
+      factor*referenceField[celli] >= thresholdField[celli]
+      \endverbatim
+      where:
+        - \c referenceField is the field used to supply the look-up values
+        - \c thresholdField supplies the values beyond which the injection is
+            permitted.
 
-        factor*referenceField[cellI] >= thresholdField[cellI]
-
-        where:
-          - referenceField is the field used to supply the look-up values
-          - thresholdField supplies the values beyond which the injection is
-            permitted
-
-    - limited to a user-supllied number of injections per injector location
+    Limited to a user-supplied number of injections per injector location
 
 SourceFiles
     FieldActivatedInjection.C
@@ -135,9 +135,9 @@ public:
         FieldActivatedInjection(const FieldActivatedInjection<CloudType>& im);
 
         //- Construct and return a clone
-        virtual autoPtr<InjectionModel<CloudType> > clone() const
+        virtual autoPtr<InjectionModel<CloudType>> clone() const
         {
-            return autoPtr<InjectionModel<CloudType> >
+            return autoPtr<InjectionModel<CloudType>>
             (
                 new FieldActivatedInjection<CloudType>(*this)
             );
@@ -173,7 +173,7 @@ public:
                 const scalar time,
                 vector& position,
                 label& cellOwner,
-                label& tetFaceI,
+                label& tetFacei,
                 label& tetPtI
             );
 
@@ -202,7 +202,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "FieldActivatedInjection.C"
+    #include "FieldActivatedInjection.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

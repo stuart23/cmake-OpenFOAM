@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -63,7 +63,7 @@ template<class Type, class DType, class LUType>
 void Foam::LduMatrix<Type, DType, LUType>::Amul
 (
     Field<Type>& Apsi,
-    const tmp<Field<Type> >& tpsi
+    const tmp<Field<Type>>& tpsi
 ) const
 {
     Type* __restrict__ ApsiPtr = Apsi.begin();
@@ -117,7 +117,7 @@ template<class Type, class DType, class LUType>
 void Foam::LduMatrix<Type, DType, LUType>::Tmul
 (
     Field<Type>& Tpsi,
-    const tmp<Field<Type> >& tpsi
+    const tmp<Field<Type>>& tpsi
 ) const
 {
     Type* __restrict__ TpsiPtr = Tpsi.begin();
@@ -198,12 +198,12 @@ void Foam::LduMatrix<Type, DType, LUType>::sumA
 
     // Add the interface internal coefficients to diagonal
     // and the interface boundary coefficients to the sum-off-diagonal
-    forAll(interfaces_, patchI)
+    forAll(interfaces_, patchi)
     {
-        if (interfaces_.set(patchI))
+        if (interfaces_.set(patchi))
         {
-            const unallocLabelList& pa = lduAddr().patchAddr(patchI);
-            const Field<LUType>& pCoeffs = interfacesUpper_[patchI];
+            const unallocLabelList& pa = lduAddr().patchAddr(patchi);
+            const Field<LUType>& pCoeffs = interfacesUpper_[patchi];
 
             forAll(pa, face)
             {
@@ -280,13 +280,13 @@ void Foam::LduMatrix<Type, DType, LUType>::residual
 
 
 template<class Type, class DType, class LUType>
-Foam::tmp<Foam::Field<Type> > Foam::LduMatrix<Type, DType, LUType>::residual
+Foam::tmp<Foam::Field<Type>> Foam::LduMatrix<Type, DType, LUType>::residual
 (
     const Field<Type>& psi
 ) const
 {
-    tmp<Field<Type> > trA(new Field<Type>(psi.size()));
-    residual(trA(), psi);
+    tmp<Field<Type>> trA(new Field<Type>(psi.size()));
+    residual(trA.ref(), psi);
     return trA;
 }
 

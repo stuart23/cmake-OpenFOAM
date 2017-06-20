@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -169,8 +169,8 @@ public:
         (
             const polyMesh& mesh,
             const vector& position,
-            const label cellI,
-            const label tetFaceI,
+            const label celli,
+            const label tetFacei,
             const label tetPtI
         );
 
@@ -179,8 +179,8 @@ public:
         (
             const polyMesh& mesh,
             const vector& position,
-            const label cellI,
-            const label tetFaceI,
+            const label celli,
+            const label tetFacei,
             const label tetPtI,
             const label typeId,
             const scalar nParticle0,
@@ -232,9 +232,9 @@ public:
                 mesh_(mesh)
             {}
 
-            autoPtr<CollidingParcel<ParcelType> > operator()(Istream& is) const
+            autoPtr<CollidingParcel<ParcelType>> operator()(Istream& is) const
             {
-                return autoPtr<CollidingParcel<ParcelType> >
+                return autoPtr<CollidingParcel<ParcelType>>
                 (
                     new CollidingParcel<ParcelType>(mesh_, is, true)
                 );

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -41,7 +41,7 @@ void Foam::bufferedAccumulator<Type>::accumulateAndResetBuffer(const label b)
 
     averagesTaken_++;
 
-    (*this)[b] = Field<Type>(bufferLength(), pTraits<Type>::zero);
+    (*this)[b] = Field<Type>(bufferLength(), Zero);
 
     bufferOffsets_[b] = 0;
 }
@@ -52,7 +52,7 @@ void Foam::bufferedAccumulator<Type>::accumulateAndResetBuffer(const label b)
 template<class Type>
 Foam::bufferedAccumulator<Type>::bufferedAccumulator()
 :
-    List< Field<Type> >(),
+    List<Field<Type>>(),
     averagesTaken_(),
     bufferOffsets_()
 {}
@@ -66,7 +66,7 @@ Foam::bufferedAccumulator<Type>::bufferedAccumulator
     const label bufferingInterval
 )
 :
-    List< Field<Type> >(),
+    List<Field<Type>>(),
     averagesTaken_(),
     bufferOffsets_()
 {
@@ -85,7 +85,7 @@ Foam::bufferedAccumulator<Type>::bufferedAccumulator
     const bufferedAccumulator<Type>& bA
 )
 :
-    List< Field<Type> >(static_cast< List< Field<Type> > >(bA)),
+    List<Field<Type>>(static_cast<List<Field<Type>>>(bA)),
     averagesTaken_(bA.averagesTaken()),
     bufferOffsets_(bA.bufferOffsets())
 {}
@@ -112,7 +112,7 @@ void Foam::bufferedAccumulator<Type>::setSizes
 
     forAll((*this), b)
     {
-        (*this)[b] = Field<Type>(bufferLength, pTraits<Type>::zero);
+        (*this)[b] = Field<Type>(bufferLength, Zero);
     }
 
     averagesTaken_ = 0;
@@ -156,7 +156,7 @@ Foam::label Foam::bufferedAccumulator<Type>::addToBuffers
         {
             if (bufferToRefill != -1)
             {
-                FatalErrorIn("bufferedAccumulator<Type>::addToBuffers ")
+                FatalErrorInFunction
                     << "More than one bufferedAccumulator accumulation "
                     << "buffer filled at once, this is considered an error."
                     << abort(FatalError);
@@ -181,15 +181,13 @@ Foam::Field<Type> Foam::bufferedAccumulator<Type>::averaged() const
     }
     else
     {
-        WarningIn
-        (
-            "bufferedAccumulator<Type>::averagedbufferedAccumulator() const"
-        )   << "Averaged correlation function requested but averagesTaken = "
+        WarningInFunction
+            << "Averaged correlation function requested but averagesTaken = "
             << averagesTaken_
             << ". Returning empty field."
             << endl;
 
-        return Field<Type>(bufferLength(), pTraits<Type>::zero);
+        return Field<Type>(bufferLength(), Zero);
     }
 }
 
@@ -197,7 +195,7 @@ Foam::Field<Type> Foam::bufferedAccumulator<Type>::averaged() const
 template<class Type>
 void Foam::bufferedAccumulator<Type>::resetAveraging()
 {
-    accumulationBuffer() = Field<Type>(bufferLength(), pTraits<Type>::zero);
+    accumulationBuffer() = Field<Type>(bufferLength(), Zero);
 
     averagesTaken_ = 0;
 }
@@ -214,14 +212,12 @@ void Foam::bufferedAccumulator<Type>::operator=
     // Check for assignment to self
     if (this == &rhs)
     {
-        FatalErrorIn
-        (
-            "bufferedAccumulator<Type>::operator=(const bufferedAccumulator&)"
-        )   << "Attempted assignment to self"
+        FatalErrorInFunction
+            << "Attempted assignment to self"
             << abort(FatalError);
     }
 
-    List< Field<Type> >::operator=(rhs);
+    List<Field<Type>>::operator=(rhs);
 
     averagesTaken_ = rhs.averagesTaken();
 
@@ -231,6 +227,6 @@ void Foam::bufferedAccumulator<Type>::operator=
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#   include "bufferedAccumulatorIO.C"
+    #include "bufferedAccumulatorIO.C"
 
 // ************************************************************************* //

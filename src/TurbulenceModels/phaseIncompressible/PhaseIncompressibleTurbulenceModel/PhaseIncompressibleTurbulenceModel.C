@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -63,7 +63,7 @@ PhaseIncompressibleTurbulenceModel
 // * * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * //
 
 template<class TransportModel>
-Foam::autoPtr<Foam::PhaseIncompressibleTurbulenceModel<TransportModel> >
+Foam::autoPtr<Foam::PhaseIncompressibleTurbulenceModel<TransportModel>>
 Foam::PhaseIncompressibleTurbulenceModel<TransportModel>::New
 (
     const volScalarField& alpha,
@@ -169,11 +169,7 @@ Foam::tmp<Foam::volSymmTensorField>
 Foam::PhaseIncompressibleTurbulenceModel<TransportModel>::
 devRhoReff() const
 {
-    notImplemented
-    (
-        "PhaseIncompressibleTurbulenceModel<TransportModel>::"
-        "devRhoReff()"
-    );
+    NotImplemented;
 
     return devReff();
 }
@@ -187,11 +183,7 @@ divDevRhoReff
     volVectorField& U
 ) const
 {
-    notImplemented
-    (
-        "PhaseIncompressibleTurbulenceModel<TransportModel>::"
-        "divDevRhoReff(volVectorField& U)"
-    );
+    NotImplemented;
 
     return divDevReff(U);
 }

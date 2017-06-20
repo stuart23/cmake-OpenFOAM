@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::autoPtr<Foam::SurfaceFilmModel<CloudType> >
+Foam::autoPtr<Foam::SurfaceFilmModel<CloudType>>
 Foam::SurfaceFilmModel<CloudType>::New
 (
     const dictionary& dict,
@@ -44,21 +44,15 @@ Foam::SurfaceFilmModel<CloudType>::New
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
-        FatalErrorIn
-        (
-            "SurfaceFilmModel<CloudType>::New"
-            "("
-                "const dictionary&, "
-                "CloudType&"
-            ")"
-        )   << "Unknown surface film model type "
+        FatalErrorInFunction
+            << "Unknown surface film model type "
             << modelType << nl << nl
             << "Valid surface film model types are:" << nl
             << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 
-    return autoPtr<SurfaceFilmModel<CloudType> >(cstrIter()(dict, owner));
+    return autoPtr<SurfaceFilmModel<CloudType>>(cstrIter()(dict, owner));
 }
 
 

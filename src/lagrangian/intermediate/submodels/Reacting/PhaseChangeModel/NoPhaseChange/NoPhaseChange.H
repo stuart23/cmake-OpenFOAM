@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -62,9 +62,9 @@ public:
         NoPhaseChange(const NoPhaseChange<CloudType>& pcm);
 
         //- Construct and return a clone
-        virtual autoPtr<PhaseChangeModel<CloudType> > clone() const
+        virtual autoPtr<PhaseChangeModel<CloudType>> clone() const
         {
-            return autoPtr<PhaseChangeModel<CloudType> >
+            return autoPtr<PhaseChangeModel<CloudType>>
             (
                 new NoPhaseChange<CloudType>(*this)
             );
@@ -84,7 +84,7 @@ public:
         virtual void calculate
         (
             const scalar dt,
-            const label cellI,
+            const label celli,
             const scalar Re,
             const scalar Pr,
             const scalar d,
@@ -106,7 +106,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "NoPhaseChange.C"
+    #include "NoPhaseChange.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

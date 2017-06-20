@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,7 +25,7 @@ Application
     dnsFoam
 
 Description
-    Direct numerical simulation solver for boxes of isotropic turbulence
+    Direct numerical simulation solver for boxes of isotropic turbulence.
 
 \*---------------------------------------------------------------------------*/
 
@@ -41,16 +41,13 @@ Description
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCase.H"
+    #include "postProcess.H"
 
+    #include "setRootCase.H"
     #include "createTime.H"
     #include "createMeshNoClear.H"
-
-    pisoControl piso(mesh);
-
-    #include "readTransportProperties.H"
+    #include "createControl.H"
     #include "createFields.H"
-    #include "readTurbulenceProperties.H"
     #include "initContinuityErrs.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -61,7 +58,7 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        force.internalField() = ReImSum
+        force.primitiveFieldRef() = ReImSum
         (
             fft::reverseTransform
             (
@@ -88,15 +85,16 @@ int main(int argc, char *argv[])
         {
             volScalarField rAU(1.0/UEqn.A());
             surfaceScalarField rAUf("rAUf", fvc::interpolate(rAU));
-            volVectorField HbyA("HbyA", U);
-            HbyA = rAU*UEqn.H();
-
+            volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
             surfaceScalarField phiHbyA
             (
                 "phiHbyA",
-                (fvc::interpolate(HbyA) & mesh.Sf())
+                fvc::flux(HbyA)
               + rAUf*fvc::ddtCorr(U, phi)
             );
+
+            // Update the pressure BCs to ensure flux consistency
+            constrainPressure(p, U, phiHbyA, rAUf);
 
             fvScalarMatrix pEqn
             (
@@ -115,7 +113,7 @@ int main(int argc, char *argv[])
 
         runTime.write();
 
-        if (runTime.outputTime())
+        if (runTime.writeTime())
         {
             calcEk(U, K).write
             (

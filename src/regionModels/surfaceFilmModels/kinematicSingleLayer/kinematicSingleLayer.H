@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -403,8 +403,8 @@ public:
             //- External hook to add sources to the film
             virtual void addSources
             (
-                const label patchI,            // patchI on primary region
-                const label faceI,             // faceI of patchI
+                const label patchi,            // patchi on primary region
+                const label facei,             // facei of patchi
                 const scalar massSource,       // [kg]
                 const vector& momentumSource,  // [kg.m/s] (tang'l momentum)
                 const scalar pressureSource,   // [kg.m/s] (normal momentum)
@@ -510,16 +510,16 @@ public:
             // Mapped into primary region
 
                 //- Return total mass source - Eulerian phase only
-                virtual tmp<DimensionedField<scalar, volMesh> > Srho() const;
+                virtual tmp<DimensionedField<scalar, volMesh>> Srho() const;
 
                 //- Return mass source for specie i - Eulerian phase only
-                virtual tmp<DimensionedField<scalar, volMesh> > Srho
+                virtual tmp<DimensionedField<scalar, volMesh>> Srho
                 (
                     const label i
                 ) const;
 
                 //- Return enthalpy source - Eulerian phase only
-                virtual tmp<DimensionedField<scalar, volMesh> > Sh() const;
+                virtual tmp<DimensionedField<scalar, volMesh>> Sh() const;
 
 
         // I-O
@@ -538,7 +538,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "kinematicSingleLayerTemplates.C"
+    #include "kinematicSingleLayerTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

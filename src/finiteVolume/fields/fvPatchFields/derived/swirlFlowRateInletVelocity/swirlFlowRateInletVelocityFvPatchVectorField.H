@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -37,8 +37,7 @@ Description
     dimensions of the flux, phi. The current density is used to correct the
     velocity when applying the mass basis.
 
-    \heading Patch usage
-
+Usage
     \table
         Property     | Description             | Required    | Default value
         phi          | flux field name         | no          | phi
@@ -49,7 +48,7 @@ Description
 
     Example of the boundary condition specification:
     \verbatim
-    myPatch
+    <patchName>
     {
         type            swirlFlowRateInletVelocity;
         flowRate        constant 0.2;
@@ -58,13 +57,14 @@ Description
     \endverbatim
 
 Note
-    - the \c flowRate and \c rpm entries are DataEntry types, able to describe
+    - the \c flowRate and \c rpm entries are Function1 types, able to describe
       time varying functions.  The example above gives the usage for supplying
       constant values.
     - the value is positive into the domain
 
-SeeAlso
+See also
     Foam::fixedValueFvPatchField
+    Foam::Function1Types
 
 SourceFiles
     swirlFlowRateInletVelocityFvPatchVectorField.C
@@ -75,7 +75,7 @@ SourceFiles
 #define swirlFlowRateInletVelocityFvPatchVectorField_H
 
 #include "fixedValueFvPatchFields.H"
-#include "DataEntry.H"
+#include "Function1.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -98,10 +98,10 @@ class swirlFlowRateInletVelocityFvPatchVectorField
         const word rhoName_;
 
         //- Inlet integral flow rate
-        autoPtr<DataEntry<scalar> > flowRate_;
+        autoPtr<Function1<scalar>> flowRate_;
 
         //- Angular speed in revolutions per minute (RPM)
-        autoPtr<DataEntry<scalar> > rpm_;
+        autoPtr<Function1<scalar>> rpm_;
 
 
 public:

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -55,22 +55,22 @@ bool Foam::triSurfaceSearch::checkUniqueHit
     {
         // near point
 
-        const label nearPointI = f[nearLabel];
+        const label nearPointi = f[nearLabel];
 
         const labelList& pointFaces =
-            surface().pointFaces()[surface().meshPointMap()[nearPointI]];
+            surface().pointFaces()[surface().meshPointMap()[nearPointi]];
 
         forAll(pointFaces, pI)
         {
-            const label pointFaceI = pointFaces[pI];
+            const label pointFacei = pointFaces[pI];
 
-            if (pointFaceI != currHit.index())
+            if (pointFacei != currHit.index())
             {
                 forAll(hits, hI)
                 {
                     const pointIndexHit& hit = hits[hI];
 
-                    if (hit.index() == pointFaceI)
+                    if (hit.index() == pointFacei)
                     {
                         return false;
                     }
@@ -91,22 +91,22 @@ bool Foam::triSurfaceSearch::checkUniqueHit
 
         forAll(edgeFaces, fI)
         {
-            const label edgeFaceI = edgeFaces[fI];
+            const label edgeFacei = edgeFaces[fI];
 
-            if (edgeFaceI != currHit.index())
+            if (edgeFacei != currHit.index())
             {
                 forAll(hits, hI)
                 {
                     const pointIndexHit& hit = hits[hI];
 
-                    if (hit.index() == edgeFaceI)
+                    if (hit.index() == edgeFacei)
                     {
                         // Check normals
                         const vector currHitNormal =
                             surface().faceNormals()[currHit.index()];
 
                         const vector existingHitNormal =
-                            surface().faceNormals()[edgeFaceI];
+                            surface().faceNormals()[edgeFacei];
 
                         const label signCurrHit =
                             pos(currHitNormal & lineVec);
@@ -200,7 +200,7 @@ Foam::triSurfaceSearch::tree() const
     if (treePtr_.empty())
     {
         // Calculate bb without constructing local point numbering.
-        treeBoundBox bb(vector::zero, vector::zero);
+        treeBoundBox bb(Zero, Zero);
 
         if (surface().size())
         {
@@ -209,7 +209,7 @@ Foam::triSurfaceSearch::tree() const
 
             if (nPoints != surface().points().size())
             {
-                WarningIn("triSurfaceSearch::tree() const")
+                WarningInFunction
                     << "Surface does not have compact point numbering."
                     << " Of " << surface().points().size()
                     << " only " << nPoints
@@ -377,7 +377,7 @@ void Foam::triSurfaceSearch::findLineAll
 (
     const pointField& start,
     const pointField& end,
-    List<List<pointIndexHit> >& info
+    List<List<pointIndexHit>>& info
 ) const
 {
     const indexedOctree<treeDataTriSurface>& octree = tree();
@@ -394,7 +394,7 @@ void Foam::triSurfaceSearch::findLineAll
 
     treeDataTriSurface::findAllIntersectOp allIntersectOp(octree, shapeMask);
 
-    forAll(start, pointI)
+    forAll(start, pointi)
     {
         hits.clear();
         shapeMask.clear();
@@ -404,14 +404,14 @@ void Foam::triSurfaceSearch::findLineAll
             // See if any intersection between pt and end
             pointIndexHit inter = octree.findLine
             (
-                start[pointI],
-                end[pointI],
+                start[pointi],
+                end[pointi],
                 allIntersectOp
             );
 
             if (inter.hit())
             {
-                vector lineVec = end[pointI] - start[pointI];
+                vector lineVec = end[pointi] - start[pointi];
                 lineVec /= mag(lineVec) + VSMALL;
 
                 if
@@ -435,7 +435,7 @@ void Foam::triSurfaceSearch::findLineAll
             }
         }
 
-        info[pointI].transfer(hits);
+        info[pointi].transfer(hits);
     }
 
     indexedOctree<treeDataTriSurface>::perturbTol() = oldTol;

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -86,7 +86,7 @@ void Foam::csvSetWriter<Type>::write
     const bool writeTracks,
     const PtrList<coordSet>& points,
     const wordList& valueSetNames,
-    const List<List<Field<Type> > >& valueSets,
+    const List<List<Field<Type>>>& valueSets,
     Ostream& os
 ) const
 {
@@ -94,7 +94,7 @@ void Foam::csvSetWriter<Type>::write
 
     if (valueSets.size() != valueSetNames.size())
     {
-        FatalErrorIn("csvSetWriter<Type>::write(..)")
+        FatalErrorInFunction
             << "Number of variables:" << valueSetNames.size() << endl
             << "Number of valueSets:" << valueSets.size()
             << exit(FatalError);
@@ -147,7 +147,7 @@ namespace Foam
 
         os << nl;
     }
-} // end namespace
+}
 
 
 template<class Type>
@@ -183,17 +183,24 @@ void Foam::csvSetWriter<Type>::writeCoordHeader
     Ostream& os
 ) const
 {
+    const word axisName(points.axis());
+
     if (points.hasVectorAxis())
     {
-        forAll(points, i)
+        for
+        (
+            word::const_iterator iter = axisName.begin();
+            iter != axisName.end();
+            ++iter
+        )
         {
-            os << points.axis()[i];
+            os << *iter;
             writeSeparator(os);
         }
     }
     else
     {
-        os << points.axis();
+        os << axisName;
         writeSeparator(os);
     }
 }

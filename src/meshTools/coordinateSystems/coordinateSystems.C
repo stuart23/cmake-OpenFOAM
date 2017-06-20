@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -57,7 +57,7 @@ Foam::coordinateSystems::coordinateSystems
 Foam::coordinateSystems::coordinateSystems
 (
     const IOobject& io,
-    const Xfer<PtrList<coordinateSystem> >& lst
+    const Xfer<PtrList<coordinateSystem>>& lst
 )
 :
     IOPtrList<coordinateSystem>(io, lst)
@@ -97,12 +97,6 @@ const Foam::coordinateSystems& Foam::coordinateSystems::New
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-Foam::label Foam::coordinateSystems::find(const keyType& key) const
-{
-    return findIndex(key);
-}
-
 
 Foam::labelList Foam::coordinateSystems::findIndices(const keyType& key) const
 {

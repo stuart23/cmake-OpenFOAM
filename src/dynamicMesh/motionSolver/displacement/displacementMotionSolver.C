@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -130,16 +130,8 @@ Foam::displacementMotionSolver::displacementMotionSolver
 {
     if (points0_.size() != mesh.nPoints())
     {
-        FatalErrorIn
-        (
-            "displacementMotionSolver::"
-            "displacementMotionSolver\n"
-            "(\n"
-            "    const polyMesh&,\n"
-            "    const IOdictionary&,\n"
-            "    const word&\n"
-            ")"
-        )   << "Number of points in mesh " << mesh.nPoints()
+        FatalErrorInFunction
+            << "Number of points in mesh " << mesh.nPoints()
             << " differs from number of points " << points0_.size()
             << " read from file "
             <<
@@ -198,37 +190,34 @@ void Foam::displacementMotionSolver::updateMesh(const mapPolyMesh& mpm)
 
     pointField newPoints0(mpm.pointMap().size());
 
-    forAll(newPoints0, pointI)
+    forAll(newPoints0, pointi)
     {
-        label oldPointI = mpm.pointMap()[pointI];
+        label oldPointi = mpm.pointMap()[pointi];
 
-        if (oldPointI >= 0)
+        if (oldPointi >= 0)
         {
-            label masterPointI = mpm.reversePointMap()[oldPointI];
+            label masterPointi = mpm.reversePointMap()[oldPointi];
 
-            if (masterPointI == pointI)
+            if (masterPointi == pointi)
             {
-                newPoints0[pointI] = points0_[oldPointI];
+                newPoints0[pointi] = points0_[oldPointi];
             }
             else
             {
                 // New point - assume motion is scaling
-                newPoints0[pointI] = points0_[oldPointI] + cmptMultiply
+                newPoints0[pointi] = points0_[oldPointi] + cmptMultiply
                 (
                     scaleFactors,
-                    points[pointI] - points[masterPointI]
+                    points[pointi] - points[masterPointi]
                 );
             }
         }
         else
         {
-            FatalErrorIn
-            (
-                "displacementMotionSolver::updateMesh"
-                "(const mapPolyMesh&)"
-            )   << "Cannot determine co-ordinates of introduced vertices."
-                << " New vertex " << pointI << " at co-ordinate "
-                << points[pointI] << exit(FatalError);
+            FatalErrorInFunction
+                << "Cannot determine co-ordinates of introduced vertices."
+                << " New vertex " << pointi << " at co-ordinate "
+                << points[pointi] << exit(FatalError);
         }
     }
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -37,7 +37,7 @@ Foam::fv::faceCorrectedSnGrad<Type>::~faceCorrectedSnGrad()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::GeometricField<Type, Foam::fvsPatchField, Foam::surfaceMesh> >
+Foam::tmp<Foam::GeometricField<Type, Foam::fvsPatchField, Foam::surfaceMesh>>
 Foam::fv::faceCorrectedSnGrad<Type>::fullGradCorrection
 (
     const GeometricField<Type, fvPatchField, volMesh>& vf
@@ -51,7 +51,7 @@ Foam::fv::faceCorrectedSnGrad<Type>::fullGradCorrection
     );
 
     // construct GeometricField<Type, fvsPatchField, surfaceMesh>
-    tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > tsfCorr
+    tmp<GeometricField<Type, fvsPatchField, surfaceMesh>> tsfCorr
     (
         new GeometricField<Type, fvsPatchField, surfaceMesh>
         (
@@ -68,13 +68,13 @@ Foam::fv::faceCorrectedSnGrad<Type>::fullGradCorrection
         )
     );
 
-    Field<Type>& sfCorr = tsfCorr().internalField();
+    Field<Type>& sfCorr = tsfCorr.ref().primitiveFieldRef();
 
     const pointField& points = mesh.points();
     const faceList& faces = mesh.faces();
-    const vectorField& Sf = mesh.Sf().internalField();
-    const vectorField& C = mesh.C().internalField();
-    const scalarField& magSf = mesh.magSf().internalField();
+    const vectorField& Sf = mesh.Sf();
+    const vectorField& C = mesh.C();
+    const scalarField& magSf = mesh.magSf();
     const labelList& owner = mesh.owner();
     const labelList& neighbour = mesh.neighbour();
 
@@ -116,14 +116,14 @@ Foam::fv::faceCorrectedSnGrad<Type>::fullGradCorrection
         sfCorr[facei] = dCorr&fgrad;
     }
 
-    tsfCorr().boundaryField() = pTraits<Type>::zero;
+    tsfCorr.ref().boundaryFieldRef() = Zero;
 
     return tsfCorr;
 }
 
 
 template<class Type>
-Foam::tmp<Foam::GeometricField<Type, Foam::fvsPatchField, Foam::surfaceMesh> >
+Foam::tmp<Foam::GeometricField<Type, Foam::fvsPatchField, Foam::surfaceMesh>>
 Foam::fv::faceCorrectedSnGrad<Type>::correction
 (
     const GeometricField<Type, fvPatchField, volMesh>& vf
@@ -132,7 +132,7 @@ Foam::fv::faceCorrectedSnGrad<Type>::correction
     const fvMesh& mesh = this->mesh();
 
     // construct GeometricField<Type, fvsPatchField, surfaceMesh>
-    tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > tssf
+    tmp<GeometricField<Type, fvsPatchField, surfaceMesh>> tssf
     (
         new GeometricField<Type, fvsPatchField, surfaceMesh>
         (
@@ -148,7 +148,7 @@ Foam::fv::faceCorrectedSnGrad<Type>::correction
             vf.dimensions()*mesh.nonOrthDeltaCoeffs().dimensions()
         )
     );
-    GeometricField<Type, fvsPatchField, surfaceMesh>& ssf = tssf();
+    GeometricField<Type, fvsPatchField, surfaceMesh>& ssf = tssf.ref();
 
     for (direction cmpt = 0; cmpt < pTraits<Type>::nComponents; cmpt++)
     {

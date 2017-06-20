@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -179,11 +179,8 @@ void Foam::starMesh::addSAMMcell
 
         default:
         {
-            FatalErrorIn
-            (
-                "starMesh::addSAMMcell"
-                "(const labelList& labels, const label nCreatedCells)"
-            )   << "SAMM type " << sammTypeFlag << " is invalid"
+            FatalErrorInFunction
+                << "SAMM type " << sammTypeFlag << " is invalid"
                 << abort(FatalError);
         }
     }
@@ -245,7 +242,7 @@ void Foam::starMesh::readCells()
         }
         else
         {
-            FatalErrorIn("starMesh::readCells()")
+            FatalErrorInFunction
                 << "Cannot read file " << cellsFileName
                 << abort(FatalError);
         }
@@ -278,7 +275,7 @@ void Foam::starMesh::readCells()
         labelList labels(24, label(-1));
         label lineLabel, starLabel, regionLabel, typeFlag;
 
-        for (label cellI = 0; cellI < nCells; cellI++)
+        for (label celli = 0; celli < nCells; celli++)
         {
             label nLabels = 0;
 
@@ -294,7 +291,7 @@ void Foam::starMesh::readCells()
             {
                 if ((cellsFile >> lineLabel).eof())
                 {
-                    FatalErrorIn("starMesh::readCells()")
+                    FatalErrorInFunction
                         << "Reached end of cells file before "
                         << "all cells are read in."
                         << abort(FatalError);
@@ -349,29 +346,29 @@ void Foam::starMesh::readCells()
             } while (addOnToCell >= 0);
 
             // Record STAR cell number (used for debugging)
-            starCellID_[cellI] = lineLabel;
+            starCellID_[celli] = lineLabel;
 
             // insert STAR lookup addressing
-            starCellLabelLookup_[lineLabel] = cellI;
+            starCellLabelLookup_[lineLabel] = celli;
 
             if (nLabels == 8)
             {
-                addRegularCell(labels, cellI);
+                addRegularCell(labels, celli);
             }
             else
             {
-                addSAMMcell(labels, cellI);
+                addSAMMcell(labels, celli);
             }
 
             // check cell labels
-            const labelList& curShapeLabels = cellShapes_[cellI];
+            const labelList& curShapeLabels = cellShapes_[celli];
 
             forAll(curShapeLabels, i)
             {
                 if (curShapeLabels[i] < 0)
                 {
-                    FatalErrorIn("starMesh::readCells()")
-                        << "Invalid vertex found in cell " << cellI
+                    FatalErrorInFunction
+                        << "Invalid vertex found in cell " << celli
                         << ". STAR cell no: " << lineLabel
                         << " labels: " << curShapeLabels
                         << abort(FatalError);
@@ -381,7 +378,7 @@ void Foam::starMesh::readCells()
     }
     else
     {
-        FatalErrorIn("starMesh::readCells()")
+        FatalErrorInFunction
             << "No cells in file " << cellsFileName
             << abort(FatalError);
     }

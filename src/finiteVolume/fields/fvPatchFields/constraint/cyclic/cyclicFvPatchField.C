@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,15 +26,10 @@ License
 #include "cyclicFvPatchField.H"
 #include "transformField.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-cyclicFvPatchField<Type>::cyclicFvPatchField
+Foam::cyclicFvPatchField<Type>::cyclicFvPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF
@@ -46,7 +41,35 @@ cyclicFvPatchField<Type>::cyclicFvPatchField
 
 
 template<class Type>
-cyclicFvPatchField<Type>::cyclicFvPatchField
+Foam::cyclicFvPatchField<Type>::cyclicFvPatchField
+(
+    const fvPatch& p,
+    const DimensionedField<Type, volMesh>& iF,
+    const dictionary& dict
+)
+:
+    coupledFvPatchField<Type>(p, iF, dict),
+    cyclicPatch_(refCast<const cyclicFvPatch>(p))
+{
+    if (!isA<cyclicFvPatch>(p))
+    {
+        FatalIOErrorInFunction
+        (
+            dict
+        )   << "    patch type '" << p.type()
+            << "' not constraint type '" << typeName << "'"
+            << "\n    for patch " << p.name()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
+            << exit(FatalIOError);
+    }
+
+    this->evaluate(Pstream::blocking);
+}
+
+
+template<class Type>
+Foam::cyclicFvPatchField<Type>::cyclicFvPatchField
 (
     const cyclicFvPatchField<Type>& ptf,
     const fvPatch& p,
@@ -59,61 +82,18 @@ cyclicFvPatchField<Type>::cyclicFvPatchField
 {
     if (!isA<cyclicFvPatch>(this->patch()))
     {
-        FatalErrorIn
-        (
-            "cyclicFvPatchField<Type>::cyclicFvPatchField"
-            "("
-                "const cyclicFvPatchField<Type>& ,"
-                "const fvPatch&, "
-                "const DimensionedField<Type, volMesh>&, "
-                "const fvPatchFieldMapper&"
-            ")"
-        )   << "    patch type '" << p.type()
+        FatalErrorInFunction
             << "' not constraint type '" << typeName << "'"
             << "\n    for patch " << p.name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
+            << " of field " << this->internalField().name()
+            << " in file " << this->internalField().objectPath()
             << exit(FatalIOError);
     }
 }
 
 
 template<class Type>
-cyclicFvPatchField<Type>::cyclicFvPatchField
-(
-    const fvPatch& p,
-    const DimensionedField<Type, volMesh>& iF,
-    const dictionary& dict
-)
-:
-    coupledFvPatchField<Type>(p, iF, dict),
-    cyclicPatch_(refCast<const cyclicFvPatch>(p))
-{
-    if (!isA<cyclicFvPatch>(p))
-    {
-        FatalIOErrorIn
-        (
-            "cyclicFvPatchField<Type>::cyclicFvPatchField"
-            "("
-                "const fvPatch&, "
-                "const Field<Type>&, "
-                "const dictionary&"
-            ")",
-            dict
-        )   << "    patch type '" << p.type()
-            << "' not constraint type '" << typeName << "'"
-            << "\n    for patch " << p.name()
-            << " of field " << this->dimensionedInternalField().name()
-            << " in file " << this->dimensionedInternalField().objectPath()
-            << exit(FatalIOError);
-    }
-
-    this->evaluate(Pstream::blocking);
-}
-
-
-template<class Type>
-cyclicFvPatchField<Type>::cyclicFvPatchField
+Foam::cyclicFvPatchField<Type>::cyclicFvPatchField
 (
     const cyclicFvPatchField<Type>& ptf
 )
@@ -125,7 +105,7 @@ cyclicFvPatchField<Type>::cyclicFvPatchField
 
 
 template<class Type>
-cyclicFvPatchField<Type>::cyclicFvPatchField
+Foam::cyclicFvPatchField<Type>::cyclicFvPatchField
 (
     const cyclicFvPatchField<Type>& ptf,
     const DimensionedField<Type, volMesh>& iF
@@ -139,14 +119,15 @@ cyclicFvPatchField<Type>::cyclicFvPatchField
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-tmp<Field<Type> > cyclicFvPatchField<Type>::patchNeighbourField() const
+Foam::tmp<Foam::Field<Type>>
+Foam::cyclicFvPatchField<Type>::patchNeighbourField() const
 {
-    const Field<Type>& iField = this->internalField();
+    const Field<Type>& iField = this->primitiveField();
     const labelUList& nbrFaceCells =
         cyclicPatch().cyclicPatch().neighbPatch().faceCells();
 
-    tmp<Field<Type> > tpnf(new Field<Type>(this->size()));
-    Field<Type>& pnf = tpnf();
+    tmp<Field<Type>> tpnf(new Field<Type>(this->size()));
+    Field<Type>& pnf = tpnf.ref();
 
 
     if (doTransform())
@@ -172,16 +153,16 @@ tmp<Field<Type> > cyclicFvPatchField<Type>::patchNeighbourField() const
 
 
 template<class Type>
-const cyclicFvPatchField<Type>& cyclicFvPatchField<Type>::neighbourPatchField()
-const
+const Foam::cyclicFvPatchField<Type>&
+Foam::cyclicFvPatchField<Type>::neighbourPatchField() const
 {
     const GeometricField<Type, fvPatchField, volMesh>& fld =
     static_cast<const GeometricField<Type, fvPatchField, volMesh>&>
     (
-        this->internalField()
+        this->primitiveField()
     );
 
-    return refCast<const cyclicFvPatchField<Type> >
+    return refCast<const cyclicFvPatchField<Type>>
     (
         fld.boundaryField()[this->cyclicPatch().neighbPatchID()]
     );
@@ -189,7 +170,7 @@ const
 
 
 template<class Type>
-void cyclicFvPatchField<Type>::updateInterfaceMatrix
+void Foam::cyclicFvPatchField<Type>::updateInterfaceMatrix
 (
     scalarField& result,
     const scalarField& psiInternal,
@@ -217,7 +198,7 @@ void cyclicFvPatchField<Type>::updateInterfaceMatrix
 
 
 template<class Type>
-void cyclicFvPatchField<Type>::updateInterfaceMatrix
+void Foam::cyclicFvPatchField<Type>::updateInterfaceMatrix
 (
     Field<Type>& result,
     const Field<Type>& psiInternal,
@@ -244,14 +225,10 @@ void cyclicFvPatchField<Type>::updateInterfaceMatrix
 
 
 template<class Type>
-void cyclicFvPatchField<Type>::write(Ostream& os) const
+void Foam::cyclicFvPatchField<Type>::write(Ostream& os) const
 {
     fvPatchField<Type>::write(os);
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

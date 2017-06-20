@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -100,9 +100,9 @@ void Foam::regionModels::regionModel::initialise()
     DynamicList<label> intCoupledPatchIDs;
     const polyBoundaryMesh& rbm = regionMesh().boundaryMesh();
 
-    forAll(rbm, patchI)
+    forAll(rbm, patchi)
     {
-        const polyPatch& regionPatch = rbm[patchI];
+        const polyPatch& regionPatch = rbm[patchi];
         if (isA<mappedPatchBase>(regionPatch))
         {
             if (debug)
@@ -111,7 +111,7 @@ void Foam::regionModels::regionModel::initialise()
                     <<  " " << regionPatch.name() << endl;
             }
 
-            intCoupledPatchIDs.append(patchI);
+            intCoupledPatchIDs.append(patchi);
 
             nBoundaryFaces += regionPatch.faceCells().size();
 
@@ -127,8 +127,8 @@ void Foam::regionModels::regionModel::initialise()
             )
             {
 
-                const label primaryPatchI = mapPatch.samplePolyPatch().index();
-                primaryPatchIDs.append(primaryPatchI);
+                const label primaryPatchi = mapPatch.samplePolyPatch().index();
+                primaryPatchIDs.append(primaryPatchi);
             }
         }
     }
@@ -138,7 +138,7 @@ void Foam::regionModels::regionModel::initialise()
 
     if (returnReduce(nBoundaryFaces, sumOp<label>()) == 0)
     {
-        WarningIn("regionModel::initialise()")
+        WarningInFunction
             << "Region model has no mapped boundary conditions - transfer "
             << "between regions will not be possible" << endl;
     }
@@ -215,8 +215,8 @@ const Foam::AMIPatchToPatchInterpolation&
 Foam::regionModels::regionModel::interRegionAMI
 (
     const regionModel& nbrRegion,
-    const label regionPatchI,
-    const label nbrPatchI,
+    const label regionPatchi,
+    const label nbrPatchi,
     const bool flip
 ) const
 {
@@ -226,17 +226,17 @@ Foam::regionModels::regionModel::interRegionAMI
 
     if (nbrRegionID != -1)
     {
-        if (!interRegionAMI_[nbrRegionID].set(regionPatchI))
+        if (!interRegionAMI_[nbrRegionID].set(regionPatchi))
         {
-            const polyPatch& p = regionMesh().boundaryMesh()[regionPatchI];
-            const polyPatch& nbrP = nbrRegionMesh.boundaryMesh()[nbrPatchI];
+            const polyPatch& p = regionMesh().boundaryMesh()[regionPatchi];
+            const polyPatch& nbrP = nbrRegionMesh.boundaryMesh()[nbrPatchi];
 
             int oldTag = UPstream::msgType();
             UPstream::msgType() = oldTag + 1;
 
             interRegionAMI_[nbrRegionID].set
             (
-                regionPatchI,
+                regionPatchi,
                 new AMIPatchToPatchInterpolation
                 (
                     p,
@@ -252,7 +252,7 @@ Foam::regionModels::regionModel::interRegionAMI
             UPstream::msgType() = oldTag;
         }
 
-        return interRegionAMI_[nbrRegionID][regionPatchI];
+        return interRegionAMI_[nbrRegionID][regionPatchi];
     }
     else
     {
@@ -260,8 +260,8 @@ Foam::regionModels::regionModel::interRegionAMI
 
         interRegionAMINames_.append(nbrRegion.name());
 
-        const polyPatch& p = regionMesh().boundaryMesh()[regionPatchI];
-        const polyPatch& nbrP = nbrRegionMesh.boundaryMesh()[nbrPatchI];
+        const polyPatch& p = regionMesh().boundaryMesh()[regionPatchi];
+        const polyPatch& nbrP = nbrRegionMesh.boundaryMesh()[nbrPatchi];
 
         label nPatch = regionMesh().boundaryMesh().size();
 
@@ -279,7 +279,7 @@ Foam::regionModels::regionModel::interRegionAMI
 
         interRegionAMI_[nbrRegionID].set
         (
-            regionPatchI,
+            regionPatchi,
             new AMIPatchToPatchInterpolation
             (
                 p,
@@ -294,7 +294,7 @@ Foam::regionModels::regionModel::interRegionAMI
 
         UPstream::msgType() = oldTag;
 
-        return interRegionAMI_[nbrRegionID][regionPatchI];
+        return interRegionAMI_[nbrRegionID][regionPatchi];
     }
 }
 
@@ -302,10 +302,10 @@ Foam::regionModels::regionModel::interRegionAMI
 Foam::label Foam::regionModels::regionModel::nbrCoupledPatchID
 (
     const regionModel& nbrRegion,
-    const label regionPatchI
+    const label regionPatchi
 ) const
 {
-    label nbrPatchI = -1;
+    label nbrPatchi = -1;
 
     // region
     const fvMesh& nbrRegionMesh = nbrRegion.regionMesh();
@@ -315,34 +315,20 @@ Foam::label Foam::regionModels::regionModel::nbrCoupledPatchID
 
     const polyBoundaryMesh& pbm = regionMesh().boundaryMesh();
 
-    if (regionPatchI > pbm.size() - 1)
+    if (regionPatchi > pbm.size() - 1)
     {
-        FatalErrorIn
-        (
-            "Foam::label Foam::regionModels::regionModel::nbrCoupledPatchID"
-            "("
-                "const regionModel&, "
-                "const label"
-            ") const"
-        )
+        FatalErrorInFunction
             << "region patch index out of bounds: "
-            << "region patch index = " << regionPatchI
+            << "region patch index = " << regionPatchi
             << ", maximum index = " << pbm.size() - 1
             << abort(FatalError);
     }
 
-    const polyPatch& pp = regionMesh().boundaryMesh()[regionPatchI];
+    const polyPatch& pp = regionMesh().boundaryMesh()[regionPatchi];
 
     if (!isA<mappedPatchBase>(pp))
     {
-        FatalErrorIn
-        (
-            "Foam::label Foam::regionModels::regionModel::nbrCoupledPatchID"
-            "("
-                "const regionModel&, "
-                "const label"
-            ") const"
-        )
+        FatalErrorInFunction
             << "Expected a " << mappedPatchBase::typeName
             << " patch, but found a " << pp.type() << abort(FatalError);
     }
@@ -355,36 +341,29 @@ Foam::label Foam::regionModels::regionModel::nbrCoupledPatchID
     // find patch on nbr region that has the same sample patch name
     forAll(nbrRegion.intCoupledPatchIDs(), j)
     {
-        const label nbrRegionPatchI = nbrRegion.intCoupledPatchIDs()[j];
+        const label nbrRegionPatchi = nbrRegion.intCoupledPatchIDs()[j];
 
         const mappedPatchBase& mpb =
-            refCast<const mappedPatchBase>(nbrPbm[nbrRegionPatchI]);
+            refCast<const mappedPatchBase>(nbrPbm[nbrRegionPatchi]);
 
         if (mpb.samplePatch() == primaryPatchName)
         {
-            nbrPatchI = nbrRegionPatchI;
+            nbrPatchi = nbrRegionPatchi;
             break;
         }
     }
 
-    if (nbrPatchI == -1)
+    if (nbrPatchi == -1)
     {
-        const polyPatch& p = regionMesh().boundaryMesh()[regionPatchI];
+        const polyPatch& p = regionMesh().boundaryMesh()[regionPatchi];
 
-        FatalErrorIn
-        (
-            "Foam::label Foam::regionModels::regionModel::nbrCoupledPatchID"
-            "("
-                "const regionModel&, "
-                "const label"
-            ") const"
-        )
+        FatalErrorInFunction
             << "Unable to find patch pair for local patch "
             << p.name() << " and region " << nbrRegion.name()
             << abort(FatalError);
     }
 
-    return nbrPatchI;
+    return nbrPatchi;
 }
 
 
@@ -548,7 +527,7 @@ void Foam::regionModels::regionModel::evolve()
             Info<< endl << decrIndent;
         }
 
-        if (time_.outputTime())
+        if (time_.writeTime())
         {
             outputProperties().writeObject
             (

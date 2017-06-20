@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -78,13 +78,15 @@ Ostream& operator<<
 template<class Type>
 class SolverPerformance
 {
-    word   solverName_;
-    word   fieldName_;
-    Type   initialResidual_;
-    Type   finalResidual_;
-    label  noIterations_;
-    bool   converged_;
-    FixedList<bool, pTraits<Type>::nComponents> singular_;
+    // Private data
+
+        word   solverName_;
+        word   fieldName_;
+        Type   initialResidual_;
+        Type   finalResidual_;
+        label  noIterations_;
+        bool   converged_;
+        FixedList<bool, pTraits<Type>::nComponents> singular_;
 
 
 public:
@@ -108,8 +110,8 @@ public:
 
         SolverPerformance()
         :
-            initialResidual_(pTraits<Type>::zero),
-            finalResidual_(pTraits<Type>::zero),
+            initialResidual_(Zero),
+            finalResidual_(Zero),
             noIterations_(0),
             converged_(false),
             singular_(false)
@@ -220,6 +222,17 @@ public:
         //- Print summary of solver performance to the given stream
         void print(Ostream& os) const;
 
+        //- Replace component based on the minimal SolverPerformance
+        void replace
+        (
+            const label cmpt,
+            const SolverPerformance<typename pTraits<Type>::cmptType>& sp
+        );
+
+        //- Return the summary maximum of SolverPerformance<Type>
+        //  Effectively it will mostly return solverPerformanceScalar
+        SolverPerformance<typename pTraits<Type>::cmptType> max();
+
 
     // Member Operators
 
@@ -229,7 +242,7 @@ public:
     // Friend functions
 
         //- Return the element-wise maximum of two SolverPerformance<Type>s
-        friend SolverPerformance<Type> max <Type>
+        friend SolverPerformance<Type> Foam::max <Type>
         (
             const SolverPerformance<Type>&,
             const SolverPerformance<Type>&
@@ -258,27 +271,27 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define makeSolverPerformance(Type)                                           \
-                                                                              \
-typedef Foam::SolverPerformance<Type>                                         \
-    solverPerformance##Type;                                                  \
-                                                                              \
-defineNamedTemplateTypeNameAndDebug(solverPerformance##Type, 0);              \
-                                                                              \
-template<>                                                                    \
-const scalar solverPerformance##Type::great_(1e20);                           \
-                                                                              \
-template<>                                                                    \
-const scalar solverPerformance##Type::small_(1e-20);                          \
-                                                                              \
-template<>                                                                    \
-const scalar solverPerformance##Type::vsmall_(VSMALL);                        \
+#define makeSolverPerformance(Type)                                            \
+                                                                               \
+typedef Foam::SolverPerformance<Type>                                          \
+    solverPerformance##Type;                                                   \
+                                                                               \
+defineNamedTemplateTypeNameAndDebug(solverPerformance##Type, 0);               \
+                                                                               \
+template<>                                                                     \
+const scalar solverPerformance##Type::great_(1e20);                            \
+                                                                               \
+template<>                                                                     \
+const scalar solverPerformance##Type::small_(1e-20);                           \
+                                                                               \
+template<>                                                                     \
+const scalar solverPerformance##Type::vsmall_(VSMALL);                         \
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "SolverPerformance.C"
+    #include "SolverPerformance.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

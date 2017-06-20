@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,15 +25,10 @@ License
 
 #include "processorFvsPatchField.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors * * * * * * * * * * * * * * //
 
 template<class Type>
-processorFvsPatchField<Type>::processorFvsPatchField
+Foam::processorFvsPatchField<Type>::processorFvsPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, surfaceMesh>& iF
@@ -45,7 +40,7 @@ processorFvsPatchField<Type>::processorFvsPatchField
 
 
 template<class Type>
-processorFvsPatchField<Type>::processorFvsPatchField
+Foam::processorFvsPatchField<Type>::processorFvsPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, surfaceMesh>& iF,
@@ -57,9 +52,31 @@ processorFvsPatchField<Type>::processorFvsPatchField
 {}
 
 
-// Construct by mapping given processorFvsPatchField<Type>
 template<class Type>
-processorFvsPatchField<Type>::processorFvsPatchField
+Foam::processorFvsPatchField<Type>::processorFvsPatchField
+(
+    const fvPatch& p,
+    const DimensionedField<Type, surfaceMesh>& iF,
+    const dictionary& dict
+)
+:
+    coupledFvsPatchField<Type>(p, iF, dict),
+    procPatch_(refCast<const processorFvPatch>(p))
+{
+    if (!isType<processorFvPatch>(p))
+    {
+        FatalIOErrorInFunction
+        (
+            dict
+        )   << "patch " << this->patch().index() << " not processor type. "
+            << "Patch type = " << p.type()
+            << exit(FatalIOError);
+    }
+}
+
+
+template<class Type>
+Foam::processorFvsPatchField<Type>::processorFvsPatchField
 (
     const processorFvsPatchField<Type>& ptf,
     const fvPatch& p,
@@ -72,16 +89,8 @@ processorFvsPatchField<Type>::processorFvsPatchField
 {
     if (!isType<processorFvPatch>(this->patch()))
     {
-        FatalErrorIn
-        (
-            "processorFvsPatchField<Type>::processorFvsPatchField\n"
-            "(\n"
-            "    const processorFvsPatchField<Type>& ptf,\n"
-            "    const fvPatch& p,\n"
-            "    const DimensionedField<Type, surfaceMesh>& iF,\n"
-            "    const fvPatchFieldMapper& mapper\n"
-            ")\n"
-        )   << "Field type does not correspond to patch type for patch "
+        FatalErrorInFunction
+            << "Field type does not correspond to patch type for patch "
             << this->patch().index() << "." << endl
             << "Field type: " << typeName << endl
             << "Patch type: " << this->patch().type()
@@ -91,36 +100,7 @@ processorFvsPatchField<Type>::processorFvsPatchField
 
 
 template<class Type>
-processorFvsPatchField<Type>::processorFvsPatchField
-(
-    const fvPatch& p,
-    const DimensionedField<Type, surfaceMesh>& iF,
-    const dictionary& dict
-)
-:
-    coupledFvsPatchField<Type>(p, iF, dict),
-    procPatch_(refCast<const processorFvPatch>(p))
-{
-    if (!isType<processorFvPatch>(p))
-    {
-        FatalIOErrorIn
-        (
-            "processorFvsPatchField<Type>::processorFvsPatchField\n"
-            "(\n"
-            "    const fvPatch& p,\n"
-            "    const Field<Type>& field,\n"
-            "    const dictionary& dict\n"
-            ")\n",
-            dict
-        )   << "patch " << this->patch().index() << " not processor type. "
-            << "Patch type = " << p.type()
-            << exit(FatalIOError);
-    }
-}
-
-
-template<class Type>
-processorFvsPatchField<Type>::processorFvsPatchField
+Foam::processorFvsPatchField<Type>::processorFvsPatchField
 (
     const processorFvsPatchField<Type>& ptf
 )
@@ -131,7 +111,7 @@ processorFvsPatchField<Type>::processorFvsPatchField
 
 
 template<class Type>
-processorFvsPatchField<Type>::processorFvsPatchField
+Foam::processorFvsPatchField<Type>::processorFvsPatchField
 (
     const processorFvsPatchField<Type>& ptf,
     const DimensionedField<Type, surfaceMesh>& iF
@@ -145,12 +125,8 @@ processorFvsPatchField<Type>::processorFvsPatchField
 // * * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * //
 
 template<class Type>
-processorFvsPatchField<Type>::~processorFvsPatchField()
+Foam::processorFvsPatchField<Type>::~processorFvsPatchField()
 {}
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

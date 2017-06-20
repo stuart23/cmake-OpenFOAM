@@ -2,7 +2,7 @@
     word alphaScheme("div(phi,alpha)");
     word alpharScheme("div(phirb,alpha)");
 
-    tmp<fv::ddtScheme<scalar> > ddtAlpha
+    tmp<fv::ddtScheme<scalar>> ddtAlpha
     (
         fv::ddtScheme<scalar>::New
         (
@@ -15,28 +15,29 @@
     scalar ocCoeff = 0;
     if
     (
-        isType<fv::EulerDdtScheme<scalar> >(ddtAlpha())
-     || isType<fv::localEulerDdtScheme<scalar> >(ddtAlpha())
+        isType<fv::EulerDdtScheme<scalar>>(ddtAlpha())
+     || isType<fv::localEulerDdtScheme<scalar>>(ddtAlpha())
     )
     {
         ocCoeff = 0;
     }
-    else if (isType<fv::CrankNicolsonDdtScheme<scalar> >(ddtAlpha()))
+    else if (isType<fv::CrankNicolsonDdtScheme<scalar>>(ddtAlpha()))
     {
         if (nAlphaSubCycles > 1)
         {
-            FatalErrorIn(args.executable())
+            FatalErrorInFunction
                 << "Sub-cycling is not supported "
                    "with the CrankNicolson ddt scheme"
                 << exit(FatalError);
         }
 
         ocCoeff =
-            refCast<fv::CrankNicolsonDdtScheme<scalar> >(ddtAlpha()).ocCoeff();
+            refCast<const fv::CrankNicolsonDdtScheme<scalar>>(ddtAlpha())
+           .ocCoeff();
     }
     else
     {
-        FatalErrorIn(args.executable())
+        FatalErrorInFunction
             << "Only Euler and CrankNicolson ddt schemes are supported"
             << exit(FatalError);
     }
@@ -53,11 +54,14 @@
         phic += (mixture.cAlpha()*icAlpha)*fvc::interpolate(mag(U));
     }
 
+    surfaceScalarField::Boundary& phicBf =
+        phic.boundaryFieldRef();
+
     // Do not compress interface at non-coupled boundary faces
     // (inlets, outlets etc.)
     forAll(phic.boundaryField(), patchi)
     {
-        fvsPatchScalarField& phicp = phic.boundaryField()[patchi];
+        fvsPatchScalarField& phicp = phicBf[patchi];
 
         if (!phicp.coupled())
         {
@@ -104,7 +108,7 @@
         if (alphaApplyPrevCorr && talphaPhiCorr0.valid())
         {
             Info<< "Applying the previous iteration compression flux" << endl;
-            MULES::correct(alpha1, alphaPhi, talphaPhiCorr0(), 1, 0);
+            MULES::correct(alpha1, alphaPhi, talphaPhiCorr0.ref(), 1, 0);
 
             alphaPhi += talphaPhiCorr0();
         }
@@ -150,7 +154,7 @@
             tmp<surfaceScalarField> talphaPhiCorr(talphaPhiUn() - alphaPhi);
             volScalarField alpha10("alpha10", alpha1);
 
-            MULES::correct(alpha1, talphaPhiUn(), talphaPhiCorr(), 1, 0);
+            MULES::correct(alpha1, talphaPhiUn(), talphaPhiCorr.ref(), 1, 0);
 
             // Under-relax the correction for all but the 1st corrector
             if (aCorr == 0)

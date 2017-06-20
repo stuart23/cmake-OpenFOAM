@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,8 +30,6 @@ License
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-// Calculates per face the neighbour data (= faces of cell). Leaves out the
-// face itself since this is already in stencil.
 void Foam::CFCFaceToCellStencil::calcFaceBoundaryData
 (
     labelListList& neiGlobal
@@ -43,25 +41,25 @@ void Foam::CFCFaceToCellStencil::calcFaceBoundaryData
 
     neiGlobal.setSize(nBnd);
 
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        const polyPatch& pp = patches[patchI];
-        label faceI = pp.start();
+        const polyPatch& pp = patches[patchi];
+        label facei = pp.start();
 
         if (pp.coupled())
         {
             // For coupled faces get the faces of the cell on the other side
             forAll(pp, i)
             {
-                const labelList& cFaces = mesh().cells()[own[faceI]];
+                const labelList& cFaces = mesh().cells()[own[facei]];
 
-                labelList& globFaces = neiGlobal[faceI-mesh().nInternalFaces()];
+                labelList& globFaces = neiGlobal[facei-mesh().nInternalFaces()];
                 globFaces.setSize(cFaces.size()-1);
                 label globI = 0;
 
                 forAll(cFaces, j)
                 {
-                    if (cFaces[j] != faceI)
+                    if (cFaces[j] != facei)
                     {
                         globFaces[globI++] = globalNumbering().toGlobal
                         (
@@ -69,7 +67,7 @@ void Foam::CFCFaceToCellStencil::calcFaceBoundaryData
                         );
                     }
                 }
-                faceI++;
+                facei++;
             }
         }
         else if (isA<emptyPolyPatch>(pp))
@@ -81,7 +79,7 @@ void Foam::CFCFaceToCellStencil::calcFaceBoundaryData
             // Do nothing since face itself already in stencil
         }
     }
-    //syncTools::swapBoundaryFaceList(mesh(), neiGlobal);
+
     syncTools::syncBoundaryFaceList
     (
         mesh(),
@@ -92,10 +90,10 @@ void Foam::CFCFaceToCellStencil::calcFaceBoundaryData
 }
 
 
-// Calculates per cell the neighbour data (= cell or boundary in global
-// numbering). First element is always cell itself!
-void Foam::CFCFaceToCellStencil::calcCellStencil(labelListList& globalCellFaces)
- const
+void Foam::CFCFaceToCellStencil::calcCellStencil
+(
+    labelListList& globalCellFaces
+) const
 {
     const label nBnd = mesh().nFaces()-mesh().nInternalFaces();
     const labelList& own = mesh().faceOwner();
@@ -114,16 +112,16 @@ void Foam::CFCFaceToCellStencil::calcCellStencil(labelListList& globalCellFaces)
     boolList validBFace(mesh().nFaces()-mesh().nInternalFaces(), true);
 
     const polyBoundaryMesh& patches = mesh().boundaryMesh();
-    forAll(patches, patchI)
+    forAll(patches, patchi)
     {
-        const polyPatch& pp = patches[patchI];
+        const polyPatch& pp = patches[patchi];
 
         if (isA<emptyPolyPatch>(pp))
         {
-            label bFaceI = pp.start()-mesh().nInternalFaces();
+            label bFacei = pp.start()-mesh().nInternalFaces();
             forAll(pp, i)
             {
-                validBFace[bFaceI++] = false;
+                validBFace[bFacei++] = false;
             }
         }
     }
@@ -135,52 +133,52 @@ void Foam::CFCFaceToCellStencil::calcCellStencil(labelListList& globalCellFaces)
     DynamicList<label> allGlobalFaces(100);
 
     globalCellFaces.setSize(mesh().nCells());
-    forAll(globalCellFaces, cellI)
+    forAll(globalCellFaces, celli)
     {
-        const cell& cFaces = mesh().cells()[cellI];
+        const cell& cFaces = mesh().cells()[celli];
 
         allGlobalFaces.clear();
 
         // My faces first
         forAll(cFaces, i)
         {
-            label faceI = cFaces[i];
+            label facei = cFaces[i];
 
             if
             (
-                mesh().isInternalFace(faceI)
-             || validBFace[faceI-mesh().nInternalFaces()]
+                mesh().isInternalFace(facei)
+             || validBFace[facei-mesh().nInternalFaces()]
             )
             {
-                allGlobalFaces.append(globalNumbering().toGlobal(faceI));
+                allGlobalFaces.append(globalNumbering().toGlobal(facei));
             }
         }
 
         // faces of neighbouring cells second
         forAll(cFaces, i)
         {
-            label faceI = cFaces[i];
+            label facei = cFaces[i];
 
-            if (mesh().isInternalFace(faceI))
+            if (mesh().isInternalFace(facei))
             {
-                label nbrCellI = own[faceI];
-                if (nbrCellI == cellI)
+                label nbrCelli = own[facei];
+                if (nbrCelli == celli)
                 {
-                    nbrCellI = nei[faceI];
+                    nbrCelli = nei[facei];
                 }
-                const cell& nbrFaces = mesh().cells()[nbrCellI];
+                const cell& nbrFaces = mesh().cells()[nbrCelli];
 
                 forAll(nbrFaces, j)
                 {
-                    label nbrFaceI = nbrFaces[j];
+                    label nbrFacei = nbrFaces[j];
 
                     if
                     (
-                        mesh().isInternalFace(nbrFaceI)
-                     || validBFace[nbrFaceI-mesh().nInternalFaces()]
+                        mesh().isInternalFace(nbrFacei)
+                     || validBFace[nbrFacei-mesh().nInternalFaces()]
                     )
                     {
-                        label nbrGlobalI = globalNumbering().toGlobal(nbrFaceI);
+                        label nbrGlobalI = globalNumbering().toGlobal(nbrFacei);
 
                         // Check if already there. Note:should use hashset?
                         if (findIndex(allGlobalFaces, nbrGlobalI) == -1)
@@ -193,7 +191,7 @@ void Foam::CFCFaceToCellStencil::calcCellStencil(labelListList& globalCellFaces)
             else
             {
                 const labelList& nbrGlobalFaces =
-                    neiGlobal[faceI-mesh().nInternalFaces()];
+                    neiGlobal[facei-mesh().nInternalFaces()];
 
                 forAll(nbrGlobalFaces, j)
                 {
@@ -208,16 +206,16 @@ void Foam::CFCFaceToCellStencil::calcCellStencil(labelListList& globalCellFaces)
             }
         }
 
-        globalCellFaces[cellI] = allGlobalFaces;
-        //Pout<< "** cell:" << cellI
-        //    << " at:" << mesh().cellCentres()[cellI]
+        globalCellFaces[celli] = allGlobalFaces;
+        //Pout<< "** cell:" << celli
+        //    << " at:" << mesh().cellCentres()[celli]
         //    << endl;
-        //const labelList& globalFaces = globalCellFaces[cellI];
+        //const labelList& globalFaces = globalCellFaces[celli];
         //forAll(globalFaces, i)
         //{
-        //    label faceI = globalNumbering().toLocal(globalFaces[i]);
-        //    Pout<< "    face:" << faceI
-        //        << " at:" << mesh().faceCentres()[faceI]
+        //    label facei = globalNumbering().toLocal(globalFaces[i]);
+        //    Pout<< "    face:" << facei
+        //        << " at:" << mesh().faceCentres()[facei]
         //        << endl;
         //}
     }

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -54,12 +54,12 @@ int main(int argc, char *argv[])
     // Test mapDistribute
     // ~~~~~~~~~~~~~~~~~~
 
-    if (false)
+    if (true)
     {
         Random rndGen(43544*Pstream::myProcNo());
 
         // Generate random data.
-        List<Tuple2<label, List<scalar> > > complexData(100);
+        List<Tuple2<label, List<scalar>>> complexData(100);
         forAll(complexData, i)
         {
             complexData[i].first() = rndGen.integer(0, Pstream::nProcs()-1);
@@ -76,33 +76,32 @@ int main(int argc, char *argv[])
         labelList nSend(Pstream::nProcs(), 0);
         forAll(complexData, i)
         {
-            label procI = complexData[i].first();
-            nSend[procI]++;
+            label proci = complexData[i].first();
+            nSend[proci]++;
         }
-
-        // Sync how many to send
-        labelListList allNTrans(Pstream::nProcs());
-        allNTrans[Pstream::myProcNo()] = nSend;
-        combineReduce(allNTrans, UPstream::listEq());
 
         // Collect items to be sent
         labelListList sendMap(Pstream::nProcs());
-        forAll(sendMap, procI)
+        forAll(sendMap, proci)
         {
-            sendMap[procI].setSize(nSend[procI]);
+            sendMap[proci].setSize(nSend[proci]);
         }
         nSend = 0;
         forAll(complexData, i)
         {
-            label procI = complexData[i].first();
-            sendMap[procI][nSend[procI]++] = i;
+            label proci = complexData[i].first();
+            sendMap[proci][nSend[proci]++] = i;
         }
+
+        // Sync how many to send
+        labelList nRecv;
+        Pstream::exchangeSizes(sendMap, nRecv);
 
         // Collect items to be received
         labelListList recvMap(Pstream::nProcs());
-        forAll(recvMap, procI)
+        forAll(recvMap, proci)
         {
-            recvMap[procI].setSize(allNTrans[procI][Pstream::myProcNo()]);
+            recvMap[proci].setSize(nRecv[proci]);
         }
 
         label constructSize = 0;
@@ -112,13 +111,13 @@ int main(int argc, char *argv[])
             recvMap[Pstream::myProcNo()][i] = constructSize++;
         }
         // Construct from other processors
-        forAll(recvMap, procI)
+        forAll(recvMap, proci)
         {
-            if (procI != Pstream::myProcNo())
+            if (proci != Pstream::myProcNo())
             {
-                forAll(recvMap[procI], i)
+                forAll(recvMap[proci], i)
                 {
-                    recvMap[procI][i] = constructSize++;
+                    recvMap[proci][i] = constructSize++;
                 }
             }
         }

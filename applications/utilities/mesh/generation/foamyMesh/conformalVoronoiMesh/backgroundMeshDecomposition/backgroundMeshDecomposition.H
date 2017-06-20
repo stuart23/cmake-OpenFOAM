@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,16 +30,16 @@ Description
 
     The requirements are:
 
-    + To have a decomposition of space which can quickly interrogate an
+    - To have a decomposition of space which can quickly interrogate an
       arbitrary location from any processor to reliably and unambiguously
       determine which processor owns the space that the point is in, i.e. as
       the vertices move, or need inserted as part of the surface conformation,
       send them to the correct proc.
 
-    + To be able to be dynamically built, refined and redistributed to other
+    - To be able to be dynamically built, refined and redistributed to other
       procs the partitioning as the meshing progresses to balance the load.
 
-    + To be able to query whether a sphere (the circumsphere of a Delaunay tet)
+    - To be able to query whether a sphere (the circumsphere of a Delaunay tet)
       overlaps any part of the space defined by the structure, and whether a
       ray (Voronoi edge) penetrates any part of the space defined by the
       structure, this is what determines if points get referred to a processor.
@@ -118,7 +118,7 @@ class backgroundMeshDecomposition
         autoPtr<bPatch> boundaryFacesPtr_;
 
         //- Search tree for the boundaryFaces_ patch
-        autoPtr<indexedOctree<treeDataBPatch> > bFTreePtr_;
+        autoPtr<indexedOctree<treeDataBPatch>> bFTreePtr_;
 
         //- The bounds of all background meshes on all processors
         treeBoundBoxList allBackgroundMeshBounds_;
@@ -167,7 +167,7 @@ class backgroundMeshDecomposition
         //  it
         bool refineCell
         (
-            label cellI,
+            label celli,
             volumeType volType,
             scalar& weightEstimate
         ) const;
@@ -225,7 +225,7 @@ public:
         );
 
         //- Distribute supplied the points to the appropriate processor
-        template<typename PointType>
+        template<class PointType>
         autoPtr<mapDistribute> distributePoints(List<PointType>& points) const;
 
         //- Is the given position inside the domain of this decomposition
@@ -263,7 +263,7 @@ public:
         ) const;
 
         //- What processor is the given position on?
-        template<typename PointType>
+        template<class PointType>
         labelList processorPosition(const List<PointType>& pts) const;
 
         //- What is the nearest processor to the given position?
@@ -275,7 +275,7 @@ public:
         //  launched from, it is assumed that the point is on that processor.
         //  The index data member of the pointIndexHit is replaced with the
         //  processor index.
-        List<List<pointIndexHit> > intersectsProcessors
+        List<List<pointIndexHit>> intersectsProcessors
         (
             const List<point>& starts,
             const List<point>& ends,

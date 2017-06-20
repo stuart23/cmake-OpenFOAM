@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -90,13 +90,13 @@ void Foam::vtkSetWriter<Type>::write
 
         const Field<Type>& fld = *valueSets[setI];
 
-        forAll(fld, pointI)
+        forAll(fld, pointi)
         {
-            if (pointI != 0)
+            if (pointi != 0)
             {
                 os  << ' ';
             }
-            writer<Type>::write(fld[pointI], os);
+            writer<Type>::write(fld[pointi], os);
         }
         os  << nl;
     }
@@ -109,13 +109,13 @@ void Foam::vtkSetWriter<Type>::write
     const bool writeTracks,
     const PtrList<coordSet>& tracks,
     const wordList& valueSetNames,
-    const List<List<Field<Type> > >& valueSets,
+    const List<List<Field<Type>>>& valueSets,
     Ostream& os
 ) const
 {
     if (valueSets.size() != valueSetNames.size())
     {
-        FatalErrorIn("vtkSetWriter<Type>::write(..)")
+        FatalErrorInFunction
             << "Number of variables:" << valueSetNames.size() << endl
             << "Number of valueSets:" << valueSets.size()
             << exit(FatalError);
@@ -172,7 +172,7 @@ void Foam::vtkSetWriter<Type>::write
         os  << valueSetNames[setI] << ' ' << pTraits<Type>::nComponents << ' '
             << nPoints << " float" << nl;
 
-        const List<Field<Type> >& fieldVals = valueSets[setI];
+        const List<Field<Type>>& fieldVals = valueSets[setI];
 
         forAll(fieldVals, i)
         {

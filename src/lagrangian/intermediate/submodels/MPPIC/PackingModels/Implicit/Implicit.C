@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,6 +30,7 @@ License
 #include "fvmLaplacian.H"
 #include "fvcReconstruct.H"
 #include "volPointInterpolation.H"
+#include "zeroGradientFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -43,15 +44,26 @@ Foam::PackingModels::Implicit<CloudType>::Implicit
     PackingModel<CloudType>(dict, owner, typeName),
     alpha_
     (
-        this->owner().name() + ":alpha",
-        this->owner().theta()
+        IOobject
+        (
+            this->owner().name() + ":alpha",
+            this->owner().db().time().timeName(),
+            this->owner().mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        this->owner().mesh(),
+        dimensionedScalar("zero", dimless, 0.0),
+        zeroGradientFvPatchScalarField::typeName
     ),
     phiCorrect_(NULL),
     uCorrect_(NULL),
+    applyLimiting_(this->coeffDict().lookup("applyLimiting")),
     applyGravity_(this->coeffDict().lookup("applyGravity")),
     alphaMin_(readScalar(this->coeffDict().lookup("alphaMin"))),
     rhoMin_(readScalar(this->coeffDict().lookup("rhoMin")))
 {
+    alpha_ = this->owner().theta();
     alpha_.oldTime();
 }
 
@@ -66,6 +78,7 @@ Foam::PackingModels::Implicit<CloudType>::Implicit
     alpha_(cm.alpha_),
     phiCorrect_(cm.phiCorrect_()),
     uCorrect_(cm.uCorrect_()),
+    applyLimiting_(cm.applyLimiting_),
     applyGravity_(cm.applyGravity_),
     alphaMin_(cm.alphaMin_),
     rhoMin_(cm.rhoMin_)
@@ -98,12 +111,17 @@ void Foam::PackingModels::Implicit<CloudType>::cacheFields(const bool store)
         const volScalarField& rhoc = this->owner().rho();
 
         const AveragingMethod<scalar>& rhoAverage =
-            mesh.lookupObject<AveragingMethod<scalar> >
+            mesh.lookupObject<AveragingMethod<scalar>>
             (
                 cloudName + ":rhoAverage"
             );
+        const AveragingMethod<vector>& uAverage =
+            mesh.lookupObject<AveragingMethod<vector> >
+            (
+                cloudName + ":uAverage"
+            );
         const AveragingMethod<scalar>& uSqrAverage =
-            mesh.lookupObject<AveragingMethod<scalar> >
+            mesh.lookupObject<AveragingMethod<scalar>>
             (
                 cloudName + ":uSqrAverage"
             );
@@ -132,15 +150,8 @@ void Foam::PackingModels::Implicit<CloudType>::cacheFields(const bool store)
             dimensionedScalar("zero", dimDensity, 0),
             zeroGradientFvPatchField<scalar>::typeName
         );
-        rho.internalField() = max(rhoAverage.internalField(), rhoMin_);
+        rho.primitiveFieldRef() = max(rhoAverage.primitiveField(), rhoMin_);
         rho.correctBoundaryConditions();
-
-        //Info << "       x: " << mesh.C().internalField().component(2) << endl;
-        //Info << "   alpha: " << alpha_.internalField() << endl;
-        //Info << "alphaOld: " << alpha_.oldTime().internalField() << endl;
-        //Info << "     rho: " << rho.internalField() << endl;
-        //Info << endl;
-
 
         // Stress field
         // ~~~~~~~~~~~~
@@ -161,15 +172,33 @@ void Foam::PackingModels::Implicit<CloudType>::cacheFields(const bool store)
             zeroGradientFvPatchField<scalar>::typeName
         );
 
-        tauPrime.internalField() =
+        tauPrime.primitiveFieldRef() =
             this->particleStressModel_->dTaudTheta
             (
-                alpha_.internalField(),
-                rho.internalField(),
-                uSqrAverage.internalField()
+                alpha_.primitiveField(),
+                rho.primitiveField(),
+                uSqrAverage.primitiveField()
             )();
 
         tauPrime.correctBoundaryConditions();
+
+
+        // Gravity flux
+        // ~~~~~~~~~~~~
+
+        tmp<surfaceScalarField> phiGByA;
+
+        if (applyGravity_)
+        (
+            phiGByA = tmp<surfaceScalarField>
+            (
+                new surfaceScalarField
+                (
+                    "phiGByA",
+                    deltaT*(g & mesh.Sf())*fvc::interpolate(1.0 - rhoc/rho)
+                )
+            )
+        );
 
 
         // Implicit solution for the volume fraction
@@ -191,14 +220,7 @@ void Foam::PackingModels::Implicit<CloudType>::cacheFields(const bool store)
 
         if (applyGravity_)
         {
-            surfaceScalarField
-                phiGByA
-                (
-                    "phiGByA",
-                    deltaT*(g & mesh.Sf())*fvc::interpolate(1.0 - rhoc/rho)
-                );
-
-            alphaEqn += fvm::div(phiGByA, alpha_);
+            alphaEqn += fvm::div(phiGByA(), alpha_);
         }
 
         alphaEqn.solve();
@@ -217,6 +239,67 @@ void Foam::PackingModels::Implicit<CloudType>::cacheFields(const bool store)
             )
         );
 
+        // limit the correction flux
+        if (applyLimiting_)
+        {
+            volVectorField U
+            (
+                IOobject
+                (
+                    cloudName + ":U",
+                    this->owner().db().time().timeName(),
+                    mesh,
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE
+                ),
+                mesh,
+                dimensionedVector("zero", dimVelocity, Zero),
+                fixedValueFvPatchField<vector>::typeName
+            );
+            U.primitiveFieldRef() = uAverage.primitiveField();
+            U.correctBoundaryConditions();
+
+            surfaceScalarField phi
+            (
+                cloudName + ":phi",
+                linearInterpolate(U) & mesh.Sf()
+            );
+
+            if (applyGravity_)
+            {
+                phiCorrect_.ref() -= phiGByA();
+            }
+
+            forAll(phiCorrect_(), facei)
+            {
+                // Current and correction fluxes
+                const scalar phiCurr = phi[facei];
+                scalar& phiCorr = phiCorrect_.ref()[facei];
+
+                // Don't limit if the correction is in the opposite direction to
+                // the flux. We need all the help we can get in this state.
+                if (phiCurr*phiCorr < 0)
+                {}
+
+                // If the correction and the flux are in the same direction then
+                // don't apply any more correction than is already present in
+                // the flux.
+                else if (phiCorr > 0)
+                {
+                    phiCorr = max(phiCorr - phiCurr, 0);
+                }
+                else
+                {
+                    phiCorr = min(phiCorr - phiCurr, 0);
+                }
+            }
+
+            if (applyGravity_)
+            {
+                phiCorrect_.ref() += phiGByA();
+            }
+        }
+
         // correction velocity
         uCorrect_ = tmp<volVectorField>
         (
@@ -230,9 +313,9 @@ void Foam::PackingModels::Implicit<CloudType>::cacheFields(const bool store)
         uCorrect_->correctBoundaryConditions();
 
         //Info << endl;
-        //Info << "     alpha: " << alpha_.internalField() << endl;
-        //Info << "phiCorrect: " << phiCorrect_->internalField() << endl;
-        //Info << "  uCorrect: " << uCorrect_->internalField() << endl;
+        //Info << "     alpha: " << alpha_.primitiveField() << endl;
+        //Info << "phiCorrect: " << phiCorrect_->primitiveField() << endl;
+        //Info << "  uCorrect: " << uCorrect_->primitiveField() << endl;
         //Info << endl;
     }
     else
@@ -254,33 +337,33 @@ Foam::vector Foam::PackingModels::Implicit<CloudType>::velocityCorrection
     const fvMesh& mesh = this->owner().mesh();
 
     // containing tetrahedron and parcel coordinates within
-    const label cellI = p.cell();
-    const label faceI = p.tetFace();
-    const tetIndices tetIs(cellI, faceI, p.tetPt(), mesh);
+    const label celli = p.cell();
+    const label facei = p.tetFace();
+    const tetIndices tetIs(celli, facei, p.tetPt(), mesh);
     List<scalar> tetCoordinates(4);
     tetIs.tet(mesh).barycentric(p.position(), tetCoordinates);
 
     // cell velocity
-    const vector U = uCorrect_()[cellI];
+    const vector U = uCorrect_()[celli];
 
     // face geometry
-    vector nHat = mesh.faces()[faceI].normal(mesh.points());
+    vector nHat = mesh.faces()[facei].normal(mesh.points());
     const scalar nMag = mag(nHat);
     nHat /= nMag;
 
     // get face flux
     scalar phi;
-    const label patchI = mesh.boundaryMesh().whichPatch(faceI);
-    if (patchI == -1)
+    const label patchi = mesh.boundaryMesh().whichPatch(facei);
+    if (patchi == -1)
     {
-        phi = phiCorrect_()[faceI];
+        phi = phiCorrect_()[facei];
     }
     else
     {
         phi =
-            phiCorrect_().boundaryField()[patchI]
+            phiCorrect_().boundaryField()[patchi]
             [
-                mesh.boundaryMesh()[patchI].whichFace(faceI)
+                mesh.boundaryMesh()[patchi].whichFace(facei)
             ];
     }
 

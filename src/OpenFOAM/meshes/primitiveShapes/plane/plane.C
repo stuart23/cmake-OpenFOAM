@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,6 @@ License
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-// Calculate base point and unit normal vector from plane equation
 void Foam::plane::calcPntAndVec(const scalarList& C)
 {
     if (mag(C[0]) > VSMALL)
@@ -49,7 +48,7 @@ void Foam::plane::calcPntAndVec(const scalarList& C)
             }
             else
             {
-                FatalErrorIn("void plane::calcPntAndVec(const scalarList&)")
+                FatalErrorInFunction
                     << "At least one plane coefficient must have a value"
                     << abort(FatalError);
             }
@@ -61,7 +60,7 @@ void Foam::plane::calcPntAndVec(const scalarList& C)
 
     if (magUnitVector < VSMALL)
     {
-        FatalErrorIn("void plane::calcPntAndVec(const scalarList&)")
+        FatalErrorInFunction
             << "Plane normal defined with zero length"
             << abort(FatalError);
     }
@@ -88,15 +87,8 @@ void Foam::plane::calcPntAndVec
      || mag(point3-point1) < VSMALL
     )
     {
-        FatalErrorIn
-        (
-            "void plane::calcPntAndVec\n"
-            "(\n"
-            "    const point&,\n"
-            "    const point&,\n"
-            "    const point&\n"
-            ")\n"
-        )   << "Bad points:" << point1 << ' ' << point2 << ' ' << point3
+        FatalErrorInFunction
+            << "Bad points:" << point1 << ' ' << point2 << ' ' << point3
             << abort(FatalError);
     }
 
@@ -105,15 +97,8 @@ void Foam::plane::calcPntAndVec
 
     if (magUnitVector < VSMALL)
     {
-        FatalErrorIn
-        (
-            "void plane::calcPntAndVec\n"
-            "(\n"
-            "    const point&,\n"
-            "    const point&,\n"
-            "    const point&\n"
-            ")\n"
-        )   << "Plane normal defined with zero length" << nl
+        FatalErrorInFunction
+            << "Plane normal defined with zero length" << nl
             << "Bad points:" << point1 << ' ' << point2 << ' ' << point3
             << abort(FatalError);
     }
@@ -124,11 +109,10 @@ void Foam::plane::calcPntAndVec
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from normal vector through the origin
 Foam::plane::plane(const vector& normalVector)
 :
     unitVector_(normalVector),
-    basePoint_(vector::zero)
+    basePoint_(Zero)
 {
     scalar magUnitVector(mag(unitVector_));
 
@@ -138,14 +122,13 @@ Foam::plane::plane(const vector& normalVector)
     }
     else
     {
-        FatalErrorIn("plane::plane(const vector&)")
+        FatalErrorInFunction
             << "plane normal has zero length. basePoint:" << basePoint_
             << abort(FatalError);
     }
 }
 
 
-// Construct from point and normal vector
 Foam::plane::plane(const point& basePoint, const vector& normalVector)
 :
     unitVector_(normalVector),
@@ -159,21 +142,19 @@ Foam::plane::plane(const point& basePoint, const vector& normalVector)
     }
     else
     {
-        FatalErrorIn("plane::plane(const point&, const vector&)")
+        FatalErrorInFunction
             << "plane normal has zero length. basePoint:" << basePoint_
             << abort(FatalError);
     }
 }
 
 
-// Construct from plane equation
 Foam::plane::plane(const scalarList& C)
 {
     calcPntAndVec(C);
 }
 
 
-// Construct from three points
 Foam::plane::plane
 (
     const point& a,
@@ -185,11 +166,10 @@ Foam::plane::plane
 }
 
 
-// Construct from dictionary
 Foam::plane::plane(const dictionary& dict)
 :
-    unitVector_(vector::zero),
-    basePoint_(point::zero)
+    unitVector_(Zero),
+    basePoint_(Zero)
 {
     const word planeType(dict.lookup("planeType"));
 
@@ -226,7 +206,7 @@ Foam::plane::plane(const dictionary& dict)
     }
     else
     {
-        FatalIOErrorIn("plane::plane(const dictionary&)", dict)
+        FatalIOErrorInFunction(dict)
             << "Invalid plane type: " << planeType << nl
             << "Valid options include: planeEquation, embeddedPoints and "
             << "pointAndNormal"
@@ -235,7 +215,6 @@ Foam::plane::plane(const dictionary& dict)
 }
 
 
-// Construct from Istream. Assumes point and normal vector.
 Foam::plane::plane(Istream& is)
 :
     unitVector_(is),
@@ -249,7 +228,7 @@ Foam::plane::plane(Istream& is)
     }
     else
     {
-        FatalErrorIn("plane::plane(Istream& is)")
+        FatalErrorInFunction
             << "plane normal has zero length. basePoint:" << basePoint_
             << abort(FatalError);
     }
@@ -258,21 +237,18 @@ Foam::plane::plane(Istream& is)
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Return plane normal vector
 const Foam::vector& Foam::plane::normal() const
 {
     return unitVector_;
 }
 
 
-// Return plane base point
 const Foam::point& Foam::plane::refPoint() const
 {
     return basePoint_;
 }
 
 
-// Return coefficients for plane equation: ax + by + cz + d = 0
 Foam::FixedList<Foam::scalar, 4> Foam::plane::planeCoeffs() const
 {
     FixedList<scalar, 4> C(4);
@@ -320,21 +296,18 @@ Foam::FixedList<Foam::scalar, 4> Foam::plane::planeCoeffs() const
 }
 
 
-// Return nearest point in the plane for the given point
 Foam::point Foam::plane::nearestPoint(const point& p) const
 {
     return p - unitVector_*((p - basePoint_) & unitVector_);
 }
 
 
-// Return distance from the given point to the plane
 Foam::scalar Foam::plane::distance(const point& p) const
 {
     return mag((p - basePoint_) & unitVector_);
 }
 
 
-// Cutting point for plane and line defined by origin and direction
 Foam::scalar Foam::plane::normalIntersect
 (
     const point& pnt0,
@@ -347,7 +320,6 @@ Foam::scalar Foam::plane::normalIntersect
 }
 
 
-// Cutting line of two planes
 Foam::plane::ray Foam::plane::planeIntersect(const plane& plane2) const
 {
     // Mathworld plane-plane intersection. Assume there is a point on the
@@ -415,7 +387,6 @@ Foam::plane::ray Foam::plane::planeIntersect(const plane& plane2) const
 }
 
 
-// Cutting point of three planes
 Foam::point Foam::plane::planePlaneIntersect
 (
     const plane& plane2,

@@ -1,10 +1,5 @@
 set( SOURCES
 
-fvOption/fvOption.C
-fvOption/fvOptionIO.C
-fvOption/fvOptionList.C
-fvOption/fvIOoptionList.C
-
 cellSetOption/cellSetOption.C
 cellSetOption/cellSetOptionIO.C
 
@@ -35,6 +30,10 @@ sources/derived/solidificationMeltingSource/solidificationMeltingSource.C
 sources/derived/solidificationMeltingSource/solidificationMeltingSourceIO.C
 sources/derived/tabulatedAccelerationSource/tabulatedAccelerationSource.C
 sources/derived/tabulatedAccelerationSource/tabulated6DoFAcceleration/tabulated6DoFAcceleration.C
+sources/derived/buoyancyForce/buoyancyForce.C
+sources/derived/buoyancyForce/buoyancyForceIO.C
+sources/derived/buoyancyEnergy/buoyancyEnergy.C
+sources/derived/buoyancyEnergy/buoyancyEnergyIO.C
 
 sources/interRegion/interRegionHeatTransfer/interRegionHeatTransferModel/interRegionHeatTransferModel.C
 sources/interRegion/interRegionHeatTransfer/interRegionHeatTransferModel/interRegionHeatTransferModelIO.C
@@ -43,9 +42,8 @@ sources/interRegion/interRegionHeatTransfer/tabulatedHeatTransfer/tabulatedHeatT
 sources/interRegion/interRegionHeatTransfer/variableHeatTransfer/variableHeatTransfer.C
 sources/interRegion/interRegionExplicitPorositySource/interRegionExplicitPorositySource.C
 
-constraints/general/explicitSetValue/explicitSetValue.C
-
-constraints/derived/fixedTemperatureConstraint/fixedTemperatureConstraint.C
+constraints/fixedValueConstraint/fixedValueConstraints.C
+constraints/fixedTemperatureConstraint/fixedTemperatureConstraint.C
 
 corrections/limitTemperature/limitTemperature.C
 
