@@ -186,7 +186,7 @@ fields/fvPatchFields/derived/interstitialInletVelocity/interstitialInletVelocity
 fields/fvPatchFields/derived/prghPressure/prghPressureFvPatchScalarField.C
 fields/fvPatchFields/derived/prghTotalPressure/prghTotalPressureFvPatchScalarField.C
 fields/fvPatchFields/derived/prghTotalHydrostaticPressure/prghTotalHydrostaticPressureFvPatchScalarField.C
-fields/fvPatchFields/derived/fixedProfile/fixedProfileFvPatchScalarField.C
+fields/fvPatchFields/derived/fixedProfile/fixedProfileFvPatchFields.C
 fields/fvPatchFields/derived/plenumPressure/plenumPressureFvPatchScalarField.C
 
 fields/fvsPatchFields/fvsPatchField/fvsPatchFields.C

@@ -36,9 +36,9 @@ License
 #include <cstdlib>
 #include <csignal>
 
-#if defined(WM_SP)
+#if defined(OF_SINGLE_PRECISION)
     #define MPI_SCALAR MPI_FLOAT
-#elif defined(WM_DP)
+#elif defined(OF_DOUBLE_PRECISION)
     #define MPI_SCALAR MPI_DOUBLE
 #endif
 
