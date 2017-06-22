@@ -17,30 +17,33 @@ def findheaders(cmake_file_name):
     
     def readIncludes(filename):
         include_files = []
-        with open(filename) as source_file:
-            for line in source_file.readlines():
-                if (line.find('#') >= 0) and (line.find('include') > 0):
-                    header_file = filter(lambda a: a.find('.H') > 0 or a.find('.h') > 0 or a.find('.C') > 0 , line.split())
-                    include_files += header_file
-            include_files = [a.replace('"','') for a in include_files]
+        try:
+            with open(filename) as source_file:
+                for line in source_file.readlines():
+                    if (line.find('#') >= 0) and (line.find('include') > 0):
+                        header_file = filter(lambda a: a.find('.H') > 0 or a.find('.h') > 0 or a.find('.C') > 0 , line.split())
+                        include_files += header_file
+                include_files = [a.replace('"','') for a in include_files]
+        except IOError:
+            pass
         return include_files
     
     def findFile(filename):
         for root, directory, files in os.walk(os.getcwd()):
             if filename in files:
-                return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
+                return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM2/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
                     os.path.join(root, filename))
-        for root, directory, files in os.walk('/home/stuart/cmake-OpenFOAM/src'):
+        for root, directory, files in os.walk('/home/stuart/cmake-OpenFOAM2/cmake-OpenFOAM/src'):
             if filename in files:
-                return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
+                return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM2/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
                     os.path.join(root, filename))
         for root, directory, files in os.walk(os.path.abspath(os.path.join(os.getcwd(),'..'))):
             if filename in files:
-                return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
+                return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM2/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
                     os.path.join(root, filename))
-        for root, directory, files in os.walk('/home/stuart/cmake-OpenFOAM/applications'):
+        for root, directory, files in os.walk('/home/stuart/cmake-OpenFOAM2/cmake-OpenFOAM/applications'):
             if filename in files:
-                return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
+                return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM2/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
                     os.path.join(root, filename))
     
     def walkFile(filename, scanned_files, depth):
@@ -75,11 +78,18 @@ def findheaders(cmake_file_name):
         old_lines = cmake_file.readlines()
 
     with open(cmake_file_name, "w") as cmake_file:
+        includes = False
         for line in old_lines:
             if line.startswith("include_directories( ${CMAKE_SOURCE_DIR}/"):
+                includes = True
                 break
             cmake_file.write(line)
+        
+        if includes:
+            cmake_file.write('\n'.join(unique_includes))
 
-        cmake_file.write('\n'.join(unique_includes))
-
-findheaders("CMakeLists.txt")
+for root, directory, files in os.walk(os.getcwd()):
+    if "CMakeLists.txt" in files:
+        print "Scanning " + os.path.join(root, "CMakeLists.txt")
+        os.chdir(root) 
+        findheaders("CMakeLists.txt")
