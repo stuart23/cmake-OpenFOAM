@@ -10,7 +10,7 @@ applyBoundaryLayer.C
 add_executable( ${EXE_NAME} ${SOURCES} )
 install( TARGETS ${EXE_NAME} DESTINATION bin )
 
-target_link_libraries( ${EXE_NAME} turbulenceModels incompressibleTurbulenceModels incompressibleTransportModels genericPatchFields finiteVolume meshTools OpenFOAM dl m )
+target_link_libraries( ${EXE_NAME} turbulenceModels incompressibleTurbulenceModels incompressibleTransportModels genericPatchFields finiteVolume meshTools fvOptions OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/preProcessing/applyBoundaryLayer )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
@@ -325,4 +325,5 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/searchableSurface )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/surfaceLocation )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triSurfaceTools )
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triangleFuncs )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/incompressible/singlePhaseTransportModel )

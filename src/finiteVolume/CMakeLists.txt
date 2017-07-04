@@ -355,6 +355,7 @@ finiteVolume/convectionSchemes/boundedConvectionScheme/boundedConvectionSchemes.
 finiteVolume/laplacianSchemes/laplacianScheme/laplacianSchemes.C
 finiteVolume/laplacianSchemes/gaussLaplacianScheme/gaussLaplacianSchemes.C
 
+finiteVolume/fvc/fvcFlux.C
 finiteVolume/fvc/fvcMeshPhi.C
 finiteVolume/fvc/fvcSmooth/fvcSmooth.C
 finiteVolume/fvc/fvcReconstructMag.C

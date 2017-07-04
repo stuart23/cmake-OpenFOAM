@@ -71,7 +71,7 @@ meshToMesh0/calculateMeshToMesh0Weights.C
 add_library( sampling SHARED ${SOURCES} )
 install( TARGETS sampling DESTINATION lib )
 
-target_link_libraries( sampling finiteVolume meshTools surfMesh fileFormats triSurface lagrangian conversion )
+target_link_libraries( sampling finiteVolume meshTools surfMesh fileFormats triSurface lagrangian dynamicMesh conversion )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
