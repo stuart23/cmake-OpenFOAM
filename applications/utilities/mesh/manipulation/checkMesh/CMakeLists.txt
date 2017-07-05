@@ -14,7 +14,7 @@ checkMesh.C
 add_executable( ${EXE_NAME} ${SOURCES} )
 install( TARGETS ${EXE_NAME} DESTINATION bin )
 
-target_link_libraries( ${EXE_NAME} meshTools sampling surfaceMesh dynamicMesh OpenFOAM dl m )
+target_link_libraries( ${EXE_NAME} meshTools sampling surfMesh dynamicMesh OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/manipulation/checkMesh )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )

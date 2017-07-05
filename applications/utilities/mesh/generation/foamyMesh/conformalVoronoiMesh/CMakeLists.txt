@@ -84,7 +84,7 @@ add_definitions( -frounding-math )
 add_definitions( -DCGAL_INEXACT )
 add_definitions( -DNDEBUG )
 
-target_link_libraries( ${LIB_NAME} ${CGAL_LIBRARIES} meshTools edgeMesh fileFormats triSurface dynamicMesh surfMesh sampling autoMesh OpenFOAM dl m )
+target_link_libraries( ${LIB_NAME} ${CGAL_LIBRARIES} meshTools edgeMesh fileFormats triSurface dynamicMesh surfMesh sampling snappyHexMesh OpenFOAM dl m )
 
 include_directories( ${CGAL_INCLUDE_DIR} )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/mesh/generation/foamyMesh/conformalVoronoiMesh/DelaunayMesh )

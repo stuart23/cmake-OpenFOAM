@@ -10,7 +10,7 @@ orientFaceZone.C
 add_executable( ${EXE_NAME} ${SOURCES} )
 install( TARGETS ${EXE_NAME} DESTINATION bin )
 
-target_link_libraries( ${EXE_NAME} meshTools autoMesh triSurface OpenFOAM dl m )
+target_link_libraries( ${EXE_NAME} meshTools snappyHexMesh triSurface OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

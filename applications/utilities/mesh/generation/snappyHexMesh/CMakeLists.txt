@@ -13,7 +13,7 @@ set_target_properties( ${EXE_NAME} PROPERTIES
 	OUTPUT_NAME snappyHexMesh
 )	
 
-target_link_libraries( ${EXE_NAME} finiteVolume decompositionMethods ptscotchDecomp meshTools surfMesh fileFormats dynamicMesh autoMesh OpenFOAM dl m )
+target_link_libraries( ${EXE_NAME} finiteVolume decompositionMethods scotchDecomp ptscotchDecomp meshTools surfMesh fileFormats dynamicMesh snappyHexMesh OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )

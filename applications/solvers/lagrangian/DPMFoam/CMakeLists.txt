@@ -388,4 +388,5 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/regionModels/regionModel/regionMode
 include_directories( ${CMAKE_SOURCE_DIR}/src/regionModels/regionModel/regionModelFunctionObject/regionModelFunctionObject )
 include_directories( ${CMAKE_SOURCE_DIR}/src/regionModels/regionModel/singleLayerRegion )
 include_directories( ${CMAKE_SOURCE_DIR}/src/regionModels/surfaceFilmModels/surfaceFilmModel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/incompressible/singlePhaseTransportModel )

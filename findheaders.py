@@ -14,6 +14,7 @@ with open(sys.argv[1]) as cmake_file:
             source_files.append(line.strip())
 
 source_files = filter(lambda x: len(x) > 1, source_files)
+#print source_files
 
 def readIncludes(filename):
     include_files = []
@@ -28,13 +29,17 @@ def readIncludes(filename):
 def findFile(filename):
     for root, directory, files in os.walk(os.getcwd()):
         if filename in files:
-            return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
-                os.path.join(root, filename))
-    for root, directory, files in os.walk('/home/stuart/cmake-OpenFOAM/src'):
-        if filename in files:
-            return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
+            return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM2/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
                 os.path.join(root, filename))
     for root, directory, files in os.walk(os.path.abspath(os.path.join(os.getcwd(),'..'))):
+        if filename in files:
+            return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM2/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
+                os.path.join(root, filename))
+    for root, directory, files in os.walk(os.path.abspath(os.path.join(os.getcwd(),'..','..'))):
+        if filename in files:
+            return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM2/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
+                os.path.join(root, filename))
+    for root, directory, files in os.walk('/home/stuart/cmake-OpenFOAM/src'):
         if filename in files:
             return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
                 os.path.join(root, filename))
@@ -45,6 +50,9 @@ def findFile(filename):
 
 def walkFile(filename, scanned_files, depth):
     includes = readIncludes(filename)
+    #if depth == 0:
+    #    print filename
+    #    print includes
     #print('. '*depth + filename + ' CONTAINS ' + ','.join(includes))
     directories = []
     if len(includes) == 0:
