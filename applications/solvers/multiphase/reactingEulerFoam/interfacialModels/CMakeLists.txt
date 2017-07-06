@@ -65,6 +65,14 @@ aspectRatioModels/Wellek/Wellek.C
 
 wallDependentModel/wallDependentModel.C
 
+wallDampingModels/wallDampingModel/wallDampingModel.C
+wallDampingModels/wallDampingModel/newWallDampingModel.C
+wallDampingModels/noWallDamping/noWallDamping.C
+wallDampingModels/interpolated/interpolatedWallDamping.C
+wallDampingModels/linear/linearWallDamping.C
+wallDampingModels/cosine/cosineWallDamping.C
+wallDampingModels/sine/sineWallDamping.C
+
 )
 
 ## Define the output
@@ -115,6 +123,11 @@ include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactin
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/virtualMassModels/constantVirtualMassCoefficient )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/virtualMassModels/noVirtualMass )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/virtualMassModels/virtualMassModel )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/wallDampingModels/cosine )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/wallDampingModels/interpolated )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/wallDampingModels/linear )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/wallDampingModels/noWallDamping )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/wallDampingModels/sine )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/wallDampingModels/wallDampingModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/wallDependentModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/wallLubricationModels/Antal )
@@ -122,6 +135,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactin
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/wallLubricationModels/TomiyamaWallLubrication )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/wallLubricationModels/noWallLubrication )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/wallLubricationModels/wallLubricationModel )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/BlendedInterfacialModel/blendingMethods/blendingMethod )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/phaseModel/MovingPhaseModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/phaseModel/phaseModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/phasePair/phasePair )

@@ -331,4 +331,5 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triSurfaceTool
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triangleFuncs )
 include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/radiation/include )
 include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/radiation/radiationModels/radiationModel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/incompressible/singlePhaseTransportModel )

@@ -39,6 +39,10 @@ def findFile(filename):
         if filename in files:
             return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM2/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
                 os.path.join(root, filename))
+    for root, directory, files in os.walk(os.path.abspath(os.path.join(os.getcwd(),'..','..','..'))):
+        if filename in files:
+            return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM2/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),
+                os.path.join(root, filename))
     for root, directory, files in os.walk('/home/stuart/cmake-OpenFOAM/src'):
         if filename in files:
             return('include_directories( %s )' % root.replace('/home/stuart/cmake-OpenFOAM','${CMAKE_SOURCE_DIR}'),

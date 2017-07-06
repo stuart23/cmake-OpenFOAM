@@ -10,7 +10,7 @@ buoyantBoussinesqSimpleFoam.C
 add_executable( ${EXE_NAME} ${SOURCES} )
 install( TARGETS ${EXE_NAME} DESTINATION bin )
 
-target_link_libraries( ${EXE_NAME} turbulenceModels incompressibleTurbulenceModels incompressibleTransportModels finiteVolume sampling meshTools fvOptions OpenFOAM dl m )
+target_link_libraries( ${EXE_NAME} turbulenceModels incompressibleTurbulenceModels incompressibleTransportModels radiationModels finiteVolume sampling meshTools fvOptions OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/heatTransfer/buoyantBoussinesqSimpleFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
@@ -328,4 +328,5 @@ include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triSurfaceTool
 include_directories( ${CMAKE_SOURCE_DIR}/src/meshTools/triSurface/triangleFuncs )
 include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/radiation/include )
 include_directories( ${CMAKE_SOURCE_DIR}/src/thermophysicalModels/radiation/radiationModels/radiationModel )
+include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels )
 include_directories( ${CMAKE_SOURCE_DIR}/src/transportModels/incompressible/singlePhaseTransportModel )

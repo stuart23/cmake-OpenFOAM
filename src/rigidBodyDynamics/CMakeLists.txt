@@ -1,5 +1,16 @@
 set( SOURCES
 
+bodies/rigidBody/rigidBody.C
+bodies/masslessBody/masslessBody.C
+bodies/jointBody/jointBody.C
+bodies/compositeBody/compositeBody.C
+bodies/subBody/subBody.C
+bodies/sphere/sphere.C
+bodies/cuboid/cuboid.C
+
+joints/joint/joint.C
+joints/null/nullJoint.C
+joints/composite/compositeJoint.C
 joints/floating/floatingJoint.C
 
 joints/Rx/Rx.C
