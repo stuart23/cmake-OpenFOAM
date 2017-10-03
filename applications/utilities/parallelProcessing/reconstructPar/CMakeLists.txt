@@ -10,7 +10,7 @@ reconstructPar.C
 add_executable( ${EXE_NAME} ${SOURCES} )
 install( TARGETS ${EXE_NAME} DESTINATION bin )
 
-target_link_libraries( ${EXE_NAME} finiteVolume genericPatchFields lagrangian meshTools reconstruct regionModels OpenFOAM dl m )
+target_link_libraries( ${EXE_NAME} finiteVolume genericPatchFields lagrangian dynamicMesh meshTools reconstruct regionModels OpenFOAM dl m )
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/utilities/parallelProcessing/reconstructPar )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
