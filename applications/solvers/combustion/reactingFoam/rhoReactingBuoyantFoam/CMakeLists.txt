@@ -12,8 +12,8 @@ install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} finiteVolume fvOptions meshTools sampling turbulenceModels compressibleTurbulenceModels reactionThermophysicalModels specie compressibleTransportModels fluidThermophysicalModels chemistryModel ODE combustionModels OpenFOAM dl m )
 
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/combustion/reactingFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/combustion/reactingFoam/rhoReactingBuoyantFoam )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/combustion/reactingFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )

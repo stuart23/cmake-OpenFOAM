@@ -14,7 +14,8 @@ target_link_libraries( ${EXE_NAME} engine turbulenceModels compressibleTurbulenc
 
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/combustion/coldEngineFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/combustion/engineFoam )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/combustion/reactingFoam )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/combustion/XiFoam )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/compressible/rhoPimpleFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )

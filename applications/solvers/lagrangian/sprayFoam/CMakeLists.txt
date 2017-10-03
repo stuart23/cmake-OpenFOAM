@@ -12,9 +12,8 @@ install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} turbulenceModels compressibleTurbulenceModels lagrangian lagrangianIntermediate lagrangianTurbulence lagrangianSpray specie compressibleTransportModels fluidThermophysicalModels liquidProperties liquidMixtureProperties solidProperties solidMixtureProperties thermophysicalFunctions reactionThermophysicalModels SLGThermo chemistryModel radiationModels ODE regionModels surfaceFilmModels combustionModels finiteVolume fvOptions meshTools sampling OpenFOAM dl m )
 
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/lagrangian/reactingParcelFilmFoam )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/lagrangian/reactingParcelFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/lagrangian/sprayFoam )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/lagrangian/reactingParcelFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )

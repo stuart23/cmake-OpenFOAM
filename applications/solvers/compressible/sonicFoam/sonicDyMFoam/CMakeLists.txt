@@ -12,10 +12,9 @@ install( TARGETS ${EXE_NAME} DESTINATION bin )
 
 target_link_libraries( ${EXE_NAME} compressibleTransportModels fluidThermophysicalModels specie turbulenceModels compressibleTurbulenceModels finiteVolume meshTools sampling fvOptions dynamicFvMesh topoChangerFvMesh dynamicMesh meshTools OpenFOAM dl m )
 
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/combustion/chemFoam )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/compressible/sonicFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/compressible/sonicFoam/sonicDyMFoam )
-include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/incompressible/pimpleFoam/pimpleDyMFoam )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/compressible/sonicFoam )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/compressible/rhoPimpleFoam/rhoPimpleDyMFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )
