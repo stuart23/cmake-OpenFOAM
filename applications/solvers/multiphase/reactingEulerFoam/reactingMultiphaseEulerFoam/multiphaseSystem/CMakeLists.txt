@@ -25,7 +25,6 @@ include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactin
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/interfacialModels/wallLubricationModels/wallLubricationModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/BlendedInterfacialModel )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/BlendedInterfacialModel/blendingMethods/blendingMethod )
-#SB include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/BlendedInterfacialModel/blendingMethods/linear )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/PhaseSystems/HeatAndMassTransferPhaseSystem )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/PhaseSystems/HeatTransferPhaseSystem )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/PhaseSystems/InterfaceCompositionPhaseChangePhaseSystem )

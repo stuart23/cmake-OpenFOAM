@@ -22,8 +22,6 @@ include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactin
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/phaseSystems/phaseSystem )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/reactingTwoPhaseEulerFoam )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/reactingTwoPhaseEulerFoam/twoPhaseSystem )
-# include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/reactingMultiphaseEulerFoam )
-# include_directories( ${CMAKE_SOURCE_DIR}/applications/solvers/multiphase/reactingEulerFoam/reactingMultiphaseEulerFoam/multiphaseSystem )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/cpuTime )
 include_directories( ${CMAKE_SOURCE_DIR}/src/OSspecific/POSIX/memInfo )
